@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/operations/audit-logging/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>MCP Audit Logging - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "MCP Audit Logging";
+        var mkdocs_page_input_path = "operations/audit-logging.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/operations/audit-logging/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">MCP Audit Logging</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/operations/audit-logging.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="mcp-audit-logging">MCP Audit Logging<a class="headerlink" href="#mcp-audit-logging" title="Permanent link">&para;</a></h1>
+<p>Shared MCP deployments can enable an append-only, HMAC-SHA256 authenticated
+JSONL audit log. Logging is disabled unless both the path and key are set.</p>
+<p>Each tool invocation writes a <code>started</code> record before the operation and a
+<code>succeeded</code> or <code>failed</code> record afterward. Records include service, operation,
+time, invocation ID, status, sequence, and the previous record MAC. Tool
+arguments, SQL text, profile payloads, generated rows, return values, and error
+messages are never recorded.</p>
+<h2 id="configure">Configure<a class="headerlink" href="#configure" title="Permanent link">&para;</a></h2>
+<p>Create a private directory and a base64-encoded key containing at least 32
+random bytes:</p>
+<pre><code class="language-bash">install -d -m 700 /var/lib/test-data-agent/audit
+export TEST_DATA_AGENT_AUDIT_LOG=/var/lib/test-data-agent/audit/mcp.jsonl
+export TEST_DATA_AGENT_AUDIT_HMAC_KEY=&quot;$(
+  python3 -c 'import base64, secrets; print(base64.b64encode(secrets.token_bytes(32)).decode())'
+)&quot;
+export TEST_DATA_AGENT_AUDIT_ACTOR=shared-worker-1
+</code></pre>
+<p>Provide the key through the deployment secret manager. Do not commit it, put it
+in MCP client configuration, or print it in CI logs. The log parent directory
+must already exist. Symbolic links, hard-linked files, and group- or
+world-writable log files are rejected.</p>
+<p>For Docker or another secret-file provider, configure the file instead of an
+environment value:</p>
+<pre><code class="language-bash">export TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE=/run/secrets/audit_hmac_key
+unset TEST_DATA_AGENT_AUDIT_HMAC_KEY
+</code></pre>
+<p>The file must contain only the base64 key, may end with one newline, and is
+read with no-follow semantics and a 4096-byte limit. Configuring both key
+sources is rejected. See <a href="../containers/">Container Deployment</a> for the
+least-privilege Compose example.</p>
+<p>When audit configuration is present but invalid, MCP operations fail closed.
+The default admission limit is 64 MiB. Override it with
+<code>TEST_DATA_AGENT_AUDIT_MAX_BYTES</code>, up to 1 GiB. A new invocation starts only
+when the log has room for its <code>started</code> record plus one maximum-size terminal
+record. Once admitted, its terminal record is always appended; concurrent
+terminal records may therefore exceed the admission limit by at most one
+bounded record per active invocation.</p>
+<h2 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h2>
+<p>With the same key present in the environment:</p>
+<pre><code class="language-bash">test-data-agent audit-verify /var/lib/test-data-agent/audit/mcp.jsonl
+</code></pre>
+<p>Verification reads at most 4097 bytes per physical record and rejects records
+over 4096 bytes before JSON parsing or HMAC validation. The limit includes the
+newline; a valid final record without a newline is also accepted.
+Verification checks every sequence number, previous-record link, and HMAC. A
+changed, inserted, reordered, or removed interior record fails verification.</p>
+<p>HMAC authentication protects against modification by parties that do not hold
+the key. It does not protect against a process or administrator that can read
+the key, and a local chain alone cannot prove that valid records were removed
+from the end. Periodically copy the log and reported final MAC to immutable
+external storage when stronger retention guarantees are required.</p>
+<h2 id="rotate">Rotate<a class="headerlink" href="#rotate" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Stop MCP workers that write to the file.</li>
+<li>Run <code>audit-verify</code>.</li>
+<li>Store the verified file and final MAC in the retention system.</li>
+<li>Move the old file and restart the workers with a new empty path.</li>
+</ol>
+<p>The admission limit fails closed before a new operation starts instead of
+silently dropping its terminal audit event.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

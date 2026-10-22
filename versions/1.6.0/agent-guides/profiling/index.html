@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/agent-guides/profiling/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>File profiling guide - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "File profiling guide";
+        var mkdocs_page_input_path = "agent-guides/profiling.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/agent-guides/profiling/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">File profiling guide</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/agent-guides/profiling.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="file-profiling-guide">File profiling guide<a class="headerlink" href="#file-profiling-guide" title="Permanent link">&para;</a></h1>
+<p>Read this guide for CSV, Parquet, folder profiling, profile caches, samples, or
+schema inference.</p>
+<p>Treat every input file as potentially sensitive. Profiling may retain only
+metadata and bounded evidence needed to build a generation specification.</p>
+<p>Parquet profiles represent unavailable null and distinctness statistics as
+<code>null</code>, not zero. Unknown distinctness cannot nominate a primary key or supply
+relationship-confidence evidence.
+Automatic spec inference rejects unknown null ratios; provide an explicit
+reviewed spec rather than silently inventing a distribution. Local sensitivity
+inspection uses bounded batches with existing cell, expanded-byte and time
+budgets. It retains only flags, not values; composite content is conservatively
+sensitive. Exhaustion fails without publishing a partial trusted profile.
+Numeric inspection uses an explicit textual representation only for sensitivity,
+not field matching. Unsupported binary evidence is conservatively sensitive.
+The existing local profiling deadline spans inspection and metadata finalization;
+the generation deadline is not a substitute.</p>
+<p>SQL query-source files follow the same rule. Parse and authorize the bounded
+file before database access, retain only a source fingerprint, policy version,
+virtual schema, and safe aggregates, and never retain SQL text, literals,
+backend messages, endpoints, or query rows. Database wildcard selectors must
+first resolve to a deterministic explicit-column snapshot.</p>
+<h2 id="allowed-evidence">Allowed evidence<a class="headerlink" href="#allowed-evidence" title="Permanent link">&para;</a></h2>
+<ul>
+<li>column names and inferred data types;</li>
+<li>null ratios and approximate distinct counts;</li>
+<li>bounded values and counts for explicitly allowlisted non-sensitive business
+  enums, or frequency-ranked synthetic labels for other categorical fields;</li>
+<li>numeric ranges and percentiles;</li>
+<li>date/time ranges;</li>
+<li>string-length distributions;</li>
+<li>masked patterns; and</li>
+<li>synthetic examples that were not copied from the input.</li>
+</ul>
+<p>Parquet <code>decimal128(p,s)</code> and declared PostgreSQL/allowed-query
+<code>numeric(p,s)</code> retain schema-only precision and scale (up to 38 digits) in
+<code>DatasetProfile</code>; no decimal source values or extrema are retained. A profile
+cannot supply exact generation bounds on its own: infer-spec requires a human
+to provide a reviewed <code>decimal_range</code> in DatasetSpec 1.1 or an explicit
+<code>infer-spec --decimal-fields</code> mapping. Coarse numeric profiles may include
+<code>zero_ratio</code>, <code>subunit_ratio</code> and <code>min_subunit_magnitude</code>; these are aggregate
+prevalence and orders, never exact decimal bounds. Higher declared
+precision fails closed. Unbounded SQL <code>numeric</code> retains its legacy approximate
+FLOAT path and must not be presented as exact financial evidence.</p>
+<p>Folder CSV profiles label <code>unique_ratio_kind</code> as <code>exact</code> (rounded to six decimal
+places) or <code>lower_bound</code> when the 10,000-value distinct tracker overflows.
+For <code>lower_bound</code>, display “at least X%”, not exact uniqueness. The ratio uses
+non-null normalized values and is truncated downward to six decimal places.
+Overflow evidence cannot nominate a primary key, even when its lower bound
+exceeds the usual threshold. Relationship discovery excludes lower-bound parent
+keys and omits lower-bound child distinct ratios from numeric evidence. Older
+profiles and other producers default to <code>unspecified</code>, not proven exact; reprofile
+old folder artifacts to obtain the new uncertainty metadata. This statistic is
+unrelated to the planned percentage of unchanged values after transformation.
+Cache format 6 invalidates older folder caches and recomputes their evidence,
+including repeated-identifier pool sizes.
+Unspecified metadata is omitted from canonical profile fingerprints to preserve
+saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.</p>
+<h2 id="forbidden-behavior">Forbidden behavior<a class="headerlink" href="#forbidden-behavior" title="Permanent link">&para;</a></h2>
+<p>These are source-free profiling/generation rules. The separate gated selective
+transformation contract (ADR-0029) permits explicit mapped replacements to equal
+other source values for every field, with value-free sensitivity notes. It does
+not permit raw profile/review/transport disclosure or broaden direct preserve.</p>
+<ul>
+<li>copying or shuffling source rows;</li>
+<li>exposing real names, emails, phones, addresses, IDs, tokens, secrets, or
+  other PII;</li>
+<li>preserving unique sensitive identifiers;</li>
+<li>leaking rare free-text values; or</li>
+<li>using a source sample as generated output.</li>
+</ul>
+<p>Profile implementations should detect delimiter, encoding, and headers where
+practical; infer types; estimate nulls and cardinality; detect likely PII;
+mask sensitive evidence; and produce a reusable profile suitable for spec
+inference.</p>
+<p>Local category preservation is requested with a typed, field-scoped
+<code>entity.field</code> allowlist. CLI workflows accept repeatable
+<code>--local-category ENTITY.FIELD</code> options and persist the reviewed scopes in the
+safe profile and inferred DatasetSpec. The allowlist is authorization input,
+not proof that a value is safe; content checks remain mandatory before any
+source literal is preserved. Database entities use their complete qualified
+identity, for example <code>--local-category hr.public.employees.status</code>.</p>
+<p>Bound file size, rows, cells, sample size, and wall-clock work. A cache may
+store metadata-only profiles, source fingerprints, and explicitly allowlisted
+bounded non-sensitive enum values, but never raw rows or sensitive source
+values. Infer local relationships and conditional rules before replacing
+non-allowlisted categorical values, then rewrite their predicates to the same
+synthetic labels so generation semantics remain intact. On deadline
+or budget failure, do not publish a partial profile as trusted evidence.
+The closed common transformation workflow checks configured session total-byte
+ceilings before profile capture. Existing behavior policies are parsed before
+source capture so each source's file-byte ceiling is checked before reading and
+while reading. New policy drafts use the configured session/default file ceiling;
+aggregate limits remain independent, with no truncation or automatic increase.
+Single-CSV generation binds its complete-row reuse check to non-reversible row
+digests collected during the same CSV read that produced the profile; it does
+not reopen the mutable source path before publication.
+Review-first agent plans also bind CSV and CSV-folder approval to a SHA-256
+digest of the source bytes captured before profiling. Approval and final
+publication fail closed if those bytes change, and older unbound plans must be
+replanned.
+Dataset folders require one artifact stem per entity across CSV, JSON, and
+Parquet inputs; duplicate stems fail before any row artifact is read.
+The local profiling deadline is checked between individual field operations
+and field finalization steps, not only between rows and files.</p>
+<p>The normal flow is:</p>
+<ol>
+<li>profile the input;</li>
+<li>infer a generation specification;</li>
+<li>generate synthetic data;</li>
+<li>validate it; and</li>
+<li>export the result.</li>
+</ol>
+<p>Folder numeric sensitivity inspects both exact canonical decimal and retained float representations. Cache reuse binds the sorted local-category field authorization and verifies it against the stored profile; changed permissions require fresh profiling.</p>
+<p>Exact local categories inspect integer values as decimal text for sensitive content, while retaining permitted small integers and booleans in their original types. Rejections do not include source values.</p>
+<p>Dataset validation reads Parquet in256-row batches. Actual batch bytes and retained Arrow dictionary logical expansion share the configured <code>TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES</code> allowance across Parquet entities; metadata page sizes are only an early gate. Rows and scalar leaf cells are cumulative across CSV, JSON and Parquet. Nested Parquet values obey cell/depth limits, and string character/binary byte lengths are checked before batch conversion to Python rows. Dictionary accounting includes retained storage plus logical expansion and is conservative. Arrow must decode one batch before these checks: native decoder peak RSS, page/dictionary allocations and Python object overhead are not bounded by this payload allowance. No partial dataset is returned on rejection.</p>
+<p>Single-file CSV profiling carries an explicit budget through preflight, row/cell inspection and column finalization. Its default local deadline uses <code>TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SECONDS</code>; an inherited MCP request deadline is checked at the same checkpoints. Profile serialization, temporary-file flush/fsync and post-replacement directory fsync are covered. Expiry restores an existing output through a same-directory rollback link, or removes a newly published output; temporary files/links are cleaned and a typed invocation-limit failure is returned. Concurrent replacement fails without overwriting the other writer. CSV row-digest profiling and generation retain the inherited request deadline through staged single-entity publication; expiry during replacements uses the existing rollback path. Checks are cooperative boundaries, not preemption of an active parser or filesystem operation.</p>
+<p>Parquet metadata adapters now share the same pre-conversion Arrow leaf/depth/size and cumulative cell/decoded-byte checks as dataset readers. Bounded composites remain conservatively sensitive; limits fail before nested Python conversion. Native batch decode still precedes inspection and is not a peak-RSS guarantee.</p>
+<p>Folder formula, temporal, conditional, aggregate and relationship mining share one cumulative inference-evaluation allowance, using <code>TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS</code> (default5,000,000). Candidate work and row comparisons are charged inside loops. Existing local and captured MCP deadlines are checked there; exhaustion returns no trusted profile/cache. Public mining helpers accept an optional explicit <code>LocalProfileBudget</code> and preserve their normal candidate ordering and confidence semantics.</p>
+<p>Transformation CSV output rejects formula-capable string cells and headers
+before publication instead of modifying exact replacement text. Valid numeric
+scalars retain numeric output, including negative values. Typed Parquet/SQL
+output is governed by its own scalar encoding contract.</p>
+<p>CSV-folder inventory uses streaming directory enumeration, checks the local and
+captured invocation deadlines for every entry (including non-CSV entries),
+rejects the first matching file beyond the configured file count, and sorts
+only the bounded inventory. Cache fingerprints and agent fingerprints use the
+same inventory control. Dataset validation applies it to CSV/JSON/Parquet.
+Source byte fingerprinting charges actual per-file and aggregate bytes while
+reading, with deadline checks before and after each bounded read. Growing
+inputs fail closed; static inputs retain the existing fingerprint framing.
+These are cooperative checks and do not preempt an active filesystem operation.</p>
+<p>Cache fingerprint/load/write helpers accept an optional keyword-only
+<code>LocalProfileBudget</code>; folder profiling passes its existing budget through cache
+inventory. Default CLI/MCP source detection also uses bounded enumeration.</p>
+<p>Transformation profile and policy files are captured below the trusted default
+or explicit session total-byte ceiling before YAML parsing. A larger run budget
+cannot raise this bootstrap file limit. After bounded parsing, explicit saved
+profile limits may raise the aggregate source budget; session limits still win.</p>
+<p>Saving a captured batch profile bounds every external recapture to its original
+admitted byte length. Growing sources or declarations are rejected before payload
+allocation; exact byte comparison still rejects other mutations before publication.</p>
+<p>Common transformation CLI and MCP preserve the fixed cleanup-incomplete warning
+when publication rollback cannot confirm removal. Inspect the selected destination
+before retrying; private failure details remain suppressed.</p>
+<p>CSV rows wider than their header are rejected with a value-free input-limit
+error before retention or profiling. Missing fields retain existing null padding.
+This structural check does not establish a native CSV parser peak-memory bound.</p>
+<p>CSV folder relationship inference uses matching descriptive identifier names
+and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
+and ambiguous parent domains require explicit reviewed relationships. Cache
+format 6 invalidates older inferred bindings; reprofile saved artifacts.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

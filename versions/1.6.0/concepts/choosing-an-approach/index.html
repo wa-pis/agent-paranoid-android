@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/concepts/choosing-an-approach/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Choose An Approach - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Choose An Approach";
+        var mkdocs_page_input_path = "concepts/choosing-an-approach.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/concepts/choosing-an-approach/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Choose An Approach</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#quick-comparison">Quick Comparison</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#choose-this-project-when">Choose This Project When</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#choose-something-else-when">Choose Something Else When</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Choose An Approach</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/concepts/choosing-an-approach.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="choose-an-approach">Choose An Approach<a class="headerlink" href="#choose-an-approach" title="Permanent link">&para;</a></h1>
+<p>Agent Paranoid Android is for teams that need deterministic test datasets from
+bounded CSV, PostgreSQL, or Trino evidence without copying source rows. Its
+primary interfaces are the CLI and Python library. Database clients, MCP, and
+AI providers are optional integrations around the same review and validation
+boundaries.</p>
+<p>The database workflows below are available in stable <code>1.6.0</code>.</p>
+<h2 id="quick-comparison">Quick Comparison<a class="headerlink" href="#quick-comparison" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Best starting point</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A safe, repeatable dataset from profiled structure and reviewed rules</td>
+<td>Agent Paranoid Android</td>
+<td>Profiles bounded evidence, generates fresh values, validates executable rules, and records a seed and manifest.</td>
+</tr>
+<tr>
+<td>One PostgreSQL table or Trino table with a known schema</td>
+<td>Exact component configuration and exact table/column allowlists</td>
+<td>This is the stable, narrowest database-source path. It keeps executed profiling work explicit and aggregate-only.</td>
+</tr>
+<tr>
+<td>A platform-supplied JDBC connection string</td>
+<td>JDBC-style endpoint input plus separate credentials, allowlists, and budgets</td>
+<td>It reuses the Python adapter and accepts endpoint syntax only; it does not add Java or a JDBC driver.</td>
+</tr>
+<tr>
+<td>Every column in one approved table</td>
+<td>Qualified column wildcard</td>
+<td><code>schema.table.*</code> or <code>catalog.schema.table.*</code> expands through bounded metadata into explicit columns; executed SQL never projects <code>*</code>.</td>
+</tr>
+<tr>
+<td>One reviewed derived relation from a single table</td>
+<td><code>profile-query</code></td>
+<td>A strict local-file <code>SELECT</code> becomes one aggregate-only virtual profile. It is not an arbitrary SQL runner and never returns query rows.</td>
+</tr>
+<tr>
+<td>A few hand-authored values or one simple object factory</td>
+<td>Faker or an application fixture factory</td>
+<td>Less setup when you already know every field and do not need profiling, review artifacts, or dataset validation.</td>
+</tr>
+<tr>
+<td>Application-native fixtures coupled to ORM models and lifecycle hooks</td>
+<td>A framework fixture factory</td>
+<td>Better fit when model constructors and database callbacks are the contract being tested.</td>
+</tr>
+<tr>
+<td>Production-like statistical fidelity with formal privacy targets</td>
+<td>A specialist statistical synthesizer plus a privacy evaluation</td>
+<td>This project does not certify anonymity, differential privacy, or resistance to every re-identification attack.</td>
+</tr>
+<tr>
+<td>A masked or reduced copy of production</td>
+<td>A governed masking/subsetting system</td>
+<td>Use only when policy permits retaining real rows; this project deliberately generates fresh rows instead.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="choose-this-project-when">Choose This Project When<a class="headerlink" href="#choose-this-project-when" title="Permanent link">&para;</a></h2>
+<ul>
+<li>source access must stay read-only and metadata-focused;</li>
+<li>generated rows must be reproducible from an explicit seed;</li>
+<li>foreign keys, temporal order, formulas, and business rules must be executable
+  and independently validated;</li>
+<li>humans must approve inferred specifications before generation;</li>
+<li>CSV, JSON, SQL, or Parquet output needs an evidence manifest.</li>
+</ul>
+<p>Start with the offline installed demo:</p>
+<pre><code class="language-bash">test-data-agent demo --output out/demo
+</code></pre>
+<h2 id="choose-something-else-when">Choose Something Else When<a class="headerlink" href="#choose-something-else-when" title="Permanent link">&para;</a></h2>
+<p>Use a simpler factory when manually defining every field is cheaper than
+profiling and review. Use a specialist privacy system when you need a measured
+privacy guarantee. Use governed masking only when retaining source rows is an
+explicit requirement and is allowed by your data policy.</p>
+<p>No approach removes the need to review sensitive identifiers, rare free text,
+quasi-identifiers, and organization-specific privacy requirements.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../reference/" class="btn btn-neutral float-left" title="Reference Index"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../profiles-and-specs/" class="btn btn-neutral float-right" title="Profiles And Specs">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../../reference/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../profiles-and-specs/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

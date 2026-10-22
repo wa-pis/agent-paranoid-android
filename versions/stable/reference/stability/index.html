@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/reference/stability/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Public Stability - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Public Stability";
+        var mkdocs_page_input_path = "reference/stability.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/reference/stability/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Public Stability</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/stability.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="public-stability">Public Stability<a class="headerlink" href="#public-stability" title="Permanent link">&para;</a></h1>
+<p>This page defines the supported integration surfaces at and after the <code>1.0</code>
+compatibility baseline. "Supported" means changes are reviewed against the
+listed contract gate and announced when migration is required. It does not
+mean that every internal module is public. Provider adapters remain
+experimental unless a later feature release promotes one explicitly.</p>
+<h2 id="stability-table">Stability Table<a class="headerlink" href="#stability-table" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Status</th>
+<th>Owner</th>
+<th>Compatibility rule</th>
+<th>Contract gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top-level Python imports in <code>test_data_agent.__all__</code></td>
+<td>Supported</td>
+<td><code>src/test_data_agent/__init__.py</code></td>
+<td>Additive exports are allowed; removal, rename, or incompatible signature changes are breaking</td>
+<td><code>public-python-api.json</code>, <code>test_contract_fixtures.py</code></td>
+</tr>
+<tr>
+<td><code>test-data-agent</code> commands, options, aliases, JSON success/errors, doctor states, completion inventory, and exit codes</td>
+<td>Supported</td>
+<td><code>cli.py</code>, <code>cli_parser.py</code>, <code>cli_presenter.py</code></td>
+<td>New optional commands/options are additive; rename, removal, changed default, output shape, or exit-code meaning is breaking</td>
+<td><code>cli-parser-surface.json</code>, CLI parser and presenter tests</td>
+</tr>
+<tr>
+<td>Generator MCP tools and schemas</td>
+<td>Supported</td>
+<td><code>mcp_generator_server.py</code>, <code>mcp_generator_transport.py</code></td>
+<td>New optional fields or tools are additive; removed tools, required fields, schema narrowing, or changed safety semantics are breaking</td>
+<td><code>mcp-generator-tools.json</code>, generator MCP tests</td>
+</tr>
+<tr>
+<td>Trino MCP tools and schemas</td>
+<td>Supported</td>
+<td><code>mcp_trino_server.py</code>, <code>mcp_trino_transport.py</code></td>
+<td>New bounded metadata fields or allowlisted tools are additive; removed tools, required fields, schema narrowing, or weaker safety defaults are breaking</td>
+<td><code>mcp-trino-tools.json</code>, Trino MCP tests</td>
+</tr>
+<tr>
+<td><code>DatasetSpec</code> YAML/JSON</td>
+<td>Versioned</td>
+<td><code>core/dataset.py</code></td>
+<td>Optional fields with safe defaults require a schema minor version; removed, required, narrowed, or reinterpreted fields require a schema major version</td>
+<td>JSON Schema, <code>dataset-spec.json</code>, DatasetSpec contract tests</td>
+</tr>
+<tr>
+<td>Advisor request, exchange, and proposal JSON</td>
+<td>Versioned</td>
+<td><code>advisor.py</code></td>
+<td>Optional metadata is additive; trust-channel, fingerprint, required-field, or proposal-validation changes are breaking</td>
+<td><code>advisor-exchange.json</code>, advisor contract tests</td>
+</tr>
+<tr>
+<td>Generated bundle filenames and manifest/report JSON</td>
+<td>Supported</td>
+<td><code>io/artifacts.py</code>, <code>io/workflows.py</code></td>
+<td>New optional files or fields are additive; renamed/removed files, required fields, or changed field meaning are breaking</td>
+<td><code>artifact-layout.json</code>, <code>generation-manifest.json</code>, <code>validation-report.json</code></td>
+</tr>
+<tr>
+<td>Provider adapters and runnable examples</td>
+<td>Experimental</td>
+<td><code>providers/</code>, <code>examples/</code></td>
+<td>May evolve between feature releases; deterministic core contracts and safety rules still apply</td>
+<td>Provider tests, documentation smoke tests</td>
+</tr>
+</tbody>
+</table>
+<p>The module paths in the owner column identify maintenance ownership, not
+additional public imports. Import internal modules only when the relevant API
+reference explicitly documents them.</p>
+<h2 id="130-database-source-additions">1.3.0 Database Source Additions<a class="headerlink" href="#130-database-source-additions" title="Permanent link">&para;</a></h2>
+<p>Credential-free JDBC-style endpoint input, qualified column wildcards,
+<code>profile-query</code>, and the top-level <code>SqlQueryProfileRequest</code> query-profiling
+exports are supported in stable <code>1.5.0</code> and retained in stable
+<code>1.6.0</code>; see <a href="../../1.6.0-release-status/">release status</a>.
+Existing component configuration, exact allowlists, PostgreSQL profiling and
+Trino safety boundaries remain supported under their documented policies.</p>
+<h2 id="artifact-persistence-boundary">Artifact Persistence Boundary<a class="headerlink" href="#artifact-persistence-boundary" title="Permanent link">&para;</a></h2>
+<p>The supported artifact contract distinguishes three properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Supported behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atomic visibility</td>
+<td>Completion-state and advisor-handoff files that use atomic writers are written beside the destination and replaced atomically. New folder, review, and agent-plan bundles are staged as siblings and published with one directory rename. Standalone artifact commands and multi-file updates are not covered by one global atomic transaction.</td>
+</tr>
+<tr>
+<td>Process-interruption recovery</td>
+<td>Catchable failures and interactive cancellation remove staging data or roll back moved files. Single-entity generation publishes its manifest last, validates format/suffix agreement, and permits replacement only of the same complete manifest-owned bundle. Agent completion can stop between its separately atomic receipt and result markers; <code>agent-status</code> and <code>agent-recover</code> revalidate the unchanged generated bundle before completing metadata publication.</td>
+</tr>
+<tr>
+<td>Crash or power-loss durability</td>
+<td>Not guaranteed. Shared atomic single-file writes and owned directory publication use <code>fsync</code>, but this does not make every artifact or multi-file bundle crash-consistent. A hard process stop, host or storage failure, or power loss may still leave staging data or an incomplete bundle.</td>
+</tr>
+</tbody>
+</table>
+<p>A single-entity update inside an existing directory moves several files and is
+not one filesystem transaction; its rollback applies only while the process
+can handle the failure. The historical complete artifact durability work was deferred until after 1.0
+and is not an RC4 or stable-1.0 release blocker because crash/power-loss
+durability is not part of the supported contract. See
+<a href="../../operations/resource-budgets/#artifact-persistence-contract">Operational Resource Budgets</a>
+for the disposition and operator guidance.</p>
+<h2 id="change-classification">Change Classification<a class="headerlink" href="#change-classification" title="Permanent link">&para;</a></h2>
+<p>An additive change:</p>
+<ul>
+<li>preserves every existing valid input and documented output meaning;</li>
+<li>adds only optional fields with safe defaults;</li>
+<li>does not change command defaults, exit-code meaning, file names, or tool
+  safety boundaries;</li>
+<li>keeps older clients able to ignore the addition.</li>
+</ul>
+<p>A breaking change includes:</p>
+<ul>
+<li>removing, renaming, or narrowing an import, command, option, tool, field, or
+  artifact;</li>
+<li>changing a default, exit code, field meaning, trust boundary, or validation
+  behavior relied on by supported clients;</li>
+<li>making an optional field required;</li>
+<li>accepting data that a safety boundary previously rejected.</li>
+</ul>
+<p>Bug and security fixes may intentionally reject previously accepted unsafe or
+invalid input. Release notes must identify the affected surface and migration
+path.</p>
+<h2 id="review-gate">Review Gate<a class="headerlink" href="#review-gate" title="Permanent link">&para;</a></h2>
+<p>Every public contract change must:</p>
+<ol>
+<li>identify the affected row in the table;</li>
+<li>classify the change as additive or breaking;</li>
+<li>update OpenSpec, documentation, changelog, and the owning tests;</li>
+<li>regenerate golden fixtures only after reviewing the semantic diff;</li>
+<li>use a release that matches the compatibility impact.</li>
+</ol>
+<p>Run <code>python3 scripts/update_contract_fixtures.py</code> only for an intentional,
+reviewed contract change. A fixture update is evidence of a changed contract,
+not approval to change it.</p>
+<p><code>tests/fixtures/contracts/contract-catalog.json</code> versions every golden JSON and
+MCP fixture. <code>additive_only</code> entries cannot remove, rename, narrow, or require
+existing fields without a breaking release. <code>schema_versioned</code> entries must
+advance their serialized schema version and provide migration guidance for a
+breaking change. Contract tests reject fixtures missing from this catalog.</p>
+<p>Immutable baselines under <code>tests/fixtures/compatibility/vX.Y.Z/</code> come from an
+annotated previous feature-release tag. Current readers and generators must
+accept those reviewed specs and metadata. These baselines are copied with
+provenance and are never regenerated by current models.</p>
+<p>See <a href="../../concepts/dataset-spec-compatibility/">DatasetSpec Compatibility</a> for
+schema-version and deprecation rules. See
+<a href="../support-policy/">Runtime And Integration Support</a> for supported Python
+versions, optional extras, and provider-adapter maturity.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

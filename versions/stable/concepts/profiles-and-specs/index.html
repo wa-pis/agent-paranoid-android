@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/concepts/profiles-and-specs/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Profiles And Specs - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Profiles And Specs";
+        var mkdocs_page_input_path = "concepts/profiles-and-specs.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/concepts/profiles-and-specs/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Profiles And Specs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#safe-profile">Safe Profile</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#sql-query-source">SQL Query Source</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#datasetspec">DatasetSpec</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generation">Generation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#versioning">Versioning</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Profiles And Specs</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/concepts/profiles-and-specs.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="profiles-and-specs">Profiles And Specs<a class="headerlink" href="#profiles-and-specs" title="Permanent link">&para;</a></h1>
+<p>Profiles and specifications have different roles.</p>
+<h2 id="safe-profile">Safe Profile<a class="headerlink" href="#safe-profile" title="Permanent link">&para;</a></h2>
+<p>A profile describes source structure without becoming a copy of the source
+dataset. It can contain:</p>
+<ul>
+<li>field names and inferred types;</li>
+<li>null ratios and approximate distinct counts;</li>
+<li>numeric ranges and percentiles;</li>
+<li>date and timestamp ranges;</li>
+<li>safe distributions for non-sensitive low-cardinality fields;</li>
+<li>string length statistics and masked sensitive patterns;</li>
+<li>inferred relationship and constraint candidates.</li>
+</ul>
+<p>A profile must not contain source rows, raw PII, credentials, tokens, or rare
+free-text values. Exact values are disabled by default. An explicit
+field-scoped local allowlist may retain a reviewed bounded non-sensitive
+business enum or constant after content, cardinality, and value-length checks.</p>
+<p>Create one from a CSV folder:</p>
+<pre><code class="language-bash">test-data-agent profile-example data/example_dataset \
+  --output out/profile.json
+</code></pre>
+<p>For example, retain a reviewed local enum while replacing every other source
+literal:</p>
+<pre><code class="language-bash">test-data-agent profile-example data/example_dataset \
+  --local-category orders.status \
+  --output out/profile.json
+</code></pre>
+<p>This authorization remains local. External advisors receive deterministic
+field-scoped labels, and default MCP responses do not receive the exact enum.</p>
+<h3 id="sql-query-source">SQL Query Source<a class="headerlink" href="#sql-query-source" title="Permanent link">&para;</a></h3>
+<p>This source type is available in stable <code>1.6.0</code>.</p>
+<p>One reviewed local query file can shape a PostgreSQL or Trino virtual entity:</p>
+<pre><code class="language-bash">test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity paid_orders \
+  --output out/profile.json
+</code></pre>
+<p>SQL source policy 1.1 accepts exactly one fully qualified, single-table <code>SELECT</code>
+with explicit projections or an authorized qualified wildcard, bounded filters,
+and a small deterministic scalar-expression set. It rejects joins, CTEs,
+subqueries, set operations, windows, table functions, commands, volatile or
+unknown functions, multiple statements, and unauthorized references before
+derived aggregate work begins.</p>
+<p>It also accepts aliased <code>SUM</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code> and <code>AVG</code> projections,
+optionally grouped by explicit authorized source columns. Each other selected
+column must be a grouping key. <code>COUNT(*)</code> counts rows; it is not a row wildcard.
+Aggregate arguments may use the existing scalar expressions, but nested or
+wrapped aggregates, DISTINCT aggregates, HAVING, grouping expressions/ordinals,
+ROLLUP and grouping sets remain unsupported. Grouped/aggregate queries referencing
+sensitive-name source columns fail closed even when renamed. Existing budgets
+and disclosure checks remain; small groups are not an anonymity guarantee.
+For example, <code>SELECT status, COUNT(*) AS measured FROM public.orders GROUP BY
+status</code> profiles a grouped relation without fetching its rows.</p>
+<p>Query profiles also record <code>has_unmodeled_expressions</code>: a source-dependent
+non-column projection or any aggregate (including <code>COUNT(*)</code>) sets it to <code>true</code>. Profiling remains available, but
+<code>infer-spec</code> rejects such profiles rather than silently generating independent
+values that break SQL-expression dependencies. Direct column aliases remain
+eligible. Older SQL profiles missing the marker must be reprofiled before
+automatic inference. Non-query legacy profiles retain prior inference behavior.
+The optional marker defaults to null (unknown); unknown does not change legacy
+profile fingerprints, while explicit true/false is included in the fingerprint.
+This does not translate SQL into formulas or authorize raw query-result access.</p>
+<p>The profile records <code>source_fingerprint</code> and <code>source_policy_version</code>, not SQL
+text or literals. The adapter performs a no-row schema probe followed by
+bounded aggregates. Query result rows are never returned, persisted, sent to a
+provider or MCP, or supplied to generation.</p>
+<h2 id="datasetspec">DatasetSpec<a class="headerlink" href="#datasetspec" title="Permanent link">&para;</a></h2>
+<p><code>DatasetSpec</code> is the reviewed, executable generation contract. It contains:</p>
+<ul>
+<li>entities, fields, types, nullability, and row counts;</li>
+<li>primary keys and relationships;</li>
+<li>distributions and constraints;</li>
+<li>privacy annotations;</li>
+<li>structured business rules;</li>
+<li>generation and validation settings and schema version.</li>
+</ul>
+<p>Infer a spec:</p>
+<pre><code class="language-bash">test-data-agent infer-spec out/profile.json \
+  --count 100 \
+  --output out/dataset_spec.yaml
+</code></pre>
+<p>Review the spec before generation. Inferred relationships and constraints are
+candidates, not unquestionable facts.</p>
+<h2 id="generation">Generation<a class="headerlink" href="#generation" title="Permanent link">&para;</a></h2>
+<p>Generation reads the specification, not source rows:</p>
+<pre><code class="language-bash">test-data-agent generate out/dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+</code></pre>
+<p>The seed belongs to the generation request and is recorded in the effective
+spec and manifest.</p>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent validate out/dataset_spec.yaml out/generated \
+  --output out/generated/validation_report.json
+</code></pre>
+<p>Validation is deterministic Python code. An AI client may plan or summarize
+the workflow, but it is not the only validator.</p>
+<h2 id="versioning">Versioning<a class="headerlink" href="#versioning" title="Permanent link">&para;</a></h2>
+<p>Newly constructed <code>DatasetSpec</code> files use <code>schema_version: "1.1"</code>; version
+<code>1.0</code> remains supported, and serialized files without a version load as <code>1.0</code>
+for compatibility. Exact DECIMAL fields require <code>1.1</code>. Keep the schema version,
+package version, <code>spec_sha256</code>,
+<code>business_validation.rules_sha256</code>, and seed with any dataset that must be
+reproduced later.</p>
+<p>The complete field reference is in <a href="../../dataset_profile_and_spec/">DatasetSpec</a>.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../choosing-an-approach/" class="btn btn-neutral float-left" title="Choose An Approach"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../safety-model/" class="btn btn-neutral float-right" title="Safety Model">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../choosing-an-approach/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../safety-model/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

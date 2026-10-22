@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/operations/migrating-to-0.6/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Migrating To 0.6 - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Migrating To 0.6";
+        var mkdocs_page_input_path = "operations/migrating-to-0.6.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/operations/migrating-to-0.6/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Migrating To 0.6</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/operations/migrating-to-0.6.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="migrating-to-06">Migrating To 0.6<a class="headerlink" href="#migrating-to-06" title="Permanent link">&para;</a></h1>
+<p>Version <code>0.6.0</code> makes <code>DatasetSpec</code> the only generation specification used by
+the CLI and Python API. The <code>GenerationSpec</code> compatibility API deprecated in
+<code>0.2.0</code> has been removed so every workflow uses the same privacy,
+resource-limit, generation, and validation code.</p>
+<h2 id="what-changed">What Changed<a class="headerlink" href="#what-changed" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>generate</code> accepts a YAML or JSON <code>DatasetSpec</code>, or a safe profile through
+  <code>--profile</code>.</li>
+<li><code>validate</code> accepts a <code>DatasetSpec</code> and a generated dataset folder.</li>
+<li>Single-CSV workflows write <code>dataset_spec.json</code>.</li>
+<li>Deprecated specification models, converters, row generators, validators,
+  and package-root exports are no longer available.</li>
+</ul>
+<p>Safe profile JSON containing top-level <code>columns</code> remains supported. Use it with
+<code>generate --profile</code> or convert it into a reviewable spec with <code>infer-spec</code>.</p>
+<h2 id="convert-a-single-table-file">Convert A Single-Table File<a class="headerlink" href="#convert-a-single-table-file" title="Permanent link">&para;</a></h2>
+<p>The removed format placed one table under <code>table</code>:</p>
+<pre><code class="language-json">{
+  &quot;seed&quot;: 11,
+  &quot;output_format&quot;: &quot;json&quot;,
+  &quot;table&quot;: {
+    &quot;name&quot;: &quot;customers&quot;,
+    &quot;row_count&quot;: 2,
+    &quot;columns&quot;: [
+      {
+        &quot;name&quot;: &quot;customer_id&quot;,
+        &quot;data_type&quot;: &quot;integer&quot;,
+        &quot;strategy&quot;: &quot;sequence&quot;
+      },
+      {
+        &quot;name&quot;: &quot;status&quot;,
+        &quot;data_type&quot;: &quot;string&quot;,
+        &quot;strategy&quot;: &quot;choice&quot;,
+        &quot;choices&quot;: [&quot;new&quot;, &quot;active&quot;]
+      }
+    ]
+  }
+}
+</code></pre>
+<p>The equivalent <code>DatasetSpec</code> is explicit about entities, identifier behavior,
+distributions, and generation settings:</p>
+<pre><code class="language-yaml">schema_version: &quot;1.0&quot;
+entities:
+  - name: customers
+    row_count: 2
+    primary_key: customer_id
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+        distribution:
+          kind: synthetic_identifier
+      - name: status
+        data_type: string
+        distribution:
+          kind: categorical
+          categories:
+            - value: new
+              count: 1
+            - value: active
+              count: 1
+generation_settings:
+  seed: 11
+  output_format: json
+</code></pre>
+<p>Review each conversion rather than mechanically changing key names:</p>
+<table>
+<thead>
+<tr>
+<th>Removed field</th>
+<th><code>DatasetSpec</code> field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>one item in <code>entities</code></td>
+</tr>
+<tr>
+<td><code>tables</code></td>
+<td><code>entities</code></td>
+</tr>
+<tr>
+<td><code>columns</code></td>
+<td><code>fields</code></td>
+</tr>
+<tr>
+<td><code>foreign_keys</code></td>
+<td><code>relationships</code></td>
+</tr>
+<tr>
+<td><code>strategy: sequence</code></td>
+<td>identifier field plus <code>synthetic_identifier</code> distribution</td>
+</tr>
+<tr>
+<td><code>strategy: choice</code></td>
+<td><code>categorical</code> distribution</td>
+</tr>
+<tr>
+<td>numeric/date bounds</td>
+<td>typed numeric, date, or datetime distribution</td>
+</tr>
+<tr>
+<td><code>sensitive</code> and Faker provider</td>
+<td>privacy annotation plus <code>semantic_type</code></td>
+</tr>
+<tr>
+<td>root seed and output format</td>
+<td><code>generation_settings</code></td>
+</tr>
+</tbody>
+</table>
+<p>The project intentionally does not silently convert removed specification
+files. Automatic conversion could preserve an unsafe assumption or lose
+generation intent.</p>
+<h2 id="update-commands">Update Commands<a class="headerlink" href="#update-commands" title="Permanent link">&para;</a></h2>
+<p>Generation continues to use the same command shape:</p>
+<pre><code class="language-bash">test-data-agent generate dataset_spec.yaml \
+  --output out/generated
+</code></pre>
+<p>Validation now requires the generated folder:</p>
+<pre><code class="language-bash">test-data-agent validate dataset_spec.yaml out/generated \
+  --output out/generated/validation_report.json
+</code></pre>
+<p>For a safe profile payload:</p>
+<pre><code class="language-bash">test-data-agent infer-spec profile.json \
+  --count 100 \
+  --output dataset_spec.yaml
+</code></pre>
+<h2 id="update-python-imports">Update Python Imports<a class="headerlink" href="#update-python-imports" title="Permanent link">&para;</a></h2>
+<p>Use the dataset-oriented API:</p>
+<pre><code class="language-python">from test_data_agent import DatasetSpec, generate_dataset, validate_dataset
+from test_data_agent.io import generate_dataset_bundle
+</code></pre>
+<p>Load and review the new contract before generation:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from test_data_agent.io import load_dataset_spec
+
+spec = load_dataset_spec(Path(&quot;dataset_spec.yaml&quot;))
+</code></pre>
+<p>See <a href="../../concepts/profiles-and-specs/">Profiles And Specs</a> for the current
+workflow and <a href="../../dataset_profile_and_spec/">DatasetSpec</a> for the complete
+field reference.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

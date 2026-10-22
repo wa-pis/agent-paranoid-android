@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/development/documentation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Publishing Documentation - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Publishing Documentation";
+        var mkdocs_page_input_path = "development/documentation.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/development/documentation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Publishing Documentation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/development/documentation.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="publishing-documentation">Publishing Documentation<a class="headerlink" href="#publishing-documentation" title="Permanent link">&para;</a></h1>
+<h2 id="tools-and-local-preview">Tools And Local Preview<a class="headerlink" href="#tools-and-local-preview" title="Permanent link">&para;</a></h2>
+<p>Hosting remains <strong>GitHub Pages</strong>. MkDocs renders pages, <strong>mike</strong> owns version
+storage, aliases and the version selector, and <strong>mkdocs-print-site-plugin</strong>
+assembles the printable handbook. HTMLArk embeds its assets; Chrome prints PDF.
+There is no Read the Docs service or separate account to configure.</p>
+<pre><code class="language-bash">uv sync --frozen --only-group docs --no-install-project
+uv run --no-sync mkdocs build --strict
+uv run --no-sync python -m scripts.build_documentation --output site --verify-release --state-bundle site.bundle
+python3 -m http.server --directory site 8000
+</code></pre>
+<p>The complete build needs Chrome/Chromium. Pass <code>--browser PATH</code> if necessary.
+It uses a temporary browser profile and blocks DNS; HTML embedding can read only
+resources inside the rendered site. Documentation export never reads datasets,
+receipts, credentials or user browser profiles. A plain <code>mkdocs serve</code> includes
+the print page but does not generate download files.</p>
+<p>The small project adapter verifies release evidence, attaches provenance, keeps
+legacy root URLs, scopes search and packages downloads. It delegates rendering,
+version storage, aliases and selector behavior to the installed tools. The
+locked documentation group is separate from runtime package dependencies.</p>
+<h2 id="versions-and-compatibility">Versions And Compatibility<a class="headerlink" href="#versions-and-compatibility" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Site root</td>
+<td>Maintained guide for the verified stable package; existing URLs work</td>
+</tr>
+<tr>
+<td><code>versions/stable/</code></td>
+<td>mike's copy alias to the selected stable guide, with selector</td>
+</tr>
+<tr>
+<td><code>versions/X.Y.Z/</code></td>
+<td>Guide for that exact package version, with its own search index</td>
+</tr>
+<tr>
+<td><code>versions/next/</code></td>
+<td>Clearly labelled development documentation</td>
+</tr>
+<tr>
+<td><code>documentation.json</code></td>
+<td>Package version/source, documentation revision and status</td>
+</tr>
+<tr>
+<td><code>downloads/</code></td>
+<td>PDF, standalone HTML, Markdown source ZIP, selected-version site ZIP</td>
+</tr>
+</tbody>
+</table>
+<p>A package-version guide may receive reviewed documentation corrections while it
+is current. Its metadata records the documentation commit separately from the
+package release commit. <strong>It is not an untouched snapshot of the release-era
+prose</strong>, and it does not inherit the package's exact-SHA review. Once another
+package becomes current, older rendered guides remain unchanged unless an
+explicitly reviewed correction is published for them. Never relabel today's
+prose as guidance for an unsupported historical package.</p>
+<p>mike stores generated versions and aliases in the <code>gh-pages</code> branch. That branch
+is publication state, not a source branch. The root tree is a compatibility copy
+of maintained stable guidance; it links to the native version selector. All
+other versions have independent search indexes. Historical/maintainer pages
+remain available through the history index but are excluded from default search.</p>
+<p>Local builds use <code>refs/remotes/origin/gh-pages</code> when available. Fetch it first to
+retain existing versions, or pass <code>--state-ref REF</code> to a local branch containing
+previous native state. First publication bootstraps only the current verified
+stable package; it does not manufacture earlier snapshots. A <code>next</code> build
+requires already-published stable state and preserves the complete stable root.</p>
+<h2 id="publication-and-release-gates">Publication And Release Gates<a class="headerlink" href="#publication-and-release-gates" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Finish the existing exact-source package release gates and public verification.</li>
+<li>Add its stable version, exact release commit and successful public-verification
+   run ID to <code>docs/releases.json</code>; retain prior catalog entries. Advance <code>stable</code>
+   only for the publicly verified stable package. RCs stay out of this pointer.</li>
+<li>Review guides and fictional installed-package examples against that package.
+   Run focused documentation checks and inspect the complete export.</li>
+<li>Merge the reviewed source change. The main-only Pages workflow verifies the
+   catalog, builds all formats and publishes the complete Pages artifact.</li>
+<li>Public verification compares exact metadata, the native stable alias/destination, entry-page hash and all four
+   download hashes. <strong>Only after that succeeds</strong> does a separate write-scoped job
+   retain the native mike Git bundle in <code>gh-pages</code>, without force-pushing.</li>
+</ol>
+<p>PR builds have read-only repository permissions and never push state. Complete
+main publications are serialized. Build/export failure leaves the deployed site
+untouched. A failure after Pages deployment requires restoring a retained prior
+successful Pages artifact; public verification is not an atomic deployment and
+there is no automatic rollback. If retaining mike state fails after successful
+verification, restore the matching <code>documentation-mike-state</code> workflow artifact
+before another publication, so version history is not lost. Artifacts are retained
+for 90 days; <code>gh-pages</code> retains published version history.</p>
+<p>Builds use a disposable Git repository and cannot change a developer's branches.
+Local site replacement is staged and restores the prior output on handled errors
+or interruptions. If another writer prevents restoration, recover the preserved
+sibling <code>.apa-docs-backup-*</code> directory manually.</p>
+<h2 id="checks">Checks<a class="headerlink" href="#checks" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">uv run --no-sync pytest tests/test_documentation.py tests/test_documentation_build.py
+uv run --no-sync mkdocs build --strict
+</code></pre>
+<p>Tests require both the documentation group and development test dependencies.
+The PDF and standalone HTML contain the current navigation's user chapters,
+excluding history, roadmap and documentation administration. The Markdown ZIP
+preserves the full documentation source tree so reference links remain reusable;
+historical pages keep their original provenance. The site ZIP contains one
+selected version, without recursively including other versions or its own ZIP.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

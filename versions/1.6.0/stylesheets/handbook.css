@@ -1,0 +1,35 @@
+.documentation-identity { padding: .75em; margin-bottom: 1em; background: #edf4f8; border-left: 3px solid #2980b9; overflow-wrap: anywhere; font-size: .85em; }
+@media print {
+  @page { size: A4; margin: 18mm 15mm; }
+  html, body, .rst-content { font-family: Arial, sans-serif; font-size: 10pt; }
+  h1, h2, h3 { break-after: avoid; }
+  pre { white-space: pre-wrap !important; overflow-wrap: anywhere; }
+  table { width: 100%; font-size: 8pt; table-layout: fixed; }
+  th, td { white-space: normal !important; overflow-wrap: anywhere; }
+  tr { break-inside: avoid; }
+  .documentation-identity { font-size: 8pt; }
+}
+
+body:has(#print-site-page) .wy-nav-content-wrap { margin-left: 0; }
+body:has(#print-site-page) .wy-nav-content { max-width: 100%; }
+#print-site-page pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media print {
+  #print-site-page section.print-page.md-section { page-break-before: auto; }
+  #print-site-page section.print-page.md-section > h1 {
+    padding: 0; margin: 1em 0 .5em; font-size: 20pt; text-align: left;
+  }
+  #print-site-page section.print-page.md-section > section.print-page:first-of-type {
+    page-break-before: avoid;
+  }
+  #print-site-page pre, #print-site-page p { page-break-inside: auto; }
+}
+
+#print-site-page pre code { white-space: pre-wrap !important; overflow-wrap: anywhere; word-break: break-word; }
+@media print {
+  .handbook-cover { padding-top: 25mm; break-after: page; }
+  .handbook-cover h1 { font-size: 28pt; }
+  .handbook-contents { break-after: page; }
+  .handbook-contents h2 { font-size: 13pt; margin: 12pt 0 4pt; }
+  .handbook-contents ul { margin-bottom: 6pt; }
+  #print-site-page pre code { display: block; font-size: 8pt; }
+}

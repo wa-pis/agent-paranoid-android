@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/domain_agnostic_workflow/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Domain-Agnostic Dataset Workflow - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Domain-Agnostic Dataset Workflow";
+        var mkdocs_page_input_path = "domain_agnostic_workflow.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/domain_agnostic_workflow/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Domain-Agnostic Dataset Workflow</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/domain_agnostic_workflow.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="domain-agnostic-dataset-workflow">Domain-Agnostic Dataset Workflow<a class="headerlink" href="#domain-agnostic-dataset-workflow" title="Permanent link">&para;</a></h1>
+<p>This compatibility page retains existing section links. Current instructions
+now have a single owner for each task, rather than a second copy of commands.</p>
+<h2 id="mental-model">Mental Model<a class="headerlink" href="#mental-model" title="Permanent link">&para;</a></h2>
+<p>Profile safe metadata, review a DatasetSpec, generate new values and validate the result. See <a href="../concepts/profiles-and-specs/">Profiles And Specs</a>.</p>
+<h2 id="folder-layout">Folder Layout<a class="headerlink" href="#folder-layout" title="Permanent link">&para;</a></h2>
+<p>Use one CSV per table. File stems identify entities. See <a href="../getting-started/related-tables/">Related Tables</a>.</p>
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
+<p>Follow the reviewed profile/spec/generate/validate flow. Commands live in one canonical reference. See <a href="../reference/cli-workflows/">CLI Workflows</a>.</p>
+<h2 id="large-inputs-and-profile-cache">Large Inputs And Profile Cache<a class="headerlink" href="#large-inputs-and-profile-cache" title="Permanent link">&para;</a></h2>
+<p>Profiling and inference are resource-bounded. Cache only safe metadata; use --no-cache when a fresh profile is needed. See <a href="../reference/configuration/">Configuration</a>.</p>
+<h2 id="large-trino-tables">Large Trino Tables<a class="headerlink" href="#large-trino-tables" title="Permanent link">&para;</a></h2>
+<p>Keep profiling aggregate-only, allowlisted and bounded. Never download source rows for generation. See <a href="../how-to/trino/">Profile Through Trino</a>.</p>
+<h2 id="what-gets-written">What Gets Written<a class="headerlink" href="#what-gets-written" title="Permanent link">&para;</a></h2>
+<p>Keep the specification, manifest and validation reports with the generated data. See <a href="../getting-started/review-output/">Review The Output</a>.</p>
+<h2 id="how-relationships-are-preserved">How Relationships Are Preserved<a class="headerlink" href="#how-relationships-are-preserved" title="Permanent link">&para;</a></h2>
+<p>Generated child references use generated parent keys. Review inferred links and ambiguous identifiers. See <a href="../concepts/relational-synthesis-contract/">Relational Synthesis Contract</a>.</p>
+<h2 id="how-constraints-are-preserved">How Constraints Are Preserved<a class="headerlink" href="#how-constraints-are-preserved" title="Permanent link">&para;</a></h2>
+<p>Typed, executable rules enforce formulas, temporal order and cross-table conditions. See <a href="../how-to/business-rules/">Business Rules</a>.</p>
+<h2 id="safety-notes">Safety Notes<a class="headerlink" href="#safety-notes" title="Permanent link">&para;</a></h2>
+<p>Generation uses the specification and seed, never a pool of source rows. Privacy review remains necessary. See <a href="../concepts/safety-model/">Safety Model</a>.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

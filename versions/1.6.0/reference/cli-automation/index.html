@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/reference/cli-automation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>CLI Automation And JSON - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CLI Automation And JSON";
+        var mkdocs_page_input_path = "reference/cli-automation.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/reference/cli-automation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">CLI Automation And JSON</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/cli-automation.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="cli-automation-and-json">CLI Automation And JSON<a class="headerlink" href="#cli-automation-and-json" title="Permanent link">&para;</a></h1>
+<p>Every core command accepts <code>--json</code>. Success writes one versioned
+<code>CliSuccessResponse</code> to stdout and leaves stderr empty:</p>
+<pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;ok&quot;: true,
+  &quot;command&quot;: &quot;test-data-agent demo&quot;,
+  &quot;exit_code&quot;: 0,
+  &quot;status&quot;: &quot;succeeded&quot;,
+  &quot;artifacts&quot;: [&quot;out/demo&quot;],
+  &quot;result&quot;: null
+}
+</code></pre>
+<p>Validation failures use the same envelope with exit code <code>1</code> and status
+<code>validation_failed</code>. Artifact paths appear only after publication. Human
+summaries and progress never share stdout with the JSON document.</p>
+<p><code>doctor --json</code> returns typed local statuses including <code>available</code>,
+<code>not_installed</code>, <code>failed</code>, and <code>skipped</code>. A successful local smoke does not
+claim that remote credentials or services are available.</p>
+<h2 id="agent-json-contract">Agent JSON Contract<a class="headerlink" href="#agent-json-contract" title="Permanent link">&para;</a></h2>
+<p>Use JSON output when invoking the review flow from automation:</p>
+<pre><code class="language-bash">test-data-agent agent-plan data/example_dataset --workspace out/agent --json
+test-data-agent agent-review out/agent --json
+test-data-agent agent-status out/agent --json
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot; --json
+</code></pre>
+<p>Planning and approval return an <code>AgentResult</code>; advisor request returns an
+<code>AdvisorRequest</code> or <code>AdvisorExchange</code>; advisor apply and status return an
+<code>AgentWorkspaceStatus</code>; review returns an <code>AgentReviewReport</code>. These versioned
+contracts never include source or generated rows.</p>
+<p><code>AgentReviewReport</code> contains field metadata, relationships, privacy safety
+flags, plan/current fingerprints, and <code>generation_performed: false</code>. It omits
+distribution values. Completed results add an approval receipt tied to the
+exact reviewed fingerprint.</p>
+<p>Known failures also write one versioned JSON document to stdout when <code>--json</code>
+is present:</p>
+<pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;ok&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;invalid_arguments&quot;,
+    &quot;message&quot;: &quot;the following arguments are required: --workspace&quot;,
+    &quot;command&quot;: &quot;test-data-agent agent-plan&quot;,
+    &quot;exit_code&quot;: 2,
+    &quot;retryable&quot;: false,
+    &quot;help&quot;: &quot;test-data-agent agent-plan --help&quot;
+  }
+}
+</code></pre>
+<p>Clients must branch on <code>error.code</code>, not message text. Stable codes and process
+exit behavior are listed in <a href="../cli-errors/">CLI Errors And Exit Codes</a>.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

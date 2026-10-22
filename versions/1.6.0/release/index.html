@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/release/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Release Process - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Release Process";
+        var mkdocs_page_input_path = "release.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/release/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Release Process</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/release.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="release-process">Release Process<a class="headerlink" href="#release-process" title="Permanent link">&para;</a></h1>
+<p>Use this process before merging release candidates or creating tags.</p>
+<h2 id="versioned-documentation">Versioned Documentation<a class="headerlink" href="#versioned-documentation" title="Permanent link">&para;</a></h2>
+<p>Follow <a href="../development/documentation/">Publishing Documentation</a> for mike version
+management, the verified stable catalog, offline exports and deployed identity
+checks. Advance the stable documentation pointer only after the package's public
+verification succeeds. Documentation revisions are separate from package source;
+historical evidence is retained unchanged; later guide corrections carry their
+own documentation revision.</p>
+<h2 id="preflight">Preflight<a class="headerlink" href="#preflight" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Review <code>openspec/project.md</code> and the affected capability specs.</li>
+<li>Confirm the change belongs in the MVP or has an OpenSpec proposal under
+   <code>openspec/changes/</code>.</li>
+<li>Update README examples, user-facing docs, and <code>CHANGELOG.md</code> for visible
+   behavior changes. Follow the <a href="../changelog-policy/">changelog policy</a>; do not
+   turn release notes into an internal engineering log.</li>
+<li>Regenerate <code>schemas/dataset_spec.schema.json</code> when <code>DatasetSpec</code> changes:</li>
+</ol>
+<pre><code class="language-bash">python3 scripts/export_dataset_schema.py
+</code></pre>
+<h2 id="checks">Checks<a class="headerlink" href="#checks" title="Permanent link">&para;</a></h2>
+<p>Run the executable release gate:</p>
+<pre><code class="language-bash">scripts/check_release.sh
+</code></pre>
+<p>The gate runs direct Python privacy checks plus direct PostgreSQL and Trino
+service-boundary tests before the full coverage suite, so transport-level tests
+cannot mask a bypass in the underlying application API.</p>
+<p>The script runs linting, strict type checks for the full production package,
+compilation, coverage tests, DatasetSpec schema freshness, and the README
+quickstart smoke flow. The smoke flow verifies the generated manifest reports
+<code>synthetic: true</code>, <code>source_rows_copied: false</code>, a valid validation report, the
+expected seed, and expected row counts.</p>
+<h3 id="pre-rc-coverage-evidence">Pre-RC Coverage Evidence<a class="headerlink" href="#pre-rc-coverage-evidence" title="Permanent link">&para;</a></h3>
+<p>The unit, property, and contract suite passed locally on 2026-08-01 against
+<code>origin/main</code> commit <code>3862753</code> with:</p>
+<pre><code class="language-bash">uv run --no-sync pytest \
+  --cov=test_data_agent \
+  --cov-report=term-missing \
+  --cov-fail-under=85
+</code></pre>
+<p>Result: 518 passed, 2 live-Trino integration tests skipped, and 87.94% total
+coverage. This establishes the configured pre-RC coverage gate; it does not
+replace the required rerun against the exact release-candidate commit or the
+published artifact checks.</p>
+<p>CI and tagged releases also build the wheel and install it in an isolated
+environment. That smoke check verifies package version metadata, the PEP 561
+<code>py.typed</code> marker, console entry points, and <code>test-data-agent doctor
+--skip-smoke</code> before release attestations are created.
+The compressed project wheel has a 512 KiB regression ceiling; optional
+dependency-count budgets are checked separately.</p>
+<p>For a candidate containing GigaChat, the release matrix additionally requires
+isolated base, <code>gigachat</code>, and <code>all</code> wheel checks on Python 3.11 through 3.14,
+<code>doctor --require-extra gigachat</code>, dependency/license verification, and the
+fake-SDK provider suite with no credentials or network access. A live provider
+call is optional manual evidence and must use only the fictional fixture.</p>
+<h2 id="rc6-to-stable-promotion">RC6 To Stable Promotion<a class="headerlink" href="#rc6-to-stable-promotion" title="Permanent link">&para;</a></h2>
+<h3 id="current-160-promotion">Current 1.6.0 promotion<a class="headerlink" href="#current-160-promotion" title="Permanent link">&para;</a></h3>
+<p>The owner authorized stable <code>1.6.0</code> on 2026-10-16, selecting publicly verified
+<code>v1.6.0rc5</code>, commit <code>890925afdff68e97cafe38a28605d2874c9dad79</code>, as the accepted
+runtime. Documentation consistency fixes at main
+<code>304e75d7f998fae6c8d58595a432880ac9da1531</code> may accompany its version-only
+promotion. Apply the permitted-hunk policy below directly against <code>v1.6.0rc5</code>.
+This authorization supersedes earlier pending-authorization status; all fresh
+stable gates, independent exact-main review, artifact hashes and signed
+acceptance remain required. See <a href="../1.6.0-release-status/">stable status</a>.</p>
+<p>RC5 human and automated evidence retains its original source/artifact identity.
+For this requested full stable release, complete the outstanding fictional
+transformation/session campaign, binding its installed-artifact results and
+genuine local-terminal human steps before declaring the combined work accepted.
+It remains open while those results are missing; version promotion cannot close
+it, manufacture human preservation consent or broaden runtime activation. This
+does not reopen completed historical RC5 gates. Any behavior correction first
+needs a newly accepted RC.</p>
+<p>Stable <code>1.6.0</code> completed this process at exact main
+<code>258c035c22408becf17ab090635710a50dda8ccc</code>; see the
+<a href="../release-evidence-1.6.0/">stable release evidence</a> for hashes, independent
+review, genuine local-terminal fictional acceptance and successful public
+verification. Prior RC evidence remains bound to its historical source.</p>
+<h3 id="historical-promotion-baselines">Historical promotion baselines<a class="headerlink" href="#historical-promotion-baselines" title="Permanent link">&para;</a></h3>
+<p>The historical 1.0.0 RC6 baseline is the exact commit named by the annotated
+<code>v1.0.0rc6</code> tag after the public-package, documentation, container,
+attestation, signature, integration, invocation-hardening, and
+clean-environment acceptance checks have all passed. RC5 remains historical
+release evidence and is superseded for stable promotion. Record the RC6 tag
+commit and acceptance evidence before opening the stable release pull request.
+The accepted baseline, artifact hashes, public profile checks, and container
+digests are recorded in the
+<a href="../release-evidence-1.0.0rc6/">RC6 published release evidence</a>.
+Stable <code>v1.0.0</code> was subsequently published from exact commit
+<code>eb4ef2a5d111ef31390f0a204068369e3f934a3b</code>; its signed tag, artifact hashes,
+image digests, and post-publish checks are recorded in the
+<a href="../release-evidence-1.0.0/">stable published release evidence</a>.</p>
+<p>The post-1.0 GigaChat adapter changes runtime behavior, dependencies,
+packaging, public CLI selection, and an external security boundary. It must be
+accepted in a new minor release candidate; it cannot be folded into a
+documentation-only <code>1.0.0</code> promotion. Version selection, tagging, and
+publication remain separate explicit release work. Candidate <code>v1.1.0rc1</code> was
+published from exact commit <code>5f95ccfd3774a6d16a4a5c77d1460a8cebf5eca1</code>;
+its signed tag, artifact hashes, image digests, and post-publish checks are
+recorded in the
+<a href="../release-evidence-1.1.0rc1/">1.1.0rc1 published release evidence</a>.</p>
+<p>The subsequent CLI automation and artifact-integrity work changes runtime
+behavior, adds the public <code>completion</code> command and core success JSON contract,
+and extends documented process codes. It therefore requires <code>1.1.0rc2</code> before
+stable <code>1.1.0</code>. The implementation PR may prepare tests, OpenSpec, changelog,
+and acceptance steps, but it must not create the tag or publish artifacts.
+Exact-commit RC2 acceptance must repeat the core/doctor JSON, malformed-input,
+missing-extra entrypoint, Ctrl+C cleanup, suffix/overwrite rollback,
+80-column help, four-shell completion, full package, and isolated-wheel gates.
+Candidate <code>v1.1.0rc2</code> targets accepted commit
+<code>9ff776b8fc59ed8037f7dc5aa23d124a61eb6a90</code>. Its signed multi-platform
+container images were published, but Python publication failed closed before a
+GitHub Release or PyPI upload because a macOS-derived sdist digest did not
+match the Linux release build. The protected tag remains immutable. Stable
+<code>1.1.0</code> therefore promotes the same accepted runtime through a version- and
+documentation-only diff with Linux-derived artifact digests. Exact outcomes
+and published container digests are recorded in the
+<a href="../release-evidence-1.1.0rc2/">1.1.0rc2 partial release evidence</a>.</p>
+<p>Stable <code>v1.1.0</code> was subsequently published from exact commit
+<code>a536629c209878754c4250ef21a47f69e4c01cae</code>. Its signed tag, independent
+exact-commit approval, package hashes, signed image digests, and successful
+post-publish checks are recorded in the
+<a href="../release-evidence-1.1.0/">1.1.0 published release evidence</a>.</p>
+<p>The post-1.1 portable-provenance and security-boundary changes first shipped as
+<code>1.2.0rc1</code>. Its package and container publication succeeded, but post-publish
+acceptance failed because the verifier did not stage the portable bundle at the
+path recorded in <code>SHA256SUMS</code>. That published candidate remains immutable and
+is superseded by <code>1.2.0rc2</code>, which contains only the verifier correction and
+release identity changes. RC2 completed public acceptance; its immutable
+results are recorded in the
+<a href="../release-evidence-1.2.0rc2/">1.2.0rc2 published release evidence</a>. Future
+candidates must still pass the complete release gate and independent approval
+before tagging, then verify the downloaded portable <code>*.sigstore.json</code> bundle
+against both Python distributions before acceptance.</p>
+<p>Stable <code>1.2.0</code> promotes that accepted RC2 runtime through the permitted
+version- and documentation-only diff. No application runtime, public API,
+dependency, workflow, container, or security-boundary change belongs in the
+promotion. The signed tag, reviewed promotion, package hashes, signed image
+digests, and successful post-publish checks are recorded in the
+<a href="../release-evidence-1.2.0/">1.2.0 published release evidence</a>.</p>
+<p>The database-source ergonomics implemented after <code>1.2.0</code> add credential-free
+JDBC-style endpoint syntax, table-qualified column wildcards, and one bounded
+aggregate-only SQL query-source workflow. These change runtime behavior,
+public CLI/Python contracts, and database security boundaries, so they are
+assigned to <code>1.3.0rc1</code>. The candidate completed exact-commit review, the
+component/JDBC/wildcard/query installed-wheel matrices for PostgreSQL and
+Trino, and public artifact verification. Its immutable results are recorded in
+the <a href="../release-evidence-1.3.0rc1/">1.3.0rc1 published release evidence</a>.</p>
+<p>Stable <code>1.3.0</code> promotes that accepted RC1 runtime through the permitted
+version- and documentation-only diff. No application runtime, public API,
+dependency, workflow, container, or security-boundary change belongs in the
+promotion. The signed tag, reviewed promotion, package hashes, signed image
+digests, and successful post-publish checks are recorded in the
+<a href="../release-evidence-1.3.0/">1.3.0 published release evidence</a>.</p>
+<p>Patch candidate <code>1.3.1rc1</code> packaged the post-<code>1.3.0</code> documentation and package
+discovery cleanup together with audited build-tool and pinned workflow-action
+maintenance. Its release failed closed before GitHub Release or PyPI
+publication because artifact digests generated on macOS differed from the
+Ubuntu release build; container publication was canceled before push. The
+immutable failed tag is superseded by <code>1.3.1rc2</code>, which adds a no-publish Ubuntu
+artifact preflight and otherwise retains the same application runtime, public
+APIs, dependencies, and security boundaries. RC2 completed exact-commit gates,
+independent review, GitHub and PyPI publication, multi-platform signed container
+publication, and public-artifact verification. Its immutable results are
+recorded in the
+<a href="../release-evidence-1.3.1rc2/">1.3.1rc2 published release evidence</a>.</p>
+<p>Stable <code>1.3.1</code> promotes that accepted RC2 tree through the permitted version-
+and documentation-only diff. It introduces no application runtime, public API,
+dependency, packaging, workflow, container, or security-boundary change.</p>
+<p>Review the stable promotion directly against the accepted candidate:</p>
+<pre><code class="language-bash">git diff --name-status v1.3.1rc2 HEAD
+git diff v1.3.1rc2 HEAD
+</code></pre>
+<p>A new release candidate is required only when a change affects runtime
+behavior, public APIs, dependencies, packaging, security boundaries,
+container behavior, or published artifact integrity. Documentation,
+changelog, review evidence, checklist reconciliation, release notes, and
+version-only promotion changes do not require a new release candidate when the
+accepted runtime tree remains unchanged.</p>
+<p>The stable promotion diff may contain only these reviewed release changes:</p>
+<ul>
+<li><code>pyproject.toml</code>: the project version and release-status classifiers only;
+  dependencies, build settings, entry points, and extras remain unchanged;</li>
+<li><code>src/test_data_agent/version.py</code>: <code>__version__</code> only;</li>
+<li><code>uv.lock</code>: the root <code>agent-paranoid-android</code> version only, with the resolved
+  dependency graph and hashes unchanged;</li>
+<li><code>CHANGELOG.md</code>: add the stable promotion entry, date, and links while
+  retaining prerelease history and introducing no new behavior claim;</li>
+<li>release-facing version references, release evidence, roadmap status, and
+  OpenSpec completion or archive metadata. These documentation files may
+  describe only behavior already accepted in the selected candidate.</li>
+</ul>
+<p>Release-validation assertions that only replace a hard-coded candidate
+version with the active package version are generated release metadata for
+this purpose. They may be normalized during promotion, but no test scenario,
+fixture, runtime assertion, safety assertion, or product coverage may change.</p>
+<p>File membership alone is not approval: every changed hunk must match one of
+those categories. All other changes require a new release candidate. In
+particular, any executable production, runtime or safety test, schema, fixture,
+dependency, build, workflow, or container change means the candidate is not
+the accepted stable source tree. Stop the promotion, make the change in a newly
+numbered release candidate, and complete that candidate's acceptance before
+trying stable promotion again.</p>
+<p>Before any candidate or stable publication, the release workflow must validate
+the machine-readable RC acceptance manifest. It must bind the tag to the
+reviewed commit digest, require closed release-blocking findings and recorded
+approval, and match the published artifact digests. A version-matching tag or
+unchecked Markdown checklist is not sufficient evidence.</p>
+<p>The manifest is the complete JSON message of the signed annotated tag. Schema
+version <code>1</code> requires exact <code>release</code>, <code>findings</code>, <code>approvals</code>, <code>gates</code>, and
+<code>artifacts</code> objects. Findings RC6-S1-S4 and RC6-S7-S20 must be <code>closed</code> or
+explicitly <code>approved</code> with HTTPS evidence; every approval and the CI,
+Containers, Documentation, and Security gate result must identify the reviewed
+commit and an HTTPS evidence URL. <code>artifacts</code> contains the exact wheel and
+sdist basenames with lowercase SHA-256 digests.</p>
+<p>Before recording candidate digests, run the no-publish Ubuntu artifact
+preflight for the exact reviewed commit:</p>
+<pre><code class="language-bash">gh workflow run release-preflight.yml \
+  --ref main \
+  --field commit=&lt;reviewed-main-commit&gt;
+gh run download &lt;preflight-run-id&gt; \
+  --name release-preflight-&lt;reviewed-main-commit&gt; \
+  --dir /tmp/release-preflight
+</code></pre>
+<p>The preflight has read-only repository permissions, runs the full release gate,
+sets <code>SOURCE_DATE_EPOCH</code> from the reviewed commit timestamp, and uploads the
+wheel, source distribution, and <code>ARTIFACT_SHA256</code> as temporary workflow
+artifacts. It cannot create a tag, release, attestation, package, or container.
+Copy those Ubuntu-derived digests into the signed acceptance manifest. The
+tag-triggered build uses the same runner, checkout depth and tags, Python, uv,
+lockfile, release gate, build command, and epoch and fails before attestation or
+publication if either digest is different.</p>
+<p>Run every final release gate, including <code>scripts/check_release.sh</code> and
+<code>mkdocs build --strict</code>, on the exact stable release commit. Merge only after
+the required pipeline is green and conflict-free. Create the stable tag only
+from the verified merge commit in <code>main</code>; tagging and post-publish checks are
+separate explicit steps.</p>
+<p>If a <code>main</code> push event does not create an expected gate run, dispatch CI,
+Containers, Documentation, and Security manually with <code>--ref main</code> while the
+reviewed commit is still the exact <code>main</code> tip. Manual container dispatch runs
+validation only; image publication remains restricted to accepted signed
+version tags. Record all four exact-commit run URLs in the acceptance manifest.</p>
+<h2 id="generation-contract-corrective-release">Generation Contract Corrective Release<a class="headerlink" href="#generation-contract-corrective-release" title="Permanent link">&para;</a></h2>
+<p>The generation and validation corrections in PR #490 completed public
+acceptance in <code>1.3.2rc1</code> at exact commit
+<code>5eb29ce4af94049e27c32462211725e5f896d9b6</code>; see
+<a href="../release-evidence-1.3.2rc1/">the immutable RC1 evidence</a>.</p>
+<p>Stable preparation then exposed a pre-existing randomized safety-test defect:
+unquoted catalog <code>AS</code> was rejected as invalid SQL before the test's expected
+allowlist rejection. Production behavior remained fail-closed. The corrected
+test prefixes unquoted generated names with <code>outside_</code> and retains quoted-name
+coverage and strict <code>AllowlistError</code> assertions. Explicit examples retain the
+regression. Since safety-test changes are excluded from stable promotion,
+<code>1.3.2rc2</code> repeated and passed the entire acceptance process before stable <code>1.3.2</code>.
+No production code, dependency, schema, fixture, workflow, or container behavior
+changes from RC1. The accepted RC2 commit is
+<code>1b32c24fce2ba13916ee5e2a800de8aaa5176c8a</code>; its hashes, independent approval,
+signed images and public checks are recorded in
+<a href="../release-evidence-1.3.2rc2/">the RC2 evidence</a>.</p>
+<p>Stable <code>1.3.2</code> promotes this runtime through version and documentation changes
+only. Review every changed hunk against the accepted candidate:</p>
+<pre><code class="language-bash">git diff --name-status v1.3.2rc2 HEAD
+git diff v1.3.2rc2 HEAD
+</code></pre>
+<p>Exact-main gates, independent approval, Ubuntu preflight, signed manifest and
+public verification remain mandatory for stable.</p>
+<p>Stable <code>1.3.2</code> completed these gates and public acceptance from exact commit
+<code>28d1176867d3ba155a420a5dfae0f6944597470d</code>. Its signed identity, approvals,
+package hashes and image digests are recorded in
+<a href="../release-evidence-1.3.2/">the stable release evidence</a>.</p>
+<h2 id="140-minor-version-release">1.4.0 Minor Version Release<a class="headerlink" href="#140-minor-version-release" title="Permanent link">&para;</a></h2>
+<p>The requested minor version <code>1.4.0</code> retains the publicly accepted <code>1.3.2</code>
+runtime at <code>28d1176867d3ba155a420a5dfae0f6944597470d</code>, itself promoted
+from accepted <code>1.3.2rc2</code>. Since only version and documentation metadata change,
+the existing version-only exception applies: a new RC is not required. No new
+feature, runtime behavior, API, dependency or safety-test change is included.
+The <a href="../release-evidence-1.3.2/">1.3.2 evidence</a> remains the runtime baseline.</p>
+<p>Review every hunk directly against the accepted stable source:</p>
+<pre><code class="language-bash">git diff --name-status v1.3.2 HEAD
+git diff v1.3.2 HEAD
+</code></pre>
+<p>The final <code>1.4.0</code> main commit still requires all exact-commit gates, independent
+approval, Ubuntu preflight hashes, a signed acceptance manifest and successful
+public-artifact verification. Prior approval is not reused for the new commit.</p>
+<p>Stable <code>1.4.0</code> completed these requirements at exact commit
+<code>5bcaef2cd991e63098de4d1601f8ae2a8207bd14</code>; see the
+<a href="../release-evidence-1.4.0/">1.4.0 published evidence</a> for hashes, signed images,
+approval and public verification, including the successful Parquet retry.</p>
+<h2 id="160rc5-feedback-and-interface-parity-candidate">1.6.0rc5 Feedback And Interface Parity Candidate<a class="headerlink" href="#160rc5-feedback-and-interface-parity-candidate" title="Permanent link">&para;</a></h2>
+<p>The owner requested <code>1.6.0rc5</code> after the RC4 feedback corrections, shared
+source/output contract, portable business rules and MCP permission documentation.
+See <a href="../rc4-external-feedback/">the feedback disposition</a>,
+<a href="../acceptance-evidence-1.6.0rc5/">cross-interface acceptance evidence</a> and
+<a href="../rc5-release-status/">RC5 release status</a>. The <code>rc5-release</code> OpenSpec
+change records the authorized release scope. Published RC3 and RC4 stay immutable.</p>
+<p>Earlier runtime campaign results retain their actual commit and artifact
+identities; they do not constitute exact-RC5 release gates. Fresh local gates,
+independent AI review, all four main workflows and Ubuntu no-publish hash checks
+have since completed for frozen main
+<code>890925afdff68e97cafe38a28605d2874c9dad79</code>; the
+<a href="../acceptance-evidence-1.6.0rc5/#exact-rc5-candidate-checkpoint">candidate checkpoint</a>
+records their identities and limits. A later documentation commit does not
+inherit these results as its own exact-commit execution evidence.</p>
+<p>Actual Codex full-current-specification human acceptance passed for that frozen
+main. Fresh inspection, full-file display and new specific human consent preceded
+generation; validation, completed-plan inspection and a separate artifact audit
+passed. The <a href="../acceptance-evidence-1.6.0rc5/#actual-codex-and-human-specification-acceptance">manual acceptance record</a>
+preserves the exact specification hashes and the limits: separate trust/tool UI
+prompts and normal interactive exit/disconnect were not captured.</p>
+<p>For a client interrupted after planning,
+<a href="../how-to/mcp/#resume-an-existing-synthetic-plan">resume the existing synthetic plan</a>
+with the same connection and tool policy. Resume preflight, an early consent
+phrase or a finished assistant turn does not replace current-file review and
+new consent. Signed-tag publication workflows have passed for GitHub, PyPI and
+all three container targets; <a href="../release-evidence-1.6.0rc5/">publication evidence</a>
+records the source binding and distribution hashes. Public-artifact verification
+passed on its first attempt with all 12 jobs: Python-package/documentation, all
+seven installation profiles and all three container targets. RC5 publication and
+release-specific public acceptance are complete.
+Permission to publish a release does not approve a dataset or issue local
+preservation authority; the separate transformation/session campaign remains open.</p>
+<h2 id="160rc4-generation-modes-candidate">1.6.0rc4 Generation Modes Candidate<a class="headerlink" href="#160rc4-generation-modes-candidate" title="Permanent link">&para;</a></h2>
+<p>The user requested RC4 after implementing full folder overwrite, edge and
+load_test behavior. See <a href="../reference/generation-modes/">generation modes and replacement</a>
+and the <code>generation-modes-and-folder-overwrite</code> OpenSpec change. RC3 remains
+immutable. RC4 requires fresh exact-commit independent review, all four main
+gates, Ubuntu artifact preflight, signed acceptance and public verification.
+RC4 completed publication and public acceptance at exact main
+<code>e62a28b75b710afa541aa15b12b5c6fe1f1ecaac</code>; see the
+<a href="../release-evidence-1.6.0rc4/">RC4 published evidence</a>.</p>
+<h2 id="160rc3-feedback-candidate">1.6.0rc3 Feedback Candidate<a class="headerlink" href="#160rc3-feedback-candidate" title="Permanent link">&para;</a></h2>
+<p>The user requested RC3 to address the external RC1 feedback. Build on published
+RC2 and preserve its transformation safety amendment. See
+<a href="../rc3-feedback/">feedback corrections and migration</a>. RC3 requires fresh
+exact-commit independent review, all four gates, Ubuntu preflight digests,
+signed acceptance manifest and post-publication verification. RC3 completed publication and public acceptance at exact main
+<code>450f6319cbad4b39c54e42b1fcb56529ca0de214</code>; see the
+<a href="../release-evidence-1.6.0rc3/">RC3 published evidence</a>. No live database
+acceptance is claimed.</p>
+<h2 id="version-and-tag">Version And Tag<a class="headerlink" href="#version-and-tag" title="Permanent link">&para;</a></h2>
+<h3 id="160rc2-mcp-workflow-candidate">1.6.0rc2 MCP Workflow Candidate<a class="headerlink" href="#160rc2-mcp-workflow-candidate" title="Permanent link">&para;</a></h3>
+<p>The <code>mcp-client-workflow-1-6-rc2</code> OpenSpec change targets the explicitly
+requested <code>1.6.0rc2</code>. It improves local MCP connection, tool guidance,
+fingerprint review and recovery, and corrects unexpected MCP 1 runtime-error
+reflection found during real-client interruption testing. Stable <code>1.6.0</code> is
+not authorized. This change does not expand source-preserving execution.</p>
+<p>The baseline <code>1.6.0rc1</code> completed public acceptance at exact commit
+<code>68a20cf333b6d1bdbb02d36e64fb62ef929b2173</code>; see
+<a href="../release-evidence-1.6.0rc1/">RC1 evidence</a>. Preserve its reviewed policy and
+security boundaries. RC2 requires fresh exact-commit gates, independent review,
+Ubuntu preflight hashes, signed acceptance manifest and public verification.
+Automated SDK approval of fictional fixtures is not manual human acceptance.
+Record the actual client/version, final candidate SHA, human specification
+review and resulting artifact checks before declaring manual client acceptance.
+Do not tag or publish while those candidate requirements remain open.</p>
+<p>RC2 publication completed at exact main <code>21f4a04ed4acd7c33caac9fda8c6c03b7f0501d1</code>.
+See <a href="../release-evidence-1.6.0rc2/">RC2 published evidence</a> for acceptance,
+artifact hashes and public verification status.</p>
+<h3 id="150-stable-promotion">1.5.0 Stable Promotion<a class="headerlink" href="#150-stable-promotion" title="Permanent link">&para;</a></h3>
+<p>Stable <code>1.5.0</code> promotes candidate <code>1.5.0rc1</code> at
+<code>f303a3ad054ebf2fd1dba666e7fb9294132f13d3</code>. The runtime includes the
+numeric-identifier privacy and short-string diversity corrections identified
+by independent AI review before candidate publication. No further runtime,
+dependency, workflow, container, schema or safety-test changes are included.
+Compare the complete promotion diff with <code>git diff v1.5.0rc1 HEAD</code>.
+Public RC acceptance, renewed independent exact-main approval, all four gates,
+Ubuntu hashes and signed-tag verification remain required before publication.
+The RC completed public acceptance; hashes, signed images and successful checks
+are recorded in the <a href="../release-evidence-1.5.0rc1/">candidate evidence</a>.</p>
+<p>Stable <code>1.5.0</code> completed publication and public acceptance at exact commit
+<code>dee79d4980934cf444a1f5d57ed05ec21d41ea2b</code>. Signed identity, independent
+approval, package hashes, image digests and the successful public-index retry
+are recorded in the <a href="../release-evidence-1.5.0/">stable release evidence</a>.</p>
+<h3 id="150-candidate">1.5.0 Candidate<a class="headerlink" href="#150-candidate" title="Permanent link">&para;</a></h3>
+<p><code>1.5.0rc1</code> includes CSV generation corrections, OpenAI 3 compatibility,
+MCP 2 compatibility with a corrected 1.28.1 minimum, and runtime container
+hardening. These are runtime and dependency changes, not a version-only
+promotion. During candidate acceptance the quickstart pin targeted this
+candidate and <code>1.4.0</code> remained the recommended stable release. Public candidate
+acceptance is now complete; the stable promotion updates the pin to <code>1.5.0</code>.
+Independent AI-assisted exact-commit review follows the explicitly labelled
+process recorded for 1.4.0; it must not be presented as human approval.
+Run all exact-commit gates and Ubuntu artifact preflight before the signed tag.
+Promote to <code>1.5.0</code> only after public package and container acceptance, with
+version/documentation changes only and renewed exact-commit approval.</p>
+<ol>
+<li>Bump <code>pyproject.toml</code> and <code>src/test_data_agent/version.py</code> together.</li>
+<li>Review every <code>Unreleased</code> entry using the
+   <a href="../changelog-policy/">changelog policy</a>, then move the classified categories
+   to the new version.</li>
+<li>Commit the release preparation.</li>
+<li>Tag the commit after <code>scripts/check_release.sh</code> passes.</li>
+</ol>
+<p>Merging a release pull request does not publish a package. After the full
+security review and independent approval, set the repository variable
+<code>RELEASE_ACCEPTED_COMMIT</code> to that exact immutable commit. Publication starts
+only after a matching tag signed by a key in <code>.github/release-signers</code> is
+pushed:</p>
+<pre><code class="language-bash">git tag -s vX.Y.Z -F /path/to/acceptance-manifest.json &lt;verified-main-commit&gt;
+git push origin vX.Y.Z
+</code></pre>
+<p>Release, container, and PyPI workflows fail before building or publishing when
+the tag is unsigned, its signer is not allowed, or its target and checked-out
+source differ from <code>RELEASE_ACCEPTED_COMMIT</code>. They also fail when the signed
+manifest is missing, stale, incomplete, or disagrees with the built wheel and
+sdist. The tag triggers
+<code>.github/workflows/release.yml</code>, which creates the GitHub Release and then
+dispatches the dedicated PyPI Trusted Publishing workflow. It also triggers
+<code>.github/workflows/containers.yml</code>, which independently validates and publishes
+the three GHCR images.</p>
+<p>Keep compatibility changes explicit. Breaking <code>DatasetSpec</code>, CLI, artifact, or
+Python API changes require a migration guide and a versioned changelog entry.</p>
+<h2 id="container-publication">Container Publication<a class="headerlink" href="#container-publication" title="Permanent link">&para;</a></h2>
+<p>Container images are never pushed from pull requests or ordinary branch
+builds. A matching version tag publishes separate CLI, generator MCP, and Trino
+MCP images for <code>linux/amd64</code> and <code>linux/arm64</code>.</p>
+<p>The workflow attaches BuildKit SBOM and maximal provenance attestations,
+creates a GitHub provenance attestation for each manifest digest, and signs the
+same digest with keyless Cosign using GitHub OIDC. It does not use a registry
+password or signing key. After the first publication, confirm all three GHCR
+packages are public and linked to this repository.</p>
+<p>For Python distributions, <code>release.yml</code> also exports the signed GitHub build
+attestation as one <code>agent-paranoid-android-&lt;version&gt;.sigstore.json</code> release
+asset covering the wheel and source distribution. Before the GitHub Release is
+created, both files are verified against that local bundle, the release tag,
+and the exact <code>release.yml</code> signer identity. The bundle is included in
+<code>SHA256SUMS</code>; the GitHub attestation API record remains available as a second
+verification path.</p>
+<h2 id="post-publish-verification">Post-Publish Verification<a class="headerlink" href="#post-publish-verification" title="Permanent link">&para;</a></h2>
+<p>After a GitHub Release, PyPI version, documentation site, and all three GHCR
+images are public, run the <code>Verify Published Release</code> workflow with the exact
+release tag. The workflow checks out the immutable annotated tag and records
+its commit, then:</p>
+<ul>
+<li>verifies GitHub Release checksums and tag-bound attestations, including the
+  downloaded portable Sigstore bundle without relying on the attestation API;</li>
+<li>compares the public PyPI hashes with the GitHub Release distributions;</li>
+<li>installs the hash-pinned wheel from public PyPI and runs <code>doctor</code> plus the
+  bundled synthetic demo;</li>
+<li>uses only that installed wheel's synthetic fixture to run agent planning,
+  metadata-only review, exact-fingerprint approval, validation, and signed
+  audit-log verification;</li>
+<li>confirms the public documentation names the same package version; and</li>
+<li>resolves each GHCR tag to an immutable multi-platform digest, verifies its
+  SBOM, GitHub provenance attestation, and keyless Cosign signature, then pulls
+  and runs the published image under the hardened health-check settings.</li>
+</ul>
+<p>Keep the successful workflow run URL and emitted image digests in the release
+evidence. This is a post-publish gate and never creates or mutates a release.</p>
+<p>Users can verify either distribution from the downloaded release assets:</p>
+<pre><code class="language-bash">gh attestation verify agent_paranoid_android-&lt;version&gt;-py3-none-any.whl \
+  --bundle agent-paranoid-android-&lt;version&gt;.sigstore.json \
+  --repo wa-pis/agent-paranoid-android \
+  --signer-workflow wa-pis/agent-paranoid-android/.github/workflows/release.yml \
+  --source-ref refs/tags/v&lt;version&gt; \
+  --deny-self-hosted-runners
+</code></pre>
+<h2 id="pypi-trusted-publishing">PyPI Trusted Publishing<a class="headerlink" href="#pypi-trusted-publishing" title="Permanent link">&para;</a></h2>
+<p>After creating a GitHub Release, <code>.github/workflows/release.yml</code> explicitly
+invokes <code>.github/workflows/publish-pypi.yml</code>. The called workflow downloads the
+release wheel and sdist, validates their embedded distribution name and
+version, verifies that both were attested by <code>release.yml</code> for the selected tag,
+and publishes with short-lived GitHub OIDC credentials. The public-index smoke
+test installs runtime dependencies from the hash-locked <code>uv.lock</code> export and
+installs the exact PyPI wheel by its verified SHA-256 digest. The workflow does
+not use a PyPI API token and does not build or execute repository code in the
+OIDC-enabled publish job.</p>
+<p>Configure the pending or project Trusted Publisher with these exact values:</p>
+<ul>
+<li>PyPI project: <code>agent-paranoid-android</code></li>
+<li>GitHub owner: <code>wa-pis</code></li>
+<li>GitHub repository: <code>agent-paranoid-android</code></li>
+<li>Workflow filename: <code>publish-pypi.yml</code></li>
+<li>Environment: <code>pypi</code></li>
+</ul>
+<p>The manual dispatch input exists only for recovering a published GitHub
+Release that predates the workflow. Duplicate PyPI versions fail loudly;
+<code>skip-existing</code> is intentionally disabled.</p>
+<h2 id="public-release-readiness">Public Release Readiness<a class="headerlink" href="#public-release-readiness" title="Permanent link">&para;</a></h2>
+<p>Before making the repository public or announcing a public release, complete
+the <a href="../public_release_checklist/">Public Release Checklist</a>. In particular:</p>
+<ol>
+<li>Confirm <code>LICENSE</code>, <code>SECURITY.md</code>, <code>CONTRIBUTING.md</code>, issue templates, pull
+   request template, and Dependabot configuration are present.</li>
+<li>Confirm author and committer emails are public-safe.</li>
+<li>Run a secret scan over the working tree and reachable Git history.</li>
+<li>Build and smoke-test the installed wheel:</li>
+</ol>
+<pre><code class="language-bash">uv build --no-build-isolation
+uv run --isolated --no-project --with ./dist/*.whl \
+  python scripts/check_installed_package.py
+uv run --isolated --no-project --with ./dist/*.whl \
+  test-data-agent doctor --skip-smoke
+</code></pre>
+<ol>
+<li>Enable GitHub security settings after publication: secret scanning,
+   Dependabot alerts, Dependabot security updates, private vulnerability
+   reporting, required CI and dependency-review checks, and active branch/tag
+   rulesets.</li>
+<li>Confirm the <code>pypi</code> GitHub environment and matching PyPI Trusted Publisher
+   use the exact workflow identity documented above.</li>
+</ol>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

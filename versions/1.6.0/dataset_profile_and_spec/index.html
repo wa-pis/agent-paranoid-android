@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/dataset_profile_and_spec/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Dataset Profile And Spec Reference - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Dataset Profile And Spec Reference";
+        var mkdocs_page_input_path = "dataset_profile_and_spec.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/dataset_profile_and_spec/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Dataset Profile And Spec Reference</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/dataset_profile_and_spec.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="dataset-profile-and-spec-reference">Dataset Profile And Spec Reference<a class="headerlink" href="#dataset-profile-and-spec-reference" title="Permanent link">&para;</a></h1>
+<p>This document describes the two main artifacts in the domain-agnostic pipeline:</p>
+<ul>
+<li><code>DatasetProfile</code> JSON</li>
+<li><code>DatasetSpec</code> YAML</li>
+</ul>
+<h2 id="datasetprofile-json">DatasetProfile JSON<a class="headerlink" href="#datasetprofile-json" title="Permanent link">&para;</a></h2>
+<p>A profile is safe metadata and bounded evidence inferred from a source. It is
+not a complete description of the domain and must not imply that unobserved
+rules are known.</p>
+<h2 id="evidence-envelope">Evidence Envelope<a class="headerlink" href="#evidence-envelope" title="Permanent link">&para;</a></h2>
+<p>The evidence-bounded contract records how each important observation was
+obtained. Relationships and constraints already expose confidence and status;
+the release contract extends that record with provenance and coverage rather
+than treating inference as fact.</p>
+<p>Target shape for an observed rule or relationship:</p>
+<pre><code class="language-yaml">origin: observed
+status: candidate
+confidence: medium
+evidence:
+  sample_size: 200
+  sampling: bounded
+  time_window:
+    from: '2026-01-01'
+    to: '2026-03-31'
+  rows_checked: 200
+  violations: 0
+source_fingerprint: sha256:...
+assumptions: []
+</code></pre>
+<p><code>high</code> confidence means strong support from the recorded evidence, not a
+universal truth claim. DDL or ORM declarations are <code>declared</code>; facts measured
+from a sample or live profile are <code>observed</code>; deterministic or AI proposals
+are <code>inferred</code> until a human accepts them. AI receives this context as
+untrusted metadata and cannot promote a hypothesis into a generation rule.</p>
+<p>If sample size, sampling method, coverage, or time window is unknown, that
+uncertainty must remain visible in the profile and review record.</p>
+<p>Top-level shape:</p>
+<pre><code class="language-json">{
+  &quot;source_type&quot;: &quot;csv_folder&quot;,
+  &quot;entities&quot;: [],
+  &quot;relationships&quot;: [],
+  &quot;constraints&quot;: []
+}
+</code></pre>
+<h3 id="entity-profile">Entity Profile<a class="headerlink" href="#entity-profile" title="Permanent link">&para;</a></h3>
+<p>Each CSV file becomes an entity:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;customers&quot;,
+  &quot;row_count&quot;: 3,
+  &quot;fields&quot;: [],
+  &quot;primary_key_candidates&quot;: [&quot;customer_id&quot;]
+}
+</code></pre>
+<h3 id="field-profile">Field Profile<a class="headerlink" href="#field-profile" title="Permanent link">&para;</a></h3>
+<p>Field profiles contain schema and safe distribution metadata:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;email&quot;,
+  &quot;data_type&quot;: &quot;string&quot;,
+  &quot;nullable&quot;: false,
+  &quot;null_ratio&quot;: 0.0,
+  &quot;unique_ratio&quot;: 1.0,
+  &quot;sensitive&quot;: true,
+  &quot;semantic_type&quot;: &quot;email&quot;,
+  &quot;is_identifier&quot;: false,
+  &quot;distribution&quot;: {
+    &quot;kind&quot;: &quot;masked_patterns&quot;,
+    &quot;patterns&quot;: [
+      {&quot;pattern&quot;: &quot;email&quot;, &quot;count&quot;: 3}
+    ]
+  }
+}
+</code></pre>
+<p>Sensitive fields use masked patterns, not raw top values. By default,
+low-cardinality non-sensitive fields preserve category frequency ranks with
+synthetic labels such as <code>category_1</code>. Exact values appear only for a field in
+the typed local category allowlist after bounded non-sensitive content checks;
+that exception does not apply to source rows, provider payloads, or default MCP
+responses.</p>
+<p>Common distribution kinds:</p>
+<ul>
+<li><code>synthetic_identifier</code></li>
+<li><code>masked_patterns</code></li>
+<li><code>numeric</code></li>
+<li><code>decimal_range</code></li>
+<li><code>numeric_shape</code></li>
+<li><code>boolean</code></li>
+<li><code>date_range</code></li>
+<li><code>datetime_range</code></li>
+<li><code>categorical</code></li>
+<li><code>string_pattern</code></li>
+</ul>
+<p>For <code>synthetic_identifier</code>, <code>pool_size</code> controls the synthetic key pool. The
+optional <code>prefix</code> property is legacy metadata retained for compatibility, not a
+generation control. String identifiers always use <code>synthetic_</code> followed by an
+ASCII integer; a supplied prefix is never copied into generated values.
+<code>masked_patterns</code> describes safe profiling evidence, not literal templates to
+copy into output. Sensitive values use their synthetic semantic formatter.
+Typed CSV bundles write exact DECIMAL values in plain fixed-point notation,
+including very small values, so standalone validation can restore their declared
+precision and scale without accepting exponent-form source strings.
+Declared precision 38, scale 38 supports both signs, including the smallest
+nonzero unit and the largest fractional magnitude. The optional minus sign is
+not part of the declared digit precision; values outside that precision and
+oversized text still fail the bounded exact parser.
+CSV formatting checks the exact-decimal width and finiteness before expanding a
+Decimal exponent; unbounded or non-finite direct values fail with a value-free
+error.</p>
+<h3 id="large-input-behavior">Large Input Behavior<a class="headerlink" href="#large-input-behavior" title="Permanent link">&para;</a></h3>
+<p>CSV-folder profiles are built with a streaming schema/distribution pass. The
+profiler can read large local files without keeping all source rows in memory.
+Only bounded samples are kept for row-level relationship and constraint mining.</p>
+<p>The optional profile cache stores the <code>DatasetProfile</code> wrapper only. It is keyed
+by CSV file names, sizes, and modification times and must remain metadata-only:
+no source rows, no real identifiers, and no raw PII.</p>
+<p>Trino-derived profiles should follow the same artifact shape but should be
+computed with pushdown aggregate queries in Trino. The local agent should keep
+the compact profile JSON, not a downloaded copy of the source table.</p>
+<h3 id="sql-query-source-profile">SQL Query Source Profile<a class="headerlink" href="#sql-query-source-profile" title="Permanent link">&para;</a></h3>
+<p>The query-source workflow introduced in stable <code>1.5.0</code> profiles one reviewed
+PostgreSQL or Trino query as a virtual entity. Its <code>source_type</code> is <code>postgres_query</code> or
+<code>trino_query</code>. It is retained in stable <code>1.6.0</code>; see <a href="../1.6.0-release-status/">release status</a>. Since RC5, the profile
+records a stable <code>source_fingerprint</code>,
+<code>source_policy_version: "1.1"</code>, and ordinary safe entity metadata and aggregates.
+This source-policy version is separate from DatasetSpec's schema version;
+older query fingerprints remain historical evidence.</p>
+<p>The fingerprint identifies the validated query shape without serializing the
+SQL. Query text, literals, physical endpoints, backend messages, and query
+result rows are excluded. Generation reads the reviewed inferred
+<code>DatasetSpec</code>, never query rows.</p>
+<h3 id="relationship-profile">Relationship Profile<a class="headerlink" href="#relationship-profile" title="Permanent link">&para;</a></h3>
+<p>Relationships are inferred with confidence:</p>
+<pre><code class="language-json">{
+  &quot;parent_entity&quot;: &quot;customers&quot;,
+  &quot;parent_field&quot;: &quot;customer_id&quot;,
+  &quot;child_entity&quot;: &quot;orders&quot;,
+  &quot;child_field&quot;: &quot;customer_id&quot;,
+  &quot;relationship_type&quot;: &quot;many_to_one&quot;,
+  &quot;confidence&quot;: 1.0,
+  &quot;status&quot;: &quot;inferred&quot;
+}
+</code></pre>
+<h3 id="constraint-profile">Constraint Profile<a class="headerlink" href="#constraint-profile" title="Permanent link">&para;</a></h3>
+<p>Constraints are also inferred with confidence and status:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;formula&quot;,
+  &quot;entity&quot;: &quot;orders&quot;,
+  &quot;fields&quot;: [&quot;amount&quot;, &quot;quantity&quot;, &quot;unit_price&quot;],
+  &quot;expression&quot;: &quot;quantity * unit_price&quot;,
+  &quot;confidence&quot;: 1.0,
+  &quot;status&quot;: &quot;inferred&quot;
+}
+</code></pre>
+<p>Supported constraint types:</p>
+<ul>
+<li><code>formula</code></li>
+<li><code>temporal</code></li>
+<li><code>conditional_required</code></li>
+<li><code>aggregate_mapping</code></li>
+</ul>
+<h2 id="datasetspec-yaml">DatasetSpec YAML<a class="headerlink" href="#datasetspec-yaml" title="Permanent link">&para;</a></h2>
+<p>The spec is the editable generation contract. It has the same core concepts as
+the profile, but it is intended for generation.</p>
+<p>Small example:</p>
+<pre><code class="language-yaml">schema_version: '1.1'
+entities:
+- name: customers
+  row_count: 2
+  primary_key: customer_id
+  fields:
+  - name: customer_id
+    data_type: integer
+    is_identifier: true
+    distribution: {kind: synthetic_identifier}
+- name: orders
+  row_count: 3
+  primary_key: order_id
+  fields:
+  - name: order_id
+    data_type: integer
+    is_identifier: true
+    distribution: {kind: synthetic_identifier}
+  - name: customer_id
+    data_type: integer
+    is_identifier: true
+    distribution: {kind: synthetic_identifier}
+  - name: quantity
+    data_type: integer
+    distribution: {kind: numeric, min_value: 1, max_value: 4}
+  - name: unit_price
+    data_type: decimal
+    distribution: {kind: decimal_range, precision: 4, scale: 2, min: '1.00', max: '5.00'}
+  - name: amount
+    data_type: decimal
+    distribution: {kind: decimal_range, precision: 5, scale: 2, min: '0.00', max: '20.00'}
+
+relationships:
+- parent_entity: customers
+  parent_field: customer_id
+  child_entity: orders
+  child_field: customer_id
+  relationship_type: many_to_one
+  confidence: 1.0
+  status: inferred
+
+constraints:
+- type: formula
+  entity: orders
+  fields: [amount, quantity, unit_price]
+  expression: quantity * unit_price
+  confidence: 1.0
+  status: inferred
+
+generation_settings:
+  seed: 12345
+  output_format: json
+</code></pre>
+<p><code>schema_version</code> is the serialized contract version and is independent from the
+Python package version. New specifications default to <code>1.1</code>; exact DECIMAL
+fields require it. Both supported versions validate unique entity/field names
+and check that relationships, constraints, primary keys, and scoped privacy
+rules refer to fields that exist. Older serialized specs without the key load
+as <code>1.0</code> for backward compatibility.</p>
+<p>Business rules can be embedded as <code>business_rules</code> in the reviewed spec or
+supplied as a reviewed YAML/JSON rule file. Generation and validation settings
+travel with the same spec across sources and output formats. See the
+<a href="../reference/source-output-matrix/">source/output contract</a> and
+<a href="../how-to/business-rules/">business-rule workflow</a>.</p>
+<h2 id="what-you-can-edit">What You Can Edit<a class="headerlink" href="#what-you-can-edit" title="Permanent link">&para;</a></h2>
+<p>Useful manual edits:</p>
+<ul>
+<li>Change <code>row_count</code> per entity.</li>
+<li>Remove an inferred relationship if it is wrong.</li>
+<li>Remove or edit a constraint if confidence is low.</li>
+<li>Change categorical counts to steer scenario frequency.</li>
+<li>Mark a field as <code>sensitive: true</code> if unsure.</li>
+<li>Set <code>nullable</code> and <code>null_ratio</code> to shape missingness.</li>
+</ul>
+<p>Avoid putting real source examples into the spec. Keep it metadata-only.</p>
+<h2 id="validation-report">Validation Report<a class="headerlink" href="#validation-report" title="Permanent link">&para;</a></h2>
+<p>Validation returns sections:</p>
+<pre><code class="language-json">{
+  &quot;valid&quot;: true,
+  &quot;sections&quot;: [
+    {&quot;name&quot;: &quot;schema&quot;, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: []},
+    {&quot;name&quot;: &quot;relationships&quot;, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: []},
+    {&quot;name&quot;: &quot;constraints&quot;, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: []}
+  ]
+}
+</code></pre>
+<p>If <code>valid</code> is false, inspect the section errors first. They tell you whether the
+problem is basic schema shape, relationship integrity, or constraint
+reconciliation.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

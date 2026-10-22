@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/acceptance-evidence-1.6.0rc5/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Cross-interface Acceptance Evidence For RC5 - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Cross-interface Acceptance Evidence For RC5";
+        var mkdocs_page_input_path = "acceptance-evidence-1.6.0rc5.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/acceptance-evidence-1.6.0rc5/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Cross-interface Acceptance Evidence For RC5</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/acceptance-evidence-1.6.0rc5.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="cross-interface-acceptance-evidence-for-rc5">Cross-interface Acceptance Evidence For RC5<a class="headerlink" href="#cross-interface-acceptance-evidence-for-rc5" title="Permanent link">&para;</a></h1>
+<h2 id="status-and-identities">Status and identities<a class="headerlink" href="#status-and-identities" title="Permanent link">&para;</a></h2>
+<p>The historical automated runtime campaign passed before RC5 preparation. Actual
+Codex and current-specification human acceptance passed on the exact RC5 main
+candidate. Publication workflows and public verification passed.
+See the <a href="../release-evidence-1.6.0rc5/">publication evidence</a>. This document
+records what actually ran, without treating a previous artifact as a newly built RC5 wheel.
+The <a href="../acceptance-matrix/">plan</a> and <a href="../release/">release process</a> still apply.</p>
+<h2 id="exact-rc5-candidate-checkpoint">Exact RC5 candidate checkpoint<a class="headerlink" href="#exact-rc5-candidate-checkpoint" title="Permanent link">&para;</a></h2>
+<p>On 2026-10-16, <a href="https://github.com/wa-pis/agent-paranoid-android/pull/623">PR #623</a>
+merged as frozen main <code>890925afdff68e97cafe38a28605d2874c9dad79</code>. Its tree
+<code>a2f57bba64603b4ae2a39c97f958c506315e630c</code> matches repaired reference
+<code>cd4f1cdba042862909fc9ccfe06fc52e4389e622</code>. The following are candidate checks;
+public release verification passed separately. Later documentation commits do not
+change these source identities or inherit their results.</p>
+<table>
+<thead>
+<tr>
+<th>Exact-main check</th>
+<th>Result and evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full local gate</td>
+<td>4197 passed, 23 classified skips, no failures, 91.49% coverage; schema, lint/types, compile, licenses/dependencies, budgets and quickstart passed.</td>
+</tr>
+<tr>
+<td>Documentation and OpenSpec</td>
+<td>Strict MkDocs passed; all 30 then-current OpenSpec items passed strict validation.</td>
+</tr>
+<tr>
+<td>CI</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245358">Main workflow</a>: Python 3.11–3.14 each passed 4197 tests with 23 skips; coverage 91.49%, 91.49%, 91.49%, 91.44%. Eighteen installed package profiles, four PostgreSQL routes and six Trino routes passed.</td>
+</tr>
+<tr>
+<td>Containers</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245187">Main workflow</a>: six actual hardened workloads across three targets and AMD64/ARM64 passed.</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245368">Main workflow</a> passed.</td>
+</tr>
+<tr>
+<td>Security</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245355">Main workflow</a> passed.</td>
+</tr>
+<tr>
+<td>Installed matrices</td>
+<td>Fresh exact-main runner/fixture: 600/600 logical cells on each of MCP 1.30.0 and 2.2.0, two seeded repeats per cell; workers completed and MCP processes were reaped.</td>
+</tr>
+<tr>
+<td>Independent AI source review</td>
+<td>Exact-main technical approval recorded in <a href="https://github.com/wa-pis/agent-paranoid-android/pull/623">PR #623</a>, subject to separate manual and release gates. Decision record SHA-256: <code>2ff4128de6dfe767f878b0347d61db38b4cf328276fcf08bcb4cb5eb6f4f030b</code>. This is not human dataset consent or a GitHub-required human approval.</td>
+</tr>
+<tr>
+<td>Ubuntu no-publish preflight</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923785970">Exact-main run</a> passed with Python 3.12.15: 4197 passed, 23 skips, build and installed-wheel checks. Downloaded wheel/sdist hashes were independently verified.</td>
+</tr>
+</tbody>
+</table>
+<p>The focused SDK suites ran separately on <code>cd4f1cdba042862909fc9ccfe06fc52e4389e622</code>:
+847 passed and six legacy combinations excluded per SDK. Their 24 referenced
+test/configuration files and all 157 package payloads were verified identical
+at main. Those focused results retain their actual <code>cd4f1cdb</code> execution identity;
+they are not described as fresh main execution. The 600-cell matrices above
+were rerun for main. Their acquisition and finite-coverage limits remain those
+described below.</p>
+<p>Ubuntu publication-preflight artifacts:</p>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>SHA-256</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent_paranoid_android-1.6.0rc5-py3-none-any.whl</code></td>
+<td><code>969f969d57c0c87784cf7708d165507d8c3cd34eb41dccccaff43bdd08dea6d1</code></td>
+</tr>
+<tr>
+<td><code>agent_paranoid_android-1.6.0rc5.tar.gz</code></td>
+<td><code>d2011e802d64157e9351805e94f97e2202b4c52a7c14511f6b6973b1079d3ae8</code></td>
+</tr>
+</tbody>
+</table>
+<p>The separate macOS manual-client wheel has SHA-256
+<code>b32e459cd7a346bba2dc47e2caf61760c7fb8d35327cd486d286667389551368</code>.
+All 162 wheel members, including 157 package files, match the Ubuntu wheel in
+content; only ZIP timestamps differ. The macOS hash is not the publication
+preflight hash.</p>
+<h2 id="actual-codex-and-human-specification-acceptance">Actual Codex and human specification acceptance<a class="headerlink" href="#actual-codex-and-human-specification-acceptance" title="Permanent link">&para;</a></h2>
+<p>On 2026-10-16, the actual Codex CLI <code>0.162.0-alpha.17.2</code> conversation continued
+with its existing fictional plan. After the authored specification was installed,
+the client inspected it and displayed the complete current file and its hash.
+The human then explicitly attested full-file review and gave new specific consent
+before generation. Earlier consent predating that file was excluded. Before
+approval, the client inspected and reread the unchanged file. The observed
+sequence then completed <code>approve_dataset_plan</code>, <code>validate_dataset</code> and a final
+<code>inspect_dataset_plan</code> reporting phase <code>completed</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Manual acceptance binding</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exact source</td>
+<td><code>890925afdff68e97cafe38a28605d2874c9dad79</code></td>
+</tr>
+<tr>
+<td>Reviewed specification byte SHA-256</td>
+<td><code>b691f8c82d2f0d28f8a70064ba414f269846ae88f98b781d06364a6ba97254e2</code></td>
+</tr>
+<tr>
+<td>Reviewed typed specification SHA-256</td>
+<td><code>2e299faba7ac1dac3f18a385922c709f4294f3de5d77ac7fa8ba1b0a0eef365d</code></td>
+</tr>
+<tr>
+<td>Manual evidence SHA-256</td>
+<td><code>22105ba0a2dcd9ed7654898c669832c7eee2c85969c79542ad23aa2f61db1270</code></td>
+</tr>
+<tr>
+<td>Final observation SHA-256</td>
+<td><code>59da184f674d6f90433e6b8596b35b4fe90492fb2292bb59d85b823822bd70d7</code></td>
+</tr>
+<tr>
+<td>Artifact audit SHA-256</td>
+<td><code>425e5d066f09626995d257e15655e30fdf00aa9280ed9d1e1858f5d53074f719</code></td>
+</tr>
+</tbody>
+</table>
+<p>The accepted result contained two synthetic customer rows and five synthetic
+order rows. Validation and the separate artifact audit passed for primary/foreign
+keys, native constraints, exact DECIMAL values and six business rules. The final
+inspection reported <code>source_rows_copied: false</code>. This manual result uses the
+separate macOS wheel identified above.</p>
+<p>The evidence records the actual user self-attestation after complete current-file
+display; automated observation alone does not prove human reading. The same
+conversation continued without a second planning call, but the exact resume
+command and resumed binary version were not independently captured beyond the
+preserved client metadata. Separate trust/tool UI prompts and normal interactive
+exit/disconnect were not captured. No process bound to the acceptance MCP
+environment remained at the final observation; that does not establish a normal
+client exit status. No transformation or preservation authority was exercised.
+Public release acceptance passed separately; publication facts are
+recorded in the <a href="../release-evidence-1.6.0rc5/">release evidence</a>.</p>
+<h2 id="historical-campaign-identities">Historical campaign identities<a class="headerlink" href="#historical-campaign-identities" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Identity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Final campaign source</td>
+<td><code>408ec527795146cb0971dc12f7eb75cb9415b0a6</code></td>
+</tr>
+<tr>
+<td>Installed matrix/SDK execution source</td>
+<td><code>2eecfd6980bd88cf1c8a4152ed3f8792f6c30895</code></td>
+</tr>
+<tr>
+<td>Campaign wheel version</td>
+<td><code>1.6.0rc4</code> development build, distinct from published RC4</td>
+</tr>
+<tr>
+<td>Byte-identical wheel SHA-256 at both sources</td>
+<td><code>5eaddcebc83961d4c3e74daa0d12fdd25657d77734a1745456c80e2106a108e6</code></td>
+</tr>
+<tr>
+<td>Final campaign sdist SHA-256</td>
+<td><code>a31db8a1b5f8e57504ef04fd52bdabbf63013916101bd92815aba8e359ba1d4d</code></td>
+</tr>
+<tr>
+<td>CI synthetic merge commit</td>
+<td><code>9e0c01dcc70a37bb3a7027cbf09de005d07f5b8d</code></td>
+</tr>
+</tbody>
+</table>
+<p>The final campaign commit changes only an isolated MCP inventory test. Rebuilt
+wheels are identical, and the matrix runner, fixture and selected SDK test
+definitions were checked for equivalence. Reports retain their real execution
+SHA. The full source gate and corrected isolated test ran on <code>408ec527</code>.
+GitHub's comparison between that head and the CI merge commit has no changed
+files. These are earlier runtime proofs, not fresh RC5 release gates or hashes.
+Independent RC5 review subsequently found unbounded DECIMAL fixed-point
+formatting in typed Parquet and its controlled-invalid fallback. The correction
+uses one bounded converter across validation and output adapters. That runtime
+change superseded version-only equivalence and required fresh installed-matrix
+and full release gates on the corrected RC5 candidate. The candidate checkpoint
+above records those reruns. Results below remain the historical campaign
+baseline, not acceptance of the correction.</p>
+<h2 id="historical-campaign-results">Historical campaign results<a class="headerlink" href="#historical-campaign-results" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result and scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full source gate</td>
+<td>4121 passed, 23 classified skips, 91.46% coverage; schema, lint/types, compile, licenses/dependencies, budgets and quickstart passed.</td>
+</tr>
+<tr>
+<td>Hosted full Python matrix</td>
+<td>Python 3.11–3.14 each passed 4121 tests with 23 skips; coverage 91.46%, 91.46%, 91.46%, 91.41%.</td>
+</tr>
+<tr>
+<td>Installed matrix</td>
+<td>600/600 logical cells per MCP SDK major, two seeded repeats per cell, completed workers and reaped MCP processes.</td>
+</tr>
+<tr>
+<td>SDK permissions/options</td>
+<td>Per SDK: 771 passed, 6 excluded legacy preservation combinations, including 21 real stdio cases.</td>
+</tr>
+<tr>
+<td>Finite option pairs</td>
+<td>464/464 defined compatible pairs; 52 behavioral cases plus an invariant over nine representative axes.</td>
+</tr>
+<tr>
+<td>Isolated registration</td>
+<td>Five passed: three common CLI flag placements, configured console tool inventory and offline piped OAuth refusal.</td>
+</tr>
+<tr>
+<td>Additional delegated CLI</td>
+<td>22 passed: direct format-editor settings/refusals and six operations across three JSON/debug positions on expected-refusal paths. Configuration only, no approval/receipt.</td>
+</tr>
+<tr>
+<td>Live fictional acquisition</td>
+<td>Four PostgreSQL and six Trino routes passed with restricted readers.</td>
+</tr>
+<tr>
+<td>Hardened containers</td>
+<td>Six actual workloads: three targets on AMD64/ARM64; non-root, read-only, network-none, bounded resources and dropped capabilities. ARM64 uses CI emulation.</td>
+</tr>
+<tr>
+<td>Installed package profiles</td>
+<td>18 passed: base, six optional extras, seven minimum-dependency profiles and four Python wheel-compatibility profiles.</td>
+</tr>
+<tr>
+<td>Documentation and specifications</td>
+<td>Strict MkDocs and all 29 then-current OpenSpec items passed.</td>
+</tr>
+</tbody>
+</table>
+<p>Hosted evidence: <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38913092295">CI, 25 successful jobs</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38913092595">containers</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38913092444">Security</a> and
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38913092389">Documentation</a>.</p>
+<p>The installed MCP 1 environment used Python 3.12.13, MCP 1.30.0, Pydantic
+2.14.1 and PyArrow 26; MCP 2 used Python 3.12.13, MCP 2.2.0, Pydantic 2.13.4
+and PyArrow 25. All 157 installed package files matched the campaign wheel.
+Independent AI review closed the confirmed runtime findings; this is separate
+from human dataset approval and must be renewed for the final RC5 main SHA.</p>
+<h2 id="coverage-limits-and-unresolved-steps">Coverage limits and unresolved steps<a class="headerlink" href="#coverage-limits-and-unresolved-steps" title="Permanent link">&para;</a></h2>
+<p>The 600 logical cells combine ten source handoffs, four outputs, five modes and
+Python/CLI/real-stdio MCP. Acquisition is prepared once per source route, then
+an independently authored reviewed specification exercises generation semantics.
+Database aggregates in this matrix are stand-ins; separate live integrations
+establish actual acquisition. This is not 600 live profiling/inference runs.</p>
+<p>The 179 typed model properties, 225 top-level CLI flag occurrences, delegated
+operation inventory and 131 default MCP argument occurrences are navigation
+inventories. Finite pair coverage does not establish every possible value,
+all triples or all option combinations. Supplemental CLI refusal tests do not
+claim arbitrary internal-exception/debug behavior or per-leaf help coverage.</p>
+<p>The 23 full-gate skips comprise ten live integration cases exercised separately,
+five isolated composition cases exercised separately, six explicitly excluded
+legacy preservation combinations and two inapplicable retained-destination
+combinations. Excluded/N/A cases are not counted as passed. Applicable bounded
+preservation refusal and destination-refusal checks passed separately.</p>
+<p>The required six-container baseline passed. Two supplemental live-Trino runs
+inside final containers remain unexecuted after local dependency/network setup
+failed; they are outside that baseline and distinct from the successful live
+database and installed-process tests. Owned database/container resources were
+cleaned up. Temporary fictional test fixtures are retained with local evidence.</p>
+<p>Actual Codex inspection, current-specification human review, new consent and the
+completed synthetic plan are recorded above, with explicit UI and client-exit
+observation limits. Automated SDK/PTY cases and permission to publish RC5 do not
+provide that dataset consent. The current exact-main gates, Ubuntu hashes and
+manual result do not replace publication or post-publication verification. The
+separately gated transformation/session campaign also remains open; this ordinary
+synthetic run grants no preservation authority or claim of complete campaign
+acceptance.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

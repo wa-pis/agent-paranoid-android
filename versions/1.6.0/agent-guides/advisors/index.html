@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/agent-guides/advisors/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Agent and advisor guide - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Agent and advisor guide";
+        var mkdocs_page_input_path = "agent-guides/advisors.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/agent-guides/advisors/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Agent and advisor guide</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/agent-guides/advisors.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="agent-and-advisor-guide">Agent and advisor guide<a class="headerlink" href="#agent-and-advisor-guide" title="Permanent link">&para;</a></h1>
+<p>Read this guide for <code>agent-plan</code>, advisor providers, OpenAI integration,
+confidence/evidence, or relationship discovery.</p>
+<p>The agent layer may plan work and produce typed specifications or hypotheses.
+It must not bypass deterministic safety, generation, validation, approval, or
+audit boundaries.</p>
+<p>Advisor requests should have typed, bounded settings for model/reasoning,
+prompt/input bytes or tokens, output tokens, timeout, retries, and total
+invocation work. Account for the complete provider request, not only the
+serialized application payload. Record bounded, redacted metrics; never log
+credentials, prompts, source values, or secrets.</p>
+<p>Inferred facts and relationships must carry evidence and confidence. AI
+relationship assistance may rank or explain candidates supplied by the local
+profiler, but it must not invent tables, fields, source rows, or relationships;
+mutate a <code>DatasetSpec</code> directly; or auto-approve a result. Candidate identity,
+kind, and referenced fields must be checked deterministically, and the result
+must remain explicitly review-gated.</p>
+<p>Provider adapters should remain optional and provider-neutral at the contract
+boundary. Normal tests use fake transports and synthetic profiles; no
+production data or private infrastructure context may be sent to an external
+provider.</p>
+<p>Local category preservation does not weaken this boundary. Even when a
+reviewed field keeps an explicitly allowlisted business enum for deterministic
+generation, every provider-bound source literal uses a field-scoped synthetic
+label and is restored only inside the fingerprint-bound local review flow.</p>
+<p>Categorical constraint predicates are part of the same provider-bound data as
+their distributions. Replace every string, number, boolean, or null category
+and matching <code>equals</code>, <code>not_equals</code>, or <code>in_values</code> value with field-scoped
+labels before serialization. Reject values outside that field's categorical
+domain; numeric distribution bounds remain unchanged.</p>
+<p>OpenAI and GigaChat apply the same category projection immediately before transport. The original request and fingerprints remain local and unchanged. Unrepresented local categorical predicates reject before sending; invalid restored proposals produce redacted invalid-response errors. Provider byte budgets include the serialized labels.</p>
+<p>Imported field distributions must be empty metadata objects or declare a
+supported typed distribution kind. Nonempty opaque objects, missing kinds
+and unsupported kinds are rejected before advisor/provider serialization.
+The same contract applies to profiles and generation specifications; generic
+errors must not reproduce rejected source contents.</p>
+<p>Provider-bound metadata uses a shared semantic projection. Opaque condition
+extras, unused constraint members, identifier prefix/pattern text and local
+auxiliary annotations are not provider input. Date bounds and formula syntax
+are canonicalized; represented categorical predicates still use field-scoped
+labels. Only established semantic classifications are provider metadata;
+unknown semantic annotations remain local. Schema identifiers remain
+confidential metadata, so operators must choose the recipient accordingly. Local immutable
+metadata and original fingerprints may be restored only after the returned
+proposal matches its projected immutable contract; projection cannot grant new
+proposal or approval authority. Custom exchange clients use the same boundary.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

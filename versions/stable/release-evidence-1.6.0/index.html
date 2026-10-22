@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/release-evidence-1.6.0/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>1.6.0 Stable Release Evidence - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1.6.0 Stable Release Evidence";
+        var mkdocs_page_input_path = "release-evidence-1.6.0.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/release-evidence-1.6.0/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">1.6.0 Stable Release Evidence</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/release-evidence-1.6.0.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="160-stable-release-evidence">1.6.0 Stable Release Evidence<a class="headerlink" href="#160-stable-release-evidence" title="Permanent link">&para;</a></h1>
+<p>GitHub, PyPI and all three signed container targets are published. Public
+verification passed on its first attempt: all 12 jobs succeeded.</p>
+<h2 id="source-and-acceptance">Source and acceptance<a class="headerlink" href="#source-and-acceptance" title="Permanent link">&para;</a></h2>
+<p>The SSH-signed tag <code>v1.6.0</code> targets exact main
+<code>258c035c22408becf17ab090635710a50dda8ccc</code>, merged through
+<a href="https://github.com/wa-pis/agent-paranoid-android/pull/626">PR #626</a>.
+Its tag object is <code>54a49885f211eb03ec0c2aa111797702524ea7da</code>.
+Independent technical AI review approved this exact commit with no open findings;
+report SHA-256 <code>f3a4c645158efad686ed4e1f615592b4d0060f0e6cf1bf1a0eeae6d452a14a7d</code>.
+The promotion retains the accepted RC5 runtime; the sole installed production
+payload change is version.py. Dependencies, schemas, fixtures, workflows and
+behavioral/safety assertions remain unchanged. The archival overlay changes only
+documentation context; its executable tail remains byte-identical.</p>
+<p>The full local gate passed 4197 tests with 23 classified skips and 91.49%
+coverage. Strict documentation and all 30 strict OpenSpec items passed.
+All four actual main workflows passed: <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38967722787">CI</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38967722649">Containers</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38967722775">Documentation</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38967722655">Security</a>.
+CI includes actual disposable PostgreSQL 4/4, Trino 6/6, minimum MCP 1.28.1
+transport 65/65 and Python 3.11–3.14. Container workloads cover all three targets
+on AMD64 and emulated ARM64.</p>
+<h2 id="installed-interface-and-personal-acceptance">Installed interface and personal acceptance<a class="headerlink" href="#installed-interface-and-personal-acceptance" title="Permanent link">&para;</a></h2>
+<p>Both MCP 1.30.0 and 2.2.0 environments used the final Ubuntu wheel. Each passed
+600 logical source/output/mode/interface cells with two seeded repeats and
+reaped MCP processes; 1080 grouped tracked executions (1001 unique cases), zero
+final skips or failures; and 22 external CLI scenarios. Separate transformation
+subsets passed 192 selected tests each, twelve fictional supplied-fixture routes
+and real-stdio common/configured lifecycle cases. An initially over-restricted
+external PATH caused 15 doctor failures per environment; original reports remain
+unchanged and separate PATH-only completion runs passed. No product or installed
+dependency was changed to repair the test environment.</p>
+<p>Actual personal controlling-terminal approval completed the common direct/fallback
+and configured owned-capture fictional cases, followed by real-stdio validate and
+execute, source cleanup, no reconnect and normal process reaping. The result is
+bound to this final source and wheel; result SHA-256
+<code>23c543c70386f41cf961c3bb16f35014d1be07793b4e437a2bf7acfa594645c8</code>.
+This is personal preservation consent for those exact fictional plans, not a
+blanket authorization. No agent issued that consent. The earlier actual Codex
+specification acceptance retains its RC5 source, version and observation limits;
+no fresh stable Codex UI or separate UI-prompt observation is claimed.</p>
+<p>Fresh private CSV capacity passed 300000 rows × 50 columns, complete readback,
+source integrity and cleanup: 90150450 output bytes, 144.136 seconds measured
+by the script's shared monotonic clock under explicit 512 MiB/1800-second
+cooperative budgets. The observed UTC interval was 2060.931 seconds; no hard
+wall-clock or peak-RSS containment is claimed. Historical twelve 1M × 100 route
+measurements retain their actual historical artifacts; they are not fresh stable
+public/wire/live-database capacity results.</p>
+<h2 id="artifact-identity">Artifact identity<a class="headerlink" href="#artifact-identity" title="Permanent link">&para;</a></h2>
+<p>A fresh <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/38970552654">Ubuntu no-publish preflight</a>
+and independent re-download/supply-chain audit established these hashes before
+signing. All 157 package payloads match exact source and installed environments.</p>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>SHA-256</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent_paranoid_android-1.6.0-py3-none-any.whl</code></td>
+<td><code>7c2c9b9399112cbfaa08dd3164f0f5b040396ebaa606a9ba42734161d7029ef6</code></td>
+</tr>
+<tr>
+<td><code>agent_paranoid_android-1.6.0.tar.gz</code></td>
+<td><code>1b02f0dcd585d2d985003769faf1df04e5d44538b5d693ac5a5eea6f0e02d1e7</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="publication-and-public-verification">Publication and public verification<a class="headerlink" href="#publication-and-public-verification" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/39017294518">Release</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/39017970928">PyPI</a> and
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/39017294527">Containers</a>
+succeeded. The stable <a href="https://github.com/wa-pis/agent-paranoid-android/releases/tag/v1.6.0">GitHub release</a>
+was published on 2026-10-17 at 08:35:53 UTC. Both public GitHub and actual PyPI
+downloads were independently rehashed against the signed manifest. Both portable
+Sigstore attestations verified with the exact release workflow and tag identity.</p>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/39018919261">Verify Published Release</a>
+passed on attempt 1: the resolve job, Python-package/documentation job, all seven
+public installation profiles and all three container jobs. Checks include
+installation/upgrade, doctor, fictional synthetic and agent approval/audit flows,
+published documentation, image provenance/SBOM, keyless signatures and hardened
+runtime workloads. Automated approval fixtures do not supply personal consent.</p>
+<table>
+<thead>
+<tr>
+<th>Image</th>
+<th>Immutable multi-platform manifest digest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ghcr.io/wa-pis/agent-paranoid-android-cli:1.6.0</code></td>
+<td><code>sha256:9fd052485b86982faca5d201d5cca0c83dffeb12f3caa613fbcbc7759c9f5978</code></td>
+</tr>
+<tr>
+<td><code>ghcr.io/wa-pis/agent-paranoid-android-generator-mcp:1.6.0</code></td>
+<td><code>sha256:2f160705fcba990966a7cd7c2eef0eae5701a4894cc36c6d910ec5d9d68eaa8a</code></td>
+</tr>
+<tr>
+<td><code>ghcr.io/wa-pis/agent-paranoid-android-trino-mcp:1.6.0</code></td>
+<td><code>sha256:8e0fb20f9b1b0ce5648d444699eaa723310236ecb9aa620fcb5dc223e5870843</code></td>
+</tr>
+</tbody>
+</table>
+<p>All three keyless signatures bind to
+<code>https://github.com/wa-pis/agent-paranoid-android/.github/workflows/containers.yml@refs/tags/v1.6.0</code>.
+The <a href="../release-ledger-1.6.0.json">value-free case ledger</a> records actual finite
+case IDs, environment versions and report hashes.</p>
+<p>Finite option coverage does not mean every possible formula/value or all option
+triples. Aggregate handoffs in the 600-cell matrix are distinct from disposable
+live acquisition; injected transformation captures are not live database tests.
+Provider adapters remain experimental and no live provider call is claimed.
+Prior RC evidence and published tags remain immutable. This later evidence does
+not relabel exact-release runtime checks as executions on its own docs commit.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

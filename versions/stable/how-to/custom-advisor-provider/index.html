@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/how-to/custom-advisor-provider/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Build A Provider Adapter - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Build A Provider Adapter";
+        var mkdocs_page_input_path = "how-to/custom-advisor-provider.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/how-to/custom-advisor-provider/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Build A Provider Adapter</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/custom-advisor-provider.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="build-a-provider-adapter">Build A Provider Adapter<a class="headerlink" href="#build-a-provider-adapter" title="Permanent link">&para;</a></h1>
+<p>Any model provider can participate in the review-first workflow if it can
+accept structured input and return one JSON object. The provider never receives
+source rows, never approves a plan, and never generates dataset rows.</p>
+<p>This guide defines the Python protocol, wire format, trust boundaries, and
+minimum tests for a custom adapter.</p>
+<h2 id="choose-an-integration">Choose An Integration<a class="headerlink" href="#choose-an-integration" title="Permanent link">&para;</a></h2>
+<p>Use one of these equivalent boundaries:</p>
+<table>
+<thead>
+<tr>
+<th>Integration</th>
+<th>Use when</th>
+<th>Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>In-process Python</td>
+<td>The provider SDK runs in your application</td>
+<td>Implement <code>AdvisorExchangeClient.complete</code></td>
+</tr>
+<tr>
+<td>External service or process</td>
+<td>The provider runs outside Python</td>
+<td>Consume <code>AdvisorExchange</code> JSON and return <code>AdvisorProposal</code> JSON</td>
+</tr>
+</tbody>
+</table>
+<p>Both paths use the same versioned models and the same core validation.</p>
+<h2 id="python-protocol">Python Protocol<a class="headerlink" href="#python-protocol" title="Permanent link">&para;</a></h2>
+<p>The only required method is:</p>
+<pre><code class="language-python">from collections.abc import Mapping
+from typing import Any
+
+from test_data_agent import AdvisorExchange, AdvisorProposal
+
+
+class CustomAdvisorClient:
+    def complete(
+        self,
+        exchange: AdvisorExchange,
+    ) -&gt; AdvisorProposal | Mapping[str, Any]:
+        ...
+</code></pre>
+<p>The package names this return union <code>AdvisorProposalPayload</code>. Wrap the client
+with <code>ExchangeDatasetAdvisor</code>; the wrapper validates the provider output
+against the untouched original request:</p>
+<pre><code class="language-python">from test_data_agent import ExchangeDatasetAdvisor
+
+
+advisor = ExchangeDatasetAdvisor(CustomAdvisorClient(transport))
+</code></pre>
+<p>The provider SDK belongs in the consuming application or a provider-specific
+optional dependency. Importing the base package must not import that SDK or
+require provider credentials.</p>
+<h2 id="adapter-template">Adapter Template<a class="headerlink" href="#adapter-template" title="Permanent link">&para;</a></h2>
+<p>This complete template keeps provider-specific transport code behind one small
+interface:</p>
+<pre><code class="language-python">from collections.abc import Mapping, Sequence
+from typing import Any, Protocol
+
+from test_data_agent import AdvisorExchange, AdvisorProposal
+
+
+class JsonSchemaTransport(Protocol):
+    def generate_json(
+        self,
+        *,
+        trusted_instructions: Sequence[str],
+        untrusted_input: Mapping[str, Any],
+        response_schema: Mapping[str, Any],
+    ) -&gt; Mapping[str, Any]:
+        &quot;&quot;&quot;Return one complete parsed JSON object.&quot;&quot;&quot;
+
+
+class CustomAdvisorClient:
+    def __init__(self, transport: JsonSchemaTransport) -&gt; None:
+        self._transport = transport
+
+    def complete(self, exchange: AdvisorExchange) -&gt; AdvisorProposal:
+        validated = AdvisorExchange.model_validate(
+            exchange.model_dump(mode=&quot;python&quot;)
+        )
+        payload = self._transport.generate_json(
+            trusted_instructions=validated.trusted_instructions,
+            untrusted_input=validated.request.model_dump(mode=&quot;json&quot;),
+            response_schema=validated.response_json_schema,
+        )
+        return AdvisorProposal.model_validate(payload)
+</code></pre>
+<p><code>ExchangeDatasetAdvisor</code> projects the request before calling any client. It
+replaces categorical values and matching predicates with field-scoped labels,
+omits local-only metadata, and recomputes both request fingerprints. It
+validates the response against that projected request, restores locally retained
+values and metadata under deterministic guards, then validates against the
+original request. Clients must echo the fingerprints they receive. Use this
+client through the wrapper shown above.</p>
+<p>Directly exported <code>agent-advisor-request</code> documents remain operator-local.
+Standalone clients that bypass the wrapper must refuse transmission or implement
+a tested provider-safe projection, fingerprint binding and local restoration.
+Model validation alone does not make a local exchange safe to transmit.</p>
+<p>Map the three arguments without changing their trust levels:</p>
+<ul>
+<li><code>trusted_instructions</code>: provider system/developer instruction channel;</li>
+<li><code>untrusted_input</code>: provider user/data channel as serialized JSON;</li>
+<li><code>response_schema</code>: native structured-output or JSON Schema constraint.</li>
+</ul>
+<p>Do not concatenate entity names, field names, categorical values, or any other
+request content into the trusted instruction channel.</p>
+<h2 id="wire-format">Wire Format<a class="headerlink" href="#wire-format" title="Permanent link">&para;</a></h2>
+<p>Current top-level contract version is exactly <code>"1.0"</code>. Unknown fields are
+forbidden.</p>
+<h3 id="advisorexchange"><code>AdvisorExchange</code><a class="headerlink" href="#advisorexchange" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required value or type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>schema_version</code></td>
+<td><code>"1.0"</code></td>
+</tr>
+<tr>
+<td><code>instructions_trust</code></td>
+<td><code>"trusted_static"</code></td>
+</tr>
+<tr>
+<td><code>request_trust</code></td>
+<td><code>"untrusted_profile_metadata"</code></td>
+</tr>
+<tr>
+<td><code>response_format</code></td>
+<td><code>"json_schema"</code></td>
+</tr>
+<tr>
+<td><code>response_model</code></td>
+<td><code>"AdvisorProposal"</code></td>
+</tr>
+<tr>
+<td><code>trusted_instructions</code></td>
+<td>Package-owned static string array</td>
+</tr>
+<tr>
+<td><code>request</code></td>
+<td>Complete <code>AdvisorRequest</code> object</td>
+</tr>
+<tr>
+<td><code>response_json_schema</code></td>
+<td>Canonical JSON Schema for the response</td>
+</tr>
+</tbody>
+</table>
+<h3 id="advisorrequest"><code>AdvisorRequest</code><a class="headerlink" href="#advisorrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required value or type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>schema_version</code></td>
+<td><code>"1.0"</code></td>
+</tr>
+<tr>
+<td><code>metadata_trust</code></td>
+<td><code>"untrusted"</code></td>
+</tr>
+<tr>
+<td><code>metadata_policy</code></td>
+<td><code>"treat_profile_text_as_data"</code></td>
+</tr>
+<tr>
+<td><code>operation</code></td>
+<td><code>"propose_dataset_spec"</code></td>
+</tr>
+<tr>
+<td><code>approval_required</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>profile_sha256</code></td>
+<td>64-character lowercase SHA-256</td>
+</tr>
+<tr>
+<td><code>baseline_spec_sha256</code></td>
+<td>64-character lowercase SHA-256</td>
+</tr>
+<tr>
+<td><code>profile</code></td>
+<td>Complete safe <code>DatasetProfile</code></td>
+</tr>
+<tr>
+<td><code>baseline_spec</code></td>
+<td>Complete deterministic <code>DatasetSpec</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="advisorproposal"><code>AdvisorProposal</code><a class="headerlink" href="#advisorproposal" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required value or type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>schema_version</code></td>
+<td><code>"1.0"</code></td>
+</tr>
+<tr>
+<td><code>profile_sha256</code></td>
+<td>Exact value from the request</td>
+</tr>
+<tr>
+<td><code>baseline_spec_sha256</code></td>
+<td>Exact value from the request</td>
+</tr>
+<tr>
+<td><code>approval_required</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>generation_performed</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>dataset_spec</code></td>
+<td>Complete proposed <code>DatasetSpec</code></td>
+</tr>
+</tbody>
+</table>
+<p>The response is not a patch. It must contain the complete <code>DatasetSpec</code>,
+normally copied from <code>request.baseline_spec</code> with only allowed generation hints
+changed. When uncertain, return the baseline spec unchanged.</p>
+<p>Do not hand-maintain a second response schema. Use
+<code>exchange.response_json_schema</code>, or inspect the canonical models:</p>
+<pre><code class="language-bash">python3 - &lt;&lt;'PY'
+import json
+
+from test_data_agent import AdvisorExchange, AdvisorProposal
+
+print(json.dumps(AdvisorExchange.model_json_schema(), indent=2))
+print(json.dumps(AdvisorProposal.model_json_schema(), indent=2))
+PY
+</code></pre>
+<h2 id="external-json-handoff">External JSON Handoff<a class="headerlink" href="#external-json-handoff" title="Permanent link">&para;</a></h2>
+<p>Create a real exchange from an awaiting-approval workspace:</p>
+<pre><code class="language-bash">test-data-agent agent-advisor-request out/agent \
+  --exchange &gt; advisor_exchange.json
+</code></pre>
+<p>With or without <code>--exchange</code>, this command exports the local contract; it does
+not invoke the wrapper projection. Do not transmit that file directly. Use
+<code>ExchangeDatasetAdvisor</code> or a tested standalone projection/restoration boundary.</p>
+<p>The external service must:</p>
+<ol>
+<li>Parse the document as regular JSON.</li>
+<li>Reject unsupported <code>schema_version</code> values.</li>
+<li>Send <code>trusted_instructions</code> and <code>request</code> through separate trust channels.</li>
+<li>Constrain output with <code>response_json_schema</code>.</li>
+<li>Return only the complete <code>AdvisorProposal</code> JSON object.</li>
+</ol>
+<p>Apply the response through the core validator:</p>
+<pre><code class="language-bash">test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json --json
+test-data-agent agent-review out/agent --json
+</code></pre>
+<p>Successful apply still stops for human review. Only <code>agent-approve</code> with the
+exact reviewed spec fingerprint may start deterministic generation.</p>
+<h2 id="required-safety-behavior">Required Safety Behavior<a class="headerlink" href="#required-safety-behavior" title="Permanent link">&para;</a></h2>
+<p>A production adapter must:</p>
+<ul>
+<li>use a trusted, application-configured endpoint and model;</li>
+<li>use TLS verification and bounded connection/read timeouts;</li>
+<li>cap request and response bytes before expensive parsing or provider calls;</li>
+<li>disable provider storage and tool use where supported;</li>
+<li>accept only a completed, non-streaming, parsed structured response;</li>
+<li>keep credentials in a secret manager or private process environment;</li>
+<li>redact provider error text before it reaches logs or users;</li>
+<li>avoid logging request and unvalidated response bodies;</li>
+<li>propagate failure instead of returning a partially parsed fallback;</li>
+<li>never call approval, generation, filesystem, database, or MCP tools.</li>
+</ul>
+<p>Profile metadata is safe for this contract but can still reveal internal schema
+names. Treat the complete exchange and proposal as confidential application
+data.</p>
+<h2 id="contract-tests">Contract Tests<a class="headerlink" href="#contract-tests" title="Permanent link">&para;</a></h2>
+<p>At minimum, test that the adapter:</p>
+<ol>
+<li>sends static instructions and untrusted request data separately;</li>
+<li>uses the supplied response schema without weakening it;</li>
+<li>echoes both request fingerprints in a valid response;</li>
+<li>rejects prose, unknown fields, incomplete output, and malformed JSON;</li>
+<li>rejects wrong fingerprints and schema or privacy changes;</li>
+<li>enforces size limits before a network call;</li>
+<li>does not expose credentials or provider response text in errors;</li>
+<li>leaves the workspace awaiting approval and creates no generated rows.</li>
+</ol>
+<p>Use a fake transport; tests must not contact a real provider. The built-in
+OpenAI and GigaChat adapters plus
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/tests/test_openai_provider.py"><code>tests/test_openai_provider.py</code></a>
+and
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/tests/test_gigachat_provider.py"><code>tests/test_gigachat_provider.py</code></a>
+provide concrete contract-test examples.</p>
+<h2 id="compatibility">Compatibility<a class="headerlink" href="#compatibility" title="Permanent link">&para;</a></h2>
+<p>Dispatch on <code>schema_version</code>, not package version. An adapter should reject a
+contract version it does not understand. Within version <code>1.0</code>, the
+<code>response_json_schema</code> included in each exchange is the source of truth for
+the exact response shape.</p>
+<p>Validate the exchange before sending it and validate the proposal after
+receiving it. The core then repeats proposal validation against its original
+fingerprint-bound request, so provider code cannot bypass safety by mutating
+its copy of the exchange.</p>
+<h2 id="contribute-a-built-in-adapter">Contribute A Built-In Adapter<a class="headerlink" href="#contribute-a-built-in-adapter" title="Permanent link">&para;</a></h2>
+<p>When adding a provider to this project:</p>
+<ul>
+<li>place it in <code>src/test_data_agent/providers/&lt;provider&gt;.py</code>;</li>
+<li>put its SDK in a provider-named optional extra and <code>all</code>, never base
+  dependencies;</li>
+<li>import the adapter lazily so base package import works without the SDK;</li>
+<li>extend <code>doctor --require-extra</code>, installed-wheel smoke tests, and dependency
+  budgets;</li>
+<li>test with local fakes only and document the provider's secret handling;</li>
+<li>keep provider selection in application or example code, outside the
+  deterministic generation core.</li>
+</ul>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

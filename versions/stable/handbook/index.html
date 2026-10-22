@@ -1,0 +1,2686 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/1.6.0/handbook/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>User Handbook - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "User Handbook";
+        var mkdocs_page_input_path = "handbook.md";
+        var mkdocs_page_url = "/agent-paranoid-android/1.6.0/handbook/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+
+        <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            remove_material_navigation();remove_mkdocs_theme_navigation();
+        })
+        </script>
+        </head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="/agent-paranoid-android/versions/1.6.0//search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">User Handbook</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+<section class="handbook-cover"><h1>Agent Paranoid Android</h1><p>User Handbook</p><p>Reproducible synthetic test data for CSV and database workflows</p></section>
+<nav class="handbook-contents" aria-label="Handbook contents">
+<h1>Contents</h1>
+
+<h2><a href="#section-1">Start Here</a></h2>
+<ul><li><a href="#index">Overview</a></li><li><a href="#getting-started-installation">Installation</a></li><li><a href="#getting-started-first-csv">First CSV Dataset</a></li><li><a href="#getting-started-related-tables">Related Tables</a></li><li><a href="#getting-started-review-output">Review The Output</a></li></ul>
+
+<h2><a href="#section-2">How-To Guides</a></h2>
+<ul><li><a href="#how-to-business-rules">Add Business Rules</a></li><li><a href="#how-to-postgresql">Profile PostgreSQL</a></li><li><a href="#how-to-trino">Profile Through Trino</a></li><li><a href="#how-to-transformation">Transform Local Data</a></li></ul>
+
+<h2><a href="#section-3">Integrations</a></h2>
+<ul><li><a href="#how-to-mcp">Connect An MCP Client</a></li><li><a href="#ai_integration">Connect An AI Client</a></li><li><a href="#operations-containers">Containers</a></li></ul>
+
+<h2><a href="#section-4">Reference</a></h2>
+<ul><li><a href="#reference">Reference Index</a></li><li><a href="#concepts-choosing-an-approach">Choose An Approach</a></li><li><a href="#concepts-profiles-and-specs">Profiles And Specs</a></li><li><a href="#concepts-safety-model">Safety Model</a></li></ul>
+
+<h2><a href="#section-5">Help</a></h2>
+<ul><li><a href="#operations-troubleshooting">Troubleshooting</a></li><li><a href="#known-issues">Known Issues</a></li></ul>
+
+</nav>
+
+
+                <div id="print-site-page" class="print-site-enumerate-figures">
+                    <section class='print-page md-section' id='section-1' heading-number='1'>
+                        <h1>Start Here<a class='headerlink' href='#section-1' title='Permanent link'></a>
+                        </h1>
+                    <section class="print-page" id="index" heading-number="1.1"><h1 id="index-agent-paranoid-android">Agent Paranoid Android<a class="headerlink" href="#index-agent-paranoid-android" title="Permanent link">&para;</a></h1>
+<p>Create repeatable test datasets with useful relationships and business rules,
+without copying source rows. Start with a file, safe database metadata, or an
+explicit specification, then review the plan before generating fresh values.</p>
+<p><a id="project-status"></a></p>
+<p>Stable <code>1.6.0</code> is the recommended release.
+Use the CLI below or the runnable
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/v1.6.0/examples/python_api">Python API example</a>.</p>
+<h2 id="index-five-minute-check">Five-Minute Check<a class="headerlink" href="#index-five-minute-check" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android==1.6.0&quot;
+test-data-agent doctor
+test-data-agent demo --output out/demo
+</code></pre>
+<p>The demo uses a bundled fictional fixture. After installation it needs no
+network, database or AI provider. A healthy installation reports:</p>
+<pre><code class="language-text">quickstart smoke: ok
+doctor passed
+</code></pre>
+<h2 id="index-choose-your-starting-point">Choose Your Starting Point<a class="headerlink" href="#index-choose-your-starting-point" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I have</th>
+<th>Start here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One CSV file</td>
+<td><a href="#getting-started-first-csv">First CSV Dataset</a></td>
+</tr>
+<tr>
+<td>Related CSV files</td>
+<td><a href="#getting-started-related-tables">Related Tables</a></td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td><a href="#how-to-postgresql">PostgreSQL Workflow</a></td>
+</tr>
+<tr>
+<td>Trino</td>
+<td><a href="#how-to-trino">Trino Workflow</a></td>
+</tr>
+<tr>
+<td>A safe profile or a plan</td>
+<td><a href="#concepts-profiles-and-specs">Profiles And Specs</a></td>
+</tr>
+</tbody>
+</table>
+<p><a id="the-safe-workflow"></a></p>
+<h2 id="index-generation-or-transformation">Generation Or Transformation?<a class="headerlink" href="#index-generation-or-transformation" title="Permanent link">&para;</a></h2>
+<p><strong>Synthetic generation</strong> creates new rows from a reviewed <code>DatasetSpec</code>. Use it
+for valid, boundary, load or controlled-invalid test cases. The normal process
+is profile, review the specification, generate, validate, then
+<a href="#getting-started-review-output">review the output</a>.</p>
+<p><strong>Selective transformation</strong> keeps one-to-one correspondence with input rows
+and applies explicit field actions. Its result has mixed origin. Source-value
+preservation requires a non-sensitive field decision and fresh local-terminal
+approval of the exact inputs and plan; agents and MCP cannot issue it.
+Start with <a href="#how-to-transformation">Transform Local Data</a>.</p>
+<h2 id="index-rules-and-formats">Rules And Formats<a class="headerlink" href="#index-rules-and-formats" title="Permanent link">&para;</a></h2>
+<p>Use <a href="#how-to-business-rules">business rules</a> for formulas, field conditions,
+foreign keys and aggregate checks. The
+<a href="#reference-source-output-matrix">source/output matrix</a> shows routes to CSV,
+JSON, Parquet and generated SQL. SQL export writes a file, not a database.</p>
+<h2 id="index-advanced-integrations">Advanced Integrations<a class="headerlink" href="#index-advanced-integrations" title="Permanent link">&para;</a></h2>
+<p><a href="#ai_integration">AI</a>, <a href="#how-to-mcp">MCP</a>,
+<a href="#operations-containers">Containers</a>, and
+<a href="#how-to-custom-advisor-provider">Custom providers</a></p>
+<p><a id="safety-boundaries"></a></p>
+<h2 id="index-before-sharing-a-dataset">Before Sharing A Dataset<a class="headerlink" href="#index-before-sharing-a-dataset" title="Permanent link">&para;</a></h2>
+<p>Review the specification, validation reports and <code>generation_manifest.json</code>.
+For a valid synthetic dataset expect <code>synthetic: true</code>,
+<code>source_rows_copied: false</code> and <code>validation_valid: true</code>.
+These checks do not certify statistical anonymity or detect every sensitive
+value. Explicit mixed/negative datasets can intentionally fail validation.</p>
+<p>Database access remains allowlisted, read-only and bounded. AI receives safe
+metadata, never raw PII, secrets or source rows. See the
+<a href="#concepts-safety-model">Safety Model</a> and
+<a href="#operations-troubleshooting">Troubleshooting</a>.</p>
+<p>For offline reading use <a href="#downloads">Downloads</a>. For another release use
+<a href="#versions">Documentation Versions</a>. Maintainer and release records live in
+<a href="#history">History And Maintenance</a>.</p></section><section class="print-page" id="getting-started-installation" heading-number="1.2"><h1 id="getting-started-installation-installation">Installation<a class="headerlink" href="#getting-started-installation-installation" title="Permanent link">&para;</a></h1>
+<p>Stable <code>1.6.0</code> is the recommended release. Its signed source, packages and
+containers passed <a href="#release-evidence-1.6.0">public verification</a>.</p>
+<h2 id="getting-started-installation-requirements">Requirements<a class="headerlink" href="#getting-started-installation-requirements" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Python 3.11 or newer</li>
+<li>enough local disk space for the requested output</li>
+<li>a dedicated working directory for inputs and generated artifacts</li>
+</ul>
+<p>The supported CI matrix covers CPython 3.11, 3.12, 3.13, and 3.14. Python 3.11
+remains the minimum so users can adopt newer interpreters without forcing
+existing environments to upgrade. The notice and release-gate rules for
+changing this matrix are defined in
+<a href="#reference-support-policy">Runtime And Integration Support</a>.</p>
+<p>Read the
+<a href="#reference-generation-contract-migration">migration notes</a> before
+regenerating existing fixtures.</p>
+<h2 id="getting-started-installation-install-from-pypi">Install From PyPI<a class="headerlink" href="#getting-started-installation-install-from-pypi" title="Permanent link">&para;</a></h2>
+<p>The stable release is <code>1.6.0</code>; the commands below
+pin that exact version for reproducible installation.</p>
+<p>Create an isolated environment:</p>
+<h3 id="getting-started-installation-macos-and-linux">macOS and Linux<a class="headerlink" href="#getting-started-installation-macos-and-linux" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install &quot;agent-paranoid-android==1.6.0&quot;
+</code></pre>
+<p>The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
+Add only the source and format integrations you need:</p>
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[parquet]==1.6.0&quot;
+python3 -m pip install &quot;agent-paranoid-android[mcp]==1.6.0&quot;
+python3 -m pip install &quot;agent-paranoid-android[mcp,trino]==1.6.0&quot;
+python3 -m pip install &quot;agent-paranoid-android[postgres]==1.6.0&quot;
+python3 -m pip install &quot;agent-paranoid-android[openai]==1.6.0&quot;
+python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.6.0&quot;
+</code></pre>
+<p>Dependency footprint budgets live in <a href="#reference-dependency-compatibility-installation-footprint">Dependency Compatibility</a>.</p>
+<p>The <code>all</code> extra remains available for development, demos, and container builds.
+It is not the recommended user installation. Use
+<code>test-data-agent doctor --require-extra all</code> to verify that full environment.</p>
+<p>The experimental GigaChat adapter is retained in <code>1.6.0</code> through its
+explicit <code>gigachat</code> extra. Follow
+<a href="#how-to-gigachat">Use The GigaChat Advisor</a> for authentication, mandatory
+TLS verification, and the review-first workflow. The default provider remains
+OpenAI.</p>
+<p><a id="accepted-candidate-baseline"></a></p>
+<p>Stable <code>1.6.0</code> is the recommended default. Add an optional extra to the same
+exact stable pin only when needed.</p>
+<h3 id="getting-started-installation-windows-powershell">Windows PowerShell<a class="headerlink" href="#getting-started-installation-windows-powershell" title="Permanent link">&para;</a></h3>
+<pre><code class="language-powershell">py -3.11 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install &quot;agent-paranoid-android==1.6.0&quot;
+</code></pre>
+<p>Run the self-contained environment check:</p>
+<pre><code class="language-bash">test-data-agent doctor
+</code></pre>
+<p>Expected final lines:</p>
+<pre><code class="language-text">quickstart smoke: ok
+doctor passed
+</code></pre>
+<p><code>doctor</code> uses a temporary fictional fixture and makes no external calls.
+Use <code>doctor --require-extra parquet</code> (or another installed extra) for an offline
+capability check. See <a href="#operations-troubleshooting">Troubleshooting</a> for
+individual checks and <a href="#reference-cli-automation">CLI automation</a> for JSON
+output.</p>
+<p><a id="install-for-development"></a></p>
+<p>For development setup use <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>.
+For documentation builds use <a href="#development-documentation">Publishing Documentation</a>.
+Shell completion has its own <a href="#reference-shell-completion">reference</a>.</p>
+<h2 id="getting-started-installation-confirm-the-installed-version">Confirm The Installed Version<a class="headerlink" href="#getting-started-installation-confirm-the-installed-version" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">python3 -c &quot;import test_data_agent; print(test_data_agent.__version__)&quot;
+</code></pre>
+<p>The package name is <code>agent-paranoid-android</code>. The command remains
+<code>test-data-agent</code>.</p>
+<h2 id="getting-started-installation-next-step">Next Step<a class="headerlink" href="#getting-started-installation-next-step" title="Permanent link">&para;</a></h2>
+<p>Use <a href="#getting-started-first-csv">First CSV Dataset</a> for one table,
+<a href="#getting-started-related-tables">Related Tables</a> for a folder containing one CSV per table,
+or <a href="#how-to-postgresql">Profile PostgreSQL</a> for an allowlisted database.</p></section><section class="print-page" id="getting-started-first-csv" heading-number="1.3"><h1 id="getting-started-first-csv-first-csv-dataset">First CSV Dataset<a class="headerlink" href="#getting-started-first-csv-first-csv-dataset" title="Permanent link">&para;</a></h1>
+<p>This tutorial profiles one CSV file, infers a generation specification,
+generates new values, and validates the result.</p>
+<h2 id="getting-started-first-csv-prerequisites">Prerequisites<a class="headerlink" href="#getting-started-first-csv-prerequisites" title="Permanent link">&para;</a></h2>
+<ul>
+<li>complete <a href="#getting-started-installation">Installation</a>;</li>
+<li>run commands from a clone of this repository so the synthetic fixture below
+  is available;</li>
+<li>choose a new output directory.</li>
+</ul>
+<p>The fixture contains fictional values and reserved example email domains.</p>
+<p>For the same workflow as an executable script with its own synthetic fixture,
+run <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/csv_quickstart"><code>examples/csv_quickstart/run.sh</code></a>.</p>
+<h2 id="getting-started-first-csv-generate-25-rows">Generate 25 Rows<a class="headerlink" href="#getting-started-first-csv-generate-25-rows" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+</code></pre>
+<p>Expected summary:</p>
+<pre><code class="language-text">Generated synthetic dataset: out | rows: customers=25 | seed: 12345 | validation: passed | source rows copied: no
+</code></pre>
+<p>The exact output path shown in the summary can vary by platform.</p>
+<h2 id="getting-started-first-csv-inspect-the-bundle">Inspect The Bundle<a class="headerlink" href="#getting-started-first-csv-inspect-the-bundle" title="Permanent link">&para;</a></h2>
+<p>The command writes:</p>
+<pre><code class="language-text">out/
+  customers.csv
+  csv_profile.json
+  dataset_spec.json
+  generation_manifest.json
+  validation_report.json
+</code></pre>
+<p>Check the manifest before using the data:</p>
+<pre><code class="language-bash">python3 -c &quot;import json; m=json.load(open('out/generation_manifest.json')); print(m['synthetic'], m['source_rows_copied'], m['validation_valid'], m['seed'])&quot;
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">True False True 12345
+</code></pre>
+<p>Open <code>out/customers.csv</code> and confirm that it contains 25 generated rows plus
+the header. Source rows are not shuffled or copied.</p>
+<h2 id="getting-started-first-csv-reproduce-the-result">Reproduce The Result<a class="headerlink" href="#getting-started-first-csv-reproduce-the-result" title="Permanent link">&para;</a></h2>
+<p>Generate into a different path with the same seed:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/repeated/customers.csv
+</code></pre>
+<p>The two generated CSV files should match:</p>
+<pre><code class="language-bash">python3 -c &quot;from pathlib import Path; assert Path('out/customers.csv').read_bytes() == Path('out/repeated/customers.csv').read_bytes(); print('deterministic: ok')&quot;
+</code></pre>
+<h2 id="getting-started-first-csv-use-your-own-csv">Use Your Own CSV<a class="headerlink" href="#getting-started-first-csv-use-your-own-csv" title="Permanent link">&para;</a></h2>
+<p>Replace the fixture path with your file:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+</code></pre>
+<p>Treat every source CSV as potentially sensitive. Do not share its contents,
+profile artifacts, or command logs until you have reviewed them. The profiler
+suppresses raw values for fields detected as sensitive, but ambiguous domain
+fields still require human review.</p>
+<p>Exact values remain replaced by default. When <code>customers.status</code> has been
+reviewed as a bounded non-sensitive business enum, authorize only that field:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --local-category customers.status \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/approved-status/customers.csv
+</code></pre>
+<p>The request fails closed if the field contains PII, secrets, identifiers,
+quasi-identifiers, free text, excessive cardinality, or long values. The option
+does not authorize any other field or any external-provider destination.</p>
+<p>Review ambiguous identifiers and financial columns before accepting inferred
+keys or distributions. For exact category limits, distinct-count evidence and
+identifier behavior, see <a href="#reference-profiling">CSV Profiling Details</a>.</p>
+<p>Next, read <a href="#getting-started-review-output">Review The Output</a>.</p></section><section class="print-page" id="getting-started-related-tables" heading-number="1.4"><h1 id="getting-started-related-tables-related-tables">Related Tables<a class="headerlink" href="#getting-started-related-tables-related-tables" title="Permanent link">&para;</a></h1>
+<p>Use this workflow when a folder contains one CSV file per related table.
+The file stem becomes the entity name.</p>
+<h2 id="getting-started-related-tables-input-layout">Input Layout<a class="headerlink" href="#getting-started-related-tables-input-layout" title="Permanent link">&para;</a></h2>
+<pre><code class="language-text">example_dataset/
+  customers.csv
+  orders.csv
+</code></pre>
+<p>The checked-in fixture already has this shape.</p>
+<p>For an executable version with synthetic inputs and business rules, run
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/relational_csv"><code>examples/relational_csv/run.sh</code></a>.</p>
+<h2 id="getting-started-related-tables-generate-the-dataset">Generate The Dataset<a class="headerlink" href="#getting-started-related-tables-generate-the-dataset" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent generate-from-example tests/fixtures/example_dataset \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/example_dataset
+</code></pre>
+<p>Expected summary:</p>
+<pre><code class="language-text">Generated synthetic dataset: out/example_dataset | rows: customers=25, orders=25 | seed: 12345 | validation: passed | source rows copied: no
+</code></pre>
+<p>The output contains:</p>
+<pre><code class="language-text">out/example_dataset/
+  customers.csv
+  orders.csv
+  profile.json
+  dataset_spec.yaml
+  generation_manifest.json
+  validation_report.json
+</code></pre>
+<h2 id="getting-started-related-tables-review-the-relationship">Review The Relationship<a class="headerlink" href="#getting-started-related-tables-review-the-relationship" title="Permanent link">&para;</a></h2>
+<p>Open <code>out/example_dataset/dataset_spec.yaml</code> and locate <code>relationships</code>.
+The inferred customer/order relationship should name:</p>
+<pre><code class="language-yaml">parent_entity: customers
+parent_field: customer_id
+child_entity: orders
+child_field: customer_id
+</code></pre>
+<p>The generator creates new parent identifiers first and assigns child foreign
+keys from those generated values. Source identifiers are not reused.</p>
+<h2 id="getting-started-related-tables-run-the-stages-separately">Run The Stages Separately<a class="headerlink" href="#getting-started-related-tables-run-the-stages-separately" title="Permanent link">&para;</a></h2>
+<p>Use separate commands when the inferred specification needs review or editing:</p>
+<pre><code class="language-bash">test-data-agent profile-example tests/fixtures/example_dataset \
+  --output out/profile.json
+
+test-data-agent infer-spec out/profile.json \
+  --count 25 \
+  --output out/dataset_spec.yaml
+
+test-data-agent generate out/dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+
+test-data-agent validate out/dataset_spec.yaml out/generated \
+  --output out/generated/validation_report.json
+</code></pre>
+<p>Do not generate until a reviewer accepts inferred relationships and
+constraints for a new domain.</p>
+<p>To preserve one reviewed local enum across the staged workflow, pass the same
+field-scoped selector while profiling:</p>
+<pre><code class="language-bash">test-data-agent profile-example tests/fixtures/example_dataset \
+  --local-category orders.status \
+  --output out/profile-with-status.json
+</code></pre>
+<p><code>orders.cancellation_reason</code> is free text and is not eligible. The allowlist
+does not copy source rows or expose exact values to external advisors or
+default MCP responses.</p>
+<p>See <a href="#concepts-profiles-and-specs">Profiles And Specs</a> for the purpose of
+each stage.</p></section><section class="print-page" id="getting-started-review-output" heading-number="1.5"><h1 id="getting-started-review-output-review-the-output">Review The Output<a class="headerlink" href="#getting-started-review-output-review-the-output" title="Permanent link">&para;</a></h1>
+<p>A successful command is not the end of the review. Use the artifacts in the
+bundle to decide whether the synthetic dataset is safe and useful.</p>
+<p>This page describes synthetic-generation bundles. The gated mixed-origin
+transformation workflow has a separate review contract: validation does not
+make its output synthetic, and action provenance and any required exact-snapshot
+local preservation receipt must also be checked. See
+<a href="#reference-cli-implemented-rc-execution-candidate">Selective Transformation</a>.</p>
+<h2 id="getting-started-review-output-review-order">Review Order<a class="headerlink" href="#getting-started-review-output-review-order" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Read <code>generation_manifest.json</code>.</li>
+<li>Read <code>validation_report.json</code>.</li>
+<li>Read <code>business_validation_report.json</code> when business rules were supplied.</li>
+<li>Review the effective <code>dataset_spec.yaml</code> or <code>dataset_spec.json</code>.</li>
+<li>Inspect a small sample of generated rows.</li>
+</ol>
+<h2 id="getting-started-review-output-manifest-checks">Manifest Checks<a class="headerlink" href="#getting-started-review-output-manifest-checks" title="Permanent link">&para;</a></h2>
+<p>For a valid synthetic dataset, require all of these conditions:</p>
+<pre><code class="language-json">{
+  &quot;synthetic&quot;: true,
+  &quot;source_rows_copied&quot;: false,
+  &quot;validation_valid&quot;: true
+}
+</code></pre>
+<p>Also confirm:</p>
+<ul>
+<li><code>seed</code> is the value requested by the caller;</li>
+<li><code>row_counts</code> match the requested scale;</li>
+<li><code>output_format</code> is correct;</li>
+<li><code>package_version</code> and <code>dataset_spec_schema_version</code> are recorded;</li>
+<li><code>spec_sha256</code> is present;</li>
+<li><code>business_validation.rules_sha256</code> and its summary are present when rules
+  were used.</li>
+<li><code>effective_rules</code> binds generation mode, validation settings, relationship,
+  constraint, and distribution counts to the exact spec and business-rule
+  fingerprints without repeating rule values.</li>
+</ul>
+<h2 id="getting-started-review-output-validation-report">Validation Report<a class="headerlink" href="#getting-started-review-output-validation-report" title="Permanent link">&para;</a></h2>
+<p><code>validation_report.json</code> reports deterministic checks for:</p>
+<ul>
+<li>entity and field schema;</li>
+<li>primary-key uniqueness;</li>
+<li>relationships and foreign keys;</li>
+<li>field and row constraints;</li>
+<li>temporal and formula constraints;</li>
+<li>aggregate reconciliation.</li>
+</ul>
+<p>Do not treat a missing report as success. A failed valid-mode run is not an
+accepted dataset. Explicit mixed/negative test generation may retain intentionally
+invalid rows and their failed validation report in a supported output format;
+the CLI reports <code>validation_failed</code> and exit 1. Do not relabel that result valid.
+Parquet negative datasets use explicitly marked scalar columns when malformed
+cells cannot fit native Arrow types. The bundle reader restores those cells for
+validation; their report remains invalid. Ordinary incompatible typed values
+still reject the entire export without partial publication. Keep the specification,
+manifest and encoding metadata described in the <a href="#reference-source-output-matrix">source/output matrix</a>. Privacy failures never authorize publication of source values.</p>
+<p>These synthetic manifest checks do not apply to the separately gated selective
+transformation workflow. Its bundle records mixed origin, action provenance
+and any exact-input preservation authority; it must not claim fully synthetic
+or anonymous output. Transformation validation failure prevents publication.
+See the <a href="#reference-cli-implemented-rc-execution-candidate">execution contract</a>.</p>
+<h2 id="getting-started-review-output-assurance-levels">Assurance Levels<a class="headerlink" href="#getting-started-review-output-assurance-levels" title="Permanent link">&para;</a></h2>
+<p>Interpret each result at its actual level:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Evidence</th>
+<th>What it does not prove</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Structural validation</td>
+<td>Schema, keys, relationships, constraints, formulas, and business rules passed deterministic checks.</td>
+<td>Values are private or safe to distribute.</td>
+</tr>
+<tr>
+<td>Built-in safety policy</td>
+<td>The reviewed spec rejected known raw sensitive values, unsafe categories, and disabled safety settings. The report's <code>privacy</code> section records this policy check.</td>
+<td>Detectors found every PII, secret, quasi-identifier, or rare free-text value.</td>
+</tr>
+<tr>
+<td>Complete-row reuse check</td>
+<td>A supported CSV workflow compared generated and available source rows and found no complete-row match.</td>
+<td>No individual value, partial row, rare combination, or statistical pattern resembles the source.</td>
+</tr>
+<tr>
+<td>Domain privacy review</td>
+<td>An accountable reviewer assessed the generated artifacts under the organization's policy and intended use.</td>
+<td>A formal statistical privacy guarantee unless a separate qualified evaluation provides one.</td>
+</tr>
+</tbody>
+</table>
+<p><code>validation_valid: true</code> means the enabled deterministic checks passed. It is
+not a privacy certificate. Name- and value-based detection is heuristic and
+can produce false negatives, especially for domain identifiers,
+quasi-identifiers, rare categories, and free text. This project does not assign
+an anonymity, differential-privacy, or re-identification-resistance level.</p>
+<h2 id="getting-started-review-output-profile-review">Profile Review<a class="headerlink" href="#getting-started-review-output-profile-review" title="Permanent link">&para;</a></h2>
+<p>Profiles should contain metadata such as types, null ratios, ranges,
+percentiles, approximate distinct counts, safe low-cardinality distributions,
+and masked patterns.</p>
+<p>Stop and investigate if a profile contains:</p>
+<ul>
+<li>a real email address, phone number, token, credential, or private key;</li>
+<li>a source row copied as a nested object or list;</li>
+<li>rare free-text values that could identify a person;</li>
+<li>an unexpected identifier distribution.</li>
+</ul>
+<h2 id="getting-started-review-output-generated-row-review">Generated-Row Review<a class="headerlink" href="#getting-started-review-output-generated-row-review" title="Permanent link">&para;</a></h2>
+<p>Inspect generated data for domain usefulness, but do not compare or publish raw
+source rows during that review. For sensitive domains, perform review in the
+same protected environment as the source data.</p>
+<p>Current CSV bundles declare <code>csv_encoding: backslash-null-v1</code> in their manifest.
+String cells and headers that could be spreadsheet formulas receive a reversible
+<code>\F</code> marker; null is <code>\N</code>, empty text stays empty, and literal leading backslashes
+are doubled. Numeric values, including negative numbers, remain numeric. Keep
+the manifest for schema-aware bundle decoding; legacy unmarked CSV retains its
+previous interpretation. Artifact names supplied through public workflows must
+be one safe filename component; separators and parent-directory components are
+rejected before any artifact is written. Formula failures expose only fixed
+local reasons, never expressions, values, or nested exception text.</p>
+<p>Re-run with the same spec, rules, package version, and seed when reproducibility
+is required. A change to any of those inputs can legitimately change output.</p>
+<p>See <a href="#concepts-safety-model">Safety Model</a> for guarantees and limitations.</p></section></section>
+                    <section class='print-page md-section' id='section-2' heading-number='2'>
+                        <h1>How-To Guides<a class='headerlink' href='#section-2' title='Permanent link'></a>
+                        </h1>
+                    <section class="print-page" id="how-to-business-rules" heading-number="2.1"><h1 id="how-to-business-rules-add-business-rules">Add Business Rules<a class="headerlink" href="#how-to-business-rules-add-business-rules" title="Permanent link">&para;</a></h1>
+<p>Use structured YAML or JSON when generated rows must satisfy domain rules.
+The deterministic rule engine applies and validates the rules; an LLM is not
+the enforcement mechanism.</p>
+<p>For a complete annotated format, see
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/business_rules">the runnable business-rules reference</a>,
+including all rule families, condition operators, formula modes, aggregates,
+scenarios and a matching DatasetSpec. The standalone
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/business_rules.schema.json">JSON Schema</a>
+is generated from the runtime model.</p>
+<h2 id="how-to-business-rules-create-a-rule-file">Create A Rule File<a class="headerlink" href="#how-to-business-rules-create-a-rule-file" title="Permanent link">&para;</a></h2>
+<p>The checked-in example at <code>examples/orders_rules.yaml</code> contains:</p>
+<pre><code class="language-yaml">field_rules:
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, cancelled]
+  - table: orders
+    field: amount
+    required: true
+    min_value: 0
+
+row_rules:
+  - type: temporal_ordering
+    table: orders
+    start_field: created_at
+    end_field: fulfilled_at
+    allow_equal: true
+
+  - type: formula
+    table: orders
+    field: amount
+    expression: quantity * unit_price
+</code></pre>
+<p>Rule references must match fields in the effective <code>DatasetSpec</code>. Unknown keys,
+tables, fields, rule types, and formula syntax are rejected.</p>
+<h2 id="how-to-business-rules-prepare-a-reviewed-spec">Prepare A Reviewed Spec<a class="headerlink" href="#how-to-business-rules-prepare-a-reviewed-spec" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent profile-example tests/fixtures/example_dataset \
+  --output out/rules/profile.json
+
+test-data-agent infer-spec out/rules/profile.json \
+  --count 25 \
+  --output out/rules/dataset_spec.yaml
+</code></pre>
+<p>Review <code>out/rules/dataset_spec.yaml</code>, then generate with rules:</p>
+<pre><code class="language-bash">test-data-agent generate out/rules/dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --business-rules examples/orders_rules.yaml \
+  --output out/rules/generated
+</code></pre>
+<p>Review:</p>
+<pre><code class="language-text">out/rules/generated/
+  business_validation_report.json
+  generation_manifest.json
+  validation_report.json
+</code></pre>
+<p>The generation manifest records a normalized rule fingerprint, rule counts,
+pass/fail counts, truncation status, overall business validity, and bounded
+expected-versus-observed violation counts.</p>
+<h2 id="how-to-business-rules-supported-rule-categories">Supported Rule Categories<a class="headerlink" href="#how-to-business-rules-supported-rule-categories" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Field rule</td>
+<td>Required values, allowed values, numeric bounds</td>
+</tr>
+<tr>
+<td>Conditional required</td>
+<td>Require fields when a condition matches</td>
+</tr>
+<tr>
+<td>Conditional allowed values</td>
+<td>Restrict a field under a condition</td>
+</tr>
+<tr>
+<td>Temporal ordering</td>
+<td>Enforce start/end ordering</td>
+</tr>
+<tr>
+<td>Formula</td>
+<td>Calculate or validate bounded arithmetic</td>
+</tr>
+<tr>
+<td>Foreign key</td>
+<td>Preserve cross-table references</td>
+</tr>
+<tr>
+<td>Aggregate formula</td>
+<td>Validate an aggregate expectation</td>
+</tr>
+<tr>
+<td>Scenario</td>
+<td>Control weighted combinations of field values</td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-to-business-rules-generate-controlled-invalid-cases">Generate Controlled Invalid Cases<a class="headerlink" href="#how-to-business-rules-generate-controlled-invalid-cases" title="Permanent link">&para;</a></h2>
+<p>Use an explicit generation mode:</p>
+<pre><code class="language-bash">test-data-agent generate out/rules/dataset_spec.yaml \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --mode mixed \
+  --invalid-ratio 0.02 \
+  --business-rules examples/orders_rules.yaml \
+  --output out/rules/mixed_cases
+</code></pre>
+<p>With business rules, <code>mixed</code> uses seeded random row selection at the requested
+invalid ratio and attempts an eligible rule violation for each selected row.
+The ratio is not an exact count of failed cells or rules. <code>negative</code> attempts
+eligible violations for every row; it does not make every field invalid, and
+tables without an applicable mutation can remain valid. Keep these datasets
+clearly separated from valid fixtures and review the validation report rather
+than expecting it to pass.</p>
+<p>For tables with several field and row rules, selected rows are distributed
+deterministically across required, allowed-value, numeric-bound, conditional,
+temporal, and formula violations. Reusing the same seed, mode, ratio, and rule
+file reproduces the same negative cases. Foreign-key violations use synthetic
+missing parent keys without changing the parent table. Aggregate-formula
+violations change only the configured concrete numeric field. Count-style
+aggregate rules with <code>field: "*"</code> are validation-only because changing row
+counts would also break the dataset shape.</p>
+<p>One selected invalid mutation can break several overlapping rules. The engine
+audits the affected row before and after mutation and includes newly broken
+local rules in the expected counts. Cross-table rules are checked before and
+after the injection pass; newly broken rules with a valid baseline are also
+counted. Injection requires a valid business-rule baseline and refuses an
+already invalid baseline before introducing negative cases. Standalone
+validation still reports unplanned failures as unexpected. An injection
+that does not break its selected rule still reports a missing expected failure.
+These audits share the normal work and deadline budgets.</p>
+<p>The business validation report compares expected and observed violations per
+rule. <code>unexpected_violation_count</code> identifies failures that were not selected
+by controlled invalid generation; <code>missing_expected_violation_count</code> identifies
+selected cases that validation did not observe. <code>expectations_met</code> is true only
+when both counts are zero. These fields contain counts only, never generated
+row values.</p>
+<h3 id="how-to-business-rules-reproduce-the-same-cases-through-cli-and-mcp">Reproduce The Same Cases Through CLI And MCP<a class="headerlink" href="#how-to-business-rules-reproduce-the-same-cases-through-cli-and-mcp" title="Permanent link">&para;</a></h3>
+<p>The checked-in <code>examples/negative_cases/</code> bundle fixes the spec, rule file,
+seed (<code>1300</code>), mode (<code>mixed</code>), and invalid ratio (<code>0.5</code>). Run it through CLI:</p>
+<pre><code class="language-bash">test-data-agent generate examples/negative_cases/dataset_spec.yaml \
+  --seed 1300 \
+  --mode mixed \
+  --invalid-ratio 0.5 \
+  --format json \
+  --business-rules examples/negative_cases/business_rules.yaml \
+  --output out/negative-cli
+</code></pre>
+<p>The MCP equivalent uses the same files after copying the example bundle below
+the configured generator workspace. The mode and invalid ratio are already
+recorded in <code>dataset_spec.yaml</code>:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;generate_dataset&quot;,
+  &quot;arguments&quot;: {
+    &quot;spec_path&quot;: &quot;negative_cases/dataset_spec.yaml&quot;,
+    &quot;output_folder&quot;: &quot;negative-mcp&quot;,
+    &quot;output_format&quot;: &quot;json&quot;,
+    &quot;seed&quot;: 1300,
+    &quot;business_rules_path&quot;: &quot;negative_cases/business_rules.yaml&quot;
+  }
+}
+</code></pre>
+<p>Both paths produce identical synthetic row files and matching expected versus
+observed violation counts. Use separate empty output folders when repeating the
+example.</p>
+<h2 id="how-to-business-rules-safety-restrictions">Safety Restrictions<a class="headerlink" href="#how-to-business-rules-safety-restrictions" title="Permanent link">&para;</a></h2>
+<p>Do not put real identifiers, emails, phone numbers, addresses, credentials,
+tokens, or other production literals into rule files. Sensitive-looking
+literals are rejected by CLI and MCP entry points.</p>
+<p>Formula syntax is a bounded arithmetic subset, not Python or SQL. Rule payload
+size, expression complexity, and estimated row/rule evaluations are limited.</p>
+<p>See <a href="#reference-configuration">Configuration</a> for adjustable limits.</p></section><section class="print-page" id="how-to-postgresql" heading-number="2.2"><h1 id="how-to-postgresql-profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#how-to-postgresql-profile-postgresql" title="Permanent link">&para;</a></h1>
+<p>Database profiling is available in stable <code>1.6.0</code> and requires explicit
+read-only configuration, allowlists and resource budgets.</p>
+<p>Install the optional driver:</p>
+<pre><code class="language-bash">pip install &quot;agent-paranoid-android[postgres]&quot;
+</code></pre>
+<p>Configure one explicit read-only scope. The password setting names another
+environment variable; it is not the password itself.</p>
+<pre><code class="language-bash">export POSTGRES_SOURCE_ID=warehouse
+export POSTGRES_HOST=db.example.internal
+export POSTGRES_DATABASE=analytics
+export POSTGRES_USER=test_data_agent
+export POSTGRES_PASSWORD_ENV=WAREHOUSE_PASSWORD
+export WAREHOUSE_PASSWORD='replace-in-your-shell'
+export POSTGRES_ALLOWED_SCHEMAS=public
+export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
+export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.orders.order_id,public.orders.customer_id,public.orders.state,public.orders.amount
+</code></pre>
+<p>For an intentionally table-wide aggregate profile, an entry may instead use
+the exact <code>schema.table.*</code> form:</p>
+<pre><code class="language-bash">export POSTGRES_ALLOWED_COLUMNS='public.customers.*,public.orders.*'
+</code></pre>
+<p>The parent tables must still appear exactly in <code>POSTGRES_ALLOWED_TABLES</code>.
+Before any aggregate runs, bounded PostgreSQL catalog metadata expands each
+wildcard into a frozen, sorted explicit-column snapshot. Profiling queries
+enumerate quoted column identifiers; they never execute <code>SELECT *</code>. Bare,
+schema-wide, table-name, embedded, or over-budget wildcards fail closed.</p>
+<p>If a platform portal supplies a JDBC endpoint, replace only the separate host,
+port, database, and TLS settings with a credential-free JDBC-style URL:</p>
+<pre><code class="language-bash">export POSTGRES_JDBC_URL='jdbc:postgresql://db.example.internal:5432/analytics?sslmode=verify-full'
+</code></pre>
+<p>Keep <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD_ENV</code>, every allowlist, and every budget
+separate. Userinfo, passwords, unknown query properties, and session-changing
+options in the URL fail before a connection is opened. This syntax is parsed
+into the existing Psycopg adapter; Java and JDBC drivers are not used. If both
+URL and component settings are present, explicitly supplied values must match.</p>
+<p>PostgreSQL connections now default to <code>verify-full</code>, which verifies the server
+certificate and configured hostname. Configure a trusted CA certificate through
+the Psycopg/libpq trust-root configuration (for example <code>PGSSLROOTCERT</code>) and use
+a hostname covered by the certificate. Existing installations using the former
+<code>require</code> default must configure trust before upgrading. Connection failure does
+not fall back to a weaker mode. Explicit <code>require</code>, <code>verify-ca</code>, or <code>disable</code>
+requires <code>POSTGRES_ALLOW_INSECURE=true</code> and is intended only for isolated local
+testing; these modes do not provide full server identity verification.</p>
+<p>The database role must already be read-only. The client also requests a
+read-only transaction, TLS, statement and lock timeouts, and bounded aggregate
+results. It accepts no arbitrary SQL and never profiles source rows.</p>
+<p>Table profiling retains observed minimum/maximum bounds for non-sensitive
+<code>date</code> and <code>timestamp</code> columns in the existing column-summary query. Inferred
+generation uses those ranges; timestamp offsets are retained. Sensitive-name
+columns do not expose date bounds, and all-null columns have none. Invalid or
+inconsistently typed bounds fail profiling rather than silently inventing a
+period. Missing bounds elsewhere still require review; this table-profile
+behavior does not imply date-bound support for <code>profile-query</code>.</p>
+<p>Create a safe profile, review a generation specification, generate, and
+validate. Output paths must not already exist unless the command explicitly
+supports <code>--overwrite</code>:</p>
+<pre><code class="language-bash">test-data-agent profile-postgres --output out/postgres-profile.json
+test-data-agent infer-spec out/postgres-profile.json --output out/dataset-spec.yaml
+test-data-agent generate out/dataset-spec.yaml --seed 12345 --output out/generated
+test-data-agent validate out/dataset-spec.yaml out/generated
+test-data-agent export-postgres-sql out/dataset-spec.yaml --seed 12345 --output out/generated.sql
+</code></pre>
+<p>Run the SQL only in the intended local or disposable target database:</p>
+<pre><code class="language-bash">psql --set ON_ERROR_STOP=1 --dbname synthetic_target --file out/generated.sql
+</code></pre>
+<p>The SQL file contains one transaction, deterministic quoted <code>CREATE TABLE</code>,
+foreign-key, and <code>INSERT</code> statements, PostgreSQL scalar literals, and <code>NULL</code>.
+It is built from validated generated records, not profile query rows. Render or
+validation failure leaves no partial output file. Repeating export with the
+same reviewed spec, seed, package, and recorded environment produces the same
+logical SQL; compare files directly when verifying one environment:</p>
+<pre><code class="language-bash">test-data-agent export-postgres-sql out/dataset-spec.yaml \
+  --seed 12345 --output out/generated-second.sql
+cmp out/generated.sql out/generated-second.sql
+</code></pre>
+<p>To profile a reviewed relation without creating a database view, put
+one fully qualified single-table query in a local file:</p>
+<pre><code class="language-sql">SELECT o.order_id, o.state, o.amount AS amount
+FROM public.orders AS o
+WHERE o.order_id &lt; 999999
+</code></pre>
+<p>Keep the same physical schema/table/column allowlists and run:</p>
+<pre><code class="language-bash">test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity orders_query \
+  --output out/query-profile.json
+test-data-agent infer-spec out/query-profile.json \
+  --output out/query-spec.yaml
+test-data-agent generate out/query-spec.yaml \
+  --seed 12345 --output out/query-generated
+test-data-agent validate out/query-spec.yaml out/query-generated
+</code></pre>
+<p>This generation walkthrough uses direct columns and aliases, all explicitly
+allowed above. A derived expression such as <code>amount * 2</code> can be profiled under
+the SQL policy, but automatic <code>infer-spec</code> rejects profiles with unsupported
+expression dependencies. Do not infer that the expression is translated into
+a generation formula; review a separate supported specification instead.</p>
+<p>The query is parsed locally and must stay inside the documented scalar,
+projection, and filter subset. A no-row schema probe and bounded aggregate
+wrappers execute in the forced read-only session. The profile contains a query
+fingerprint but not the SQL text, its literal, backend messages, or query rows.</p>
+<p>The equivalent typed Python entry point keeps the query path and database
+configuration explicit:</p>
+<pre><code class="language-python">from pathlib import Path
+
+import psycopg
+
+from test_data_agent import (
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    profile_postgres_query_source,
+)
+from test_data_agent.postgres_config import PostgresConfig
+
+request = SqlQueryProfileRequest(
+    adapter=SqlQueryAdapter.POSTGRES,
+    source_id=&quot;warehouse&quot;,
+    entity=&quot;orders_query&quot;,
+    query_file=Path(&quot;query.sql&quot;),
+)
+profile = profile_postgres_query_source(
+    request,
+    config=PostgresConfig.from_env(),
+    driver=psycopg,
+)
+</code></pre>
+<p>Exact values remain disabled by default. A bounded, reviewed, non-sensitive
+business enum can be kept locally with its source-qualified identity:</p>
+<pre><code class="language-bash">test-data-agent profile-postgres \
+  --local-category warehouse.public.orders.state \
+  --output out/postgres-profile.json
+</code></pre>
+<p>PII, secrets, identifiers, quasi-identifiers, free text, excessive cardinality,
+and long values fail closed. Original literals are not sent to providers, MCP,
+logs, or errors. A column wildcard is not a local-value policy: exact values
+are considered only when the separate, fully qualified <code>--local-category</code>
+selector is present and its content checks pass.</p>
+<p>The selector authorizes only the bounded value domain and aggregate counts. It
+does not retain source row order or a mapping that reconstructs source rows.
+The generated SQL may contain approved values because its input is the
+validated synthetic dataset.</p>
+<p>The same profiling boundary is available from Python:</p>
+<pre><code class="language-python">import psycopg
+
+from test_data_agent.postgres_client import PostgresClient
+from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent import generate_dataset, infer_dataset_spec, validate_dataset
+from test_data_agent.postgres_profiler import dataset_profile_from_postgres
+
+config = PostgresConfig.from_env()
+profile = dataset_profile_from_postgres(PostgresClient(config, psycopg))
+spec = infer_dataset_spec(profile)
+# Review or edit spec here before generation.
+rows = generate_dataset(spec, seed=12345)
+report = validate_dataset(rows, spec)
+assert report.valid
+</code></pre>
+<p>Keep profile and generated artifacts local unless their destination policy
+explicitly permits otherwise.</p>
+<p>For a complete synthetic end-to-end check against a temporary local
+PostgreSQL cluster, run the
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/local_postgres"><code>examples/local_postgres</code></a>
+example. It creates a SELECT-only role, proves that writes are denied, profiles
+two related tables, validates deterministic generation, executes the exported
+SQL in an empty target database, and removes the cluster. Run
+<code>examples/local_postgres/run-jdbc.sh OUTPUT</code> for the same workflow configured by
+a placeholder JDBC-style URL, or <code>examples/local_postgres/run-wildcard.sh
+OUTPUT</code> for bounded table-qualified wildcard expansion. Run
+<code>examples/local_postgres/run-query.sh OUTPUT</code> for the reviewed query-file path.</p></section><section class="print-page" id="how-to-trino" heading-number="2.3"><h1 id="how-to-trino-profile-through-trino">Profile Through Trino<a class="headerlink" href="#how-to-trino-profile-through-trino" title="Permanent link">&para;</a></h1>
+<p>Database profiling is available in stable <code>1.6.0</code> and requires explicit
+read-only configuration, allowlists and resource budgets.</p>
+<p>Install the optional Trino client and, when using MCP, the MCP SDK:</p>
+<pre><code class="language-bash">pip install &quot;agent-paranoid-android[trino]&quot;
+pip install &quot;agent-paranoid-android[mcp,trino]&quot;
+</code></pre>
+<p>Stable <code>1.6.0</code> supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
+certificates are documented in the
+<a href="#reference-configuration-trino-connection">configuration reference</a>. Follow its
+runtime secret-indirection, HTTPS verification and local OAuth opt-in rules.
+Local contract tests do not establish remote authentication compatibility.</p>
+<p>Configure an explicit read-only scope:</p>
+<pre><code class="language-bash">export TRINO_HOST=trino.example.internal
+export TRINO_PORT=8443
+export TRINO_USER=test_data_agent
+export TRINO_HTTP_SCHEME=https
+export TRINO_ALLOWED_CATALOGS=warehouse
+export TRINO_ALLOWED_SCHEMAS=analytics
+export TRINO_ALLOWED_TABLE_COLUMNS='warehouse.analytics.orders.*'
+export TRINO_DEPLOYMENT_PROFILE=shared-hardened
+export TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES=1073741824
+</code></pre>
+<p><code>TRINO_ALLOWED_TABLE_COLUMNS</code> is optional for compatibility. When set, an
+entry is either one exact <code>catalog.schema.table.column</code> or the exact
+<code>catalog.schema.table.*</code> form. Wildcards require restricted mode and catalog
+and schema membership in the mandatory allowlists. Bounded
+<code>information_schema</code> metadata is validated and sorted before the first table
+aggregate; the complete column budget is charged in preflight. Executed
+profiling SQL still quotes explicit columns and never projects <code>*</code>.</p>
+<p>The same endpoint and optional request defaults can come from a credential-free
+JDBC-style URL:</p>
+<pre><code class="language-bash">export TRINO_JDBC_URL='jdbc:trino://trino.example.internal:8443/warehouse/analytics?SSL=true'
+export TRINO_USER=test_data_agent
+export TRINO_ALLOWED_CATALOGS=warehouse
+export TRINO_ALLOWED_SCHEMAS=analytics
+</code></pre>
+<p>The catalog and schema path must match the allowlists. Credentials, tokens,
+roles, session properties, proxies, headers, unknown properties, and
+<code>SSL=false</code> fail before client construction. This is parsed into the Python
+Trino client; it does not install or invoke Java or a JDBC driver. Explicit
+component settings may coexist only when their values agree.</p>
+<p>The default aggregate-only MCP tools list allowlisted metadata, describe
+tables, and compute bounded aggregate profiles. They do not return source rows
+or raw category literals. Table and column profiling share cumulative
+statement, column, deadline, response, and optional scan budgets.</p>
+<p>A wildcard authorizes aggregate profiling scope only. It does not authorize
+category literals, preserve-as-is, caller SQL stars, row-returning tools,
+provider payloads, default MCP literals, logs, or errors. Exact table-column
+entries retain their existing bounded category-summary policy.</p>
+<p>Check that the Trino capability is installed, then start the MCP server:</p>
+<pre><code class="language-bash">test-data-agent doctor --require-extra trino
+test-data-agent-mcp-trino
+</code></pre>
+<p><code>doctor</code> checks the installed driver, safe-SQL support and configured deployment
+budget profile using a local smoke check. It does not validate the selected
+endpoint, authentication or catalog/schema allowlists, or contact Trino.
+Server startup and tool calls enforce their respective configuration and access
+checks; a successful local doctor check does not prove database access.</p>
+<p>The explicit opt-in <code>run_safe_select</code> surface is disabled by default. Enabling
+it is a separate row-privacy contract: every string is recursively masked, but
+allowed non-string source values may remain, so its output is not source-free,
+anonymous, or a generated dataset.</p>
+<p>Use the checked-in disposable example for a complete profile-to-generation
+workflow over Trino's synthetic TPC-H <code>tiny</code> catalog:</p>
+<pre><code class="language-bash">examples/local_trino/run.sh /tmp/agent-paranoid-trino-example
+</code></pre>
+<p>Use <code>examples/local_trino/run-jdbc.sh OUTPUT</code> to run the identical disposable
+workflow with its endpoint and <code>tpch/tiny</code> defaults supplied in JDBC syntax.
+Use <code>examples/local_trino/run-wildcard.sh OUTPUT</code> to exercise bounded
+<code>tpch.tiny.nation.*</code> expansion and deterministic field ordering.
+Use <code>examples/local_trino/run-query.sh OUTPUT</code> to profile one reviewed local
+<code>SELECT</code> as a virtual entity. Query-source mode additionally requires exact
+<code>TRINO_ALLOWED_TABLE_COLUMNS</code> entries or a table-qualified wildcard and rejects
+unrestricted mode. It stores a fingerprint, not query text, literals, backend
+messages, endpoints, or result rows.</p>
+<p>The typed Python entry point uses the same environment configuration and
+policy boundary:</p>
+<pre><code class="language-python">from pathlib import Path
+
+import trino
+
+from test_data_agent import (
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    profile_trino_query_source,
+)
+from test_data_agent.trino_config import TrinoConfig
+
+request = SqlQueryProfileRequest(
+    adapter=SqlQueryAdapter.TRINO,
+    source_id=&quot;warehouse&quot;,
+    entity=&quot;nation_query&quot;,
+    query_file=Path(&quot;query.sql&quot;),
+)
+profile = profile_trino_query_source(
+    request,
+    config=TrinoConfig.from_env(),
+    driver=trino,
+)
+</code></pre>
+<p>The example removes its container on success or failure and leaves only the
+safe profile, reviewed spec, generated rows, validation report, manifest, and a
+bounded result summary. See <a href="#reference-configuration">Configuration</a> and
+<a href="#mcp_examples">MCP Tools</a> for the full limits and tool contracts.</p></section><section class="print-page" id="how-to-transformation" heading-number="2.4"><h1 id="how-to-transformation-transform-local-data">Transform Local Data<a class="headerlink" href="#how-to-transformation-transform-local-data" title="Permanent link">&para;</a></h1>
+<p>Use selective transformation when each output row must correspond to an input
+row. Unlike synthetic generation, the result has mixed origin and may contain
+explicitly replaced or approved preserved source values. Treat the destination
+as potentially sensitive; validation is not an anonymity certificate.</p>
+<h2 id="how-to-transformation-choose-an-action-for-each-field">Choose An Action For Each Field<a class="headerlink" href="#how-to-transformation-choose-an-action-for-each-field" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>drop</code></td>
+<td>Remove the field.</td>
+</tr>
+<tr>
+<td><code>synthesize</code></td>
+<td>Generate new values using the declared generation policy.</td>
+</tr>
+<tr>
+<td><code>substitute</code></td>
+<td>Apply an explicit typed mapping, optionally shared by a domain.</td>
+</tr>
+<tr>
+<td><code>replace_text</code></td>
+<td>Apply explicit exact-text mappings. Field mappings override file-wide mappings without cascading.</td>
+</tr>
+<tr>
+<td><code>preserve</code></td>
+<td>Retain an eligible non-sensitive field only after exact local approval.</td>
+</tr>
+</tbody>
+</table>
+<p>For an unmatched mapping, select rejection, synthesis or eligible preservation
+explicitly. A preserve fallback has the same approval requirements as direct
+preservation. Explicit mapped replacements may equal another source value,
+including a sensitive permutation; this is not permission for implicit copying.
+Mapping values never belong in logs, summaries, provider requests or MCP replies.</p>
+<h2 id="how-to-transformation-review-before-execution">Review Before Execution<a class="headerlink" href="#how-to-transformation-review-before-execution" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Prepare a valid behavior policy, source and any local mapping files. Use a
+   new destination distinct from every input.</li>
+<li>Run <code>transform-review SOURCE POLICY.yaml</code>. Review the value-free field
+   decisions and record the displayed <code>snapshot_sha256</code>.</li>
+<li>To edit an already valid policy locally, use
+   <code>transform-review SOURCE POLICY.yaml --decide --edit-actions</code>, then <code>SAVE</code>.
+   Review the saved bytes again. Saving is not approval.</li>
+<li>If any action preserves values, obtain the receipt in your own interactive
+   local terminal with
+   <code>transform-approve SOURCE POLICY.yaml RECEIPT --snapshot-sha256 SHA</code>.</li>
+<li>Execute with
+   <code>transform-execute SOURCE POLICY.yaml DESTINATION --snapshot-sha256 SHA</code>,
+   adding <code>--receipt RECEIPT</code> when required. Inspect provenance and validation.</li>
+</ol>
+<p><code>SOURCE</code>, <code>POLICY.yaml</code>, <code>RECEIPT</code>, <code>DESTINATION</code> and <code>SHA</code> above are placeholders,
+not a ready-to-run dataset approval. Use installed <code>COMMAND --help</code> for options.
+Never supply real data to a provider while preparing the policy.</p>
+<h2 id="how-to-transformation-conditions-for-preservation">Conditions For Preservation<a class="headerlink" href="#how-to-transformation-conditions-for-preservation" title="Permanent link">&para;</a></h2>
+<p>Every preserved field needs an explicit non-sensitive decision, no positive or
+conflicting sensitivity evidence, and a bounded operator comment. Sensitive,
+unknown and disputed fields remain blocked. DECIMAL preservation is blocked by
+default. Approval binds the exact source, classification, policy and referenced
+mapping bytes. Any bound input change requires fresh review and approval.</p>
+<p>Only the controlling local terminal can issue the receipt. Piped confirmation,
+an agent flag and MCP approval cannot replace it. A matching receipt permits
+only its reviewed plan; it does not authorize another dataset.</p>
+<h2 id="how-to-transformation-multiple-inputs-and-databases">Multiple Inputs And Databases<a class="headerlink" href="#how-to-transformation-multiple-inputs-and-databases" title="Permanent link">&para;</a></h2>
+<p>Use a <a href="#reference-configuration-closed-common-transformation-profile">common saved profile</a>
+with <code>transform-batch</code> for multiple inputs and final linked validation. Creation
+saves configuration only. Validation and execution consume the exact reviewed
+digest and any required local receipt.</p>
+<p>Configured SQL sessions use administrator allowlists and read-only budgets to
+capture once. Later steps reuse the same frozen snapshot without reconnecting.
+Sessions enforce admission, expiry and cleanup. MCP consumers stay workspace
+confined and return metadata, not rows.</p>
+<p>See the <a href="#reference-cli-implemented-rc-execution-candidate">CLI contract</a>
+for formats and arguments, <a href="#reference-mcp-permissions">MCP permissions</a>
+for integration rights, and <a href="#reference-configuration">Configuration</a>
+for schemas and budgets. Historical RC anchors remain valid links.</p></section></section>
+                    <section class='print-page md-section' id='section-3' heading-number='3'>
+                        <h1>Integrations<a class='headerlink' href='#section-3' title='Permanent link'></a>
+                        </h1>
+                    <section class="print-page" id="how-to-mcp" heading-number="3.1"><h1 id="how-to-mcp-connect-an-mcp-client">Connect An MCP Client<a class="headerlink" href="#how-to-mcp-connect-an-mcp-client" title="Permanent link">&para;</a></h1>
+<p>These workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
+server and enable only tools required for your task. For local preservation
+approval use <a href="#how-to-transformation">Transform Local Data</a>; MCP cannot issue it.</p>
+<p>The project exposes two MCP servers with separate trust boundaries:</p>
+<ul>
+<li>the generator's ordinary file tools use one workspace; configured SQL
+  transformation sessions additionally own private temporary captures;</li>
+<li>the Trino server's default aggregate-only tools provide allowlisted,
+  read-only metadata and profiling.</li>
+</ul>
+<p>Start with the generator server. Add Trino only when database profiling is
+required.</p>
+<p>Before enabling tools, use <a href="#reference-mcp-permissions">MCP Permissions</a>
+for the complete tool inventory, required filesystem/network/database rights,
+client confirmation policy, and separate transformation approval requirements.
+These are stdio servers: the client launches a local process; no inbound port
+or MCP OAuth scope is required. Client tool approval, operating-system access,
+database grants and human dataset review are separate controls.</p>
+<p>For process and dependency isolation, use the separate hardened images in
+<a href="#operations-containers">Container Deployment</a>. The generator example has
+no network, while the Trino worker receives no generator workspace mount.</p>
+<h2 id="how-to-mcp-generator-only-quickstart">Generator-Only Quickstart<a class="headerlink" href="#how-to-mcp-generator-only-quickstart" title="Permanent link">&para;</a></h2>
+<p>Install the optional MCP support in a dedicated environment. Use the version
+selected in <a href="#getting-started-installation">Installation</a>.</p>
+<pre><code class="language-bash">python3 -m venv /path/to/mcp-env
+/path/to/mcp-env/bin/python -m pip install &quot;agent-paranoid-android[mcp]&quot;
+mkdir -p /path/to/synthetic-workspace
+</code></pre>
+<p>Desktop clients may not inherit your shell's PATH. Configure the absolute
+executable path and restart the client after changing its configuration:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;test-data-agent-generator&quot;: {
+      &quot;command&quot;: &quot;/path/to/mcp-env/bin/test-data-agent-mcp-generator&quot;,
+      &quot;env&quot;: {
+        &quot;TEST_DATA_AGENT_WORKSPACE_ROOT&quot;: &quot;/path/to/synthetic-workspace&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>Replace both absolute paths with your own. The client should discover
+<code>plan_dataset</code>, <code>inspect_dataset_plan</code>, <code>approve_dataset_plan</code>, and
+<code>recover_dataset_plan</code>. This local workflow requires no database or AI-provider
+credentials. The <code>mcpServers</code> example applies to clients supporting that
+configuration format; use your client's equivalent server settings otherwise.</p>
+<p>Create <code>customers.csv</code> inside the workspace with this fictional fixture:</p>
+<pre><code class="language-csv">customer_id,email,status
+1,alice@example.com,active
+2,bob@example.com,paused
+</code></pre>
+<p>Ask your assistant: "Plan four synthetic customers from customers.csv with seed
+81. Show me the specification for review before generating files."
+The corresponding <code>plan_dataset</code> arguments are:</p>
+<pre><code class="language-json">{
+  &quot;source_path&quot;: &quot;customers.csv&quot;,
+  &quot;workspace_path&quot;: &quot;agent/customers&quot;,
+  &quot;source_type&quot;: &quot;csv&quot;,
+  &quot;count&quot;: 4,
+  &quot;seed&quot;: 81,
+  &quot;output_format&quot;: &quot;csv&quot;,
+  &quot;table_name&quot;: &quot;customers&quot;
+}
+</code></pre>
+<p>The response has <code>approval_required: true</code> and <code>spec_path</code>. No generated dataset
+exists yet. Open the spec artifact locally and review field types, privacy,
+relationships, count, and seed. Inspection is a read-only operation:</p>
+<pre><code class="language-json">{&quot;workspace_path&quot;: &quot;agent/customers&quot;}
+</code></pre>
+<p>Call <code>inspect_dataset_plan</code> with those arguments. After a human reviews and
+explicitly approves the exact current specification, call
+<code>approve_dataset_plan</code> with:</p>
+<pre><code class="language-json">{
+  &quot;workspace_path&quot;: &quot;agent/customers&quot;,
+  &quot;reviewed_spec_sha256&quot;: &quot;&lt;review.current_spec_sha256 from inspection&gt;&quot;
+}
+</code></pre>
+<p>Replace the placeholder with the actual fingerprint. If the specification
+changes, inspect and review it again; a copied fingerprint is not human approval.
+The approval response should report <code>row_counts: {"customers": 4}</code>,
+<code>validation_valid: true</code>, and paths to output, manifest, validation report, and
+approval receipt. Inspect the same workspace again to confirm <code>phase: completed</code>.
+Report these summaries and paths; do not attach or inline dataset rows.</p>
+<h3 id="how-to-mcp-resume-an-existing-synthetic-plan">Resume An Existing Synthetic Plan<a class="headerlink" href="#how-to-mcp-resume-an-existing-synthetic-plan" title="Permanent link">&para;</a></h3>
+<p>If the client closes after planning, keep the agent workspace and resume the
+same conversation through the client's normal session-resume action. Restore
+the same verified installation, workspace root, MCP connection and tool filter.
+Keep the existing model, authentication, sandbox and confirmation policy. Run
+only one copy of that client session.</p>
+<p>For the Codex CLI, the upstream client command is <code>codex resume SESSION_ID</code>;
+replace <code>SESSION_ID</code> with the existing conversation's identifier. This is a
+Codex command, not an Agent Paranoid Android option. If the original launch
+supplied MCP settings only for that invocation, reapply those same settings
+through the reviewed client launcher when resuming. A bare resume command does
+not establish that the required server and tool filter were restored.</p>
+<p>Continue with <code>inspect_dataset_plan</code> for the existing workspace. Do not replay
+<code>plan_dataset</code>, delete the plan, or choose a new workspace merely to clear a
+non-empty-directory refusal. A launcher refusing to create a second plan does
+not establish that the package or final-commit checks failed.</p>
+<p>When the phase is <code>awaiting_approval</code>:</p>
+<ol>
+<li>Inspect the current plan and make the entire current <code>dataset_spec.yaml</code>
+   available for the human to open and read. Check both its file bytes and
+   <code>review.current_spec_sha256</code> against the specification being reviewed.</li>
+<li>Obtain fresh, explicit human consent for that exact current specification.
+   A model's summary, copied fingerprint, bootstrap prompt, general release
+   authorization or consent sent before the final specification was prepared
+   does not complete this review.</li>
+<li>Immediately before approval, inspect and check the same file again. Changed
+   bytes require another full-file view and renewed consent.</li>
+<li>Call <code>approve_dataset_plan</code> with the unchanged reviewed fingerprint, then
+   <code>validate_dataset</code> and inspect the completed workspace. Report validation,
+   counts and artifact paths without returning rows.</li>
+</ol>
+<p>Client-session resume and <code>recover_dataset_plan</code> are different operations.
+For an interrupted approval, follow the state returned by inspection: report
+an existing <code>completed</code> result, use recovery only when <code>next_action</code> requests
+it, and stop for inspection on an unexpected state. Resuming a conversation
+does not itself approve a dataset or authorize preservation. See the
+<a href="#reference-mcp-permissions-choose-a-client-policy-and-check-it">permission boundaries</a>.</p>
+<h3 id="how-to-mcp-corrective-next-steps">Corrective Next Steps<a class="headerlink" href="#how-to-mcp-corrective-next-steps" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Missing executable or MCP extra: check the absolute path, install <code>[mcp]</code>
+  into that environment, and restart the client.</li>
+<li>Rejected workspace path: move the input inside the configured root and use
+  relative paths. Do not expand permissions to bypass the boundary.</li>
+<li>Non-empty planning directory: inspect the existing plan and
+  <a href="#how-to-mcp-resume-an-existing-synthetic-plan">resume its review</a>. Use a new workspace
+  only when deliberately starting a separate dataset.</li>
+<li>Stale review fingerprint: inspect, review the changed specification, and
+  obtain renewed human approval before submitting its current fingerprint.</li>
+<li>Interrupted approval or a lost response: inspect first. If <code>phase</code> is
+  <code>completed</code>, report the existing result. If <code>next_action</code> is <code>recover</code>, call
+  <code>recover_dataset_plan</code> with the workspace and reviewed fingerprint. Recovery
+  retains published outputs without generating another dataset. If inspection
+  requests review and approval, follow that state instead.</li>
+<li>Fixed argument-validation or transport-limit error: correct arguments against
+  the discovered tool schema or reduce request size. Do not disable budgets or
+  expect rejected values to be reflected in error messages.</li>
+</ul>
+<p>Add Trino only for database profiling, using the separate configuration and
+<a href="#how-to-mcp-safe-trino-sequence">Safe Trino Sequence</a> below. Keep database credentials in
+the Trino server for that aggregate-profile-to-synthetic workflow. The separately
+configured SQL transformation session has its own connection requirements.</p>
+<h2 id="how-to-mcp-prepare-a-workspace">Prepare A Workspace<a class="headerlink" href="#how-to-mcp-prepare-a-workspace" title="Permanent link">&para;</a></h2>
+<p><a id="closed-common-profile-candidate"></a></p>
+<p><a id="common-profile-workflow-16-rc"></a></p>
+<h3 id="how-to-mcp-common-profile-workflow">Common-Profile Workflow<a class="headerlink" href="#how-to-mcp-common-profile-workflow" title="Permanent link">&para;</a></h3>
+<p>Stable <code>1.6.0</code> provides <code>common_transformation</code> in the generator console
+server. Registration grants no dataset permission or preservation approval.
+Stable acceptance has <a href="#release-evidence-1.6.0">finite recorded limits</a>;
+changed activation still needs its own review.
+It accepts <code>operation</code> (<code>review</code>, <code>validate</code>, <code>execute</code>), workspace-relative
+<code>profile</code>, and positive explicit <code>max_total_bytes</code>, <code>max_review_bytes</code>,
+<code>max_output_bytes</code>. Validation/execution require the exact reviewed
+<code>snapshot_sha256</code>. Preservation additionally requires a pre-existing local
+<code>receipt</code>; MCP cannot issue it. Optional <code>destination</code> is execute-only and names
+a new direct-child output bundle. Without it, execution is temporary.</p>
+<p>The workspace root comes from server configuration, never tool arguments.
+Responses contain value-free review/summary metadata, not output rows or mapping
+literals. Existing transport/work budgets still apply; these byte settings do
+not enlarge source-free profiling or serialized response budgets. Unknown
+arguments, including <code>root</code> and <code>approved</code>, are rejected without reflection.
+Configuration creation and human confirmation remain local CLI operations.
+Installed fictional acceptance with MCP SDK1/SDK2 does not authorize private
+data access or issue a local preservation receipt.</p>
+<pre><code class="language-bash">mkdir -p /path/to/synthetic-workspace
+</code></pre>
+<p>Inputs, safe profiles, reviewed specs, rules, and outputs used through generator
+file tools must remain below this directory. Server-owned temporary storage,
+audit logs and authentication files have separate administrator-configured
+locations. The workspace setting is an application path boundary, not an
+operating-system sandbox.</p>
+<h2 id="how-to-mcp-mcp-client-configuration">MCP Client Configuration<a class="headerlink" href="#how-to-mcp-mcp-client-configuration" title="Permanent link">&para;</a></h2>
+<p>Use the installed console commands:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;test-data-agent-generator&quot;: {
+      &quot;command&quot;: &quot;test-data-agent-mcp-generator&quot;,
+      &quot;env&quot;: {
+        &quot;TEST_DATA_AGENT_WORKSPACE_ROOT&quot;: &quot;/path/to/synthetic-workspace&quot;,
+        &quot;TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS&quot;: &quot;120&quot;
+      }
+    },
+    &quot;test-data-agent-trino&quot;: {
+      &quot;command&quot;: &quot;test-data-agent-mcp-trino&quot;,
+      &quot;env&quot;: {
+        &quot;TRINO_HOST&quot;: &quot;trino.example.internal&quot;,
+        &quot;TRINO_PORT&quot;: &quot;443&quot;,
+        &quot;TRINO_USER&quot;: &quot;synthetic_data_reader&quot;,
+        &quot;TRINO_HTTP_SCHEME&quot;: &quot;https&quot;,
+        &quot;TRINO_ALLOWED_CATALOGS&quot;: &quot;hive,iceberg&quot;,
+        &quot;TRINO_ALLOWED_SCHEMAS&quot;: &quot;test_data,staging&quot;,
+        &quot;TRINO_QUERY_MAX_EXECUTION_TIME&quot;: &quot;30s&quot;,
+        &quot;TRINO_QUERY_MAX_RUN_TIME&quot;: &quot;45s&quot;,
+        &quot;TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES&quot;: &quot;1GB&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>Give the Trino identity only the required metadata and SELECT access through
+database grants; no write or administration rights are needed. Catalog/schema
+allowlists do not create those grants. <code>TRINO_ALLOWED_TABLE_COLUMNS</code> narrows
+safe table profiling, but is not a universal per-tool ACL for metadata, counts,
+rule probes or optional <code>run_safe_select</code>. Use database grants for strict
+table/column isolation; see the <a href="#reference-mcp-permissions-trino-tool-rights">permission matrix</a>.</p>
+<p>Do not place a password or token directly in a committed MCP configuration.
+Use the client's secret mechanism or an environment injected by the runtime.</p>
+<h2 id="how-to-mcp-safe-generator-sequence">Safe Generator Sequence<a class="headerlink" href="#how-to-mcp-safe-generator-sequence" title="Permanent link">&para;</a></h2>
+<p>For selective transformation review, call <code>review_transformation</code> with
+workspace-relative <code>input_path</code>, <code>policy_path</code> and optional <code>table_name</code>.
+It reads a fixed local snapshot in the format selected by the saved policy and
+returns <code>review_only</code>, <code>snapshot_sha256</code> and the same value-free review as CLI
+<code>transform-review</code>. Referenced mapping files stay local to the policy directory.
+The tool writes no artifacts, creates no approval receipt, executes no
+transformation and connects to no database. It is separate from ordinary
+source-free generator operations.</p>
+<p>The stable <code>1.6.0</code> generator registers <code>execute_transformation</code>
+with workspace-relative <code>input_path</code>, <code>policy_path</code>, new <code>output_path</code>, mandatory
+<code>snapshot_sha256</code>, optional <code>table_name</code>/existing <code>receipt_path</code>, and optional
+<code>max_total_input_bytes</code>/<code>max_output_bytes</code> run caps. It consumes the same exact
+snapshots and budgets as CLI execution and returns <code>transformation_completed</code>,
+digest, provenance and budget summaries, never dataset rows or mapping literals.
+Explicit replacements may permute sensitive source values under the same
+field-independent contract. Review retains a value-free sensitivity note;
+mapped values stay in the selected local artifact, never MCP responses. This
+does not grant direct preservation or an implicit copy fallback.</p>
+<p>Preservation requires a matching receipt issued separately by the human local
+controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
+Changed inputs invalidate receipts; workspace escapes, existing destinations,
+unsupported actions and budget violations fail closed without copying fallback.
+Registration does not authorize a dataset. Changed activation requires fresh
+independent safety review and executable evidence.
+Changed public activation still requires matching contracts, executable safety
+evidence and independent exact-SHA review. A receipt never authorizes database
+access or external APIs.</p>
+<ol>
+<li>Put a CSV file, CSV folder, or safe profile below the workspace root.</li>
+<li>Call <code>plan_dataset</code> with that source, a new agent workspace, count, seed,
+   and output format.</li>
+<li>Stop and review the written <code>dataset_spec.yaml</code>.</li>
+<li>Call <code>inspect_dataset_plan</code> and record
+   <code>review.current_spec_sha256</code>.</li>
+<li>Call <code>approve_dataset_plan</code> with that exact fingerprint only after review.</li>
+<li>Report summaries and artifact paths, not generated rows.</li>
+</ol>
+<p>Use <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
+<code>validate_dataset</code> separately when an advanced client needs control over each
+pipeline stage. Direct <code>generate_dataset</code> and <code>export_dataset</code> do not require a
+planning approval argument; configure the client's confirmation policy before
+enabling these writing tools. Permission to invoke <code>approve_dataset_plan</code> is
+not evidence that the human reviewed the displayed specification.</p>
+<p>For the planning/approval workflow, embed <code>business_rules</code> in the reviewed
+DatasetSpec. Direct <code>generate_dataset</code> and <code>export_dataset</code> calls can instead
+provide <code>business_rules_path</code> or a bounded structured <code>business_rules_payload</code>.
+Use one rule source: external rules cannot be combined with embedded rules.</p>
+<p>Generator MCP reads newline-framed requests through the same bounded transport
+used by Trino MCP. Each request receives a fresh non-resettable budget. The
+default boundary rejects raw frames above 1 MiB, JSON deeper than 100 levels,
+JSON with more than 10,000 structural nodes, or an individual scalar above
+256 KiB before MCP/Pydantic materialization. Complete JSON-RPC responses are
+limited to 4 MiB and overflow becomes a fixed local error.
+Typed argument-validation failures also become the fixed
+<code>Tool arguments failed validation</code> error; rejected caller values and nested
+Pydantic diagnostics are not returned.
+Malformed typed requests are rejected before SDK dispatch with fixed
+<code>Invalid request parameters</code> text, and malformed notifications are dropped;
+their caller-controlled values do not enter SDK logs or retained exceptions.
+Each server process admits at most 32 active requests. Excess requests receive
+a fixed bounded capacity error, and disconnect or teardown clears retained
+request state. Trino execution is separately capped at eight concurrent
+operations per process.</p>
+<h2 id="how-to-mcp-safe-trino-sequence">Safe Trino Sequence<a class="headerlink" href="#how-to-mcp-safe-trino-sequence" title="Permanent link">&para;</a></h2>
+<p>The default aggregate-only tools are source-literal-free and contain only
+metadata and aggregate profiling operations:</p>
+<ul>
+<li><code>list_catalogs</code>, <code>list_schemas</code>, <code>list_tables</code>, <code>describe_table</code>;</li>
+<li><code>profile_table</code>, <code>profile_table_safe</code>, <code>profile_column</code>;</li>
+<li><code>profile_foreign_key</code>, <code>profile_temporal_ordering</code>, <code>profile_formula_rule</code>;</li>
+<li><code>profile_conditional_required</code>, <code>profile_conditional_allowed_values</code>;</li>
+<li><code>profile_aggregate_mapping</code>.</li>
+</ul>
+<p>Catalog and schema discovery returns only names present in the configured
+allowlists. Tables may be listed only after their catalog and schema pass those
+allowlists. Backend-controlled driver and enumeration failures are exposed as
+the fixed <code>Trino request failed</code> error without retaining the original text.</p>
+<p>This default aggregate-only surface has no row-returning diagnostic. Its
+successful responses, validation and database errors, and metadata-only audit
+records do not contain source-cell literals.</p>
+<ol>
+<li>Call <code>list_catalogs</code>, <code>list_schemas</code>, and <code>list_tables</code>.</li>
+<li>Call <code>describe_table</code>.</li>
+<li>Call <code>profile_table_safe</code> for an allowlisted table.</li>
+<li>Pass that response to generator <code>plan_trino_dataset</code> with a new workspace,
+   explicit count, seed, and output format.</li>
+<li>Stop and review the written <code>dataset_spec.yaml</code>.</li>
+<li>Call <code>inspect_dataset_plan</code> and record <code>review.current_spec_sha256</code>.</li>
+<li>Call <code>approve_dataset_plan</code> with that value as <code>reviewed_spec_sha256</code> only
+   after the human reviewed that exact spec fingerprint.</li>
+<li>Do not export or relay source rows.</li>
+</ol>
+<p>Both catalog and schema allowlists are mandatory by default. HTTPS is the
+default. Plain HTTP requires an explicit override and is intended only for an
+isolated local Trino instance.</p>
+<p>The explicit opt-in row-returning tool <code>run_safe_select</code> is not exposed by
+default. Trusted clients that need it must set <code>TRINO_ENABLE_SAFE_SELECT=true</code>.
+The review-first planning sequence above does not require it. Its bounded
+row-shaped result masks every string, including names and addresses missed by
+heuristic classification, plus non-string fields or values recognized as
+sensitive. Other non-string source values may remain, so enabling it does not
+make returned rows source-free, anonymous, or suitable for relay to an LLM or
+generated output.</p>
+<h2 id="how-to-mcp-expected-result">Expected Result<a class="headerlink" href="#how-to-mcp-expected-result" title="Permanent link">&para;</a></h2>
+<p>The default generator and default aggregate-only Trino tools return compact
+metadata:</p>
+<pre><code class="language-text">rows: customers=25, orders=25
+seed: 12345
+validation: passed
+synthetic: true
+source rows copied: false
+</code></pre>
+<p>Generated files stay in the workspace. These default tools do not return
+dataset or source rows; explicit opt-in row-returning tools are outside this
+expected result.</p>
+<h2 id="how-to-mcp-failure-conditions">Failure Conditions<a class="headerlink" href="#how-to-mcp-failure-conditions" title="Permanent link">&para;</a></h2>
+<p>The server rejects:</p>
+<ul>
+<li>paths outside the workspace, including existing symlink escapes;</li>
+<li>existing output files and non-empty output directories;</li>
+<li>unrestricted SQL, DDL, DML, joins, CTEs, and subqueries;</li>
+<li>likely PII projections and raw sensitive rule literals;</li>
+<li>non-Trino or oversized inline planning profiles;</li>
+<li>DatasetSpec input passed to <code>plan_dataset</code> instead of <code>generate_dataset</code>;</li>
+<li>missing Trino allowlists;</li>
+<li>requests exceeding configured input, output, query, or execution limits.</li>
+</ul>
+<p>See <a href="#mcp_examples">MCP Tools</a> and
+<a href="#reference-configuration">Configuration</a> for details.</p>
+<p>Preservation approval is never an MCP capability. The registered separate
+workspace execution consumer cannot issue local receipts, return rows or
+broaden source-free generator authority. Changed public activation requires the
+scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.</p>
+<p><a id="configured-sql-sessions-16-rc"></a></p>
+<h2 id="how-to-mcp-configured-sql-sessions">Configured SQL Sessions<a class="headerlink" href="#how-to-mcp-configured-sql-sessions" title="Permanent link">&para;</a></h2>
+<p>The running generator server registers <code>configured_query_session</code> with an
+instance-owned session manager. Use only an authorized administrator-configured
+PostgreSQL or Trino source. A saved batch profile and
+<a href="#reference-cli-configured-sql-sessions-16-rc">bounded query references</a>
+are workspace files; tool arguments never select endpoints or credentials.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Arguments</th>
+<th>Result and lifetime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>open</code></td>
+<td><code>profile</code>, <code>references</code>, positive <code>max_total_bytes</code>, <code>max_review_bytes</code>, <code>max_output_bytes</code></td>
+<td>Capture once; return metadata review, opaque <code>handle</code>, digest, expiry and local approval descriptor.</td>
+</tr>
+<tr>
+<td><code>review</code></td>
+<td><code>handle</code></td>
+<td>Reuse the same frozen batch; no database reconnection.</td>
+</tr>
+<tr>
+<td><code>validate</code></td>
+<td><code>handle</code>, exact <code>snapshot_sha256</code></td>
+<td>Validate temporary output; retain the session until expiry or close.</td>
+</tr>
+<tr>
+<td><code>execute</code></td>
+<td><code>handle</code>, exact <code>snapshot_sha256</code>, new direct-child <code>destination</code></td>
+<td>Verify any required local receipt, validate and publish; close the session.</td>
+</tr>
+<tr>
+<td><code>close</code></td>
+<td><code>handle</code></td>
+<td>Remove owned snapshots and receipts; the handle cannot be reused.</td>
+</tr>
+</tbody>
+</table>
+<p>Responses contain review/summary metadata, never captured rows, query text,
+mapping literals or connection secrets. <code>local_approval</code> contains an owned
+temporary root, <code>batch.yaml</code>, a fixed receipt filename, digest and input/review
+limits. These references help the local operator invoke the existing CLI:</p>
+<pre><code class="language-bash">test-data-agent transform-batch approve /owned/root batch.yaml local-session-receipt.json \
+  --snapshot-sha256 REVIEWED_DIGEST \
+  --max-total-input-bytes REVIEWED_INPUT_LIMIT --max-review-bytes REVIEWED_REVIEW_LIMIT
+</code></pre>
+<p>Use the exact metadata values while the session is alive. The CLI opens the
+controlling terminal for confirmation; MCP has no approval operation or boolean.
+This descriptor itself grants no authority. Direct or fallback preservation
+requires a valid exact receipt; explicit mappings retain their separate safety
+checks. Changed local bytes cannot produce a receipt for the frozen batch.</p>
+<p>Expiry, refusal and shutdown remove owned inputs and receipts. Execution retains
+only the selected validated output bundle inside the parent workspace. Expired
+or closed handles refuse without silently recapturing. Start a new explicit
+session and review its new digest if another capture is needed. Cumulative byte
+admission is not refunded on close or failure; restart the owning server only
+after resolving the refusal and reviewing its configured limits.</p>
+<p>Cleanup failure returns a fixed incomplete-cleanup error and latches the owner
+unhealthy; further work refuses. Preserve the failure evidence and inspect local
+temporary storage before restarting. Default bounds and overrides are documented
+in <a href="#reference-configuration-configured-sql-session-bounds-16-rc">configuration</a>.
+The entrypoint closes all sessions in a shutdown handler even if transport fails.
+Custom SDK embedding must explicitly inject a session owner and close it; the
+module-level SDK object creates no SQL sessions.</p></section><section class="print-page" id="ai_integration" heading-number="3.2"><h1 id="ai_integration-ai-integration">AI Integration<a class="headerlink" href="#ai_integration-ai-integration" title="Permanent link">&para;</a></h1>
+<p>Model-specific Python integrations should implement the provider-neutral
+<a href="#reference-advisor"><code>AdvisorExchangeClient</code></a> contract and use
+<code>ExchangeDatasetAdvisor</code>. The client receives static trusted instructions,
+safe profile metadata marked as untrusted, and the current structured-output
+schema. The adapter validates provider output against the original request and
+never generates data or bypasses approval.</p>
+<p><code>advise_agent_workspace</code> can persist that validated proposal as
+<code>advisor_review.json</code> and update the pending <code>dataset_spec.yaml</code>. The existing
+status fingerprint and explicit approval remain the only path to generation.</p>
+<p>AI is optional. The deterministic CLI and Python library can complete the full
+profile → review → generate → validate workflow without a provider, MCP client,
+or network access. Add AI only when it reduces manual work in relationship
+discovery, semantic interpretation, or business-rule hypothesis generation.</p>
+<p>When AI is used, this project can be used by an AI client in three practical
+ways:</p>
+<ol>
+<li>As a local CLI tool.</li>
+<li>Through two MCP servers that cover default aggregate-only Trino profiling
+   and synthetic data generation.</li>
+<li>Through the review-first local agent workflow.</li>
+</ol>
+<h2 id="ai_integration-cli-mode">CLI Mode<a class="headerlink" href="#ai_integration-cli-mode" title="Permanent link">&para;</a></h2>
+<p>An AI agent with shell access can call the local command-line interface:</p>
+<pre><code class="language-bash">test-data-agent profile-example ...
+test-data-agent infer-spec ...
+test-data-agent generate ...
+test-data-agent validate ...
+</code></pre>
+<p>In this mode, the AI plans the workflow, builds or edits a <code>DatasetSpec</code>, runs
+deterministic generation, validates the output, and reports the result.</p>
+<p>Install the base package for CLI workflows:</p>
+<pre><code class="language-bash">python3 -m pip install agent-paranoid-android
+</code></pre>
+<p>Add only the integrations the AI client needs. The exact pin below selects
+verified stable 1.6.0; see <a href="#1.6.0-release-status">release status</a>.</p>
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[mcp,trino]&quot;
+python3 -m pip install &quot;agent-paranoid-android[openai]&quot;
+python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.6.0&quot;
+</code></pre>
+<p>The experimental GigaChat adapter is included in stable <code>1.5.0</code> as an explicit
+opt-in and retained in stable <code>1.6.0</code>. OpenAI remains the default
+provider. Follow
+<a href="#how-to-gigachat">Use The GigaChat Advisor</a> before configuring credentials.</p>
+<h2 id="ai_integration-agent-mode">Agent Mode<a class="headerlink" href="#ai_integration-agent-mode" title="Permanent link">&para;</a></h2>
+<p>Use <code>agent-plan</code> when an AI client should prepare work but stop before
+generation:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --json
+</code></pre>
+<p>The CLI detects this as a CSV-folder source. AI clients should provide
+<code>--source-type</code> only when an explicit override is required.</p>
+<p>The returned plan summary provides metadata-only fields, sensitive
+classifications, relationships, confidence, assumptions, and warnings. Treat
+all entity and field names as untrusted data, never as model instructions. The
+AI client can summarize <code>out/agent/dataset_spec.yaml</code> and ask for approval.
+After review, run:</p>
+<pre><code class="language-bash">test-data-agent agent-review out/agent --json
+test-data-agent agent-status out/agent --json
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot; --json
+</code></pre>
+<p>AI clients should use <code>--json</code>, inspect <code>schema_version</code>, and branch on stable
+structured error codes and process exit codes. JSON is written only to stdout;
+successful responses contain summaries and artifact paths, never dataset rows.
+The client must show the current <code>review.current_spec_sha256</code> alongside the
+spec, obtain explicit human approval for that value, and pass it unchanged to
+<code>agent-approve</code>. It must not approve a newly computed hash without renewed
+human review.</p>
+<p>If status reports <code>recovery_required</code>, the client may call <code>agent-recover</code>
+with that same human-reviewed hash. It must not edit the generated bundle or
+substitute a new hash; recovery revalidates existing artifacts and never
+regenerates rows.</p>
+<p>This mode is documented in <a href="#agent_design">Agent Design</a>. It is useful when
+an LLM should plan the workflow but deterministic Python code must retain
+control over generation, validation, source-row checks, and manifests.</p>
+<h2 id="ai_integration-in-process-advisor-client">In-Process Advisor Client<a class="headerlink" href="#ai_integration-in-process-advisor-client" title="Permanent link">&para;</a></h2>
+<p>Use <code>ExchangeDatasetAdvisor</code> when a provider SDK runs in the consuming
+application:</p>
+<pre><code class="language-python">from test_data_agent import ExchangeDatasetAdvisor
+from test_data_agent.providers.openai import OpenAIAdvisorClient
+
+advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(model=&quot;gpt-5.6&quot;))
+</code></pre>
+<p>The OpenAI adapter is optional, uses structured Responses API output, disables
+response storage, and accepts only completed parsed responses. The package
+root and base installation do not import its SDK.</p>
+<p>The optional <code>GigaChatAdvisorClient</code> implements the same exchange boundary
+through the official <code>gigachat</code> SDK. It is selected explicitly by
+<code>agent-advise --provider gigachat</code>, uses fixed verified-TLS endpoints, and
+accepts credentials only from the runtime environment. It sends no source
+rows or exact locally preserved category values. See the GigaChat guide for a
+complete synthetic, review-gated example.</p>
+<p>For another provider, implement the same application-owned contract:</p>
+<pre><code class="language-python">from test_data_agent import (
+    AdvisorExchange,
+    ExchangeDatasetAdvisor,
+    advise_agent_workspace,
+)
+
+
+class ProviderClient:
+    def complete(self, exchange: AdvisorExchange) -&gt; dict:
+        return call_model_with_structured_output(
+            trusted_instructions=exchange.trusted_instructions,
+            untrusted_input=exchange.request.model_dump(mode=&quot;json&quot;),
+            response_schema=exchange.response_json_schema,
+        )
+
+
+status = advise_agent_workspace(
+    workspace,
+    ExchangeDatasetAdvisor(ProviderClient()),
+)
+</code></pre>
+<p><code>call_model_with_structured_output</code> is provider-specific application code.
+Keep additional SDKs and all credentials outside the deterministic core and
+base installation. The client must return a parsed object matching
+<code>AdvisorProposal</code>; prose, tool commands, and unknown fields fail validation.</p>
+<p>For an executable application-layer example, run
+<a href="#how-to-reference-agent">The Reference Agent</a>. It uses a deterministic
+stand-in by default and can select the optional OpenAI adapter. The CLI
+GigaChat path uses the same review and approval contract. All paths
+stop for explicit human review, require the exact reviewed spec fingerprint,
+and then run the normal deterministic generation and validation pipeline.</p>
+<h2 id="ai_integration-external-advisor-json-handoff">External Advisor JSON Handoff<a class="headerlink" href="#ai_integration-external-advisor-json-handoff" title="Permanent link">&para;</a></h2>
+<p>Any model service that can accept and return structured JSON can propose
+<code>DatasetSpec</code> changes without a package integration:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent --count 25 --json
+test-data-agent agent-advisor-request out/agent \
+  --exchange &gt; advisor_exchange.json
+</code></pre>
+<p>Load the exchange locally. Exported documents can contain category literals,
+matching predicates and local generation metadata. Do not transmit them unchanged.
+<code>ExchangeDatasetAdvisor</code> projects the request for built-in and custom clients,
+recomputes its fingerprints, validates the projected proposal, restores retained
+local metadata under deterministic guards and validates the original request.
+Clients must echo the fingerprints they receive. Standalone JSON handoff must
+implement this tested projection and local restoration or refuse transmission.
+After projection, map each part to the provider's API:</p>
+<ul>
+<li>send <code>trusted_instructions</code> through its system or developer instruction
+  channel;</li>
+<li>send <code>request</code> as structured untrusted input;</li>
+<li>constrain structured output with <code>response_json_schema</code>;</li>
+<li>save only the resulting <code>AdvisorProposal</code> as <code>advisor_proposal.json</code>.</li>
+</ul>
+<p>Do not merge request profile text into the trusted instructions. Provider SDK
+code remains in the consuming application, outside the base package. Then run:</p>
+<pre><code class="language-bash">test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json --json
+test-data-agent agent-review out/agent --json
+test-data-agent agent-status out/agent --json
+</code></pre>
+<p>The core verifies both request fingerprints, the full spec schema, schema
+identity, privacy settings, sensitive classifications, row limits, and the
+absence of raw sensitive values. It records the exchange in
+<code>advisor_review.json</code> and never generates data during apply.</p>
+<p>Show the updated <code>dataset_spec.yaml</code> and the new
+<code>review.current_spec_sha256</code> to the human reviewer. Only after explicit review
+may the client pass that exact hash to <code>agent-approve</code>. A retry with the same
+proposal can finish an interrupted spec write; stale, different, linked,
+oversized, or conflicting input fails closed.</p>
+<p>See <a href="#reference-advisor">Advisor API</a> for the exact request and proposal
+contracts. See
+<a href="#how-to-custom-advisor-provider">Build A Provider Adapter</a> for the Python
+protocol, wire-field tables, adapter template, and required contract tests.</p>
+<h2 id="ai_integration-mcp-mode">MCP Mode<a class="headerlink" href="#ai_integration-mcp-mode" title="Permanent link">&para;</a></h2>
+<p>Follow <a href="#how-to-mcp">Connect An MCP Client</a> for dedicated-environment
+installation, absolute executable paths, a narrow workspace and client settings.
+Use <a href="#reference-mcp-permissions">MCP Permissions</a> as the complete tool and
+rights inventory, including runtime-owned and optional capabilities.</p>
+<p>The two console commands are <code>test-data-agent-mcp-generator</code> and
+<code>test-data-agent-mcp-trino</code>. Both use stdio; they require no inbound MCP port
+or MCP OAuth scope. Client permission to invoke tools, the process user's
+filesystem/network rights, database grants and human review are separate.</p>
+<p>The default aggregate-only Trino tools return metadata and summaries, not source
+rows. The optional <code>run_safe_select</code> is registered only when
+<code>TRINO_ENABLE_SAFE_SELECT=true</code>. It masks strings and recognized sensitive
+values, but other source values may remain; never treat its rows as anonymous,
+relay them to an LLM or use them as generated output.</p>
+<p>Ordinary synthetic generator tools need only the selected workspace and no
+database/provider credentials. The separate transformation and configured SQL
+session tools have additional rights and activation gates documented in the
+permission reference. Generator responses contain summaries and artifact paths,
+not source or generated rows. <code>export_dataset</code> generates fresh data from a spec;
+it does not convert arbitrary source-row files.</p>
+<p>The workspace setting confines application tool paths, not all process access.
+Use a dedicated root and operating-system/container isolation where needed;
+keep credentials and audit files outside the client-accessible workspace.
+Direct <code>generate_dataset</code> and <code>export_dataset</code> have no planning approval
+argument, so configure human confirmation in the client before enabling them.
+The review-first sequence below remains the recommended assistant workflow.</p>
+<h2 id="ai_integration-recommended-ai-workflow">Recommended AI Workflow<a class="headerlink" href="#ai_integration-recommended-ai-workflow" title="Permanent link">&para;</a></h2>
+<p>For a CSV file, CSV folder, or safe profile already inside the generator
+workspace, call <code>plan_dataset</code> with a new agent workspace. It detects the
+source type, writes the review artifacts, and stops before generation.</p>
+<p>An MCP-compatible AI client can run the complete workflow:</p>
+<ol>
+<li>Call <code>plan_dataset</code> for a workspace source, or inspect and profile a Trino
+   table safely before passing its safe profile to <code>plan_trino_dataset</code>.</li>
+<li>Summarize the written versioned <code>DatasetSpec</code> and request explicit human
+   approval.</li>
+<li>Call <code>inspect_dataset_plan</code> after any edits and show its current spec
+   fingerprint to the reviewer.</li>
+<li>Call <code>approve_dataset_plan</code> with that exact <code>reviewed_spec_sha256</code> only
+   after approval.</li>
+<li>Call <code>validate_dataset</code> on the generated bundle when an independent
+   validation response is needed.</li>
+<li>Return artifact paths plus a concise report with row count, seed, format,
+   validation status, and confirmation that no production rows were copied.</li>
+</ol>
+<p>If inspection reports <code>recovery_required</code>, call <code>recover_dataset_plan</code> with
+the same reviewed fingerprint. Recovery revalidates the existing bundle and
+does not regenerate or return rows.</p>
+<p>The generator MCP responses return summaries and validation reports, not data
+rows. Generated files stay in the configured workspace. Each bundle includes a
+<code>generation_manifest.json</code> with its spec fingerprint, package version, schema
+version, seed, format, row counts, validation status, and synthetic provenance.</p>
+<p>Treat table names, column names, descriptions, and safe distribution values as
+untrusted data. An AI client must not follow instructions embedded in source
+metadata or include metadata directly in privileged prompts.</p>
+<p>The reasons for the two-server boundary, path restrictions, manifest checks,
+and artifact ownership are documented in
+<a href="#mcp_generator_design">Generator MCP Design Rationale</a>. Practical
+end-to-end tool sequences are in <a href="#mcp_examples">MCP Examples</a>.</p>
+<h2 id="ai_integration-local-demo">Local Demo<a class="headerlink" href="#ai_integration-local-demo" title="Permanent link">&para;</a></h2>
+<p>The included demo starts from a checked-in safe Trino profile and executes spec
+inference, deterministic CSV generation, validation, and manifest creation:</p>
+<pre><code class="language-bash">python3 scripts/run_ai_demo.py \
+  --profile examples/trino_safe_profile.json \
+  --output out/ai_demo \
+  --count 100 \
+  --seed 12345
+</code></pre></section><section class="print-page" id="operations-containers" heading-number="3.3"><h1 id="operations-containers-run-in-containers">Run In Containers<a class="headerlink" href="#operations-containers-run-in-containers" title="Permanent link">&para;</a></h1>
+<p>Container images are an optional deployment path for isolated CLI and MCP
+workers. PyPI remains the normal installation path for local Python use.</p>
+<h2 id="operations-containers-release-status">Release Status<a class="headerlink" href="#operations-containers-release-status" title="Permanent link">&para;</a></h2>
+<p>Stable <code>1.6.0</code> images are published and verified; see the
+<a href="#release-evidence-1.6.0">immutable digests and signatures</a>.
+The <a href="#release-evidence-1.6.0rc5">RC5 container evidence</a> remains bound to RC5.</p>
+<p>Select an exact version tag such as
+<code>ghcr.io/wa-pis/agent-paranoid-android-cli:1.6.0</code>, then resolve and verify its
+immutable digest before use. The stable tag also updates the mutable <code>1.6</code>, <code>1</code>
+and <code>latest</code> aliases; none provides immutable version identity.</p>
+<h2 id="operations-containers-published-images">Published Images<a class="headerlink" href="#operations-containers-published-images" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Image</th>
+<th>Entrypoint</th>
+<th>Installed surface</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ghcr.io/wa-pis/agent-paranoid-android-cli</code></td>
+<td><code>test-data-agent</code></td>
+<td>Core CSV and JSON workflows</td>
+</tr>
+<tr>
+<td><code>ghcr.io/wa-pis/agent-paranoid-android-generator-mcp</code></td>
+<td><code>test-data-agent-mcp-generator</code></td>
+<td>Core plus MCP</td>
+</tr>
+<tr>
+<td><code>ghcr.io/wa-pis/agent-paranoid-android-trino-mcp</code></td>
+<td><code>test-data-agent-mcp-trino</code></td>
+<td>Core, MCP, Trino, and SQLGlot</td>
+</tr>
+</tbody>
+</table>
+<p>Release tags publish <code>linux/amd64</code> and <code>linux/arm64</code> manifests. PyArrow is not
+installed in these images. Use the PyPI <code>parquet</code> extra when Parquet output is
+required.</p>
+<p>Pull requests build and run every target on both architectures. ARM64 checks
+use QEMU only as CI execution support; the resulting image still reports
+<code>arm64</code> and must pass the same non-root, read-only, network-isolated health
+contract as the native AMD64 validation. Both architectures also run actual
+installed CLI generation, validation and seeded replay in JSON, CSV and SQL;
+generator MCP profiling, inference, generation, validation and export over
+stdio; and Trino MCP discovery plus an excluded-catalog refusal before network
+access. Evidence records the source commit and image digest. The minimal images
+also prove a safe missing-Parquet-extra refusal. Live database acquisition is a
+separate disposable-database campaign, not a health-check claim.</p>
+<h2 id="operations-containers-build-locally">Build Locally<a class="headerlink" href="#operations-containers-build-locally" title="Permanent link">&para;</a></h2>
+<p>Build only the target you need:</p>
+<pre><code class="language-bash">docker build --target cli -t agent-paranoid-android:cli .
+docker build --target generator-mcp -t agent-paranoid-android:generator-mcp .
+docker build --target trino-mcp -t agent-paranoid-android:trino-mcp .
+</code></pre>
+<p>The Dockerfile uses digest-pinned Python and uv images, a frozen lockfile, and
+separate dependency sets. Final images run as UID/GID <code>65532</code> by default.
+The shared runtime layer installs fixed Bookworm PCRE2 and Perl packages and
+checks their versions during the build. Perl remains a Debian essential package;
+image scans continue to block fixable High and Critical findings.</p>
+<h2 id="operations-containers-prepare-compose">Prepare Compose<a class="headerlink" href="#operations-containers-prepare-compose" title="Permanent link">&para;</a></h2>
+<p>Create writable workspace and audit folders plus a private audit key file:</p>
+<pre><code class="language-bash">umask 077
+mkdir -p workspace audit/generator audit/trino secrets
+openssl rand -base64 32 &gt; secrets/generator_audit_hmac_key
+openssl rand -base64 32 &gt; secrets/trino_audit_hmac_key
+chmod 600 secrets/generator_audit_hmac_key secrets/trino_audit_hmac_key
+export CONTAINER_UID=&quot;$(id -u)&quot;
+export CONTAINER_GID=&quot;$(id -g)&quot;
+</code></pre>
+<p><code>CONTAINER_UID</code> and <code>CONTAINER_GID</code> must remain non-zero. They let the
+non-root process write to bind-mounted host folders on Linux. Never commit the
+<code>secrets</code>, <code>audit</code>, or <code>workspace</code> folders.</p>
+<p>Build the Compose targets from the current checkout:</p>
+<pre><code class="language-bash">docker compose build cli generator-mcp trino-mcp
+docker compose run --rm cli doctor --skip-smoke
+</code></pre>
+<p>The Compose contract applies a read-only root filesystem, drops all
+capabilities, enables <code>no-new-privileges</code>, limits CPU, memory, processes, and
+temporary storage, and publishes no ports.</p>
+<h2 id="operations-containers-generator-mcp">Generator MCP<a class="headerlink" href="#operations-containers-generator-mcp" title="Permanent link">&para;</a></h2>
+<p>The generator receives only <code>/workspace</code> and <code>/audit</code>; it has no network:</p>
+<pre><code class="language-bash">docker compose run --rm -T generator-mcp
+</code></pre>
+<p>Set <code>TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS</code> in the shell or Compose <code>.env</code>
+file before starting generator MCP to configure its invocation deadline. The
+default is 120 seconds; finite positive values are required. Independent generation,
+profiling, transformation and container memory limits still apply.</p>
+<p>An MCP client can launch that command directly. Use an absolute Compose path:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;test-data-generator&quot;: {
+      &quot;command&quot;: &quot;docker&quot;,
+      &quot;args&quot;: [
+        &quot;compose&quot;,
+        &quot;-f&quot;,
+        &quot;/absolute/path/agent-paranoid-android/compose.yaml&quot;,
+        &quot;run&quot;,
+        &quot;--rm&quot;,
+        &quot;-T&quot;,
+        &quot;generator-mcp&quot;
+      ]
+    }
+  }
+}
+</code></pre>
+<p>The client receives MCP messages over stdio. There is intentionally no exposed
+HTTP port.</p>
+<h2 id="operations-containers-trino-mcp">Trino MCP<a class="headerlink" href="#operations-containers-trino-mcp" title="Permanent link">&para;</a></h2>
+<p>Set an HTTPS endpoint and narrow allowlists before starting the Trino worker:</p>
+<pre><code class="language-bash">export TRINO_HOST=trino.example.internal
+export TRINO_PORT=443
+export TRINO_USER=test_data_agent
+export TRINO_ALLOWED_CATALOGS=iceberg
+export TRINO_ALLOWED_SCHEMAS=dev,staging
+docker compose run --rm -T trino-mcp
+</code></pre>
+<p>Missing host or allowlists fail before the server starts. The Trino service has
+network access but receives no generator workspace mount. The Compose example
+does not enable unrestricted access, plain HTTP, or the optional raw-SQL tool.</p>
+<h2 id="operations-containers-audit-secret">Audit Secret<a class="headerlink" href="#operations-containers-audit-secret" title="Permanent link">&para;</a></h2>
+<p>Compose mounts separate generator and Trino audit keys below <code>/run/secrets</code>.
+Keys are not stored in image metadata or process environment. The application
+rejects a secret file that is empty, oversized, writable by another user,
+linked, or configured together with <code>TEST_DATA_AGENT_AUDIT_HMAC_KEY</code>.</p>
+<p>The services also use separate host directories and logs:
+<code>audit/generator/generator.jsonl</code> and <code>audit/trino/trino.jsonl</code>. A compromise of
+one worker therefore does not grant the key or writable log mount of the other.
+Stop the corresponding writer before rotating either file. See
+<a href="#operations-audit-logging">MCP Audit Logging</a>.</p>
+<h2 id="operations-containers-verify-a-published-image">Verify A Published Image<a class="headerlink" href="#operations-containers-verify-a-published-image" title="Permanent link">&para;</a></h2>
+<p>Use the immutable digest shown by GHCR rather than relying on a mutable tag:</p>
+<pre><code class="language-bash">IMAGE=ghcr.io/wa-pis/agent-paranoid-android-generator-mcp
+DIGEST=sha256:replace-with-published-digest
+
+cosign verify \
+  --certificate-identity-regexp \
+  '^https://github.com/wa-pis/agent-paranoid-android/.github/workflows/containers.yml@refs/tags/v[0-9].*$' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  &quot;${IMAGE}@${DIGEST}&quot;
+
+gh attestation verify &quot;oci://${IMAGE}@${DIGEST}&quot; \
+  --repo wa-pis/agent-paranoid-android
+
+docker buildx imagetools inspect &quot;${IMAGE}@${DIGEST}&quot; \
+  --format '{{ json .SBOM }}'
+</code></pre>
+<p>The release workflow signs the multi-platform manifest digest with a
+short-lived GitHub OIDC identity and publishes BuildKit SBOM and provenance
+attestations. No Cosign private key is stored in the repository.</p>
+<p>Pull-request CI also scans every native container target for fixable High and
+Critical operating-system and Python-package vulnerabilities. A finding at
+either severity blocks publication through the container validation gate.
+Unfixed upstream findings remain visible in the scan output and must be
+reviewed separately during release-candidate security review.</p>
+<h2 id="operations-containers-health-semantics">Health Semantics<a class="headerlink" href="#operations-containers-health-semantics" title="Permanent link">&para;</a></h2>
+<p>The image health command performs only local checks: non-root execution,
+expected dependencies, workspace access, Trino safety configuration, and audit
+configuration. It never connects to Trino or reads a dataset. Because MCP uses
+stdio, container liveness is also represented by the MCP process itself.</p></section></section>
+                    <section class='print-page md-section' id='section-4' heading-number='4'>
+                        <h1>Reference<a class='headerlink' href='#section-4' title='Permanent link'></a>
+                        </h1>
+                    <section class="print-page" id="reference" heading-number="4.1"><h1 id="reference-reference-index">Reference Index<a class="headerlink" href="#reference-reference-index" title="Permanent link">&para;</a></h1>
+<p>Start with a <a href="#.">task guide</a> when you need a complete workflow. Use
+these references for exact options, schemas and integration contracts.</p>
+<h2 id="reference-commands-and-automation">Commands And Automation<a class="headerlink" href="#reference-commands-and-automation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#reference-cli">CLI command index</a> and <a href="#reference-cli-workflows">workflow recipes</a></li>
+<li><a href="#reference-cli-automation">JSON automation</a>, <a href="#reference-cli-errors">errors and exit codes</a>,
+  <a href="#reference-shell-completion">shell completion</a></li>
+<li><a href="#reference-configuration">Configuration and budgets</a>, <a href="#operations-resource-budgets">resource limits</a></li>
+</ul>
+<h2 id="reference-data-contract">Data Contract<a class="headerlink" href="#reference-data-contract" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#reference-source-output-matrix">Source/output matrix</a> and <a href="#reference-generation-modes">generation modes</a></li>
+<li><a href="#dataset_profile_and_spec">DatasetSpec fields</a>, <a href="#concepts-dataset-spec-compatibility">schema compatibility</a></li>
+<li><a href="#reference-profiling">CSV profiling details</a></li>
+<li><a href="#concepts-relational-synthesis-contract">Relationships</a></li>
+<li><a href="#reference-generation-contract-migration">Migration notes</a> and <a href="#reference-compatibility">compatibility aliases</a></li>
+<li><a href="#reference-stability">Public stability</a>, <a href="#reference-support-policy">runtime support</a>,
+  <a href="#reference-dependency-compatibility">dependency compatibility</a></li>
+</ul>
+<h2 id="reference-integrations">Integrations<a class="headerlink" href="#reference-integrations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#mcp_examples">MCP tools</a>, <a href="#reference-mcp-permissions">permissions</a>,
+  <a href="#operations-audit-logging">audit logging</a></li>
+<li><a href="#reference-advisor">Advisor API</a>, <a href="#how-to-gigachat">GigaChat</a>,
+  <a href="#how-to-custom-advisor-provider">custom advisor</a>,
+  <a href="#how-to-custom-semantic-provider">semantic provider</a>,
+  <a href="#how-to-reference-agent">reference agent</a></li>
+</ul>
+<h2 id="reference-further-reading">Further Reading<a class="headerlink" href="#reference-further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#concepts-threat-model">Threat model</a></li>
+<li><a href="#getting-started-product-validation-pilot">Product validation pilot</a></li>
+<li><a href="#domain_agnostic_workflow">Dataset workflow</a></li>
+<li><a href="#history">History and maintenance</a></li>
+</ul></section><section class="print-page" id="concepts-choosing-an-approach" heading-number="4.2"><h1 id="concepts-choosing-an-approach-choose-an-approach">Choose An Approach<a class="headerlink" href="#concepts-choosing-an-approach-choose-an-approach" title="Permanent link">&para;</a></h1>
+<p>Agent Paranoid Android is for teams that need deterministic test datasets from
+bounded CSV, PostgreSQL, or Trino evidence without copying source rows. Its
+primary interfaces are the CLI and Python library. Database clients, MCP, and
+AI providers are optional integrations around the same review and validation
+boundaries.</p>
+<p>The database workflows below are available in stable <code>1.6.0</code>.</p>
+<h2 id="concepts-choosing-an-approach-quick-comparison">Quick Comparison<a class="headerlink" href="#concepts-choosing-an-approach-quick-comparison" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Best starting point</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A safe, repeatable dataset from profiled structure and reviewed rules</td>
+<td>Agent Paranoid Android</td>
+<td>Profiles bounded evidence, generates fresh values, validates executable rules, and records a seed and manifest.</td>
+</tr>
+<tr>
+<td>One PostgreSQL table or Trino table with a known schema</td>
+<td>Exact component configuration and exact table/column allowlists</td>
+<td>This is the stable, narrowest database-source path. It keeps executed profiling work explicit and aggregate-only.</td>
+</tr>
+<tr>
+<td>A platform-supplied JDBC connection string</td>
+<td>JDBC-style endpoint input plus separate credentials, allowlists, and budgets</td>
+<td>It reuses the Python adapter and accepts endpoint syntax only; it does not add Java or a JDBC driver.</td>
+</tr>
+<tr>
+<td>Every column in one approved table</td>
+<td>Qualified column wildcard</td>
+<td><code>schema.table.*</code> or <code>catalog.schema.table.*</code> expands through bounded metadata into explicit columns; executed SQL never projects <code>*</code>.</td>
+</tr>
+<tr>
+<td>One reviewed derived relation from a single table</td>
+<td><code>profile-query</code></td>
+<td>A strict local-file <code>SELECT</code> becomes one aggregate-only virtual profile. It is not an arbitrary SQL runner and never returns query rows.</td>
+</tr>
+<tr>
+<td>A few hand-authored values or one simple object factory</td>
+<td>Faker or an application fixture factory</td>
+<td>Less setup when you already know every field and do not need profiling, review artifacts, or dataset validation.</td>
+</tr>
+<tr>
+<td>Application-native fixtures coupled to ORM models and lifecycle hooks</td>
+<td>A framework fixture factory</td>
+<td>Better fit when model constructors and database callbacks are the contract being tested.</td>
+</tr>
+<tr>
+<td>Production-like statistical fidelity with formal privacy targets</td>
+<td>A specialist statistical synthesizer plus a privacy evaluation</td>
+<td>This project does not certify anonymity, differential privacy, or resistance to every re-identification attack.</td>
+</tr>
+<tr>
+<td>A masked or reduced copy of production</td>
+<td>A governed masking/subsetting system</td>
+<td>Use only when policy permits retaining real rows; this project deliberately generates fresh rows instead.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="concepts-choosing-an-approach-choose-this-project-when">Choose This Project When<a class="headerlink" href="#concepts-choosing-an-approach-choose-this-project-when" title="Permanent link">&para;</a></h2>
+<ul>
+<li>source access must stay read-only and metadata-focused;</li>
+<li>generated rows must be reproducible from an explicit seed;</li>
+<li>foreign keys, temporal order, formulas, and business rules must be executable
+  and independently validated;</li>
+<li>humans must approve inferred specifications before generation;</li>
+<li>CSV, JSON, SQL, or Parquet output needs an evidence manifest.</li>
+</ul>
+<p>Start with the offline installed demo:</p>
+<pre><code class="language-bash">test-data-agent demo --output out/demo
+</code></pre>
+<h2 id="concepts-choosing-an-approach-choose-something-else-when">Choose Something Else When<a class="headerlink" href="#concepts-choosing-an-approach-choose-something-else-when" title="Permanent link">&para;</a></h2>
+<p>Use a simpler factory when manually defining every field is cheaper than
+profiling and review. Use a specialist privacy system when you need a measured
+privacy guarantee. Use governed masking only when retaining source rows is an
+explicit requirement and is allowed by your data policy.</p>
+<p>No approach removes the need to review sensitive identifiers, rare free text,
+quasi-identifiers, and organization-specific privacy requirements.</p></section><section class="print-page" id="concepts-profiles-and-specs" heading-number="4.3"><h1 id="concepts-profiles-and-specs-profiles-and-specs">Profiles And Specs<a class="headerlink" href="#concepts-profiles-and-specs-profiles-and-specs" title="Permanent link">&para;</a></h1>
+<p>Profiles and specifications have different roles.</p>
+<h2 id="concepts-profiles-and-specs-safe-profile">Safe Profile<a class="headerlink" href="#concepts-profiles-and-specs-safe-profile" title="Permanent link">&para;</a></h2>
+<p>A profile describes source structure without becoming a copy of the source
+dataset. It can contain:</p>
+<ul>
+<li>field names and inferred types;</li>
+<li>null ratios and approximate distinct counts;</li>
+<li>numeric ranges and percentiles;</li>
+<li>date and timestamp ranges;</li>
+<li>safe distributions for non-sensitive low-cardinality fields;</li>
+<li>string length statistics and masked sensitive patterns;</li>
+<li>inferred relationship and constraint candidates.</li>
+</ul>
+<p>A profile must not contain source rows, raw PII, credentials, tokens, or rare
+free-text values. Exact values are disabled by default. An explicit
+field-scoped local allowlist may retain a reviewed bounded non-sensitive
+business enum or constant after content, cardinality, and value-length checks.</p>
+<p>Create one from a CSV folder:</p>
+<pre><code class="language-bash">test-data-agent profile-example data/example_dataset \
+  --output out/profile.json
+</code></pre>
+<p>For example, retain a reviewed local enum while replacing every other source
+literal:</p>
+<pre><code class="language-bash">test-data-agent profile-example data/example_dataset \
+  --local-category orders.status \
+  --output out/profile.json
+</code></pre>
+<p>This authorization remains local. External advisors receive deterministic
+field-scoped labels, and default MCP responses do not receive the exact enum.</p>
+<h3 id="concepts-profiles-and-specs-sql-query-source">SQL Query Source<a class="headerlink" href="#concepts-profiles-and-specs-sql-query-source" title="Permanent link">&para;</a></h3>
+<p>This source type is available in stable <code>1.6.0</code>.</p>
+<p>One reviewed local query file can shape a PostgreSQL or Trino virtual entity:</p>
+<pre><code class="language-bash">test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity paid_orders \
+  --output out/profile.json
+</code></pre>
+<p>SQL source policy 1.1 accepts exactly one fully qualified, single-table <code>SELECT</code>
+with explicit projections or an authorized qualified wildcard, bounded filters,
+and a small deterministic scalar-expression set. It rejects joins, CTEs,
+subqueries, set operations, windows, table functions, commands, volatile or
+unknown functions, multiple statements, and unauthorized references before
+derived aggregate work begins.</p>
+<p>It also accepts aliased <code>SUM</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code> and <code>AVG</code> projections,
+optionally grouped by explicit authorized source columns. Each other selected
+column must be a grouping key. <code>COUNT(*)</code> counts rows; it is not a row wildcard.
+Aggregate arguments may use the existing scalar expressions, but nested or
+wrapped aggregates, DISTINCT aggregates, HAVING, grouping expressions/ordinals,
+ROLLUP and grouping sets remain unsupported. Grouped/aggregate queries referencing
+sensitive-name source columns fail closed even when renamed. Existing budgets
+and disclosure checks remain; small groups are not an anonymity guarantee.
+For example, <code>SELECT status, COUNT(*) AS measured FROM public.orders GROUP BY
+status</code> profiles a grouped relation without fetching its rows.</p>
+<p>Query profiles also record <code>has_unmodeled_expressions</code>: a source-dependent
+non-column projection or any aggregate (including <code>COUNT(*)</code>) sets it to <code>true</code>. Profiling remains available, but
+<code>infer-spec</code> rejects such profiles rather than silently generating independent
+values that break SQL-expression dependencies. Direct column aliases remain
+eligible. Older SQL profiles missing the marker must be reprofiled before
+automatic inference. Non-query legacy profiles retain prior inference behavior.
+The optional marker defaults to null (unknown); unknown does not change legacy
+profile fingerprints, while explicit true/false is included in the fingerprint.
+This does not translate SQL into formulas or authorize raw query-result access.</p>
+<p>The profile records <code>source_fingerprint</code> and <code>source_policy_version</code>, not SQL
+text or literals. The adapter performs a no-row schema probe followed by
+bounded aggregates. Query result rows are never returned, persisted, sent to a
+provider or MCP, or supplied to generation.</p>
+<h2 id="concepts-profiles-and-specs-datasetspec">DatasetSpec<a class="headerlink" href="#concepts-profiles-and-specs-datasetspec" title="Permanent link">&para;</a></h2>
+<p><code>DatasetSpec</code> is the reviewed, executable generation contract. It contains:</p>
+<ul>
+<li>entities, fields, types, nullability, and row counts;</li>
+<li>primary keys and relationships;</li>
+<li>distributions and constraints;</li>
+<li>privacy annotations;</li>
+<li>structured business rules;</li>
+<li>generation and validation settings and schema version.</li>
+</ul>
+<p>Infer a spec:</p>
+<pre><code class="language-bash">test-data-agent infer-spec out/profile.json \
+  --count 100 \
+  --output out/dataset_spec.yaml
+</code></pre>
+<p>Review the spec before generation. Inferred relationships and constraints are
+candidates, not unquestionable facts.</p>
+<h2 id="concepts-profiles-and-specs-generation">Generation<a class="headerlink" href="#concepts-profiles-and-specs-generation" title="Permanent link">&para;</a></h2>
+<p>Generation reads the specification, not source rows:</p>
+<pre><code class="language-bash">test-data-agent generate out/dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+</code></pre>
+<p>The seed belongs to the generation request and is recorded in the effective
+spec and manifest.</p>
+<h2 id="concepts-profiles-and-specs-validation">Validation<a class="headerlink" href="#concepts-profiles-and-specs-validation" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent validate out/dataset_spec.yaml out/generated \
+  --output out/generated/validation_report.json
+</code></pre>
+<p>Validation is deterministic Python code. An AI client may plan or summarize
+the workflow, but it is not the only validator.</p>
+<h2 id="concepts-profiles-and-specs-versioning">Versioning<a class="headerlink" href="#concepts-profiles-and-specs-versioning" title="Permanent link">&para;</a></h2>
+<p>Newly constructed <code>DatasetSpec</code> files use <code>schema_version: "1.1"</code>; version
+<code>1.0</code> remains supported, and serialized files without a version load as <code>1.0</code>
+for compatibility. Exact DECIMAL fields require <code>1.1</code>. Keep the schema version,
+package version, <code>spec_sha256</code>,
+<code>business_validation.rules_sha256</code>, and seed with any dataset that must be
+reproduced later.</p>
+<p>The complete field reference is in <a href="#dataset_profile_and_spec">DatasetSpec</a>.</p></section><section class="print-page" id="concepts-safety-model" heading-number="4.4"><h1 id="concepts-safety-model-safety-model">Safety Model<a class="headerlink" href="#concepts-safety-model-safety-model" title="Permanent link">&para;</a></h1>
+<p>The central invariant is:</p>
+<blockquote>
+<p>Generated output must contain newly generated values, not copied source rows.</p>
+</blockquote>
+<p>Source data may be read to derive bounded metadata. It is not used as a pool of
+rows to shuffle, duplicate, or export.</p>
+<h2 id="concepts-safety-model-trust-boundaries">Trust Boundaries<a class="headerlink" href="#concepts-safety-model-trust-boundaries" title="Permanent link">&para;</a></h2>
+<p>Selective transformation is a separate mixed-origin surface in stable <code>1.6.0</code>. Its <a href="#reference-cli-implemented-rc-execution-candidate">execution and approval contract</a>
+requires local interactive approval of exact input/review bytes before any
+explicitly non-sensitive field can be preserved. Agent execution can only
+consume an existing matching receipt; it cannot issue or broaden approval.
+Sensitivity conflicts, unknown fields and default DECIMAL preservation remain
+blocked. Receipt integrity does not prove personhood or anonymity. Existing
+generation, profiling and default responses retain their source-free contracts.
+Private implementation review does not activate public registration.</p>
+<p>Treat all of these as untrusted:</p>
+<ul>
+<li>CSV, JSON, YAML, and Parquet files;</li>
+<li>paths supplied to CLI or MCP tools;</li>
+<li>profile payloads supplied by another process;</li>
+<li>business-rule files and inline rule payloads;</li>
+<li>Trino identifiers, metadata, query results, and environment variables;</li>
+<li>PostgreSQL and Trino JDBC-style endpoint strings;</li>
+<li>local PostgreSQL and Trino SQL query-source files;</li>
+<li>output directories that may contain symlinks or existing files.</li>
+</ul>
+<h2 id="concepts-safety-model-defenses">Defenses<a class="headerlink" href="#concepts-safety-model-defenses" title="Permanent link">&para;</a></h2>
+<h3 id="concepts-safety-model-sensitive-data">Sensitive data<a class="headerlink" href="#concepts-safety-model-sensitive-data" title="Permanent link">&para;</a></h3>
+<p>Likely PII and secrets are detected from both field names and values. Sensitive
+columns suppress raw top values and expose masked patterns or aggregate metadata
+instead. Sensitive examples use an opaque placeholder rather than intentionally
+preserving source values. Non-sensitive category profiles replace source values
+with ranked synthetic labels by default. An explicit field-scoped local
+allowlist may preserve only a reviewed bounded non-sensitive business enum or
+constant after content, cardinality, and value-length checks. Rare free text,
+PII, secrets, identifiers, and quasi-identifiers are never eligible.</p>
+<p>Approved exact values may appear only in local profiles, reviewed specs,
+deterministic generated rows, and local SQL export. External providers receive
+field-scoped labels, and default MCP responses, logs, and public errors remain
+source-literal free.</p>
+<h3 id="concepts-safety-model-source-row-reuse">Source-row reuse<a class="headerlink" href="#concepts-safety-model-source-row-reuse" title="Permanent link">&para;</a></h3>
+<p>Generation uses a reviewed specification and a local seeded random generator.
+Runtime checks reject exact source-row reuse in supported CSV workflows.
+The comparison covers complete rows only and runs only when the source CSV is
+available to that workflow. It does not detect every partial-value,
+quasi-identifier, or statistical similarity between source and output.</p>
+<h3 id="concepts-safety-model-filesystem">Filesystem<a class="headerlink" href="#concepts-safety-model-filesystem" title="Permanent link">&para;</a></h3>
+<p>Input and output paths must be distinct. New bundles are assembled in a
+temporary sibling directory and published only after size and validation
+checks. Workspace-bound MCP paths reject traversal and symlink escapes.</p>
+<h3 id="concepts-safety-model-trino">Trino<a class="headerlink" href="#concepts-safety-model-trino" title="Permanent link">&para;</a></h3>
+<p>Trino access is read-only, allowlisted, bounded by client row limits and
+server-side time and scan budgets. Unsafe query shapes and likely sensitive
+projections are rejected before execution. The default aggregate-only tools
+return only source-literal-free metadata and aggregates. The explicit opt-in
+row-returning tool <code>run_safe_select</code> recursively masks every returned string in
+bounded scalar or composite values and any non-string field or value recognized
+as sensitive. Other non-string source values may remain, so those rows are not
+source-free or anonymous.</p>
+<h3 id="concepts-safety-model-postgresql">PostgreSQL<a class="headerlink" href="#concepts-safety-model-postgresql" title="Permanent link">&para;</a></h3>
+<p>Direct PostgreSQL profiling uses the optional driver through a forced
+read-only session. Schema, table, and column allowlists are mandatory, and one
+shared statement/result/deadline budget bounds metadata and aggregate queries.
+Normal table profiling accepts no caller SQL and reads no source rows.
+<code>profile-query</code> is a separate local-file surface for one strictly parsed,
+single-table, fully allowlisted <code>SELECT</code>. Adapter-owned no-row schema and
+aggregate queries profile its virtual relation without fetching result rows.
+The profile stores a SHA-256 fingerprint and policy version, never query text,
+query literals, backend messages, endpoints, or source rows. Qualified local
+category selectors may retain only values that pass the selective local policy
+above.</p>
+<p>PostgreSQL <code>schema.table.*</code> and Trino <code>catalog.schema.table.*</code> column selectors
+are authorization syntax, not SQL. They are expanded from bounded metadata for
+one exact allowed table into a deterministic explicit-column snapshot before
+aggregates run. They do not authorize source rows, local exact values, category
+literals, caller projection stars, providers, default MCP literals, logs, or
+errors.</p>
+<p>PostgreSQL and Trino may accept credential-free JDBC-style endpoint syntax.
+Parsing happens before client construction and rejects userinfo, secrets,
+session-changing or unknown properties, malformed escapes, ambiguous paths,
+and conflicting component configuration. The complete URL is discarded after
+normalization and is never written to profiles, manifests, MCP responses,
+provider payloads, logs, or public errors.</p>
+<h3 id="concepts-safety-model-resource-limits">Resource limits<a class="headerlink" href="#concepts-safety-model-resource-limits" title="Permanent link">&para;</a></h3>
+<p>The project limits input bytes, rows, columns, cells, YAML complexity, Parquet
+expansion, generated rows, output bytes, available disk reserve, rule work,
+query work, and wall-clock generation time.</p>
+<h2 id="concepts-safety-model-what-the-project-guarantees">What The Project Guarantees<a class="headerlink" href="#concepts-safety-model-what-the-project-guarantees" title="Permanent link">&para;</a></h2>
+<p>For supported synthetic-generation workflows and accepted inputs, the project
+is designed to:</p>
+<ul>
+<li>avoid copying complete source rows;</li>
+<li>avoid writing raw detected PII into safe profiles;</li>
+<li>regenerate identifiers and sensitive semantic values;</li>
+<li>produce logically deterministic output for the same spec, rules, seed,
+  locale, runtime, dependencies, serializer, and generator version;</li>
+<li>validate schema, relationships, constraints, and business rules;</li>
+<li>record provenance and safety flags in a generation manifest.</li>
+</ul>
+<p>The manifest records those effective inputs plus SHA-256 evidence for generated
+artifacts. Byte-for-byte identity is expected only when the complete recorded
+environment is unchanged. It is not guaranteed across Python, dependency,
+serializer, operating-system, or package versions, even when logical values and
+validation results remain equivalent.</p>
+<h2 id="concepts-safety-model-what-it-does-not-guarantee">What It Does Not Guarantee<a class="headerlink" href="#concepts-safety-model-what-it-does-not-guarantee" title="Permanent link">&para;</a></h2>
+<p>The project cannot decide whether every ambiguous business field is sensitive.
+It also cannot prove that an inferred distribution is legally or statistically
+safe for every use case. The project does not currently implement differential
+privacy, k-anonymity, l-diversity, or a privacy budget, and makes no statistical
+privacy guarantee. Treat generated data as requiring a domain-specific privacy
+review before distribution.</p>
+<p>Human review is still required for:</p>
+<ul>
+<li>domain-specific identifiers and rare free text;</li>
+<li>inferred relationships and constraints;</li>
+<li>privacy requirements outside the built-in detectors;</li>
+<li>organization-specific retention and access controls;</li>
+<li>downstream systems that may log or redistribute generated data.</li>
+</ul>
+<p>Do not send production data, raw PII, credentials, or tokens to an LLM while
+reviewing profiles or specifications.</p>
+<h2 id="concepts-safety-model-acceptance-checklist">Acceptance Checklist<a class="headerlink" href="#concepts-safety-model-acceptance-checklist" title="Permanent link">&para;</a></h2>
+<p>Before publishing a generated dataset:</p>
+<p>This checklist applies to synthetic generation, not the gated mixed-origin
+transformation workflow. A transformed bundle must not be relabelled synthetic
+merely because validation passed: its action provenance and any matching local
+preservation receipt remain separate requirements.</p>
+<ul>
+<li>manifest says <code>synthetic: true</code>;</li>
+<li>manifest says <code>source_rows_copied: false</code>;</li>
+<li>deterministic validation passed;</li>
+<li>business validation passed when rules were used;</li>
+<li>seed, row counts, format, and fingerprints are correct;</li>
+<li>profile and generated samples contain no unexpected sensitive values;</li>
+<li>the output is stored outside the source path.</li>
+</ul>
+<p>See <a href="#getting-started-review-output">Review The Output</a> for the practical
+review sequence.</p>
+<h3 id="concepts-safety-model-configured-sql-transformation-sessions">Configured SQL Transformation Sessions<a class="headerlink" href="#concepts-safety-model-configured-sql-transformation-sessions" title="Permanent link">&para;</a></h3>
+<p>The separately selected configured query workflow captures one allowlisted read-only
+result using administrator configuration, then reviews and validates frozen
+local bytes without reconnecting. It does not expand ordinary profiling or
+source-free generation authority. MCP returns only metadata and consumes an
+existing exact local controlling-TTY receipt when preservation requires one;
+it cannot issue approval. Session handles expire without recapture, owned raw
+inputs/receipts are removed, and only validated selected output is retained.
+Cleanup failure refuses further work. Registration is not data access permission
+or final exact-SHA security/release clearance.</p></section></section>
+                    <section class='print-page md-section' id='section-5' heading-number='5'>
+                        <h1>Help<a class='headerlink' href='#section-5' title='Permanent link'></a>
+                        </h1>
+                    <section class="print-page" id="operations-troubleshooting" heading-number="5.1"><h1 id="operations-troubleshooting-troubleshooting">Troubleshooting<a class="headerlink" href="#operations-troubleshooting-troubleshooting" title="Permanent link">&para;</a></h1>
+<p>Start with:</p>
+<pre><code class="language-bash">test-data-agent doctor
+test-data-agent doctor --json
+</code></pre>
+<p>The final line should be <code>doctor passed</code>.</p>
+<p>Require the optional capability you intend to operate:</p>
+<pre><code class="language-bash">test-data-agent doctor --require-extra parquet
+</code></pre>
+<p>For Parquet this performs a local temporary generation and read-back, checks
+row counts and manifest safety flags, and contacts no external service. A
+missing extra recommends installation. An installed extra whose local smoke
+fails reports a capability failure instead of recommending reinstall; check
+local setup and rerun doctor. A broken dependency import is reported as an
+import failure, not as an absent package. Exception text and temporary paths
+are omitted.
+If quickstart generation fails, earlier dependency checks remain in the report
+and <code>doctor --json</code> returns <code>ok: false</code>, exit code 1, and a failed quickstart
+check without exposing the underlying exception.</p>
+<p><code>doctor --require-extra mcp</code> constructs the real generator <code>FastMCP</code>
+transport, registers one local audited probe tool, and verifies its public tool
+listing. It does not start a server, listen on a port, invoke the tool, or
+contact an MCP client.</p>
+<p><code>doctor --require-extra trino</code> validates a bounded allowlisted query with the
+installed Trino SQL parser, constructs a client for the reserved
+<code>doctor.invalid</code> host, and closes it without opening a cursor or executing SQL.
+It does not read Trino credentials or contact a coordinator. A missing extra
+gets installation guidance; a local smoke failure does not establish a missing
+package or remote connectivity problem.</p>
+<p><code>doctor --require-extra openai</code> constructs and closes the installed SDK client
+with a local non-secret placeholder and verifies the structured Responses API
+used by the advisor adapter. It does not read <code>OPENAI_API_KEY</code>, send a request,
+or contact the provider. A local smoke failure does not establish a missing
+package or a problem with deployment credentials.</p>
+<p><code>doctor --require-extra gigachat</code> uses a local fake SDK client to verify strict
+structured-response mapping and cleanup. It does not read
+<code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>, obtain a token, or contact
+GigaChat. Install stable <code>1.6.0</code> with the <code>gigachat</code> extra.
+See <a href="#1.6.0-release-status">release status</a>.</p>
+<h2 id="operations-troubleshooting-jdbc-style-url-rejected">JDBC-Style URL Rejected<a class="headerlink" href="#operations-troubleshooting-jdbc-style-url-rejected" title="Permanent link">&para;</a></h2>
+<p>JDBC-style endpoint input, qualified column wildcards, and <code>profile-query</code> are
+available in stable <code>1.5.0</code> and retained in stable <code>1.6.0</code>.</p>
+<p>Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
+password references, tokens, roles, headers, proxies, session properties,
+allowlists, and budgets in their existing settings. Remove duplicate or
+unknown URL properties. When URL and component fields are both set, make the
+explicit host, port, database/TLS or catalog/schema values identical, or remove
+one representation. Errors intentionally omit the URL and conflicting values.</p>
+<p>An endpoint also fails when the URL exceeds 4,096 UTF-8 bytes, its host exceeds
+253 characters, a PostgreSQL database identifier exceeds 63 characters, or a
+Trino catalog/schema identifier exceeds 255 characters. Shorten the local
+configuration; the rejected value is intentionally absent from the error.</p>
+<h2 id="operations-troubleshooting-qualified-column-wildcard-rejected">Qualified Column Wildcard Rejected<a class="headerlink" href="#operations-troubleshooting-qualified-column-wildcard-rejected" title="Permanent link">&para;</a></h2>
+<p>Use exactly <code>schema.table.*</code> for PostgreSQL or
+<code>catalog.schema.table.*</code> for Trino. Keep the parent schema/table or
+catalog/schema allowlists present. Trino wildcards require restricted mode.
+Bare <code>*</code>, schema-wide forms, embedded stars, empty or duplicated metadata,
+schema drift, and expansion beyond the configured column budget fail before
+aggregate profiling. Replace the wildcard with reviewed exact columns when
+the table is wider than the intended profiling scope.</p>
+<h2 id="operations-troubleshooting-sql-query-source-rejected">SQL Query Source Rejected<a class="headerlink" href="#operations-troubleshooting-sql-query-source-rejected" title="Permanent link">&para;</a></h2>
+<p>Pass one UTF-8 file to <code>profile-query</code>; SQL text is not accepted in an option
+or environment variable. SQL source policy 1.1 permits one fully qualified,
+single-table <code>SELECT</code> with explicit output aliases, bounded filters, and the
+documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
+window operations, table functions, comments, volatile/unknown functions,
+multiple statements, and unauthorized tables or columns.</p>
+<p>Aliased SUM/COUNT/MIN/MAX/AVG and explicit-source-column GROUP BY are allowed.
+Other selected columns must be grouping keys. Remove nested/wrapped aggregates,
+DISTINCT aggregates, HAVING, grouping expressions/ordinals and grouping sets.
+Sensitive-name source references remain blocked for grouped/aggregate queries,
+even with renamed outputs. An accepted aggregate profile is not permission to
+fetch result rows or automatically infer a dependency-preserving generation spec.</p>
+<p>The query file, AST, projected fields, and adapter work must remain inside all
+configured budgets. A changed file, unsupported type, malformed backend
+metadata, schema drift, or budget exhaustion fails closed and leaves no
+profile. Errors intentionally omit SQL text, literals, endpoints, and backend
+messages; inspect the local reviewed file and allowlists instead.</p>
+<p><a id="transformation-candidate-rejected"></a></p>
+<h2 id="operations-troubleshooting-transformation-rejected">Transformation Rejected<a class="headerlink" href="#operations-troubleshooting-transformation-rejected" title="Permanent link">&para;</a></h2>
+<p>Stable <code>1.6.0</code> provides the common-profile CLI/MCP workflow. See the <a href="#reference-cli-common-profile-workflow-16-rc">CLI workflow</a>.
+Published <code>1.5.0</code> does not include this command. Registration grants no dataset
+permission. The finite fictional transformation/session campaign is recorded in
+<a href="#release-evidence-1.6.0">stable evidence</a>; it grants no blanket dataset consent.</p>
+<p>If the snapshot no longer matches, review the saved inputs, policies and
+mappings again; validate and execute with the newly returned digest. A receipt
+for an earlier snapshot cannot authorize the changed one. When preservation is
+selected, obtain a matching receipt through the separate local terminal
+workflow; an agent or MCP client cannot issue one.</p>
+<p>For a budget refusal, inspect the declared input, review and output limits
+before selecting another bounded run. Do not interpret partial work or elapsed
+process time as successful acceptance. If cleanup is incomplete, inspect the
+reported retained artifacts before retrying into a new destination. Existing
+files are not permission to overwrite or resume a failed publication.</p>
+<h2 id="operations-troubleshooting-gigachat-advice-failed">GigaChat Advice Failed<a class="headerlink" href="#operations-troubleshooting-gigachat-advice-failed" title="Permanent link">&para;</a></h2>
+<p>Check the fixed local category first: missing extra, authentication, scope,
+TLS/CA bundle, rate limit, timeout, filtered response, invalid response, or
+unavailable service. Remote response bodies and SDK exception text are
+intentionally suppressed because they may reflect credentials or request
+metadata.</p>
+<p>Configure exactly one of <code>GIGACHAT_CREDENTIALS</code> and
+<code>GIGACHAT_ACCESS_TOKEN</code>. Match <code>GIGACHAT_SCOPE</code> to the API project, keep TLS
+verification enabled, and use <code>GIGACHAT_CA_BUNDLE_FILE</code> only for a reviewed
+readable CA bundle. Do not work around a certificate failure with an insecure
+SDK example. A failed provider call leaves the workspace awaiting review and
+does not create generated rows; retry only after correcting the local cause.</p>
+<p>GigaChat's structured-output feature is currently beta. The adapter performs a
+single local baseline-compatibility pass only after initial structured
+validation fails, then reruns every normal validation. If <code>invalid response</code>
+persists, the remaining provider proposal is not safe to review; use another
+supported model or retry later instead of weakening validation.</p>
+<h2 id="operations-troubleshooting-command-not-found">Command Not Found<a class="headerlink" href="#operations-troubleshooting-command-not-found" title="Permanent link">&para;</a></h2>
+<p>Symptom:</p>
+<pre><code class="language-text">test-data-agent: command not found
+</code></pre>
+<p>Activate the environment where the package was installed:</p>
+<pre><code class="language-bash">source .venv/bin/activate
+python3 -m pip show agent-paranoid-android
+</code></pre>
+<p>On Windows PowerShell:</p>
+<pre><code class="language-powershell">.venv\Scripts\Activate.ps1
+python -m pip show agent-paranoid-android
+</code></pre>
+<h2 id="operations-troubleshooting-output-already-exists">Output Already Exists<a class="headerlink" href="#operations-troubleshooting-output-already-exists" title="Permanent link">&para;</a></h2>
+<p>Folder workflows without overwrite support require a new or empty directory.
+For example, choose a new path for <code>generate-from-example</code>:</p>
+<pre><code class="language-bash">test-data-agent generate-from-example data/example_dataset \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/run-002
+</code></pre>
+<p>DatasetSpec <code>generate --overwrite</code> replaces the entire output folder, including
+obsolete files, after generation and validation. Review the destination first;
+see <a href="#reference-generation-modes">folder replacement and rollback</a>.</p>
+<p>Single-entity file bundles use separate ownership checks. A different primary
+filename or format, invalid or missing manifest, stale sidecar, or unrelated
+sibling is rejected before replacement. Use a new output folder instead of
+deleting evidence from an incomplete or mixed file bundle. Never point output
+at a source file or source folder.</p>
+<h2 id="operations-troubleshooting-missing-optional-dependency">Missing Optional Dependency<a class="headerlink" href="#operations-troubleshooting-missing-optional-dependency" title="Permanent link">&para;</a></h2>
+<p>Optional commands print a version-pinned installation command and exit <code>69</code>.
+Run that command in the same environment as <code>test-data-agent</code>, then verify the
+capability locally:</p>
+<pre><code class="language-bash">python -m pip install &quot;agent-paranoid-android[postgres]==PACKAGE_VERSION&quot;
+test-data-agent doctor --require-extra postgres
+</code></pre>
+<p>Replace the extra and version with the exact values from the error. A passing
+local doctor check does not verify credentials or contact a remote service.</p>
+<h2 id="operations-troubleshooting-malformed-input-or-unexpected-traceback">Malformed Input Or Unexpected Traceback<a class="headerlink" href="#operations-troubleshooting-malformed-input-or-unexpected-traceback" title="Permanent link">&para;</a></h2>
+<p>Malformed YAML/JSON and invalid models are normal input failures: they exit
+<code>2</code>, publish no success artifact, and do not show a traceback. Use <code>--json</code> in
+automation to branch on <code>error.code</code>.</p>
+<p>Unexpected internal failures exit <code>70</code> with a fixed bounded message. Retry
+with <code>--debug</code> only in a trusted terminal where technical paths and exception
+context are safe to display. Provider response bodies and credentials remain
+redacted even in normal provider errors.</p>
+<h2 id="operations-troubleshooting-cancelled-operation">Cancelled Operation<a class="headerlink" href="#operations-troubleshooting-cancelled-operation" title="Permanent link">&para;</a></h2>
+<p>Ctrl+C exits <code>130</code> after catchable staging cleanup or bundle rollback. The
+message confirms that no successful final bundle was published. Inspect an
+agent workspace with <code>agent-status</code>; for a non-agent command, keep any
+unexpected destination for investigation and retry into a new path.</p>
+<h2 id="operations-troubleshooting-agent-approval-was-interrupted">Agent Approval Was Interrupted<a class="headerlink" href="#operations-troubleshooting-agent-approval-was-interrupted" title="Permanent link">&para;</a></h2>
+<p>Inspect the workspace:</p>
+<pre><code class="language-bash">test-data-agent agent-status out/agent
+</code></pre>
+<p>When it reports <code>recovery_required</code>, run the exact <code>agent-recover</code> command it
+prints. Recovery requires the previously reviewed DatasetSpec SHA-256,
+revalidates the existing generated bundle, and does not generate new rows.</p>
+<p>Do not edit files under <code>generated/</code> before recovery. A changed checkpoint,
+manifest, report, spec, profile, or row file causes recovery to fail closed.</p>
+<h2 id="operations-troubleshooting-process-or-host-stopped-during-publication">Process Or Host Stopped During Publication<a class="headerlink" href="#operations-troubleshooting-process-or-host-stopped-during-publication" title="Permanent link">&para;</a></h2>
+<p>For an agent workspace, run <code>agent-status</code> first. Use <code>agent-recover</code> only when
+the status reports <code>recovery_required</code>; it revalidates the existing generated
+bundle before publishing missing completion metadata.</p>
+<p>For a non-agent generation command, do not treat a hidden staging directory or
+a destination without its expected manifest and validation report as success.
+Confirm that no generation process is still running, retain the incomplete
+files for investigation when needed, and rerun with the same reviewed inputs
+and seed into a new destination.</p>
+<p>Where an atomic state writer or staged bundle publication is used, replacement
+prevents readers from observing its partial state during normal operation.
+Standalone artifact commands are not one global transaction. Shared atomic
+single-file writes and owned directory publication use <code>fsync</code>, but complete
+multi-file crash consistency is not guaranteed. A hard process stop, host or
+storage failure, or power loss can still leave staging data or an incomplete
+bundle. Use storage with the durability and backup
+guarantees required by the deployment.</p>
+<h2 id="operations-troubleshooting-input-limit-exceeded">Input Limit Exceeded<a class="headerlink" href="#operations-troubleshooting-input-limit-exceeded" title="Permanent link">&para;</a></h2>
+<p>The error names the failed limit. Prefer splitting an oversized source or
+reducing requested rows before raising the corresponding environment variable.</p>
+<p>When a limit must change, set the smallest value that supports the reviewed
+workload and keep output and wall-clock limits in proportion.</p>
+<p>See <a href="#reference-configuration">Configuration</a>.</p>
+<h2 id="operations-troubleshooting-sensitive-value-rejected">Sensitive Value Rejected<a class="headerlink" href="#operations-troubleshooting-sensitive-value-rejected" title="Permanent link">&para;</a></h2>
+<p>Profiles and business rules reject values that resemble PII, credentials,
+tokens, or private keys.</p>
+<p>Do not bypass the detector by encoding or fragmenting a production value.
+Replace it with a semantic rule, a reserved example value, or a generator
+strategy.</p>
+<h2 id="operations-troubleshooting-validation-failed">Validation Failed<a class="headerlink" href="#operations-troubleshooting-validation-failed" title="Permanent link">&para;</a></h2>
+<p>Open:</p>
+<ul>
+<li><code>validation_report.json</code>;</li>
+<li><code>business_validation_report.json</code>, when present;</li>
+<li>the effective spec and rule file.</li>
+</ul>
+<p>Check the first failing section before changing generation settings. Common
+causes are an incorrect inferred relationship, impossible field ranges,
+conflicting formulas, and a business rule that references the wrong field.</p>
+<p>Negative and mixed modes can fail validation intentionally. Keep their output
+separate and label it as invalid test data.</p>
+<h2 id="operations-troubleshooting-results-are-not-reproducible">Results Are Not Reproducible<a class="headerlink" href="#operations-troubleshooting-results-are-not-reproducible" title="Permanent link">&para;</a></h2>
+<p>Confirm that both runs use the same:</p>
+<ul>
+<li>package version;</li>
+<li><code>DatasetSpec</code> and its fingerprint;</li>
+<li>business-rule file and fingerprint;</li>
+<li>seed;</li>
+<li>row count, mode, invalid ratio, and format.</li>
+</ul>
+<p>File ordering and output encoding should also be compared on the same supported
+platform.</p>
+<h2 id="operations-troubleshooting-trino-allowlists-are-required">Trino Allowlists Are Required<a class="headerlink" href="#operations-troubleshooting-trino-allowlists-are-required" title="Permanent link">&para;</a></h2>
+<p>Set both variables:</p>
+<pre><code class="language-bash">export TRINO_ALLOWED_CATALOGS=hive,iceberg
+export TRINO_ALLOWED_SCHEMAS=test_data,staging
+</code></pre>
+<p>Do not use <code>TRINO_ALLOW_UNRESTRICTED=true</code> merely to silence configuration
+errors.</p>
+<h2 id="operations-troubleshooting-plain-http-is-disabled">Plain HTTP Is Disabled<a class="headerlink" href="#operations-troubleshooting-plain-http-is-disabled" title="Permanent link">&para;</a></h2>
+<p>Use HTTPS for remote Trino. For an isolated local integration instance only:</p>
+<pre><code class="language-bash">export TRINO_HTTP_SCHEME=http
+export TRINO_ALLOW_INSECURE_HTTP=true
+</code></pre>
+<h2 id="operations-troubleshooting-mcp-path-rejected">MCP Path Rejected<a class="headerlink" href="#operations-troubleshooting-mcp-path-rejected" title="Permanent link">&para;</a></h2>
+<p>Move the input or output below <code>TEST_DATA_AGENT_WORKSPACE_ROOT</code>. A textual path
+that appears to be inside the workspace can still be rejected when an existing
+symlink resolves outside it.</p>
+<p>Use a real directory with no symlink boundary and request a new output path.</p>
+<h2 id="operations-troubleshooting-reporting-a-security-problem">Reporting A Security Problem<a class="headerlink" href="#operations-troubleshooting-reporting-a-security-problem" title="Permanent link">&para;</a></h2>
+<p>Do not open a public issue containing exploit details, source data, PII, or
+credentials. Follow the repository
+<a href="https://github.com/wa-pis/agent-paranoid-android/security/policy">security policy</a>.</p></section><section class="print-page" id="known-issues" heading-number="5.2"><h1 id="known-issues-known-issues">Known Issues<a class="headerlink" href="#known-issues-known-issues" title="Permanent link">&para;</a></h1>
+<p>No currently accepted product-level issues are documented for the publicly
+verified RC5 runtime selected for stable <code>1.6.0</code>. The promotion scope audit found
+no new confirmed product defect; fresh stable review and publication checks are
+still pending. See
+<a href="#1.6.0-release-status">stable status</a>.</p>
+<p>The <a href="#acceptance-matrix">separate transformation/session acceptance campaign</a>
+remains open, including genuine local-terminal preservation acceptance where
+required. Existing automated and historical RC results do not establish its
+completion or private-data suitability. Provider adapters remain experimental;
+resource and artifact durability limits remain in their respective guides.</p>
+<p>Resolved findings and their original risk dispositions are retained in
+<a href="#security-history">Historical Security Findings</a>.</p></section></section>
+                    <section class='print-page md-section' id='section-6' heading-number='6'>
+                        <h1>Documentation<a class='headerlink' href='#section-6' title='Permanent link'></a>
+                        </h1>
+                    </section></div><style>.print-site-enumerate-headings #section-1 > h1:before { content: '1 ' }
+.print-site-enumerate-headings #index > h1:before { content: '1.1 ' }
+
+.print-site-enumerate-headings #getting-started-installation > h1:before { content: '1.2 ' }
+
+.print-site-enumerate-headings #getting-started-first-csv > h1:before { content: '1.3 ' }
+
+.print-site-enumerate-headings #getting-started-related-tables > h1:before { content: '1.4 ' }
+
+.print-site-enumerate-headings #getting-started-review-output > h1:before { content: '1.5 ' }
+
+.print-site-enumerate-headings #section-2 > h1:before { content: '2 ' }
+.print-site-enumerate-headings #how-to-business-rules > h1:before { content: '2.1 ' }
+
+.print-site-enumerate-headings #how-to-postgresql > h1:before { content: '2.2 ' }
+
+.print-site-enumerate-headings #how-to-trino > h1:before { content: '2.3 ' }
+
+.print-site-enumerate-headings #how-to-transformation > h1:before { content: '2.4 ' }
+
+.print-site-enumerate-headings #section-3 > h1:before { content: '3 ' }
+.print-site-enumerate-headings #how-to-mcp > h1:before { content: '3.1 ' }
+
+.print-site-enumerate-headings #ai_integration > h1:before { content: '3.2 ' }
+
+.print-site-enumerate-headings #operations-containers > h1:before { content: '3.3 ' }
+
+.print-site-enumerate-headings #section-4 > h1:before { content: '4 ' }
+.print-site-enumerate-headings #reference > h1:before { content: '4.1 ' }
+
+.print-site-enumerate-headings #concepts-choosing-an-approach > h1:before { content: '4.2 ' }
+
+.print-site-enumerate-headings #concepts-profiles-and-specs > h1:before { content: '4.3 ' }
+
+.print-site-enumerate-headings #concepts-safety-model > h1:before { content: '4.4 ' }
+
+.print-site-enumerate-headings #section-5 > h1:before { content: '5 ' }
+.print-site-enumerate-headings #operations-troubleshooting > h1:before { content: '5.1 ' }
+
+.print-site-enumerate-headings #known-issues > h1:before { content: '5.2 ' }
+
+.print-site-enumerate-headings #section-6 > h1:before { content: '6 ' }</style>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "/agent-paranoid-android/versions/1.6.0/";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

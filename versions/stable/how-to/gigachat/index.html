@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/how-to/gigachat/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Use The GigaChat Advisor - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Use The GigaChat Advisor";
+        var mkdocs_page_input_path = "how-to/gigachat.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/how-to/gigachat/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Use The GigaChat Advisor</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/gigachat.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="use-the-gigachat-advisor">Use The GigaChat Advisor<a class="headerlink" href="#use-the-gigachat-advisor" title="Permanent link">&para;</a></h1>
+<p>GigaChat is an experimental, explicit advisor for the existing review-first
+agent workflow. It can propose bounded <code>DatasetSpec</code> changes, but it cannot
+profile a source, approve a spec, generate rows, write SQL, or access MCP.</p>
+<p>The adapter uses the official <code>gigachat</code> Python SDK directly. GigaChain and
+LangChain are not required for this single structured request.</p>
+<div class="admonition note">
+<p class="admonition-title">Release status</p>
+<p>The adapter is included in stable <code>1.5.0</code> through the explicit <code>gigachat</code>
+extra and retained in stable <code>1.6.0</code>; see
+<a href="../../1.6.0-release-status/">release status</a>.</p>
+</div>
+<h2 id="install-the-stable-release">Install The Stable Release<a class="headerlink" href="#install-the-stable-release" title="Permanent link">&para;</a></h2>
+<p>Create an isolated environment and pin the
+exact stable release:</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.6.0&quot;
+test-data-agent doctor --require-extra gigachat
+</code></pre>
+<p>Doctor uses a local fake transport. It does not read credentials, obtain an
+access token, or contact GigaChat.</p>
+<h2 id="configure-authentication">Configure Authentication<a class="headerlink" href="#configure-authentication" title="Permanent link">&para;</a></h2>
+<p>Choose exactly one authentication mode. Keep the value in a secret manager or
+private process environment; never put it in a command argument, configuration
+file, agent workspace, shell transcript, test fixture, or issue.</p>
+<h3 id="authorization-key">Authorization Key<a class="headerlink" href="#authorization-key" title="Permanent link">&para;</a></h3>
+<p>Use the authorization key from the GigaChat API project together with its
+matching scope:</p>
+<pre><code class="language-bash">export GIGACHAT_CREDENTIALS='&lt;authorization-key-from-secret-manager&gt;'
+export GIGACHAT_SCOPE='GIGACHAT_API_PERS'
+unset GIGACHAT_ACCESS_TOKEN
+</code></pre>
+<p>Supported scopes are:</p>
+<ul>
+<li><code>GIGACHAT_API_PERS</code> for individual access;</li>
+<li><code>GIGACHAT_API_B2B</code> for prepaid business access;</li>
+<li><code>GIGACHAT_API_CORP</code> for pay-as-you-go business access.</li>
+</ul>
+<p>The SDK exchanges the authorization key for an access token in memory.</p>
+<h3 id="pre-obtained-access-token">Pre-Obtained Access Token<a class="headerlink" href="#pre-obtained-access-token" title="Permanent link">&para;</a></h3>
+<p>Alternatively, use one short-lived access token and no authorization key:</p>
+<pre><code class="language-bash">export GIGACHAT_ACCESS_TOKEN='&lt;short-lived-access-token&gt;'
+export GIGACHAT_SCOPE='GIGACHAT_API_PERS'
+unset GIGACHAT_CREDENTIALS
+</code></pre>
+<p>The official API documentation currently describes access tokens as valid for
+30 minutes. Obtain a fresh test token immediately before a manual smoke; do not
+send it through chat or commit it.</p>
+<p>See the official
+<a href="https://developers.sber.ru/docs/ru/gigachat/api/reference/rest/gigachat-api">authorization</a>
+and <a href="https://developers.sber.ru/docs/ru/gigachat/guides/using-sdks">SDK</a>
+documentation for account setup.</p>
+<h2 id="configure-certificate-trust">Configure Certificate Trust<a class="headerlink" href="#configure-certificate-trust" title="Permanent link">&para;</a></h2>
+<p>TLS verification is mandatory. The API and authorization endpoints are fixed
+to the official HTTPS services and cannot be overridden. If the operating
+system trust store does not contain the required CA certificates, point to a
+reviewed readable PEM bundle:</p>
+<pre><code class="language-bash">export GIGACHAT_CA_BUNDLE_FILE='/absolute/path/to/trusted-ca-bundle.pem'
+</code></pre>
+<p>There is no insecure-disable option. Configuration such as
+<code>GIGACHAT_VERIFY_SSL_CERTS=false</code>, a custom base URL, or a client certificate
+fails locally before a provider request.</p>
+<h2 id="run-the-synthetic-workflow">Run The Synthetic Workflow<a class="headerlink" href="#run-the-synthetic-workflow" title="Permanent link">&para;</a></h2>
+<p>Use only the checked-in fictional fixture for the first call. Choose a new
+workspace path for each run:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/gigachat-agent \
+  --count 25 \
+  --seed 12345 \
+  --format csv
+
+test-data-agent agent-review out/gigachat-agent
+test-data-agent agent-advise out/gigachat-agent --provider gigachat
+test-data-agent agent-review out/gigachat-agent
+</code></pre>
+<p><code>agent-advise</code> makes one bounded external request. It writes a validated
+<code>advisor_review.json</code> and proposed <code>dataset_spec.yaml</code>, then stops. It does not
+create <code>generated/</code>.</p>
+<p>Review the changed spec and record the new fingerprint printed by the second
+<code>agent-review</code>. Only then approve deterministic local generation:</p>
+<pre><code class="language-bash">REVIEWED_SPEC_SHA256='&lt;sha256-from-the-second-agent-review&gt;'
+test-data-agent agent-approve out/gigachat-agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot;
+</code></pre>
+<p>Use <code>--model MODEL</code> only for a reviewed provider model override. Omitting it
+uses the adapter default, <code>GigaChat</code>.</p>
+<p>After the run, remove secrets from the process environment:</p>
+<pre><code class="language-bash">unset GIGACHAT_CREDENTIALS GIGACHAT_ACCESS_TOKEN GIGACHAT_SCOPE
+unset GIGACHAT_CA_BUNDLE_FILE
+</code></pre>
+<h2 id="provider-boundary">Provider Boundary<a class="headerlink" href="#provider-boundary" title="Permanent link">&para;</a></h2>
+<p>GigaChat receives one non-streaming structured request containing:</p>
+<ul>
+<li>package-owned instructions in a system message;</li>
+<li>safe profile metadata and the baseline spec in a separate user message;</li>
+<li>the strict <code>AdvisorProposal</code> JSON Schema.</li>
+</ul>
+<p>It does not receive source or generated rows, database credentials, exact
+locally preserved category values, their reverse mappings, source free text,
+or MCP responses. Exact approved local enums are replaced with field-scoped
+synthetic labels before serialization. Entity and field names remain untrusted
+metadata and may still reveal internal schema vocabulary, so treat the exchange
+as confidential.</p>
+<p>The default request ceilings are 4 MiB input, 1 MiB response content, 4,096
+output tokens, 15 seconds per attempt, and no retries. The request disables
+streaming and provider storage. Invalid, filtered, incomplete, oversized, or
+schema-invalid output fails before the workspace changes.</p>
+<p>GigaChat structured output is currently beta. When it emits schema defaults in
+place of nested immutable values, the adapter may replace an identity-matched
+invalid <code>dataset_spec</code> with the exact fingerprint-bound local baseline. No
+provider-proposed dataset change survives that fallback. The result still must
+pass the normal Pydantic, fingerprint, privacy, and advisor-contract checks
+before a review is written; every other invalid response fails closed.</p>
+<h2 id="cost-and-testing">Cost And Testing<a class="headerlink" href="#cost-and-testing" title="Permanent link">&para;</a></h2>
+<p>A real <code>agent-advise</code> call consumes provider quota and may be billable. Normal
+unit, package, doctor, and release tests use synthetic data and local fake
+transports; they never require a GigaChat credential or network access. Run a
+live smoke only as an explicit manual check with a disposable test credential
+and the fictional fixture above.</p>
+<p>For bounded error guidance, see <a href="../../operations/troubleshooting/">Troubleshooting</a>.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
