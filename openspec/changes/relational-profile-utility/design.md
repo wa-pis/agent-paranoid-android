@@ -57,3 +57,16 @@ The report has an explicit `relationship_discovery` artifact type. DatasetSpec
 validation rejects this type across direct and file/CLI consumers instead of
 silently interpreting it as an empty spec. The shared local deadline is checked
 again by the atomic writer immediately before report publication.
+
+R5 extends the existing validation report with optional typed `utility` evidence;
+new validation calls always populate it, while legacy reports remain readable.
+The canonical spec hash binds evidence to its declarations; its shared pure
+helper moves to core with I/O wrappers and digest semantics retained.
+Active declarations exclude rejected relationships/constraints. Executed,
+not-declared and not-run states distinguish disabled and fail-fast skips.
+Existing generated relationship key-domain/resolution metrics are retained;
+native temporal counts are collected inside their existing budgeted row loop.
+No source comparison is made: unmodeled relationship counts, orphan rate and
+fan-out stay null, and source temporal fidelity remains unmeasured. Empty
+relations provide zero observations, not a successful source-fidelity claim.
+Business-rule temporal checks retain their separate business-validation evidence.

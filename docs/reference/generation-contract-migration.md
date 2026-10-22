@@ -58,3 +58,20 @@ the operation fails; revise the specification rather than consuming partial
 output. Numeric sampling remains uniform between configured bounds and foreign
 key assignment remains round-robin among non-null child rows. These are not
 claims of preserving correlations or source fan-out distributions.
+
+## Additive validation utility evidence
+
+New reports add `utility` with the canonical effective-spec hash, active native
+relationship/temporal declaration counts and executed/not-declared/not-run status.
+Temporal metrics add generated checked/failing row counts. Existing validity,
+settings, section errors and relationship metrics retain their semantics. Old
+saved reports without `utility` remain accepted. JSON consumers that enforce
+exact keys must admit this new optional field.
+
+Generated row values, DatasetSpec versions and existing profile/spec hashes are
+unchanged. Serialized validation reports and their manifest output digests do
+change. Compare replayed rows separately from report byte identity across this
+upgrade; the new contract fixtures record the intentional report changes.
+Unknown source fidelity, fan-out and missing relationship coverage remain
+unknown. No source queries, new authorization, dependency, package publication
+or completed release-candidate acceptance is implied.

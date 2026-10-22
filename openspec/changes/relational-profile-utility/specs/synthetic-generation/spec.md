@@ -87,3 +87,27 @@ successful source-fidelity check.
 #### Scenario: Discovery exceeds its bounded allowance
 - **WHEN** metadata mining exceeds its shared work/deadline allowance, 1,000-candidate cap or report byte ceiling
 - **THEN** discovery fails without publishing a partial trusted report
+
+#### Scenario: Empty supplied relations are validated
+- **WHEN** direct or CLI validation receives empty parent or child tables
+- **THEN** no references yields an unknown resolution ratio, while a real orphan fails
+- **AND** nullable child references do not require an invented parent
+- **AND** positive declared row counts still reject empty output as a schema mismatch
+- **AND** validation leaves supplied files unchanged
+
+### Requirement: Unequal Relational Sizes Have Executable Acceptance
+
+Seeded generation SHALL preserve declared unequal entity counts and nullable
+foreign-key behavior consistently through direct and CLI entry points.
+
+#### Scenario: Parent and child counts differ with nullable keys
+- **WHEN** reviewed parent and child sizes differ and child keys are all null or all non-null
+- **THEN** direct and CLI seeded runs have identical rows and exact declared counts
+- **AND** non-null child references resolve to generated parent keys
+- **AND** independent identifier domains remain disjoint and input specs remain unchanged
+
+#### Scenario: Supplied relations are empty
+- **WHEN** direct or CLI validation receives empty parent or child relations
+- **THEN** relationship metrics distinguish no references from a real orphan
+- **AND** schema validation still rejects mismatch with positive declared row counts
+- **AND** validation does not mutate supplied files

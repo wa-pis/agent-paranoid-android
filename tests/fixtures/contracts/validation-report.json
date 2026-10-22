@@ -34,5 +34,18 @@
     "validate_relationships": true,
     "validate_schema": true
   },
+  "utility": {
+    "active_relationships": 0,
+    "active_temporal_constraints": 0,
+    "evidence_scope": "generated_dataset",
+    "relationship_checks": "not_declared",
+    "source_fanout": null,
+    "source_orphan_ratio": null,
+    "source_temporal_fidelity": "unmeasured",
+    "spec_sha256": "1c4eb794266d6a4af0271ee15c0b1ae99e2b592176afa55d676d1b941d81a99e",
+    "temporal_checks": "not_declared",
+    "temporal_metrics": [],
+    "unmodeled_relationship_count": null
+  },
   "valid": true
 }

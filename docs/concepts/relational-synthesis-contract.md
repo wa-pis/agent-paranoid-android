@@ -114,3 +114,28 @@ A dataset may claim an invariant only when deterministic validation executes
 that invariant successfully. Failed or unsupported checks must block valid
 publication or appear as explicit controlled-invalid evidence. The manifest,
 effective spec, and validation reports form the review record.
+
+## Validation utility evidence
+
+`validation_report.json` and direct `validate_dataset` results include additive
+`utility` evidence bound to the canonical `spec_sha256` used by generation
+manifests. Older saved reports without this field remain readable.
+
+- `active_relationships` and `active_temporal_constraints` exclude rejected
+  declarations. Their check status is `executed`, `not_declared`, or `not_run`.
+  Disabled sections and sections skipped by fail-fast are not executed.
+- Relationship sections retain generated parent distinct-key counts, checked,
+  resolved and null references. A measured resolution ratio of zero differs
+  from `null` when there are no non-null references to check. These counts
+  describe generated key domains, not source domains.
+- `temporal_metrics` records entity, start/end field, checked row count and
+  failed row count for each active native temporal constraint. Empty data has
+  zero observations; business-rule evidence stays in `business_validation`.
+- `unmodeled_relationship_count`, `source_orphan_ratio` and `source_fanout`
+  remain `null`; `source_temporal_fidelity` is `unmeasured`. Source data is not
+  inspected by this validator. A valid report proves only the enabled declared
+  checks, never complete relationship discovery or measured source fidelity.
+
+Evidence contains metadata and counts, not key values or temporal endpoints.
+Collection shares the existing generation work and deadline budget and does
+not add a second scan of generated rows or change seeded generation.
