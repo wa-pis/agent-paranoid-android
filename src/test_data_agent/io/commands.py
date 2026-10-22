@@ -284,8 +284,13 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
     rules_path = getattr(args, "business_rules", None)
     if rules_path is not None:
         ensure_paths_distinct(rules_path, args.output)
+    count_pairs = getattr(args, "entity_count", ())
+    entity_counts = dict(count_pairs)
+    if len(entity_counts) != len(count_pairs):
+        raise ValueError("entity count overrides must not repeat an entity")
     spec = infer_dataset_spec_artifact(
         loaded, output_path=args.output, count=args.count, decimal_fields=decimal_fields,
+        entity_counts=entity_counts, max_total_rows=getattr(args, "max_total_rows", None),
         business_rules=load_business_rules(rules_path) if rules_path is not None else None,
     )
     print(

@@ -15,12 +15,27 @@ from test_data_agent.safety import assert_profile_safe, assert_spec_safe
 def infer_dataset_spec(
     profile: DatasetProfile, count: int | None = None, *,
     decimal_fields: Mapping[str, FieldSpec] | None = None,
+    entity_counts: Mapping[str, int] | None = None,
+    max_total_rows: int | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
     if profile.source_type in {"postgres_query", "trino_query"} and profile.has_unmodeled_expressions is None:
         raise ValueError("SQL query profile requires reprofiling for expression dependency checks")
     if profile.has_unmodeled_expressions:
         raise ValueError("SQL expression dependencies are unsupported for inferred generation")
+    counts = dict(entity_counts or {})
+    if set(counts) - {entity.name for entity in profile.entities}:
+        raise ValueError("entity counts must reference existing profile entities")
+    if any(type(value) is not int or value <= 0 for value in counts.values()):
+        raise ValueError("entity counts must be positive integers")
+    if max_total_rows is not None and (type(max_total_rows) is not int or max_total_rows <= 0):
+        raise ValueError("maximum total rows must be a positive integer")
+    resolved_counts = {
+        entity.name: counts.get(entity.name, count or max(entity.row_count, 1))
+        for entity in profile.entities
+    }
+    if max_total_rows is not None and sum(resolved_counts.values()) > max_total_rows:
+        raise ValueError("planned total rows exceed maximum total rows")
     overrides = decimal_fields or {}
     decimal_names = {
         f"{entity.name}.{field.name}" for entity in profile.entities
@@ -36,7 +51,7 @@ def infer_dataset_spec(
         entities.append(
             EntitySpec(
                 name=entity.name,
-                row_count=count or max(entity.row_count, 1),
+                row_count=resolved_counts[entity.name],
                 primary_key=primary_key,
                 fields=[
                     _infer_field(field, overrides.get(f"{entity.name}.{field.name}"))

@@ -6,6 +6,11 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- `infer-spec --entity-count ENTITY=COUNT` supports unequal reviewed table sizes
+  without changing `--count`; optional `--max-total-rows` rejects oversized
+  inference plans before specification publication. The same options are
+  available on the direct inference and artifact APIs.
+
 - Versioned documentation on GitHub Pages using mike, with separate development
   guidance and PDF, standalone HTML, Markdown and offline-site downloads.
   Documentation revisions remain distinct from package versions.

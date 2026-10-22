@@ -100,6 +100,17 @@ def positive_int(value: str) -> int:
     return parsed
 
 
+def entity_count(value: str) -> tuple[str, int]:
+    name, separator, raw_count = value.rpartition("=")
+    try:
+        count = int(raw_count)
+    except ValueError:
+        raise argparse.ArgumentTypeError("expected ENTITY=POSITIVE_INTEGER") from None
+    if not separator or not name or count <= 0:
+        raise argparse.ArgumentTypeError("expected ENTITY=POSITIVE_INTEGER")
+    return name, count
+
+
 def non_negative_int(value: str) -> int:
     parsed = int(value)
     if parsed < 0:
@@ -301,6 +312,8 @@ def register_dataset_commands(
     infer_spec_parser.add_argument("profile", type=Path, help="Safe profile JSON.")
     infer_spec_parser.add_argument("--output", "-o", type=Path, required=True, help="DatasetSpec YAML/JSON to write.")
     infer_spec_parser.add_argument("--count", type=positive_int, help="Override row count per entity in the inferred spec.")
+    infer_spec_parser.add_argument("--entity-count", action="append", type=entity_count, default=[], metavar="ENTITY=COUNT", help="Override one exact entity name; repeat for different entities. Takes precedence over --count.")
+    infer_spec_parser.add_argument("--max-total-rows", type=positive_int, help="Reject inference if the sum of planned entity counts exceeds this ceiling. This planning guard is not persisted in the spec.")
     infer_spec_parser.add_argument("--business-rules", type=Path, help="Embed typed business rules in the inferred specification for review and all generation interfaces.")
     infer_spec_parser.add_argument("--decimal-fields", type=Path, help="Reviewed JSON/YAML mapping ENTITY.FIELD to exact decimal FieldSpec with synthetic bounds.")
     infer_spec_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing spec file.")

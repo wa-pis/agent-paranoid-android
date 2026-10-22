@@ -36,6 +36,30 @@ business-rule guidance.
 
 ## Reviewed DatasetSpec
 
+For unequal table sizes, set counts while preparing the specification:
+
+```bash
+test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml \
+  --count 100 \
+  --entity-count warehouse.crm.customers=30 \
+  --entity-count warehouse.public.orders=200 \
+  --max-total-rows 230
+```
+
+Use exact entity names from the profile. Repeat `--entity-count ENTITY=COUNT`
+for different entities; duplicate or unknown names and nonpositive counts reject.
+An entity-specific count takes precedence over `--count`; other entities use
+`--count`, or their profiled row count (at least one) when it is omitted.
+This does not scale counts by a factor or infer relationships.
+
+`--max-total-rows` is an optional inference-time ceiling on the resolved sum.
+Oversized plans reject before field inference or spec publication. The ceiling
+is not persisted as a generation setting: review the saved counts, then generate
+without overriding them. A later `generate --count` or `load_test` multiplier
+changes the requested volume and requires a new size review. Existing generation
+row, byte and work limits still apply. Neither option changes DatasetSpec schema
+1.1 or source access.
+
 `infer-spec` expects a profiling-command artifact, not an existing DatasetSpec.
 JSON keys `schema_version`, `privacy_rules`, `privacy_settings`,
 `generation_settings` and `validation_settings` select spec parsing even if
