@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/reference/cli-workflows/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>CLI Workflows - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CLI Workflows";
+        var mkdocs_page_input_path = "reference/cli-workflows.md";
+        var mkdocs_page_url = "/agent-paranoid-android/reference/cli-workflows/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">CLI Workflows</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/cli-workflows.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="cli-workflows">CLI Workflows<a class="headerlink" href="#cli-workflows" title="Permanent link">&para;</a></h1>
+<h2 id="offline-demo">Offline Demo<a class="headerlink" href="#offline-demo" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent demo --output out/demo
+</code></pre>
+<p>The destination must not exist. The command uses a bundled fictional fixture,
+seed <code>20260801</code>, and no network or optional integration.</p>
+<h2 id="one-csv">One CSV<a class="headerlink" href="#one-csv" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+</code></pre>
+<p>For explanation and review steps, use <a href="../../getting-started/first-csv/">First CSV Dataset</a>.</p>
+<h2 id="related-csv-tables">Related CSV Tables<a class="headerlink" href="#related-csv-tables" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent generate-from-example data/example_dataset \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+</code></pre>
+<p>See <a href="../../getting-started/related-tables/">Related Tables</a> for relationship and
+business-rule guidance.</p>
+<h2 id="reviewed-datasetspec">Reviewed DatasetSpec<a class="headerlink" href="#reviewed-datasetspec" title="Permanent link">&para;</a></h2>
+<p><code>infer-spec</code> expects a profiling-command artifact, not an existing DatasetSpec.
+JSON keys <code>schema_version</code>, <code>privacy_rules</code>, <code>privacy_settings</code>,
+<code>generation_settings</code> and <code>validation_settings</code> select spec parsing even if
+profile fields are also present. Use the original profiling artifact for
+inference, or pass a reviewed spec directly to <code>generate</code>. Do not delete privacy
+settings to force a mixed JSON document to be interpreted as a profile.</p>
+<pre><code class="language-bash">test-data-agent generate dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+</code></pre>
+<p>For a reviewed DatasetSpec, omitted <code>--mode</code> and <code>--invalid-ratio</code> retain its
+saved settings. Explicit options override the effective spec, generated rows,
+saved output spec and manifest together. A nonzero ratio requires <code>mixed</code> or
+<code>negative</code>; specify <code>--invalid-ratio 0</code> when explicitly changing a saved mixed
+spec to <code>valid</code>. Profile and direct-CSV generation still default to <code>valid/0</code>.</p>
+<p>For previously reviewed safe profile metadata, use <code>--profile</code>:</p>
+<pre><code class="language-bash">test-data-agent generate --profile profile.json \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+</code></pre>
+<p><code>generate</code> accepts exactly one of a <code>DatasetSpec</code> path or <code>--profile</code>. Spec
+generation writes a dataset folder. Single-table profile generation writes one
+data file and requires <code>--count</code> and <code>--seed</code>. Multi-table profile generation
+writes the complete output folder. All sources share the
+<a href="../source-output-matrix/">source/output matrix</a>.</p>
+<h2 id="database-sources">Database Sources<a class="headerlink" href="#database-sources" title="Permanent link">&para;</a></h2>
+<p>Database workflows require mandatory physical-source allowlists and resource
+budgets. Connection components and credential-free JDBC-style endpoint input
+are environment configuration, never command-line secrets. Qualified column
+wildcards expand only against allowlisted metadata and never become a
+projection star. Reviewed query files use <code>profile-query</code>; query rows, SQL text,
+literals, endpoints, and backend messages are excluded from the profile.
+Direct non-sensitive date/timestamp query outputs include observed min/max
+bounds when the aggregate source supplies valid endpoints. Derived expressions,
+sensitive source/output names and all-null fields do not claim them.</p>
+<p><code>infer-spec</code> rejects query profiles marked with unsupported expression
+dependencies; <code>profile-query</code> itself remains available. Reprofile old SQL
+profiles without dependency metadata. Direct column aliases remain supported;
+there is no automatic SQL-to-formula translation.</p>
+<p>Follow the source-specific walkthrough instead of assembling commands from this
+reference:</p>
+<ul>
+<li><a href="../../how-to/postgresql/">PostgreSQL Workflow</a></li>
+<li><a href="../../how-to/trino/">Trino Workflow</a></li>
+</ul>
+<h2 id="review-first-agent-flow">Review-First Agent Flow<a class="headerlink" href="#review-first-agent-flow" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent agent-plan data/example_dataset \
+  --workspace out/agent \
+  --count 25 \
+  --seed 12345 \
+  --format csv
+
+test-data-agent agent-review out/agent
+REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot;
+</code></pre>
+<p><code>agent-plan</code> stops before generation. Review <code>dataset_spec.yaml</code>, record the
+current fingerprint from <code>agent-review</code>, and approve exactly that fingerprint.
+Optional provider advice changes the spec and therefore requires another review:</p>
+<pre><code class="language-bash">test-data-agent agent-advise out/agent --provider openai
+# Or explicitly select the experimental adapter:
+test-data-agent agent-advise out/agent --provider gigachat
+test-data-agent agent-review out/agent
+</code></pre>
+<p>OpenAI remains the default provider; GigaChat is an explicit experimental
+choice. Providers receive safe metadata, cannot approve, and cannot generate.
+See <a href="../../ai_integration/">Connect An AI Client</a> for provider-neutral exchange
+and trust-channel guidance.</p>
+<h2 id="generation-options">Generation Options<a class="headerlink" href="#generation-options" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--count N</code></td>
+<td>Number of generated rows per entity or an override</td>
+</tr>
+<tr>
+<td><code>--seed N</code></td>
+<td>Non-negative deterministic seed</td>
+</tr>
+<tr>
+<td><code>--format csv\|json\|sql\|parquet</code></td>
+<td>Output format</td>
+</tr>
+<tr>
+<td><code>--mode valid\|mixed\|negative\|edge\|load_test</code></td>
+<td>Generation mode</td>
+</tr>
+<tr>
+<td><code>--invalid-ratio R</code></td>
+<td>Invalid share from <code>0</code> to <code>1</code> for applicable modes</td>
+</tr>
+<tr>
+<td><code>--business-rules PATH</code></td>
+<td>Reviewed YAML or JSON rule file</td>
+</tr>
+<tr>
+<td><code>--output PATH</code></td>
+<td>Output file or new output directory</td>
+</tr>
+<tr>
+<td><code>--overwrite</code></td>
+<td>Replace a complete DatasetSpec output folder, or the same valid manifest-owned single-entity file bundle</td>
+</tr>
+</tbody>
+</table>
+<p>Parquet output from a reviewed specification uses declared integer, float,
+boolean, string, date and timestamp Arrow types, including nullable fields.
+Timestamp offsets are preserved when one consistent offset is available.
+Wide integer identifiers, mixed timestamp offsets and explicitly requested
+malformed negative cells use marked scalar encodings where native Arrow types
+cannot retain their logical values. The bundle reader restores them for validation;
+negative datasets remain invalid. Ordinary incompatible typed values still fail
+before publication. See the <a href="../source-output-matrix/#output-representations-and-revalidation">output representations</a>. A reviewed <code>DatasetSpec</code> version <code>1.1</code> may declare a
+<code>decimal</code> field with a required <code>decimal_range</code> distribution containing
+<code>precision</code> (1–38), <code>scale</code> (0–precision), and exact plain-text <code>min</code>/<code>max</code>
+bounds. Generation uses seeded base-ten integer units; CSV/JSON render decimal
+text, PostgreSQL SQL uses <code>NUMERIC(p,s)</code>, and Parquet uses <code>decimal128(p,s)</code>.
+CSV is not self-describing: the generated directory's <code>dataset_spec.yaml</code>
+records the DECIMAL precision, scale and nullability. The manifest declares the
+reversible CSV null/text encoding: null is <code>\N</code>, while an empty cell is empty text.
+Keep both companions when reusing the export; the manifest binds the specification
+by fingerprint. Legacy unmarked CSV keeps its previous interpretation.
+Version <code>1.0</code> remains readable but cannot declare <code>decimal</code>. Parquet and
+declared PostgreSQL/query <code>numeric(p,s)</code> profiles retain only schema precision
+and scale; they do not infer a runnable exact range. Reviewed ordinary DECIMAL
+formulas and aggregates use bounded exact arithmetic with one HALF_UP rounding
+at the declared target scale. See the <a href="../../rc4-external-feedback/#business-rules-across-interfaces">rule contract</a>. Ordinary generation never preserves
+source rows. The separately selected transformation candidate has its own
+<a href="../cli/#closed-common-profile-workflow-candidate">saved-profile contract</a>, exact
+typed mappings and local approval boundary; its common public registration is
+not enabled by these generation commands. Bare SQL <code>numeric</code>
+without <code>(p,s)</code> still uses approximate FLOAT semantics, not exact evidence.
+Sensitive DECIMAL ranges remain rejected before generation; explicit numeric
+measure semantics retain sensitive-name, flag and classification vetoes.</p>
+<p>DatasetSpec folder generation requires a new or empty destination unless
+<code>--overwrite</code> is set. With that flag it replaces the complete folder, including
+obsolete files, after generation and validation finish. Staging and a backup
+support rollback on publication failure; this is not a concurrent-reader atomic
+exchange. Symlinks and folders containing the input spec or rule file are refused.
+<code>generate-from-example</code> still requires a new or empty destination.</p>
+<p>Single-entity output suffixes must match the selected format. Its separate
+file-bundle overwrite requires matching ownership, manifest, format and sibling
+files. These checks do not impose manifest ownership on complete-folder replacement.</p>
+<h2 id="profiling-options">Profiling Options<a class="headerlink" href="#profiling-options" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--table NAME</code></td>
+<td>Override the inferred entity name for one CSV</td>
+</tr>
+<tr>
+<td><code>--cache-dir PATH</code></td>
+<td>Safe profile cache location</td>
+</tr>
+<tr>
+<td><code>--no-cache</code></td>
+<td>Force fresh folder profiling</td>
+</tr>
+<tr>
+<td><code>--rule-sample-rows N</code></td>
+<td>Bound row-level relationship and rule mining</td>
+</tr>
+<tr>
+<td><code>--local-category ENTITY.FIELD</code></td>
+<td>Retain one reviewed bounded non-sensitive local enum or constant; repeatable and default-off</td>
+</tr>
+</tbody>
+</table>
+<p>The local-category selector does not bypass sensitive-name, content,
+cardinality, value-length, destination, or resource checks. Exact approved
+values remain local and are replaced before external-provider requests.</p>
+<p>See <a href="../generation-modes/">generation modes and folder replacement</a> for the
+post-RC3 edge boundaries, load multiplier and complete-folder overwrite contract.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

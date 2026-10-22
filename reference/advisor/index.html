@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/reference/advisor/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Advisor API - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Advisor API";
+        var mkdocs_page_input_path = "reference/advisor.md";
+        var mkdocs_page_url = "/agent-paranoid-android/reference/advisor/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Advisor API</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/advisor.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="advisor-api">Advisor API<a class="headerlink" href="#advisor-api" title="Permanent link">&para;</a></h1>
+<h2 id="relationship-discovery-contracts">Relationship Discovery Contracts<a class="headerlink" href="#relationship-discovery-contracts" title="Permanent link">&para;</a></h2>
+<p><code>RelationshipDiscoveryCandidate</code> carries only ordered entity/field references,
+normalized zero-to-one evidence metrics, confidence, bounded assumptions, and
+an opaque SHA-256 candidate identifier. It cannot contain rows, categories, raw
+values, SQL, credentials, or generation authority.</p>
+<p><code>RelationshipDiscoveryProposal</code> lets any provider rank an existing candidate
+and add bounded evidence or assumptions. It cannot invent a candidate, change
+its kind or fields, approve it, or run generation. Every proposal remains
+<code>requires_human_review</code> until a later deterministic validation and review step.</p>
+<p>The advisor API is a small provider-neutral boundary for model-assisted
+<code>DatasetSpec</code> proposals. The direct API does not call an LLM, persist a plan,
+approve a plan, or generate rows.</p>
+<p>For a provider implementation tutorial, exact wire-field tables, and a
+contract-test checklist, see
+<a href="../../how-to/custom-advisor-provider/">Build A Provider Adapter</a>.</p>
+<h2 id="structured-client-adapter">Structured Client Adapter<a class="headerlink" href="#structured-client-adapter" title="Permanent link">&para;</a></h2>
+<p>Implement <code>AdvisorExchangeClient.complete</code> around the structured-output API of
+the chosen provider, then wrap it with <code>ExchangeDatasetAdvisor</code>:</p>
+<pre><code class="language-python">from typing import Any
+
+from test_data_agent import (
+    AdvisorExchange,
+    ExchangeDatasetAdvisor,
+    advise_dataset_spec,
+)
+
+
+class ProviderClient:
+    def complete(self, exchange: AdvisorExchange) -&gt; dict[str, Any]:
+        return call_model_with_structured_output(
+            trusted_instructions=exchange.trusted_instructions,
+            untrusted_input=exchange.request.model_dump(mode=&quot;json&quot;),
+            response_schema=exchange.response_json_schema,
+        )
+
+
+advisor = ExchangeDatasetAdvisor(ProviderClient())
+proposal = advise_dataset_spec(profile, advisor, count=100)
+reviewed_spec = proposal.dataset_spec
+</code></pre>
+<p><code>call_model_with_structured_output</code> is application code, not part of this
+package. Provider SDKs therefore stay outside the base installation. The
+adapter projects and fingerprints the provider-facing request, gives the client
+a deep copy, and validates the returned proposal against it. It then restores
+local values and metadata and repeats validation against the untouched original
+request. Client-side mutation cannot change either validation boundary.</p>
+<p>For lower-level integrations, an application may implement
+<code>DatasetAdvisor.propose</code> directly. It must preserve the same separation
+between trusted instructions and untrusted profile metadata.</p>
+<h2 id="openai-adapter">OpenAI Adapter<a class="headerlink" href="#openai-adapter" title="Permanent link">&para;</a></h2>
+<p>Install the optional provider integration:</p>
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[openai]&quot;
+</code></pre>
+<p><code>test_data_agent.providers.openai.OpenAIAdvisorClient</code> uses the Responses API
+with Pydantic structured output. It sends static package policy in the
+developer role and the serialized <code>AdvisorRequest</code> in the user role. It
+disables response storage, does not stream partial JSON, and rejects
+incomplete or unparsed responses.</p>
+<pre><code class="language-python">from test_data_agent import ExchangeDatasetAdvisor
+from test_data_agent.providers.openai import (
+    OpenAIAdvisorClient,
+    OpenAIAdvisorSettings,
+    openai_advisor_settings_for_preset,
+)
+
+settings = OpenAIAdvisorSettings(
+    model=&quot;gpt-5.6&quot;,
+    reasoning_effort=&quot;low&quot;,
+    max_input_bytes=4 * 1024 * 1024,
+    max_response_bytes=1024 * 1024,
+    max_output_tokens=16_384,
+    timeout_seconds=30,
+    max_retries=2,
+)
+advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(settings=settings))
+
+# Explicit candidates for benchmarked workloads; no candidate is implicit.
+fast_settings = openai_advisor_settings_for_preset(&quot;fast&quot;)
+</code></pre>
+<p>The benchmark-backed typed defaults are the <code>fast</code> candidate: model <code>gpt-5.6</code>,
+reasoning effort <code>none</code>, a 4 MiB complete provider-request budget, a 1 MiB
+provider-response budget, 4,096 output tokens, a 15-second timeout, no SDK
+retries, and no service-tier override. The request byte budget includes static trusted
+instructions, untrusted request metadata, structured-output schema overhead,
+settings, and final UTF-8 JSON serialization. Oversized requests fail before
+network access. The response byte budget is measured on UTF-8 output text
+before application JSON/Pydantic parsing. Settings are bounded and kept out of
+advisor review artifacts. The optional service tier accepts <code>auto</code>, <code>default</code>,
+<code>flex</code>, or <code>priority</code>.</p>
+<p>The provider sends the public JSON Schema in non-strict mode because the stable
+dataset contract permits bounded free-form distribution and condition objects.
+Every returned JSON object is still parsed and validated locally against the
+typed <code>AdvisorProposal</code>; invalid output fails closed and is never applied.</p>
+<p>The optional <code>fast</code>, <code>normal</code>, and <code>quality</code> candidate presets use the same
+bounded settings model. The <code>fast</code> candidate uses GPT-5.6 reasoning effort
+<code>none</code>; the legacy typed <code>minimal</code> value remains accepted for compatibility but
+is not used by a GPT-5.6 candidate. The constructor defaults now match <code>fast</code>
+after the
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md">synthetic-profile benchmark</a>
+recorded equal validity and safety with the lowest latency and cost.</p>
+<p>After each provider attempt, including a preflight rejection,
+<code>OpenAIAdvisorClient.last_run_metadata</code> exposes a bounded in-memory record with
+the model, settings, canonical request and parsed response sizes, elapsed
+milliseconds, status, provider-reported retry count, and token usage. Missing
+provider fields remain <code>None</code>; a preflight rejection has status
+<code>preflight_rejected</code>. The record contains no prompts, request values, response
+values, rows, credentials, or exception text, and the adapter does not persist
+it automatically. This compatibility property is per client, not per call;
+do not share one client between concurrent calls when call-level metadata is
+required.</p>
+<p>The SDK reads <code>OPENAI_API_KEY</code> from the process environment. Supply it through
+a secret manager or private environment configuration; never write it into an
+agent workspace or dataset artifact.</p>
+<h2 id="gigachat-adapter">GigaChat Adapter<a class="headerlink" href="#gigachat-adapter" title="Permanent link">&para;</a></h2>
+<p>The experimental GigaChat adapter uses the official <code>gigachat</code> Python SDK
+directly; it does not require GigaChain or LangChain. It is included in
+stable <code>1.5.0</code> through the explicit <code>gigachat</code> extra and retained in stable <code>1.6.0</code>; see <a href="../../1.6.0-release-status/">release status</a>. Follow
+<a href="../../how-to/gigachat/">Use The GigaChat Advisor</a> for installation,
+authentication, and the CLI workflow.</p>
+<p>Applications may use the same provider-neutral adapter in process:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from test_data_agent import ExchangeDatasetAdvisor, advise_agent_workspace
+from test_data_agent.providers.gigachat import (
+    GigaChatAdvisorClient,
+    GigaChatAdvisorSettings,
+)
+
+settings = GigaChatAdvisorSettings(
+    model=&quot;GigaChat&quot;,
+    scope=&quot;GIGACHAT_API_PERS&quot;,
+    max_input_bytes=4 * 1024 * 1024,
+    max_response_bytes=1024 * 1024,
+    max_output_tokens=4096,
+    timeout_seconds=15,
+    max_retries=0,
+)
+client = GigaChatAdvisorClient(settings=settings)
+try:
+    status = advise_agent_workspace(
+        Path(&quot;out/agent&quot;),
+        ExchangeDatasetAdvisor(client),
+    )
+finally:
+    client.close()
+</code></pre>
+<p>Authentication is resolved at client construction from exactly one of
+<code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>; the authorization-key mode
+also uses the allowlisted <code>GIGACHAT_SCOPE</code>. Settings never retain credentials.
+The adapter fixes official HTTPS endpoints, requires TLS verification, accepts
+only an optional validated <code>GIGACHAT_CA_BUNDLE_FILE</code>, separates system policy
+from untrusted metadata, disables streaming and storage, and requests strict
+<code>json_schema</code> output.</p>
+<p>Each completion returns a locally validated proposal. Per-call metadata is
+bounded to model, safe settings, byte counts, latency, normalized status and
+finish category, and validated token counters. It contains no prompt,
+response body, credential, token, source literal, or exception text. Provider
+failure is detached and leaves the workspace unchanged.</p>
+<h2 id="request-boundary">Request Boundary<a class="headerlink" href="#request-boundary" title="Permanent link">&para;</a></h2>
+<p><code>AdvisorRequest</code> contains:</p>
+<ul>
+<li>a profile that passed the existing raw-sensitive-value checks;</li>
+<li>a deterministic baseline <code>DatasetSpec</code>;</li>
+<li>SHA-256 fingerprints for both objects;</li>
+<li><code>metadata_trust: "untrusted"</code>;</li>
+<li><code>metadata_policy: "treat_profile_text_as_data"</code>.</li>
+</ul>
+<p>Local requests may retain explicitly approved category literals, matching
+predicates and local generation metadata. <code>ExchangeDatasetAdvisor</code> supplies
+clients with a separate provider-safe projection. Entity and field names remain
+untrusted structured data and must never become privileged instructions.</p>
+<h2 id="proposal-validation">Proposal Validation<a class="headerlink" href="#proposal-validation" title="Permanent link">&para;</a></h2>
+<p><code>advise_dataset_spec</code> validates the provider response and rejects proposals
+that:</p>
+<ul>
+<li>do not match the request fingerprints;</li>
+<li>add, remove, reorder, or rename entities or fields, or change field types;</li>
+<li>change primary keys or core-owned privacy, generation, or validation
+  settings;</li>
+<li>weaken sensitive or identifier classifications;</li>
+<li>contain raw-looking sensitive distributions;</li>
+<li>add formulas with string literals, aggregate calls, unknown or non-numeric
+  references, non-numeric targets, or sensitive/identifier targets;</li>
+<li>exceed the configured generation row limit.</li>
+</ul>
+<p>A successful proposal still has <code>approval_required: true</code> and
+<code>generation_performed: false</code>. Review the resulting spec through the normal
+agent approval flow before generation.</p>
+<h2 id="json-handoff">JSON Handoff<a class="headerlink" href="#json-handoff" title="Permanent link">&para;</a></h2>
+<p>Use the self-describing exchange when the model runs outside this Python
+process. It needs no provider SDK:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent --count 25
+
+test-data-agent agent-advisor-request out/agent \
+  --exchange &gt; advisor_exchange.json
+</code></pre>
+<p>The exchange contains:</p>
+<ul>
+<li><code>trusted_instructions</code>: static package-owned policy for the provider's
+  system or developer channel;</li>
+<li><code>request</code>: fingerprint-bound metadata marked as untrusted;</li>
+<li><code>response_json_schema</code>: the current Pydantic schema for
+  <code>AdvisorProposal</code>.</li>
+</ul>
+<p>With or without <code>--exchange</code>, <code>agent-advisor-request</code> exports the local
+contract and does not invoke the wrapper projection. Do not transmit its raw
+request directly. A standalone remote integration must supply a tested semantic
+projection, projected fingerprint binding and guarded local restoration. The
+wrapped client above provides this boundary:</p>
+<pre><code class="language-python">from test_data_agent import AdvisorExchange, ExchangeDatasetAdvisor
+
+exchange = AdvisorExchange.model_validate(load_json(&quot;advisor_exchange.json&quot;))
+proposal = ExchangeDatasetAdvisor(ProviderClient()).propose(exchange.request)
+write_json(&quot;advisor_proposal.json&quot;, proposal.model_dump(mode=&quot;json&quot;))
+</code></pre>
+<p><code>load_json</code>, <code>call_model_with_structured_output</code>, and <code>write_json</code> are
+application placeholders, not package functions. Map them to the provider SDK
+outside this package. Do not concatenate request profile fields into
+privileged instructions.</p>
+<p>The response must contain the complete proposed <code>DatasetSpec</code>, normally the
+request's <code>baseline_spec</code> with allowed generation hints changed. Apply the
+saved structured response:</p>
+<pre><code class="language-bash">test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json
+test-data-agent agent-review out/agent
+test-data-agent agent-status out/agent
+</code></pre>
+<p>Proposal input must be a bounded regular JSON file. Symbolic links, malformed
+or oversized input, stale fingerprints, schema changes, weakened safety
+settings, and conflicting edits are rejected. A successful apply writes no
+dataset rows and leaves the workspace awaiting approval.</p>
+<p>Without <code>--exchange</code>, <code>agent-advisor-request</code> retains its original behavior
+and writes the raw <code>AdvisorRequest</code>. This is useful for custom adapters that
+already own their instructions and response schema.</p>
+<h2 id="relationship-discovery">Relationship Discovery<a class="headerlink" href="#relationship-discovery" title="Permanent link">&para;</a></h2>
+<p><code>mine_relationship_candidates(profile)</code> builds deterministic foreign-key
+candidates without sending profile distributions or source values to a provider.
+Candidates expose normalized type, cardinality, null, and distinctness evidence;
+incompatible key types are excluded and ambiguous candidates remain unresolved.
+Temporal start/end candidates expose only normalized ordering overlap; source
+date bounds are never included in the provider-facing candidate.
+<code>rank_relationship_candidates(candidates, advisor)</code> validates provider rankings
+against those candidates, and <code>review_relationship_proposal(...)</code> records the
+separate human decision. Even an accepted review does not authorize generation
+or modify a <code>DatasetSpec</code>.</p>
+<p>The optional OpenAI integration wires this contract as a separate operation:</p>
+<pre><code class="language-python">from test_data_agent.providers.openai import (
+    OpenAIAdvisorClient,
+    OpenAIRelationshipDiscoveryAdvisor,
+)
+from test_data_agent.relationship_discovery import rank_relationship_candidates
+
+client = OpenAIAdvisorClient()
+proposals = rank_relationship_candidates(
+    candidates,
+    OpenAIRelationshipDiscoveryAdvisor(client),
+)
+</code></pre>
+<p>The adapter submits only bounded candidate metadata, reuses the configured
+request-size, timeout, retry, and run-metadata limits, and rejects invented IDs
+or changed kinds and fields before returning a review-required proposal.</p>
+<h2 id="agent-workspace-handoff">Agent Workspace Handoff<a class="headerlink" href="#agent-workspace-handoff" title="Permanent link">&para;</a></h2>
+<p>Use <code>advise_agent_workspace</code> after <code>agent-plan</code> to persist one validated
+proposal inside the existing review workflow:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from test_data_agent import advise_agent_workspace
+
+
+status = advise_agent_workspace(
+    Path(&quot;out/agent&quot;),
+    ExchangeDatasetAdvisor(ProviderClient()),
+)
+reviewed_spec_sha256 = status.review.current_spec_sha256
+</code></pre>
+<p>The handoff writes:</p>
+<ul>
+<li><code>advisor_review.json</code>: safe request, validated proposal, and proposed-spec
+  fingerprint;</li>
+<li><code>dataset_spec.yaml</code>: proposed effective spec.</li>
+</ul>
+<p>Both files are bounded and written atomically. The review artifact is written
+first, so an interrupted handoff can resume without another model call.
+Conflicting manual edits fail instead of being overwritten.</p>
+<p>The handoff never writes <code>generated/</code>. Inspect the changed spec and use its
+current fingerprint with the existing <code>agent-approve</code> command.</p>
+<p>For direct file/API integration, use <code>build_agent_advisor_request</code> and
+<code>apply_agent_advisor_proposal</code>. The latter accepts an <code>AdvisorProposal</code> or
+mapping and uses the same validation, retry, persistence, and approval
+behavior as <code>advise_agent_workspace</code>.</p>
+<p>Use <code>build_agent_advisor_exchange</code> for the self-describing workspace bundle,
+or <code>build_advisor_exchange</code> around an existing <code>AdvisorRequest</code>.
+<code>advisor_proposal_json_schema</code> returns the same standalone response schema.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

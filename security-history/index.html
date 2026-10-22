@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/security-history/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Historical Security Findings - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Historical Security Findings";
+        var mkdocs_page_input_path = "security-history.md";
+        var mkdocs_page_url = "/agent-paranoid-android/security-history/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Historical Security Findings</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/security-history.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="historical-security-findings">Historical Security Findings<a class="headerlink" href="#historical-security-findings" title="Permanent link">&para;</a></h1>
+<p>This page preserves the disposition and resolution history for four Low
+findings originally accepted for the <code>1.0.0rc6</code> and <code>1.0.0</code> product scope. It
+does not describe current accepted product-level issues.</p>
+<p>The source is repository-wide Codex Security scan
+<code>484dfa30-85d2-4059-b39b-2c52c9d0f5ed</code> of immutable commit
+<code>2c714a6d4df75a1faab422055593fc50a2061a03</code>. All four findings are resolved in
+stable <code>1.2.0</code>. Risk owner: <a href="https://github.com/wa-pis">@wa-pis</a>. The original
+disposition was product-risk acceptance, not proof that broader deployment
+models are safe. The independent RC6 review is recorded in the
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc6-final-release-candidate/security-review-evidence.md">RC6 security evidence</a>
+and <a href="https://github.com/wa-pis/agent-paranoid-android/issues/397">issue #397</a>.</p>
+<p>Earlier review records remain available in the
+<a href="../security-review-2026-07-31/">pre-RC review</a> and
+<a href="../security-review-2026-08-01-rc2/">RC2 review</a>.</p>
+<h2 id="ag-04-provider-response-pre-parse-bounds">AG-04: Provider Response Pre-Parse Bounds<a class="headerlink" href="#ag-04-provider-response-pre-parse-bounds" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> resolved in stable <code>1.2.0</code>.</p>
+<p>Resolution contract: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-2-0-provider-response-preparse-bound/proposal.md">archived OpenSpec change</a>.</p>
+<ul>
+<li>Finding: <code>csf_83170308250423cefd103d0d</code></li>
+<li>Occurrence: <code>occ_9873a9a253a90382015b81c6</code></li>
+<li>Fingerprint:
+  <code>codex-security/v1:sha256:154204f45b99b73f72dc88274da62359310ee2361b851b29428b234cd133bc96</code></li>
+<li>Rule: <code>resource-exhaustion.provider-response-preparse</code></li>
+</ul>
+<p>The OpenAI advisor previously passed provider output text into application JSON
+parsing before applying a local response-byte limit. The typed provider settings
+now impose a bounded UTF-8 response budget and reject oversized output with a
+fixed redacted error before application JSON/Pydantic parsing. GigaChat already
+enforced the equivalent boundary.</p>
+<p>The SDK still materializes its own response envelope before the application can
+inspect <code>output_text</code>; revisit transport streaming before operating an advisor
+as a shared multi-tenant service.</p>
+<h2 id="fs-11-json-depth-after-materialization">FS-11: JSON Depth After Materialization<a class="headerlink" href="#fs-11-json-depth-after-materialization" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> resolved in stable <code>1.2.0</code>.</p>
+<p>Resolution contract: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-json-depth-preparse-bound/proposal.md">archived OpenSpec change</a>.</p>
+<ul>
+<li>Finding: <code>csf_d7760aedb0596e6d0998da23</code></li>
+<li>Occurrence: <code>occ_9d4d5c81982172b3c0e0bde5</code></li>
+<li>Fingerprint:
+  <code>codex-security/v1:sha256:31c3e170ade78db51d05d695d3b574b8ee50eec060702cdfb03a4d8706de55dd</code></li>
+<li>Rule: <code>resource-exhaustion.json-depth-after-parse</code></li>
+</ul>
+<p>JSON datasets, JSON profile/spec imports, and profile-cache documents now pass
+through one non-recursive structural-depth scan before <code>json.loads</code> or Pydantic
+can materialize nested objects. The scan ignores brackets inside JSON strings,
+uses the existing typed environment budget, and fails closed without publishing
+a partial dataset, profile, or spec. Input byte, row, cell, and typed-model
+limits remain independent defenses.</p>
+<h2 id="mt-02-same-caller-mcp-argument-reflection">MT-02: Same-Caller MCP Argument Reflection<a class="headerlink" href="#mt-02-same-caller-mcp-argument-reflection" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> resolved in stable <code>1.2.0</code>.</p>
+<p>Resolution contract: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-argument-redaction/proposal.md">archived OpenSpec change</a>.</p>
+<ul>
+<li>Finding: <code>csf_7b1cee56a15d9ea40705a6e0</code></li>
+<li>Occurrence: <code>occ_3490f19b25f4117b792cdbca</code></li>
+<li>Fingerprint:
+  <code>codex-security/v1:sha256:da37d59b6b33173a5b0db72ecceef92694ad6ce0c7f942180e9478266e45aedf</code></li>
+<li>Rule: <code>error-disclosure.mcp-argument-reflection</code></li>
+</ul>
+<p>Generator and Trino MCP servers now replace typed FastMCP/Pydantic validation
+details with the fixed <code>Tool arguments failed validation</code> error. Rejected values
+and nested validation exceptions do not enter the MCP result.</p>
+<p>Tool schemas and non-validation application errors are unchanged.</p>
+<h2 id="mt-03-malformed-mcp-value-in-local-logs">MT-03: Malformed MCP Value In Local Logs<a class="headerlink" href="#mt-03-malformed-mcp-value-in-local-logs" title="Permanent link">&para;</a></h2>
+<p><strong>Status:</strong> resolved in stable <code>1.2.0</code>.</p>
+<p>Resolution contract: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-malformed-log-redaction/proposal.md">archived OpenSpec change</a>.</p>
+<ul>
+<li>Finding: <code>csf_afe00adf1fc2884d910eea07</code></li>
+<li>Occurrence: <code>occ_a29278197dd63475ead2653e</code></li>
+<li>Fingerprint:
+  <code>codex-security/v1:sha256:b118d28265c9382250b940dda7d9027ad9ed96c4053d66a98797a5c19061c794</code></li>
+<li>Rule: <code>log-disclosure.malformed-mcp-payload</code></li>
+</ul>
+<p>The shared bounded stdio transport now validates typed MCP client messages
+before SDK dispatch. Malformed requests receive the fixed
+<code>Invalid request parameters</code> response, while malformed notifications remain
+response-free. Rejected values cannot enter SDK validation logs or retained
+exception state.</p>
+<p>Valid requests, notifications, tool schemas, and non-validation application
+errors are unchanged.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

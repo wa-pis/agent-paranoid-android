@@ -1,0 +1,33 @@
+{
+  "package_version": "1.6.0",
+  "package_commit": "258c035c22408becf17ab090635710a50dda8ccc",
+  "documentation_revision": "d10145be9f01085eb1648b7192045ab020095b20",
+  "status": "Maintained stable guidance",
+  "chapters": [
+    "index.md",
+    "getting-started/installation.md",
+    "getting-started/first-csv.md",
+    "getting-started/related-tables.md",
+    "getting-started/review-output.md",
+    "how-to/business-rules.md",
+    "how-to/postgresql.md",
+    "how-to/trino.md",
+    "how-to/transformation.md",
+    "how-to/mcp.md",
+    "ai_integration.md",
+    "operations/containers.md",
+    "reference/index.md",
+    "concepts/choosing-an-approach.md",
+    "concepts/profiles-and-specs.md",
+    "concepts/safety-model.md",
+    "operations/troubleshooting.md",
+    "known-issues.md"
+  ],
+  "index_sha256": "93b63cf6c4624239489588437e66aa5ee859d6ea212225a8927acd54d47eff88",
+  "sha256": {
+    "handbook.pdf": "377f61957833830a03c904b947aeb58c4ed028f0051e8189bd425e27d3693077",
+    "handbook.html": "75f468024f952d44b0d525fe8b45cf5a64513e0212ed44b5cfed756a1b29b684",
+    "handbook.md.zip": "13cd8ea51a2938b32fcc9cd1264a021334f2431a5f0ecc7a6afcf9054974a7a5",
+    "site.zip": "5a3035f38187772b9ab2750fac02d40a7dc3a2a701bcafe1d44949b66af353cb"
+  }
+}

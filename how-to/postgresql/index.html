@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/how-to/postgresql/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Profile PostgreSQL - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Profile PostgreSQL";
+        var mkdocs_page_input_path = "how-to/postgresql.md";
+        var mkdocs_page_url = "/agent-paranoid-android/how-to/postgresql/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Profile PostgreSQL</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-To Guides</li>
+      <li class="breadcrumb-item active">Profile PostgreSQL</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/postgresql.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#profile-postgresql" title="Permanent link">&para;</a></h1>
+<p>Database profiling is available in stable <code>1.6.0</code> and requires explicit
+read-only configuration, allowlists and resource budgets.</p>
+<p>Install the optional driver:</p>
+<pre><code class="language-bash">pip install &quot;agent-paranoid-android[postgres]&quot;
+</code></pre>
+<p>Configure one explicit read-only scope. The password setting names another
+environment variable; it is not the password itself.</p>
+<pre><code class="language-bash">export POSTGRES_SOURCE_ID=warehouse
+export POSTGRES_HOST=db.example.internal
+export POSTGRES_DATABASE=analytics
+export POSTGRES_USER=test_data_agent
+export POSTGRES_PASSWORD_ENV=WAREHOUSE_PASSWORD
+export WAREHOUSE_PASSWORD='replace-in-your-shell'
+export POSTGRES_ALLOWED_SCHEMAS=public
+export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
+export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.orders.order_id,public.orders.customer_id,public.orders.state,public.orders.amount
+</code></pre>
+<p>For an intentionally table-wide aggregate profile, an entry may instead use
+the exact <code>schema.table.*</code> form:</p>
+<pre><code class="language-bash">export POSTGRES_ALLOWED_COLUMNS='public.customers.*,public.orders.*'
+</code></pre>
+<p>The parent tables must still appear exactly in <code>POSTGRES_ALLOWED_TABLES</code>.
+Before any aggregate runs, bounded PostgreSQL catalog metadata expands each
+wildcard into a frozen, sorted explicit-column snapshot. Profiling queries
+enumerate quoted column identifiers; they never execute <code>SELECT *</code>. Bare,
+schema-wide, table-name, embedded, or over-budget wildcards fail closed.</p>
+<p>If a platform portal supplies a JDBC endpoint, replace only the separate host,
+port, database, and TLS settings with a credential-free JDBC-style URL:</p>
+<pre><code class="language-bash">export POSTGRES_JDBC_URL='jdbc:postgresql://db.example.internal:5432/analytics?sslmode=verify-full'
+</code></pre>
+<p>Keep <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD_ENV</code>, every allowlist, and every budget
+separate. Userinfo, passwords, unknown query properties, and session-changing
+options in the URL fail before a connection is opened. This syntax is parsed
+into the existing Psycopg adapter; Java and JDBC drivers are not used. If both
+URL and component settings are present, explicitly supplied values must match.</p>
+<p>PostgreSQL connections now default to <code>verify-full</code>, which verifies the server
+certificate and configured hostname. Configure a trusted CA certificate through
+the Psycopg/libpq trust-root configuration (for example <code>PGSSLROOTCERT</code>) and use
+a hostname covered by the certificate. Existing installations using the former
+<code>require</code> default must configure trust before upgrading. Connection failure does
+not fall back to a weaker mode. Explicit <code>require</code>, <code>verify-ca</code>, or <code>disable</code>
+requires <code>POSTGRES_ALLOW_INSECURE=true</code> and is intended only for isolated local
+testing; these modes do not provide full server identity verification.</p>
+<p>The database role must already be read-only. The client also requests a
+read-only transaction, TLS, statement and lock timeouts, and bounded aggregate
+results. It accepts no arbitrary SQL and never profiles source rows.</p>
+<p>Table profiling retains observed minimum/maximum bounds for non-sensitive
+<code>date</code> and <code>timestamp</code> columns in the existing column-summary query. Inferred
+generation uses those ranges; timestamp offsets are retained. Sensitive-name
+columns do not expose date bounds, and all-null columns have none. Invalid or
+inconsistently typed bounds fail profiling rather than silently inventing a
+period. Missing bounds elsewhere still require review; this table-profile
+behavior does not imply date-bound support for <code>profile-query</code>.</p>
+<p>Create a safe profile, review a generation specification, generate, and
+validate. Output paths must not already exist unless the command explicitly
+supports <code>--overwrite</code>:</p>
+<pre><code class="language-bash">test-data-agent profile-postgres --output out/postgres-profile.json
+test-data-agent infer-spec out/postgres-profile.json --output out/dataset-spec.yaml
+test-data-agent generate out/dataset-spec.yaml --seed 12345 --output out/generated
+test-data-agent validate out/dataset-spec.yaml out/generated
+test-data-agent export-postgres-sql out/dataset-spec.yaml --seed 12345 --output out/generated.sql
+</code></pre>
+<p>Run the SQL only in the intended local or disposable target database:</p>
+<pre><code class="language-bash">psql --set ON_ERROR_STOP=1 --dbname synthetic_target --file out/generated.sql
+</code></pre>
+<p>The SQL file contains one transaction, deterministic quoted <code>CREATE TABLE</code>,
+foreign-key, and <code>INSERT</code> statements, PostgreSQL scalar literals, and <code>NULL</code>.
+It is built from validated generated records, not profile query rows. Render or
+validation failure leaves no partial output file. Repeating export with the
+same reviewed spec, seed, package, and recorded environment produces the same
+logical SQL; compare files directly when verifying one environment:</p>
+<pre><code class="language-bash">test-data-agent export-postgres-sql out/dataset-spec.yaml \
+  --seed 12345 --output out/generated-second.sql
+cmp out/generated.sql out/generated-second.sql
+</code></pre>
+<p>To profile a reviewed relation without creating a database view, put
+one fully qualified single-table query in a local file:</p>
+<pre><code class="language-sql">SELECT o.order_id, o.state, o.amount AS amount
+FROM public.orders AS o
+WHERE o.order_id &lt; 999999
+</code></pre>
+<p>Keep the same physical schema/table/column allowlists and run:</p>
+<pre><code class="language-bash">test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity orders_query \
+  --output out/query-profile.json
+test-data-agent infer-spec out/query-profile.json \
+  --output out/query-spec.yaml
+test-data-agent generate out/query-spec.yaml \
+  --seed 12345 --output out/query-generated
+test-data-agent validate out/query-spec.yaml out/query-generated
+</code></pre>
+<p>This generation walkthrough uses direct columns and aliases, all explicitly
+allowed above. A derived expression such as <code>amount * 2</code> can be profiled under
+the SQL policy, but automatic <code>infer-spec</code> rejects profiles with unsupported
+expression dependencies. Do not infer that the expression is translated into
+a generation formula; review a separate supported specification instead.</p>
+<p>The query is parsed locally and must stay inside the documented scalar,
+projection, and filter subset. A no-row schema probe and bounded aggregate
+wrappers execute in the forced read-only session. The profile contains a query
+fingerprint but not the SQL text, its literal, backend messages, or query rows.</p>
+<p>The equivalent typed Python entry point keeps the query path and database
+configuration explicit:</p>
+<pre><code class="language-python">from pathlib import Path
+
+import psycopg
+
+from test_data_agent import (
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    profile_postgres_query_source,
+)
+from test_data_agent.postgres_config import PostgresConfig
+
+request = SqlQueryProfileRequest(
+    adapter=SqlQueryAdapter.POSTGRES,
+    source_id=&quot;warehouse&quot;,
+    entity=&quot;orders_query&quot;,
+    query_file=Path(&quot;query.sql&quot;),
+)
+profile = profile_postgres_query_source(
+    request,
+    config=PostgresConfig.from_env(),
+    driver=psycopg,
+)
+</code></pre>
+<p>Exact values remain disabled by default. A bounded, reviewed, non-sensitive
+business enum can be kept locally with its source-qualified identity:</p>
+<pre><code class="language-bash">test-data-agent profile-postgres \
+  --local-category warehouse.public.orders.state \
+  --output out/postgres-profile.json
+</code></pre>
+<p>PII, secrets, identifiers, quasi-identifiers, free text, excessive cardinality,
+and long values fail closed. Original literals are not sent to providers, MCP,
+logs, or errors. A column wildcard is not a local-value policy: exact values
+are considered only when the separate, fully qualified <code>--local-category</code>
+selector is present and its content checks pass.</p>
+<p>The selector authorizes only the bounded value domain and aggregate counts. It
+does not retain source row order or a mapping that reconstructs source rows.
+The generated SQL may contain approved values because its input is the
+validated synthetic dataset.</p>
+<p>The same profiling boundary is available from Python:</p>
+<pre><code class="language-python">import psycopg
+
+from test_data_agent.postgres_client import PostgresClient
+from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent import generate_dataset, infer_dataset_spec, validate_dataset
+from test_data_agent.postgres_profiler import dataset_profile_from_postgres
+
+config = PostgresConfig.from_env()
+profile = dataset_profile_from_postgres(PostgresClient(config, psycopg))
+spec = infer_dataset_spec(profile)
+# Review or edit spec here before generation.
+rows = generate_dataset(spec, seed=12345)
+report = validate_dataset(rows, spec)
+assert report.valid
+</code></pre>
+<p>Keep profile and generated artifacts local unless their destination policy
+explicitly permits otherwise.</p>
+<p>For a complete synthetic end-to-end check against a temporary local
+PostgreSQL cluster, run the
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/local_postgres"><code>examples/local_postgres</code></a>
+example. It creates a SELECT-only role, proves that writes are denied, profiles
+two related tables, validates deterministic generation, executes the exported
+SQL in an empty target database, and removes the cluster. Run
+<code>examples/local_postgres/run-jdbc.sh OUTPUT</code> for the same workflow configured by
+a placeholder JDBC-style URL, or <code>examples/local_postgres/run-wildcard.sh
+OUTPUT</code> for bounded table-qualified wildcard expansion. Run
+<code>examples/local_postgres/run-query.sh OUTPUT</code> for the reviewed query-file path.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../business-rules/" class="btn btn-neutral float-left" title="Add Business Rules"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../trino/" class="btn btn-neutral float-right" title="Profile Through Trino">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../business-rules/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../trino/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

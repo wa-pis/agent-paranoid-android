@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/rc4-external-feedback/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>RC4 external feedback disposition - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "RC4 external feedback disposition";
+        var mkdocs_page_input_path = "rc4-external-feedback.md";
+        var mkdocs_page_url = "/agent-paranoid-android/rc4-external-feedback/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">RC4 external feedback disposition</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/rc4-external-feedback.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="rc4-external-feedback-disposition">RC4 external feedback disposition<a class="headerlink" href="#rc4-external-feedback-disposition" title="Permanent link">&para;</a></h1>
+<p>This change addresses the supplied RC4 review against current source. Historical
+reproductions in the archive are evidence to investigate, not executable project
+instructions. Tests use fictional schemas and values. These corrections are
+assigned to the requested <code>1.6.0rc5</code>; publication remains subject to the
+<a href="../release/">release process</a> and <a href="../rc5-release-status/">RC5 release status</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Reported behavior</th>
+<th>Disposition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Folder overwrite, Parquet types, edge/load modes unavailable</td>
+<td>Implemented in RC4; retain regression coverage.</td>
+</tr>
+<tr>
+<td>Trino DECIMAL precision/scale lost</td>
+<td>Preserve DB-API precision/scale when the driver reports a bare decimal type. Declared type strings already work.</td>
+</tr>
+<tr>
+<td>Automatic DECIMAL inference fails</td>
+<td>Explain the missing reviewed synthetic range and accept <code>infer-spec --decimal-fields</code>. Never infer exact bounds from source values.</td>
+</tr>
+<tr>
+<td>Small numbers have negative magnitude</td>
+<td>Correct mathematics; retain negative orders. Add zero/subunit prevalence and the minimum subunit order to avoid one large value hiding small values.</td>
+</tr>
+<tr>
+<td>High-scale synthetic decimal amounts look sensitive</td>
+<td>Explicit field-scoped <code>numeric_measure</code> permits exact reviewed DECIMAL measures. Sensitive names, flags, identifiers and privacy classification veto the policy. Defaults stay conservative.</td>
+</tr>
+<tr>
+<td>Formula reports green after rewriting its target</td>
+<td>Default <code>assign</code> is explicit in the report with assigned-row counts. <code>check</code> validates without assigning. Neither mode proves business intent.</td>
+</tr>
+<tr>
+<td>Formula silently exceeds the generation domain</td>
+<td>Report checked numeric assignments and violations of the generation range (including its scale factor) independently of business-rule validity.</td>
+</tr>
+<tr>
+<td>Null/range conditions unavailable</td>
+<td>Support explicit <code>equals: null</code>, <code>not_equals: null</code>, and finite inclusive <code>gte</code>/<code>lte</code> for integer/float/decimal fields.</td>
+</tr>
+<tr>
+<td>SQL export ignores business rules</td>
+<td>Accept <code>export-postgres-sql --business-rules</code>; apply the same typed rules and mandatory checks before writing.</td>
+</tr>
+<tr>
+<td>Saved invalid ratio causes confusing mode errors</td>
+<td>An explicit non-negative mode override resets a saved ratio unless a ratio is explicitly supplied. Invalid explicit combinations still fail.</td>
+</tr>
+<tr>
+<td>Negative output exists despite exit status 1</td>
+<td>Intentional invalid artifacts retain validation evidence. The nonzero status means validation failed, not that publication was rolled back.</td>
+</tr>
+<tr>
+<td>JSON-looking output path becomes a directory</td>
+<td>DatasetSpec <code>generate --output</code> names a bundle directory, regardless of suffix.</td>
+</tr>
+<tr>
+<td>Entity reordering changes seeded output</td>
+<td>Reproducibility requires the same ordered specification, seed and environment; entity streams are indexed by order.</td>
+</tr>
+<tr>
+<td>Dictionary names/category values are replaced</td>
+<td>Source-free generation intentionally does not copy source labels. Local categories require the existing explicit qualified-field policy, e.g. <code>--local-category warehouse.public.orders.status</code> with the complete profile entity identity.</td>
+</tr>
+<tr>
+<td>Native constraints on DECIMAL</td>
+<td>Supported with bounded exact arithmetic and a declared target-scale rounding contract.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reviewed-decimal-inference">Reviewed decimal inference<a class="headerlink" href="#reviewed-decimal-inference" title="Permanent link">&para;</a></h2>
+<p><code>infer-spec</code> accepts a bounded JSON/YAML mapping from <code>ENTITY.FIELD</code> to a full
+<code>FieldSpec</code>. Precision and scale must match known declared source metadata. The
+following range is authored for fictional test data, not copied from a profile:</p>
+<pre><code class="language-yaml">items.amount:
+  name: amount
+  data_type: decimal
+  semantic_type: numeric_measure
+  distribution:
+    kind: decimal_range
+    precision: 38
+    scale: 16
+    min: '0.0000000000000001'
+    max: '9.9999999999999999'
+</code></pre>
+<pre><code class="language-sh">test-data-agent infer-spec profile.json --decimal-fields decimal-fields.yaml --output spec.yaml
+</code></pre>
+<p>Do not use this classification for identifiers, phone/card-like source data or
+sensitive fields. It grants no source-data access or transformation permission.
+No profile automatically assigns it. DECIMAL output retains integer-unit
+arithmetic, CSV/JSON decimal strings and Parquet decimal128.</p>
+<h2 id="rules-and-validation">Rules and validation<a class="headerlink" href="#rules-and-validation" title="Permanent link">&para;</a></h2>
+<pre><code class="language-yaml">row_rules:
+  - type: formula
+    table: items
+    field: total
+    expression: quantity * price
+    mode: check
+</code></pre>
+<p>For null predicates, supply only the intended equality key. Legacy payloads
+containing both equality keys treat null entries as historical unset defaults.</p>
+<p>Use <code>assign</code> (the default) when the formula defines the output value. The business
+report records <code>application</code> and <code>assigned_row_count</code>; the generation manifest
+summarizes assignments and check-only formula counts. A standalone validator
+checks the supplied rules; it does not infer business intent or treat historical
+generation distributions as independent business constraints. Put required
+business limits in field rules or native constraints too. Generation additionally
+reports numeric assignment bounds using <code>distribution_bounds_checked_count</code> and
+<code>distribution_bounds_violation_count</code> before publication. Nonzero drift is not a
+source-fidelity claim or an implicit business constraint. Errors identify the target
+field without including an expression, operands or rejected cell values.</p>
+<p>Coarse numeric prevalence is aggregate metadata, not a reconstruction of source
+rows or a promise of exact frequencies. FLOAT generation remains approximate;
+reviewed DECIMAL bounds are the exact-value path. Missing legacy prevalence
+metadata retains the previous shape behavior.</p>
+<h2 id="business-rules-across-interfaces">Business rules across interfaces<a class="headerlink" href="#business-rules-across-interfaces" title="Permanent link">&para;</a></h2>
+<p><code>DatasetSpec.business_rules</code> carries the reviewed rules with the specification.
+Python generation, CLI, MCP and approved agent workspaces use the same engine.
+CSV, JSON, Parquet and PostgreSQL SQL output retain the same rule semantics;
+validation and export check existing rows without reassigning formula targets.
+<code>infer-spec --business-rules rules.yaml</code> embeds rules, and <code>validate
+--business-rules rules.yaml</code> checks an existing dataset without modifying it.
+Generation from examples also accepts <code>--business-rules</code>. Supply either embedded
+rules or an external rule file/payload; competing rule sources are rejected.</p>
+<p>For example, a specification can contain:</p>
+<pre><code class="language-yaml">business_rules:
+  row_rules:
+    - type: formula
+      table: items
+      field: total
+      expression: base_amount * 0.5
+      mode: assign
+</code></pre>
+<p>DECIMAL formulas use bounded rational arithmetic and round once using
+<code>ROUND_HALF_UP</code> to the target's declared scale. Precision overflow and violations
+of explicit decimal bounds fail validation. Aggregate-only business checks compare
+exact totals and expressions without assigning rows or imposing a single-row
+precision limit on their sum. Native aggregate mappings (<code>sum</code>,
+<code>avg</code>, <code>count</code>) use the same target rounding. FLOAT operands keep their existing
+finite decimal text representation; this does not recover precision already
+lost in a FLOAT input. DECIMAL formula and aggregate comparisons default to zero
+tolerance; an explicitly supplied <code>tolerance</code> overrides this and survives saving
+and reloading. Quote exact bounds and aggregate expected values to avoid YAML
+FLOAT conversion. Conditions and allowed values compare DECIMAL values exactly.</p>
+<p>Business checks remain mandatory when optional report sections are disabled.
+With reviewed business rules, mixed/negative modes construct a valid formula
+baseline and then inject the planned rule violations, preserving expected-failure
+accounting across embedded and external rules. They produce intentional invalid artifacts with evidence;
+standalone validation reports those violations and CLI generation returns a
+nonzero status when the combined validation fails. All modes retain privacy and
+resource limits. Ordinary synthetic rules confer no transformation authority.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

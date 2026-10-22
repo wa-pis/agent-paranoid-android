@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/concepts/relational-synthesis-contract/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Relational Synthesis Contract - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Relational Synthesis Contract";
+        var mkdocs_page_input_path = "concepts/relational-synthesis-contract.md";
+        var mkdocs_page_url = "/agent-paranoid-android/concepts/relational-synthesis-contract/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Relational Synthesis Contract</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/concepts/relational-synthesis-contract.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="relational-synthesis-contract">Relational Synthesis Contract<a class="headerlink" href="#relational-synthesis-contract" title="Permanent link">&para;</a></h1>
+<p>Relational synthesis preserves reviewed, executable structure. It does not
+reconstruct source rows, identifiers, totals, or rare values.</p>
+<h2 id="generated-identifier-domains">Generated Identifier Domains<a class="headerlink" href="#generated-identifier-domains" title="Permanent link">&para;</a></h2>
+<p>Within one dataset specification, identifier fields have separate deterministic
+domains, assigned by sorted entity/field names. Integer domains use disjoint
+sequences; strings encode the same generated sequence with a synthetic prefix,
+not source identifiers or entity labels. Declared relationships subsequently
+assign generated parent keys to child fields in dependency order for acyclic
+graphs. Cyclic components retain legacy input-order reconciliation; all resulting
+relationships must pass validation before publication.
+Reordering entities or fields does not change domain numbering or initial
+non-null identifier values at a given row position, before relationships and
+constraints are applied. Final FK assignments may change with null masks.
+Nullable-field masks still consume
+order-dependent randomness: changing field/entity order may change which rows
+are null. Exact replay requires the same ordered specification.</p>
+<p>Replay requires the same specification, seed and algorithm version. Adding or
+removing identifier fields can change the domain numbering and generated values.
+This is not a persistent mapping across independently generated datasets.
+The upcoming 1.6 candidate changes identifier values and their string format;
+regenerate fixtures rather than relying on the old row-counter equality.</p>
+<h2 id="evidence-bounded-synthesis">Evidence-Bounded Synthesis<a class="headerlink" href="#evidence-bounded-synthesis" title="Permanent link">&para;</a></h2>
+<p>The system does not magically discover the complete domain model from a schema
+or a sample. It records bounded observations, keeps their provenance, and
+turns unverified conclusions into hypotheses that require review.</p>
+<p>The conceptual pipeline is:</p>
+<pre><code class="language-text">SourceBundle
+  schema + constraints + examples
+        ↓
+EvidenceProfile
+  safe observations + provenance
+        ↓
+SemanticHypotheses
+  candidate relationships and rules
+        ↓
+human review
+        ↓
+ReviewedDatasetSpec
+  executable generation contract
+</code></pre>
+<p>These artifacts have deliberately different authority:</p>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>Meaning</th>
+<th>Generation authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SourceBundle</code></td>
+<td>Input schema, constraints, examples, and sampling metadata</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>EvidenceProfile</code></td>
+<td>Safe observations supported by bounded evidence</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>SemanticHypothesis</code></td>
+<td>Deterministic or AI-proposed relationship/rule</td>
+<td>None until reviewed</td>
+</tr>
+<tr>
+<td><code>ReviewedDatasetSpec</code></td>
+<td>Explicitly accepted and executable contract</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="provenance-and-confidence">Provenance And Confidence<a class="headerlink" href="#provenance-and-confidence" title="Permanent link">&para;</a></h3>
+<p>Every non-declared relationship, distribution, or business rule should retain
+an evidence envelope containing, where applicable:</p>
+<ul>
+<li><code>origin</code>: <code>declared</code>, <code>observed</code>, or <code>inferred</code>;</li>
+<li><code>status</code>: <code>candidate</code>, <code>reviewed</code>, <code>accepted</code>, or <code>rejected</code>;</li>
+<li><code>confidence</code>: <code>low</code>, <code>medium</code>, or <code>high</code>;</li>
+<li>sample size, sampling method, and time window;</li>
+<li>rows checked and observed violations;</li>
+<li>source/profile fingerprint and explicit assumptions.</li>
+</ul>
+<p>Confidence describes how strongly the conclusion is supported by the available
+evidence. It is not a claim that the rule is universally true. For example,
+observing <code>invoice.total == sum(lines.amount)</code> in 200 rows with no violations
+supports a medium-confidence hypothesis; it does not prove the domain rule.</p>
+<p>AI may rank or explain hypotheses, but it cannot increase their confidence,
+change their review status, or authorize generation. Missing evidence remains
+unknown and must either be reviewed as an explicit assumption or remain outside
+the executable contract.</p>
+<h2 id="preservation-matrix">Preservation Matrix<a class="headerlink" href="#preservation-matrix" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Preserved contract</th>
+<th>Not preserved</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Foreign-key graph</td>
+<td>Reviewed parent/child edges, supported cardinality, null policy, and referential integrity</td>
+<td>Source key values, row membership, or source ordering</td>
+<td><code>DatasetSpec</code> relationships and relationship validation</td>
+</tr>
+<tr>
+<td>Distribution shape</td>
+<td>Configured safe ranges, ratios, bounded categories, and order of magnitude</td>
+<td>Exact histograms, rare categories, source totals, or a statistical privacy guarantee</td>
+<td>Effective field distributions and validation report</td>
+</tr>
+<tr>
+<td>Temporal dependencies</td>
+<td>Reviewed ordering rules, bounded ranges, and supported lifecycle constraints</td>
+<td>Original timestamps, event sequences, or per-source-row timing</td>
+<td>Executable temporal rules and business-validation report</td>
+</tr>
+<tr>
+<td>Business invariants</td>
+<td>Supported formulas, conditions, partitions, coverage, foreign keys, and aggregate mappings</td>
+<td>Free-form prose rules or unvalidated model conclusions</td>
+<td>Effective rule fingerprint and deterministic validation results</td>
+</tr>
+</tbody>
+</table>
+<h2 id="approval-boundary">Approval Boundary<a class="headerlink" href="#approval-boundary" title="Permanent link">&para;</a></h2>
+<p>Only reviewed <code>DatasetSpec</code> relationships and structured business rules affect
+generation. Deterministic mining and AI advisors may propose candidates, but a
+proposal has no generation authority. Low-confidence, contradictory, stale, or
+unsupported candidates remain review warnings or are rejected.</p>
+<h2 id="scaling-and-privacy">Scaling And Privacy<a class="headerlink" href="#scaling-and-privacy" title="Permanent link">&para;</a></h2>
+<p>Synthetic row counts and measures may scale while retaining approved relative
+shape and order of magnitude. Scaling must use synthetic values and explicit
+rules; it must not copy source totals or preserve sensitive outliers. Exact-row
+reuse checks are a safety backstop, not proof of anonymity.</p>
+<p>Numeric distributions accept a bounded <code>scale_factor</code> from <code>0.1</code> through
+<code>10.0</code>. Sensitive numeric distributions require an explicit non-identity
+factor; generation scales the approved bounds before drawing values and records
+the effective distribution in <code>dataset_spec.yaml</code>.</p>
+<h2 id="publication-rule">Publication Rule<a class="headerlink" href="#publication-rule" title="Permanent link">&para;</a></h2>
+<p>A dataset may claim an invariant only when deterministic validation executes
+that invariant successfully. Failed or unsupported checks must block valid
+publication or appear as explicit controlled-invalid evidence. The manifest,
+effective spec, and validation reports form the review record.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

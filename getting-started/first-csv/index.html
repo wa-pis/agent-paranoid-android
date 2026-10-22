@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>First CSV Dataset - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "First CSV Dataset";
+        var mkdocs_page_input_path = "getting-started/first-csv.md";
+        var mkdocs_page_url = "/agent-paranoid-android/getting-started/first-csv/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">First CSV Dataset</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generate-25-rows">Generate 25 Rows</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#inspect-the-bundle">Inspect The Bundle</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reproduce-the-result">Reproduce The Result</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#use-your-own-csv">Use Your Own CSV</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Start Here</li>
+      <li class="breadcrumb-item active">First CSV Dataset</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/getting-started/first-csv.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="first-csv-dataset">First CSV Dataset<a class="headerlink" href="#first-csv-dataset" title="Permanent link">&para;</a></h1>
+<p>This tutorial profiles one CSV file, infers a generation specification,
+generates new values, and validates the result.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<ul>
+<li>complete <a href="../installation/">Installation</a>;</li>
+<li>run commands from a clone of this repository so the synthetic fixture below
+  is available;</li>
+<li>choose a new output directory.</li>
+</ul>
+<p>The fixture contains fictional values and reserved example email domains.</p>
+<p>For the same workflow as an executable script with its own synthetic fixture,
+run <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/csv_quickstart"><code>examples/csv_quickstart/run.sh</code></a>.</p>
+<h2 id="generate-25-rows">Generate 25 Rows<a class="headerlink" href="#generate-25-rows" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+</code></pre>
+<p>Expected summary:</p>
+<pre><code class="language-text">Generated synthetic dataset: out | rows: customers=25 | seed: 12345 | validation: passed | source rows copied: no
+</code></pre>
+<p>The exact output path shown in the summary can vary by platform.</p>
+<h2 id="inspect-the-bundle">Inspect The Bundle<a class="headerlink" href="#inspect-the-bundle" title="Permanent link">&para;</a></h2>
+<p>The command writes:</p>
+<pre><code class="language-text">out/
+  customers.csv
+  csv_profile.json
+  dataset_spec.json
+  generation_manifest.json
+  validation_report.json
+</code></pre>
+<p>Check the manifest before using the data:</p>
+<pre><code class="language-bash">python3 -c &quot;import json; m=json.load(open('out/generation_manifest.json')); print(m['synthetic'], m['source_rows_copied'], m['validation_valid'], m['seed'])&quot;
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">True False True 12345
+</code></pre>
+<p>Open <code>out/customers.csv</code> and confirm that it contains 25 generated rows plus
+the header. Source rows are not shuffled or copied.</p>
+<h2 id="reproduce-the-result">Reproduce The Result<a class="headerlink" href="#reproduce-the-result" title="Permanent link">&para;</a></h2>
+<p>Generate into a different path with the same seed:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/repeated/customers.csv
+</code></pre>
+<p>The two generated CSV files should match:</p>
+<pre><code class="language-bash">python3 -c &quot;from pathlib import Path; assert Path('out/customers.csv').read_bytes() == Path('out/repeated/customers.csv').read_bytes(); print('deterministic: ok')&quot;
+</code></pre>
+<h2 id="use-your-own-csv">Use Your Own CSV<a class="headerlink" href="#use-your-own-csv" title="Permanent link">&para;</a></h2>
+<p>Replace the fixture path with your file:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+</code></pre>
+<p>Treat every source CSV as potentially sensitive. Do not share its contents,
+profile artifacts, or command logs until you have reviewed them. The profiler
+suppresses raw values for fields detected as sensitive, but ambiguous domain
+fields still require human review.</p>
+<p>Exact values remain replaced by default. When <code>customers.status</code> has been
+reviewed as a bounded non-sensitive business enum, authorize only that field:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --local-category customers.status \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/approved-status/customers.csv
+</code></pre>
+<p>The request fails closed if the field contains PII, secrets, identifiers,
+quasi-identifiers, free text, excessive cardinality, or long values. The option
+does not authorize any other field or any external-provider destination.</p>
+<p>Review ambiguous identifiers and financial columns before accepting inferred
+keys or distributions. For exact category limits, distinct-count evidence and
+identifier behavior, see <a href="../../reference/profiling/">CSV Profiling Details</a>.</p>
+<p>Next, read <a href="../review-output/">Review The Output</a>.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../installation/" class="btn btn-neutral float-left" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../related-tables/" class="btn btn-neutral float-right" title="Related Tables">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../related-tables/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

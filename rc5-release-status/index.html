@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/rc5-release-status/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>1.6.0rc5 Release Status - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1.6.0rc5 Release Status";
+        var mkdocs_page_input_path = "rc5-release-status.md";
+        var mkdocs_page_url = "/agent-paranoid-android/rc5-release-status/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">1.6.0rc5 Release Status</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/rc5-release-status.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="160rc5-release-status">1.6.0rc5 Release Status<a class="headerlink" href="#160rc5-release-status" title="Permanent link">&para;</a></h1>
+<p>RC5 is authorized. <a href="https://github.com/wa-pis/agent-paranoid-android/pull/623">PR #623</a>
+was merged on 2026-10-16. The frozen runtime candidate is exact main
+<code>890925afdff68e97cafe38a28605d2874c9dad79</code>.
+GitHub, PyPI and all three container publication workflows passed.
+Post-publication acceptance passed on the first attempt, all 12 jobs; see the
+<a href="../release-evidence-1.6.0rc5/">publication evidence</a>.
+Published <a href="../release-evidence-1.6.0rc4/">RC4 evidence</a> remains historical and
+immutable.</p>
+<p>RC5 packages the <a href="../rc4-external-feedback/">RC4 feedback corrections</a>,
+<a href="../reference/source-output-matrix/">source/output contract</a>, portable business
+rules and <a href="../reference/mcp-permissions/">MCP permission reference</a>. The
+<a href="../acceptance-evidence-1.6.0rc5/">runtime campaign evidence</a> separates the earlier
+campaign from fresh exact-RC5 checks, artifact identities and coverage limits.</p>
+<h2 id="completed-candidate-checks">Completed candidate checks<a class="headerlink" href="#completed-candidate-checks" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The confirmed DECIMAL formatting issue is fixed, with focused regressions.</li>
+<li>The full exact-main gate passed: 4197 tests, 23 classified skips and 91.49%
+  coverage. Strict documentation and OpenSpec checks passed.</li>
+<li>Independent AI source review approved that exact main SHA. CI, Containers,
+  Documentation and Security passed on the same commit.</li>
+<li>Both installed MCP SDK matrices passed 600/600 logical cells, with two seeded
+  repeats per cell. Fresh Ubuntu no-publish artifacts were downloaded and
+  independently rehashed. See the <a href="../acceptance-evidence-1.6.0rc5/#exact-rc5-candidate-checkpoint">candidate checkpoint</a>.</li>
+<li>Actual Codex and current-specification human acceptance passed: full-file
+  review and new consent preceded generation; validation and the separate
+  artifact audit passed. See the <a href="../acceptance-evidence-1.6.0rc5/#actual-codex-and-human-specification-acceptance">manual evidence and observation limits</a>.</li>
+</ul>
+<p>These results belong to the frozen candidate, not to later documentation
+commits. A changed release candidate needs its own exact-commit evidence.</p>
+<h2 id="publication-and-retained-limits">Publication and retained limits<a class="headerlink" href="#publication-and-retained-limits" title="Permanent link">&para;</a></h2>
+<p>The completed manual acceptance is bound to the frozen candidate and the exact
+reviewed specification. Separate trust/tool UI prompts and normal client
+exit/disconnect were not independently observed; the final bound MCP process
+check found none remaining. The separately gated transformation/session campaign
+is still open, and this synthetic scenario grants no local preservation authority.</p>
+<p>The signed tag and acceptance manifest bind the frozen source and Ubuntu
+preflight hashes. GitHub/PyPI publication and the three-target container
+publication workflow succeeded. Public PyPI hashes match the preflight.</p>
+<p>The three immutable image digests and publication signature checks are recorded
+in the <a href="../release-evidence-1.6.0rc5/">published release evidence</a>.
+<code>Verify Published Release</code> passed with all 12 jobs on the first attempt, including
+the Python-package/documentation job, all seven public installation profiles and
+all three container targets. Release-specific publication and public acceptance
+are complete.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

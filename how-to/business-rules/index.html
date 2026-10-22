@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Add Business Rules - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Add Business Rules";
+        var mkdocs_page_input_path = "how-to/business-rules.md";
+        var mkdocs_page_url = "/agent-paranoid-android/how-to/business-rules/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Add Business Rules</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-rule-file">Create A Rule File</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#prepare-a-reviewed-spec">Prepare A Reviewed Spec</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#supported-rule-categories">Supported Rule Categories</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generate-controlled-invalid-cases">Generate Controlled Invalid Cases</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#reproduce-the-same-cases-through-cli-and-mcp">Reproduce The Same Cases Through CLI And MCP</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#safety-restrictions">Safety Restrictions</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-To Guides</li>
+      <li class="breadcrumb-item active">Add Business Rules</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/business-rules.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="add-business-rules">Add Business Rules<a class="headerlink" href="#add-business-rules" title="Permanent link">&para;</a></h1>
+<p>Use structured YAML or JSON when generated rows must satisfy domain rules.
+The deterministic rule engine applies and validates the rules; an LLM is not
+the enforcement mechanism.</p>
+<p>For a complete annotated format, see
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/business_rules">the runnable business-rules reference</a>,
+including all rule families, condition operators, formula modes, aggregates,
+scenarios and a matching DatasetSpec. The standalone
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/business_rules.schema.json">JSON Schema</a>
+is generated from the runtime model.</p>
+<h2 id="create-a-rule-file">Create A Rule File<a class="headerlink" href="#create-a-rule-file" title="Permanent link">&para;</a></h2>
+<p>The checked-in example at <code>examples/orders_rules.yaml</code> contains:</p>
+<pre><code class="language-yaml">field_rules:
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, cancelled]
+  - table: orders
+    field: amount
+    required: true
+    min_value: 0
+
+row_rules:
+  - type: temporal_ordering
+    table: orders
+    start_field: created_at
+    end_field: fulfilled_at
+    allow_equal: true
+
+  - type: formula
+    table: orders
+    field: amount
+    expression: quantity * unit_price
+</code></pre>
+<p>Rule references must match fields in the effective <code>DatasetSpec</code>. Unknown keys,
+tables, fields, rule types, and formula syntax are rejected.</p>
+<h2 id="prepare-a-reviewed-spec">Prepare A Reviewed Spec<a class="headerlink" href="#prepare-a-reviewed-spec" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent profile-example tests/fixtures/example_dataset \
+  --output out/rules/profile.json
+
+test-data-agent infer-spec out/rules/profile.json \
+  --count 25 \
+  --output out/rules/dataset_spec.yaml
+</code></pre>
+<p>Review <code>out/rules/dataset_spec.yaml</code>, then generate with rules:</p>
+<pre><code class="language-bash">test-data-agent generate out/rules/dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --business-rules examples/orders_rules.yaml \
+  --output out/rules/generated
+</code></pre>
+<p>Review:</p>
+<pre><code class="language-text">out/rules/generated/
+  business_validation_report.json
+  generation_manifest.json
+  validation_report.json
+</code></pre>
+<p>The generation manifest records a normalized rule fingerprint, rule counts,
+pass/fail counts, truncation status, overall business validity, and bounded
+expected-versus-observed violation counts.</p>
+<h2 id="supported-rule-categories">Supported Rule Categories<a class="headerlink" href="#supported-rule-categories" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Field rule</td>
+<td>Required values, allowed values, numeric bounds</td>
+</tr>
+<tr>
+<td>Conditional required</td>
+<td>Require fields when a condition matches</td>
+</tr>
+<tr>
+<td>Conditional allowed values</td>
+<td>Restrict a field under a condition</td>
+</tr>
+<tr>
+<td>Temporal ordering</td>
+<td>Enforce start/end ordering</td>
+</tr>
+<tr>
+<td>Formula</td>
+<td>Calculate or validate bounded arithmetic</td>
+</tr>
+<tr>
+<td>Foreign key</td>
+<td>Preserve cross-table references</td>
+</tr>
+<tr>
+<td>Aggregate formula</td>
+<td>Validate an aggregate expectation</td>
+</tr>
+<tr>
+<td>Scenario</td>
+<td>Control weighted combinations of field values</td>
+</tr>
+</tbody>
+</table>
+<h2 id="generate-controlled-invalid-cases">Generate Controlled Invalid Cases<a class="headerlink" href="#generate-controlled-invalid-cases" title="Permanent link">&para;</a></h2>
+<p>Use an explicit generation mode:</p>
+<pre><code class="language-bash">test-data-agent generate out/rules/dataset_spec.yaml \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --mode mixed \
+  --invalid-ratio 0.02 \
+  --business-rules examples/orders_rules.yaml \
+  --output out/rules/mixed_cases
+</code></pre>
+<p>With business rules, <code>mixed</code> uses seeded random row selection at the requested
+invalid ratio and attempts an eligible rule violation for each selected row.
+The ratio is not an exact count of failed cells or rules. <code>negative</code> attempts
+eligible violations for every row; it does not make every field invalid, and
+tables without an applicable mutation can remain valid. Keep these datasets
+clearly separated from valid fixtures and review the validation report rather
+than expecting it to pass.</p>
+<p>For tables with several field and row rules, selected rows are distributed
+deterministically across required, allowed-value, numeric-bound, conditional,
+temporal, and formula violations. Reusing the same seed, mode, ratio, and rule
+file reproduces the same negative cases. Foreign-key violations use synthetic
+missing parent keys without changing the parent table. Aggregate-formula
+violations change only the configured concrete numeric field. Count-style
+aggregate rules with <code>field: "*"</code> are validation-only because changing row
+counts would also break the dataset shape.</p>
+<p>One selected invalid mutation can break several overlapping rules. The engine
+audits the affected row before and after mutation and includes newly broken
+local rules in the expected counts. Cross-table rules are checked before and
+after the injection pass; newly broken rules with a valid baseline are also
+counted. Injection requires a valid business-rule baseline and refuses an
+already invalid baseline before introducing negative cases. Standalone
+validation still reports unplanned failures as unexpected. An injection
+that does not break its selected rule still reports a missing expected failure.
+These audits share the normal work and deadline budgets.</p>
+<p>The business validation report compares expected and observed violations per
+rule. <code>unexpected_violation_count</code> identifies failures that were not selected
+by controlled invalid generation; <code>missing_expected_violation_count</code> identifies
+selected cases that validation did not observe. <code>expectations_met</code> is true only
+when both counts are zero. These fields contain counts only, never generated
+row values.</p>
+<h3 id="reproduce-the-same-cases-through-cli-and-mcp">Reproduce The Same Cases Through CLI And MCP<a class="headerlink" href="#reproduce-the-same-cases-through-cli-and-mcp" title="Permanent link">&para;</a></h3>
+<p>The checked-in <code>examples/negative_cases/</code> bundle fixes the spec, rule file,
+seed (<code>1300</code>), mode (<code>mixed</code>), and invalid ratio (<code>0.5</code>). Run it through CLI:</p>
+<pre><code class="language-bash">test-data-agent generate examples/negative_cases/dataset_spec.yaml \
+  --seed 1300 \
+  --mode mixed \
+  --invalid-ratio 0.5 \
+  --format json \
+  --business-rules examples/negative_cases/business_rules.yaml \
+  --output out/negative-cli
+</code></pre>
+<p>The MCP equivalent uses the same files after copying the example bundle below
+the configured generator workspace. The mode and invalid ratio are already
+recorded in <code>dataset_spec.yaml</code>:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;generate_dataset&quot;,
+  &quot;arguments&quot;: {
+    &quot;spec_path&quot;: &quot;negative_cases/dataset_spec.yaml&quot;,
+    &quot;output_folder&quot;: &quot;negative-mcp&quot;,
+    &quot;output_format&quot;: &quot;json&quot;,
+    &quot;seed&quot;: 1300,
+    &quot;business_rules_path&quot;: &quot;negative_cases/business_rules.yaml&quot;
+  }
+}
+</code></pre>
+<p>Both paths produce identical synthetic row files and matching expected versus
+observed violation counts. Use separate empty output folders when repeating the
+example.</p>
+<h2 id="safety-restrictions">Safety Restrictions<a class="headerlink" href="#safety-restrictions" title="Permanent link">&para;</a></h2>
+<p>Do not put real identifiers, emails, phone numbers, addresses, credentials,
+tokens, or other production literals into rule files. Sensitive-looking
+literals are rejected by CLI and MCP entry points.</p>
+<p>Formula syntax is a bounded arithmetic subset, not Python or SQL. Rule payload
+size, expression complexity, and estimated row/rule evaluations are limited.</p>
+<p>See <a href="../../reference/configuration/">Configuration</a> for adjustable limits.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../getting-started/review-output/" class="btn btn-neutral float-left" title="Review The Output"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../postgresql/" class="btn btn-neutral float-right" title="Profile PostgreSQL">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../../getting-started/review-output/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../postgresql/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

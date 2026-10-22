@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/security-review-2026-07-31/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Security Review: 2026-07-31 - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Security Review: 2026-07-31";
+        var mkdocs_page_input_path = "security-review-2026-07-31.md";
+        var mkdocs_page_url = "/agent-paranoid-android/security-review-2026-07-31/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Security Review: 2026-07-31</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/security-review-2026-07-31.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="security-review-2026-07-31">Security Review: 2026-07-31<a class="headerlink" href="#security-review-2026-07-31" title="Permanent link">&para;</a></h1>
+<p>This review records the pre-release security and supply-chain baseline after
+commit <code>5ed9af4</code>. It is a point-in-time disposition, not a replacement for the
+release-candidate audit or continuous CI gates.</p>
+<h2 id="automated-evidence">Automated Evidence<a class="headerlink" href="#automated-evidence" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python dependencies</td>
+<td>Locked, hash-verified <code>pip-audit</code>; GitHub Dependabot</td>
+<td>No open vulnerability alerts</td>
+</tr>
+<tr>
+<td>Dependency licenses</td>
+<td>All-extras/dev environment (96 packages); docs-only environment (16 packages)</td>
+<td>All declarations approved by the fail-closed policy</td>
+</tr>
+<tr>
+<td>Source code</td>
+<td>CodeQL <code>security-extended</code></td>
+<td>No open CodeQL findings</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>GitHub secret scanning and full-history Gitleaks</td>
+<td>No unresolved secrets</td>
+</tr>
+<tr>
+<td>Containers</td>
+<td>Trivy scan of native CLI and MCP targets</td>
+<td>No fixable High or Critical finding</td>
+</tr>
+<tr>
+<td>Supply chain</td>
+<td>OpenSSF Scorecard</td>
+<td>Five configuration/maturity findings reviewed below</td>
+</tr>
+</tbody>
+</table>
+<p>The release workflow also produces CycloneDX and BuildKit SBOMs, provenance,
+GitHub attestations, and keyless Cosign signatures. These artifacts must be
+verified again against the release-candidate digest.</p>
+<h2 id="scorecard-dispositions">Scorecard Dispositions<a class="headerlink" href="#scorecard-dispositions" title="Permanent link">&para;</a></h2>
+<h3 id="maintained-high">Maintained (High)<a class="headerlink" href="#maintained-high" title="Permanent link">&para;</a></h3>
+<p>Scorecard assigns zero because the repository is less than 90 days old. This is
+an age heuristic, not evidence of an unmaintained dependency or vulnerable code.</p>
+<ul>
+<li><strong>Disposition:</strong> accepted, not release-blocking.</li>
+<li><strong>Mitigation:</strong> scheduled Scorecard runs remain enabled; active releases,
+  merged changes, and required CI provide current maintenance evidence.</li>
+<li><strong>Owner:</strong> repository maintainer.</li>
+<li><strong>Revisit:</strong> after the repository is 90 days old; reopen if the score does not
+  recover automatically.</li>
+</ul>
+<h3 id="code-review-high">Code-Review (High)<a class="headerlink" href="#code-review-high" title="Permanent link">&para;</a></h3>
+<p>Scorecard found no independently approved changesets. The repository currently
+has one maintainer, so requiring an independent approval would prevent that
+maintainer from merging any change.</p>
+<ul>
+<li><strong>Disposition:</strong> accepted single-maintainer governance risk, not
+  release-blocking for 1.0.</li>
+<li><strong>Mitigation:</strong> changes use pull requests, required status checks, immutable
+  action pins, dependency review, CodeQL, secret scanning, and focused commits.</li>
+<li><strong>Owner:</strong> repository maintainer.</li>
+<li><strong>Revisit:</strong> immediately when a second trusted maintainer is available; then
+  require one approval and dismiss stale approvals.</li>
+</ul>
+<h3 id="branch-protection-high">Branch-Protection (High)<a class="headerlink" href="#branch-protection-high" title="Permanent link">&para;</a></h3>
+<p><code>main</code> blocks merges until required checks pass and rejects conflicting pull
+requests, but it does not require an independent approver, Code Owner review,
+stale-review dismissal, or last-push approval. Those controls depend on a
+second reviewer and have the same one-maintainer constraint.</p>
+<ul>
+<li><strong>Disposition:</strong> accepted single-maintainer governance risk, not
+  release-blocking for 1.0.</li>
+<li><strong>Mitigation:</strong> direct development uses pull requests; release, dependency,
+  security, documentation, wheel, and container gates run before merge.</li>
+<li><strong>Owner:</strong> repository maintainer.</li>
+<li><strong>Revisit:</strong> with the first additional maintainer; enable Code Owners, one
+  required approval, stale-review dismissal, and last-push approval together.</li>
+</ul>
+<h3 id="fuzzing-medium">Fuzzing (Medium)<a class="headerlink" href="#fuzzing-medium" title="Permanent link">&para;</a></h3>
+<p>Scorecard recognizes no external continuous fuzzing service. The project has
+property-based safety tests and controlled negative scenarios, but these do not
+meet Scorecard's fuzzing signal.</p>
+<ul>
+<li><strong>Disposition:</strong> deferred; no unbounded binary parser or network protocol
+  implementation currently justifies an external fuzzing service.</li>
+<li><strong>Owner:</strong> repository maintainer.</li>
+<li><strong>Revisit:</strong> before adding a custom parser, archive reader, or network-facing
+  protocol implementation, or in the first post-1.0 hardening cycle.</li>
+</ul>
+<h3 id="cii-best-practices-low">CII Best Practices (Low)<a class="headerlink" href="#cii-best-practices-low" title="Permanent link">&para;</a></h3>
+<p>The project is not registered for an OpenSSF Best Practices badge. This is a
+public assurance gap rather than a direct vulnerability.</p>
+<ul>
+<li><strong>Disposition:</strong> deferred until after the release candidate.</li>
+<li><strong>Owner:</strong> repository maintainer.</li>
+<li><strong>Revisit:</strong> register the project and publish the badge during post-1.0
+  governance work.</li>
+</ul>
+<h2 id="release-decision">Release Decision<a class="headerlink" href="#release-decision" title="Permanent link">&para;</a></h2>
+<p>No Critical or High code, dependency, secret, license, or fixable container
+finding remains unresolved. The two governance findings and repository-age
+heuristic are explicitly accepted with owners, mitigations, and review triggers.
+Medium and Low maturity work is deferred and does not weaken runtime safety
+boundaries.</p>
+<p>Run the full audit again for <code>1.0.0rc1</code>; any new Critical or High runtime or
+supply-chain finding is release-blocking until fixed or separately reviewed.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

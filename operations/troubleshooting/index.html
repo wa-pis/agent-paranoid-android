@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Troubleshooting - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Troubleshooting";
+        var mkdocs_page_input_path = "operations/troubleshooting.md";
+        var mkdocs_page_url = "/agent-paranoid-android/operations/troubleshooting/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Troubleshooting</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#jdbc-style-url-rejected">JDBC-Style URL Rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qualified-column-wildcard-rejected">Qualified Column Wildcard Rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sql-query-source-rejected">SQL Query Source Rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#transformation-rejected">Transformation Rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gigachat-advice-failed">GigaChat Advice Failed</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#command-not-found">Command Not Found</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#output-already-exists">Output Already Exists</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#missing-optional-dependency">Missing Optional Dependency</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#malformed-input-or-unexpected-traceback">Malformed Input Or Unexpected Traceback</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cancelled-operation">Cancelled Operation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#agent-approval-was-interrupted">Agent Approval Was Interrupted</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#process-or-host-stopped-during-publication">Process Or Host Stopped During Publication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#input-limit-exceeded">Input Limit Exceeded</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sensitive-value-rejected">Sensitive Value Rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#validation-failed">Validation Failed</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#results-are-not-reproducible">Results Are Not Reproducible</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#trino-allowlists-are-required">Trino Allowlists Are Required</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#plain-http-is-disabled">Plain HTTP Is Disabled</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mcp-path-rejected">MCP Path Rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reporting-a-security-problem">Reporting A Security Problem</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Help</li>
+      <li class="breadcrumb-item active">Troubleshooting</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/operations/troubleshooting.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h1>
+<p>Start with:</p>
+<pre><code class="language-bash">test-data-agent doctor
+test-data-agent doctor --json
+</code></pre>
+<p>The final line should be <code>doctor passed</code>.</p>
+<p>Require the optional capability you intend to operate:</p>
+<pre><code class="language-bash">test-data-agent doctor --require-extra parquet
+</code></pre>
+<p>For Parquet this performs a local temporary generation and read-back, checks
+row counts and manifest safety flags, and contacts no external service. A
+missing extra recommends installation. An installed extra whose local smoke
+fails reports a capability failure instead of recommending reinstall; check
+local setup and rerun doctor. A broken dependency import is reported as an
+import failure, not as an absent package. Exception text and temporary paths
+are omitted.
+If quickstart generation fails, earlier dependency checks remain in the report
+and <code>doctor --json</code> returns <code>ok: false</code>, exit code 1, and a failed quickstart
+check without exposing the underlying exception.</p>
+<p><code>doctor --require-extra mcp</code> constructs the real generator <code>FastMCP</code>
+transport, registers one local audited probe tool, and verifies its public tool
+listing. It does not start a server, listen on a port, invoke the tool, or
+contact an MCP client.</p>
+<p><code>doctor --require-extra trino</code> validates a bounded allowlisted query with the
+installed Trino SQL parser, constructs a client for the reserved
+<code>doctor.invalid</code> host, and closes it without opening a cursor or executing SQL.
+It does not read Trino credentials or contact a coordinator. A missing extra
+gets installation guidance; a local smoke failure does not establish a missing
+package or remote connectivity problem.</p>
+<p><code>doctor --require-extra openai</code> constructs and closes the installed SDK client
+with a local non-secret placeholder and verifies the structured Responses API
+used by the advisor adapter. It does not read <code>OPENAI_API_KEY</code>, send a request,
+or contact the provider. A local smoke failure does not establish a missing
+package or a problem with deployment credentials.</p>
+<p><code>doctor --require-extra gigachat</code> uses a local fake SDK client to verify strict
+structured-response mapping and cleanup. It does not read
+<code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>, obtain a token, or contact
+GigaChat. Install stable <code>1.6.0</code> with the <code>gigachat</code> extra.
+See <a href="../../1.6.0-release-status/">release status</a>.</p>
+<h2 id="jdbc-style-url-rejected">JDBC-Style URL Rejected<a class="headerlink" href="#jdbc-style-url-rejected" title="Permanent link">&para;</a></h2>
+<p>JDBC-style endpoint input, qualified column wildcards, and <code>profile-query</code> are
+available in stable <code>1.5.0</code> and retained in stable <code>1.6.0</code>.</p>
+<p>Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
+password references, tokens, roles, headers, proxies, session properties,
+allowlists, and budgets in their existing settings. Remove duplicate or
+unknown URL properties. When URL and component fields are both set, make the
+explicit host, port, database/TLS or catalog/schema values identical, or remove
+one representation. Errors intentionally omit the URL and conflicting values.</p>
+<p>An endpoint also fails when the URL exceeds 4,096 UTF-8 bytes, its host exceeds
+253 characters, a PostgreSQL database identifier exceeds 63 characters, or a
+Trino catalog/schema identifier exceeds 255 characters. Shorten the local
+configuration; the rejected value is intentionally absent from the error.</p>
+<h2 id="qualified-column-wildcard-rejected">Qualified Column Wildcard Rejected<a class="headerlink" href="#qualified-column-wildcard-rejected" title="Permanent link">&para;</a></h2>
+<p>Use exactly <code>schema.table.*</code> for PostgreSQL or
+<code>catalog.schema.table.*</code> for Trino. Keep the parent schema/table or
+catalog/schema allowlists present. Trino wildcards require restricted mode.
+Bare <code>*</code>, schema-wide forms, embedded stars, empty or duplicated metadata,
+schema drift, and expansion beyond the configured column budget fail before
+aggregate profiling. Replace the wildcard with reviewed exact columns when
+the table is wider than the intended profiling scope.</p>
+<h2 id="sql-query-source-rejected">SQL Query Source Rejected<a class="headerlink" href="#sql-query-source-rejected" title="Permanent link">&para;</a></h2>
+<p>Pass one UTF-8 file to <code>profile-query</code>; SQL text is not accepted in an option
+or environment variable. SQL source policy 1.1 permits one fully qualified,
+single-table <code>SELECT</code> with explicit output aliases, bounded filters, and the
+documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
+window operations, table functions, comments, volatile/unknown functions,
+multiple statements, and unauthorized tables or columns.</p>
+<p>Aliased SUM/COUNT/MIN/MAX/AVG and explicit-source-column GROUP BY are allowed.
+Other selected columns must be grouping keys. Remove nested/wrapped aggregates,
+DISTINCT aggregates, HAVING, grouping expressions/ordinals and grouping sets.
+Sensitive-name source references remain blocked for grouped/aggregate queries,
+even with renamed outputs. An accepted aggregate profile is not permission to
+fetch result rows or automatically infer a dependency-preserving generation spec.</p>
+<p>The query file, AST, projected fields, and adapter work must remain inside all
+configured budgets. A changed file, unsupported type, malformed backend
+metadata, schema drift, or budget exhaustion fails closed and leaves no
+profile. Errors intentionally omit SQL text, literals, endpoints, and backend
+messages; inspect the local reviewed file and allowlists instead.</p>
+<p><a id="transformation-candidate-rejected"></a></p>
+<h2 id="transformation-rejected">Transformation Rejected<a class="headerlink" href="#transformation-rejected" title="Permanent link">&para;</a></h2>
+<p>Stable <code>1.6.0</code> provides the common-profile CLI/MCP workflow. See the <a href="../../reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
+Published <code>1.5.0</code> does not include this command. Registration grants no dataset
+permission. The finite fictional transformation/session campaign is recorded in
+<a href="../../release-evidence-1.6.0/">stable evidence</a>; it grants no blanket dataset consent.</p>
+<p>If the snapshot no longer matches, review the saved inputs, policies and
+mappings again; validate and execute with the newly returned digest. A receipt
+for an earlier snapshot cannot authorize the changed one. When preservation is
+selected, obtain a matching receipt through the separate local terminal
+workflow; an agent or MCP client cannot issue one.</p>
+<p>For a budget refusal, inspect the declared input, review and output limits
+before selecting another bounded run. Do not interpret partial work or elapsed
+process time as successful acceptance. If cleanup is incomplete, inspect the
+reported retained artifacts before retrying into a new destination. Existing
+files are not permission to overwrite or resume a failed publication.</p>
+<h2 id="gigachat-advice-failed">GigaChat Advice Failed<a class="headerlink" href="#gigachat-advice-failed" title="Permanent link">&para;</a></h2>
+<p>Check the fixed local category first: missing extra, authentication, scope,
+TLS/CA bundle, rate limit, timeout, filtered response, invalid response, or
+unavailable service. Remote response bodies and SDK exception text are
+intentionally suppressed because they may reflect credentials or request
+metadata.</p>
+<p>Configure exactly one of <code>GIGACHAT_CREDENTIALS</code> and
+<code>GIGACHAT_ACCESS_TOKEN</code>. Match <code>GIGACHAT_SCOPE</code> to the API project, keep TLS
+verification enabled, and use <code>GIGACHAT_CA_BUNDLE_FILE</code> only for a reviewed
+readable CA bundle. Do not work around a certificate failure with an insecure
+SDK example. A failed provider call leaves the workspace awaiting review and
+does not create generated rows; retry only after correcting the local cause.</p>
+<p>GigaChat's structured-output feature is currently beta. The adapter performs a
+single local baseline-compatibility pass only after initial structured
+validation fails, then reruns every normal validation. If <code>invalid response</code>
+persists, the remaining provider proposal is not safe to review; use another
+supported model or retry later instead of weakening validation.</p>
+<h2 id="command-not-found">Command Not Found<a class="headerlink" href="#command-not-found" title="Permanent link">&para;</a></h2>
+<p>Symptom:</p>
+<pre><code class="language-text">test-data-agent: command not found
+</code></pre>
+<p>Activate the environment where the package was installed:</p>
+<pre><code class="language-bash">source .venv/bin/activate
+python3 -m pip show agent-paranoid-android
+</code></pre>
+<p>On Windows PowerShell:</p>
+<pre><code class="language-powershell">.venv\Scripts\Activate.ps1
+python -m pip show agent-paranoid-android
+</code></pre>
+<h2 id="output-already-exists">Output Already Exists<a class="headerlink" href="#output-already-exists" title="Permanent link">&para;</a></h2>
+<p>Folder workflows without overwrite support require a new or empty directory.
+For example, choose a new path for <code>generate-from-example</code>:</p>
+<pre><code class="language-bash">test-data-agent generate-from-example data/example_dataset \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/run-002
+</code></pre>
+<p>DatasetSpec <code>generate --overwrite</code> replaces the entire output folder, including
+obsolete files, after generation and validation. Review the destination first;
+see <a href="../../reference/generation-modes/">folder replacement and rollback</a>.</p>
+<p>Single-entity file bundles use separate ownership checks. A different primary
+filename or format, invalid or missing manifest, stale sidecar, or unrelated
+sibling is rejected before replacement. Use a new output folder instead of
+deleting evidence from an incomplete or mixed file bundle. Never point output
+at a source file or source folder.</p>
+<h2 id="missing-optional-dependency">Missing Optional Dependency<a class="headerlink" href="#missing-optional-dependency" title="Permanent link">&para;</a></h2>
+<p>Optional commands print a version-pinned installation command and exit <code>69</code>.
+Run that command in the same environment as <code>test-data-agent</code>, then verify the
+capability locally:</p>
+<pre><code class="language-bash">python -m pip install &quot;agent-paranoid-android[postgres]==PACKAGE_VERSION&quot;
+test-data-agent doctor --require-extra postgres
+</code></pre>
+<p>Replace the extra and version with the exact values from the error. A passing
+local doctor check does not verify credentials or contact a remote service.</p>
+<h2 id="malformed-input-or-unexpected-traceback">Malformed Input Or Unexpected Traceback<a class="headerlink" href="#malformed-input-or-unexpected-traceback" title="Permanent link">&para;</a></h2>
+<p>Malformed YAML/JSON and invalid models are normal input failures: they exit
+<code>2</code>, publish no success artifact, and do not show a traceback. Use <code>--json</code> in
+automation to branch on <code>error.code</code>.</p>
+<p>Unexpected internal failures exit <code>70</code> with a fixed bounded message. Retry
+with <code>--debug</code> only in a trusted terminal where technical paths and exception
+context are safe to display. Provider response bodies and credentials remain
+redacted even in normal provider errors.</p>
+<h2 id="cancelled-operation">Cancelled Operation<a class="headerlink" href="#cancelled-operation" title="Permanent link">&para;</a></h2>
+<p>Ctrl+C exits <code>130</code> after catchable staging cleanup or bundle rollback. The
+message confirms that no successful final bundle was published. Inspect an
+agent workspace with <code>agent-status</code>; for a non-agent command, keep any
+unexpected destination for investigation and retry into a new path.</p>
+<h2 id="agent-approval-was-interrupted">Agent Approval Was Interrupted<a class="headerlink" href="#agent-approval-was-interrupted" title="Permanent link">&para;</a></h2>
+<p>Inspect the workspace:</p>
+<pre><code class="language-bash">test-data-agent agent-status out/agent
+</code></pre>
+<p>When it reports <code>recovery_required</code>, run the exact <code>agent-recover</code> command it
+prints. Recovery requires the previously reviewed DatasetSpec SHA-256,
+revalidates the existing generated bundle, and does not generate new rows.</p>
+<p>Do not edit files under <code>generated/</code> before recovery. A changed checkpoint,
+manifest, report, spec, profile, or row file causes recovery to fail closed.</p>
+<h2 id="process-or-host-stopped-during-publication">Process Or Host Stopped During Publication<a class="headerlink" href="#process-or-host-stopped-during-publication" title="Permanent link">&para;</a></h2>
+<p>For an agent workspace, run <code>agent-status</code> first. Use <code>agent-recover</code> only when
+the status reports <code>recovery_required</code>; it revalidates the existing generated
+bundle before publishing missing completion metadata.</p>
+<p>For a non-agent generation command, do not treat a hidden staging directory or
+a destination without its expected manifest and validation report as success.
+Confirm that no generation process is still running, retain the incomplete
+files for investigation when needed, and rerun with the same reviewed inputs
+and seed into a new destination.</p>
+<p>Where an atomic state writer or staged bundle publication is used, replacement
+prevents readers from observing its partial state during normal operation.
+Standalone artifact commands are not one global transaction. Shared atomic
+single-file writes and owned directory publication use <code>fsync</code>, but complete
+multi-file crash consistency is not guaranteed. A hard process stop, host or
+storage failure, or power loss can still leave staging data or an incomplete
+bundle. Use storage with the durability and backup
+guarantees required by the deployment.</p>
+<h2 id="input-limit-exceeded">Input Limit Exceeded<a class="headerlink" href="#input-limit-exceeded" title="Permanent link">&para;</a></h2>
+<p>The error names the failed limit. Prefer splitting an oversized source or
+reducing requested rows before raising the corresponding environment variable.</p>
+<p>When a limit must change, set the smallest value that supports the reviewed
+workload and keep output and wall-clock limits in proportion.</p>
+<p>See <a href="../../reference/configuration/">Configuration</a>.</p>
+<h2 id="sensitive-value-rejected">Sensitive Value Rejected<a class="headerlink" href="#sensitive-value-rejected" title="Permanent link">&para;</a></h2>
+<p>Profiles and business rules reject values that resemble PII, credentials,
+tokens, or private keys.</p>
+<p>Do not bypass the detector by encoding or fragmenting a production value.
+Replace it with a semantic rule, a reserved example value, or a generator
+strategy.</p>
+<h2 id="validation-failed">Validation Failed<a class="headerlink" href="#validation-failed" title="Permanent link">&para;</a></h2>
+<p>Open:</p>
+<ul>
+<li><code>validation_report.json</code>;</li>
+<li><code>business_validation_report.json</code>, when present;</li>
+<li>the effective spec and rule file.</li>
+</ul>
+<p>Check the first failing section before changing generation settings. Common
+causes are an incorrect inferred relationship, impossible field ranges,
+conflicting formulas, and a business rule that references the wrong field.</p>
+<p>Negative and mixed modes can fail validation intentionally. Keep their output
+separate and label it as invalid test data.</p>
+<h2 id="results-are-not-reproducible">Results Are Not Reproducible<a class="headerlink" href="#results-are-not-reproducible" title="Permanent link">&para;</a></h2>
+<p>Confirm that both runs use the same:</p>
+<ul>
+<li>package version;</li>
+<li><code>DatasetSpec</code> and its fingerprint;</li>
+<li>business-rule file and fingerprint;</li>
+<li>seed;</li>
+<li>row count, mode, invalid ratio, and format.</li>
+</ul>
+<p>File ordering and output encoding should also be compared on the same supported
+platform.</p>
+<h2 id="trino-allowlists-are-required">Trino Allowlists Are Required<a class="headerlink" href="#trino-allowlists-are-required" title="Permanent link">&para;</a></h2>
+<p>Set both variables:</p>
+<pre><code class="language-bash">export TRINO_ALLOWED_CATALOGS=hive,iceberg
+export TRINO_ALLOWED_SCHEMAS=test_data,staging
+</code></pre>
+<p>Do not use <code>TRINO_ALLOW_UNRESTRICTED=true</code> merely to silence configuration
+errors.</p>
+<h2 id="plain-http-is-disabled">Plain HTTP Is Disabled<a class="headerlink" href="#plain-http-is-disabled" title="Permanent link">&para;</a></h2>
+<p>Use HTTPS for remote Trino. For an isolated local integration instance only:</p>
+<pre><code class="language-bash">export TRINO_HTTP_SCHEME=http
+export TRINO_ALLOW_INSECURE_HTTP=true
+</code></pre>
+<h2 id="mcp-path-rejected">MCP Path Rejected<a class="headerlink" href="#mcp-path-rejected" title="Permanent link">&para;</a></h2>
+<p>Move the input or output below <code>TEST_DATA_AGENT_WORKSPACE_ROOT</code>. A textual path
+that appears to be inside the workspace can still be rejected when an existing
+symlink resolves outside it.</p>
+<p>Use a real directory with no symlink boundary and request a new output path.</p>
+<h2 id="reporting-a-security-problem">Reporting A Security Problem<a class="headerlink" href="#reporting-a-security-problem" title="Permanent link">&para;</a></h2>
+<p>Do not open a public issue containing exploit details, source data, PII, or
+credentials. Follow the repository
+<a href="https://github.com/wa-pis/agent-paranoid-android/security/policy">security policy</a>.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../concepts/safety-model/" class="btn btn-neutral float-left" title="Safety Model"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../known-issues/" class="btn btn-neutral float-right" title="Known Issues">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../../concepts/safety-model/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../known-issues/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

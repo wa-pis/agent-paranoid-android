@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/how-to/mcp/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Connect An MCP Client - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Connect An MCP Client";
+        var mkdocs_page_input_path = "how-to/mcp.md";
+        var mkdocs_page_url = "/agent-paranoid-android/how-to/mcp/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Connect An MCP Client</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#generator-only-quickstart">Generator-Only Quickstart</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#resume-an-existing-synthetic-plan">Resume An Existing Synthetic Plan</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#corrective-next-steps">Corrective Next Steps</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#prepare-a-workspace">Prepare A Workspace</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#common-profile-workflow">Common-Profile Workflow</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mcp-client-configuration">MCP Client Configuration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#safe-generator-sequence">Safe Generator Sequence</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#safe-trino-sequence">Safe Trino Sequence</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#expected-result">Expected Result</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#failure-conditions">Failure Conditions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#configured-sql-sessions">Configured SQL Sessions</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Integrations</li>
+      <li class="breadcrumb-item active">Connect An MCP Client</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/mcp.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="connect-an-mcp-client">Connect An MCP Client<a class="headerlink" href="#connect-an-mcp-client" title="Permanent link">&para;</a></h1>
+<p>These workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
+server and enable only tools required for your task. For local preservation
+approval use <a href="../transformation/">Transform Local Data</a>; MCP cannot issue it.</p>
+<p>The project exposes two MCP servers with separate trust boundaries:</p>
+<ul>
+<li>the generator's ordinary file tools use one workspace; configured SQL
+  transformation sessions additionally own private temporary captures;</li>
+<li>the Trino server's default aggregate-only tools provide allowlisted,
+  read-only metadata and profiling.</li>
+</ul>
+<p>Start with the generator server. Add Trino only when database profiling is
+required.</p>
+<p>Before enabling tools, use <a href="../../reference/mcp-permissions/">MCP Permissions</a>
+for the complete tool inventory, required filesystem/network/database rights,
+client confirmation policy, and separate transformation approval requirements.
+These are stdio servers: the client launches a local process; no inbound port
+or MCP OAuth scope is required. Client tool approval, operating-system access,
+database grants and human dataset review are separate controls.</p>
+<p>For process and dependency isolation, use the separate hardened images in
+<a href="../../operations/containers/">Container Deployment</a>. The generator example has
+no network, while the Trino worker receives no generator workspace mount.</p>
+<h2 id="generator-only-quickstart">Generator-Only Quickstart<a class="headerlink" href="#generator-only-quickstart" title="Permanent link">&para;</a></h2>
+<p>Install the optional MCP support in a dedicated environment. Use the version
+selected in <a href="../../getting-started/installation/">Installation</a>.</p>
+<pre><code class="language-bash">python3 -m venv /path/to/mcp-env
+/path/to/mcp-env/bin/python -m pip install &quot;agent-paranoid-android[mcp]&quot;
+mkdir -p /path/to/synthetic-workspace
+</code></pre>
+<p>Desktop clients may not inherit your shell's PATH. Configure the absolute
+executable path and restart the client after changing its configuration:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;test-data-agent-generator&quot;: {
+      &quot;command&quot;: &quot;/path/to/mcp-env/bin/test-data-agent-mcp-generator&quot;,
+      &quot;env&quot;: {
+        &quot;TEST_DATA_AGENT_WORKSPACE_ROOT&quot;: &quot;/path/to/synthetic-workspace&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>Replace both absolute paths with your own. The client should discover
+<code>plan_dataset</code>, <code>inspect_dataset_plan</code>, <code>approve_dataset_plan</code>, and
+<code>recover_dataset_plan</code>. This local workflow requires no database or AI-provider
+credentials. The <code>mcpServers</code> example applies to clients supporting that
+configuration format; use your client's equivalent server settings otherwise.</p>
+<p>Create <code>customers.csv</code> inside the workspace with this fictional fixture:</p>
+<pre><code class="language-csv">customer_id,email,status
+1,alice@example.com,active
+2,bob@example.com,paused
+</code></pre>
+<p>Ask your assistant: "Plan four synthetic customers from customers.csv with seed
+81. Show me the specification for review before generating files."
+The corresponding <code>plan_dataset</code> arguments are:</p>
+<pre><code class="language-json">{
+  &quot;source_path&quot;: &quot;customers.csv&quot;,
+  &quot;workspace_path&quot;: &quot;agent/customers&quot;,
+  &quot;source_type&quot;: &quot;csv&quot;,
+  &quot;count&quot;: 4,
+  &quot;seed&quot;: 81,
+  &quot;output_format&quot;: &quot;csv&quot;,
+  &quot;table_name&quot;: &quot;customers&quot;
+}
+</code></pre>
+<p>The response has <code>approval_required: true</code> and <code>spec_path</code>. No generated dataset
+exists yet. Open the spec artifact locally and review field types, privacy,
+relationships, count, and seed. Inspection is a read-only operation:</p>
+<pre><code class="language-json">{&quot;workspace_path&quot;: &quot;agent/customers&quot;}
+</code></pre>
+<p>Call <code>inspect_dataset_plan</code> with those arguments. After a human reviews and
+explicitly approves the exact current specification, call
+<code>approve_dataset_plan</code> with:</p>
+<pre><code class="language-json">{
+  &quot;workspace_path&quot;: &quot;agent/customers&quot;,
+  &quot;reviewed_spec_sha256&quot;: &quot;&lt;review.current_spec_sha256 from inspection&gt;&quot;
+}
+</code></pre>
+<p>Replace the placeholder with the actual fingerprint. If the specification
+changes, inspect and review it again; a copied fingerprint is not human approval.
+The approval response should report <code>row_counts: {"customers": 4}</code>,
+<code>validation_valid: true</code>, and paths to output, manifest, validation report, and
+approval receipt. Inspect the same workspace again to confirm <code>phase: completed</code>.
+Report these summaries and paths; do not attach or inline dataset rows.</p>
+<h3 id="resume-an-existing-synthetic-plan">Resume An Existing Synthetic Plan<a class="headerlink" href="#resume-an-existing-synthetic-plan" title="Permanent link">&para;</a></h3>
+<p>If the client closes after planning, keep the agent workspace and resume the
+same conversation through the client's normal session-resume action. Restore
+the same verified installation, workspace root, MCP connection and tool filter.
+Keep the existing model, authentication, sandbox and confirmation policy. Run
+only one copy of that client session.</p>
+<p>For the Codex CLI, the upstream client command is <code>codex resume SESSION_ID</code>;
+replace <code>SESSION_ID</code> with the existing conversation's identifier. This is a
+Codex command, not an Agent Paranoid Android option. If the original launch
+supplied MCP settings only for that invocation, reapply those same settings
+through the reviewed client launcher when resuming. A bare resume command does
+not establish that the required server and tool filter were restored.</p>
+<p>Continue with <code>inspect_dataset_plan</code> for the existing workspace. Do not replay
+<code>plan_dataset</code>, delete the plan, or choose a new workspace merely to clear a
+non-empty-directory refusal. A launcher refusing to create a second plan does
+not establish that the package or final-commit checks failed.</p>
+<p>When the phase is <code>awaiting_approval</code>:</p>
+<ol>
+<li>Inspect the current plan and make the entire current <code>dataset_spec.yaml</code>
+   available for the human to open and read. Check both its file bytes and
+   <code>review.current_spec_sha256</code> against the specification being reviewed.</li>
+<li>Obtain fresh, explicit human consent for that exact current specification.
+   A model's summary, copied fingerprint, bootstrap prompt, general release
+   authorization or consent sent before the final specification was prepared
+   does not complete this review.</li>
+<li>Immediately before approval, inspect and check the same file again. Changed
+   bytes require another full-file view and renewed consent.</li>
+<li>Call <code>approve_dataset_plan</code> with the unchanged reviewed fingerprint, then
+   <code>validate_dataset</code> and inspect the completed workspace. Report validation,
+   counts and artifact paths without returning rows.</li>
+</ol>
+<p>Client-session resume and <code>recover_dataset_plan</code> are different operations.
+For an interrupted approval, follow the state returned by inspection: report
+an existing <code>completed</code> result, use recovery only when <code>next_action</code> requests
+it, and stop for inspection on an unexpected state. Resuming a conversation
+does not itself approve a dataset or authorize preservation. See the
+<a href="../../reference/mcp-permissions/#choose-a-client-policy-and-check-it">permission boundaries</a>.</p>
+<h3 id="corrective-next-steps">Corrective Next Steps<a class="headerlink" href="#corrective-next-steps" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Missing executable or MCP extra: check the absolute path, install <code>[mcp]</code>
+  into that environment, and restart the client.</li>
+<li>Rejected workspace path: move the input inside the configured root and use
+  relative paths. Do not expand permissions to bypass the boundary.</li>
+<li>Non-empty planning directory: inspect the existing plan and
+  <a href="#resume-an-existing-synthetic-plan">resume its review</a>. Use a new workspace
+  only when deliberately starting a separate dataset.</li>
+<li>Stale review fingerprint: inspect, review the changed specification, and
+  obtain renewed human approval before submitting its current fingerprint.</li>
+<li>Interrupted approval or a lost response: inspect first. If <code>phase</code> is
+  <code>completed</code>, report the existing result. If <code>next_action</code> is <code>recover</code>, call
+  <code>recover_dataset_plan</code> with the workspace and reviewed fingerprint. Recovery
+  retains published outputs without generating another dataset. If inspection
+  requests review and approval, follow that state instead.</li>
+<li>Fixed argument-validation or transport-limit error: correct arguments against
+  the discovered tool schema or reduce request size. Do not disable budgets or
+  expect rejected values to be reflected in error messages.</li>
+</ul>
+<p>Add Trino only for database profiling, using the separate configuration and
+<a href="#safe-trino-sequence">Safe Trino Sequence</a> below. Keep database credentials in
+the Trino server for that aggregate-profile-to-synthetic workflow. The separately
+configured SQL transformation session has its own connection requirements.</p>
+<h2 id="prepare-a-workspace">Prepare A Workspace<a class="headerlink" href="#prepare-a-workspace" title="Permanent link">&para;</a></h2>
+<p><a id="closed-common-profile-candidate"></a></p>
+<p><a id="common-profile-workflow-16-rc"></a></p>
+<h3 id="common-profile-workflow">Common-Profile Workflow<a class="headerlink" href="#common-profile-workflow" title="Permanent link">&para;</a></h3>
+<p>Stable <code>1.6.0</code> provides <code>common_transformation</code> in the generator console
+server. Registration grants no dataset permission or preservation approval.
+Stable acceptance has <a href="../../release-evidence-1.6.0/">finite recorded limits</a>;
+changed activation still needs its own review.
+It accepts <code>operation</code> (<code>review</code>, <code>validate</code>, <code>execute</code>), workspace-relative
+<code>profile</code>, and positive explicit <code>max_total_bytes</code>, <code>max_review_bytes</code>,
+<code>max_output_bytes</code>. Validation/execution require the exact reviewed
+<code>snapshot_sha256</code>. Preservation additionally requires a pre-existing local
+<code>receipt</code>; MCP cannot issue it. Optional <code>destination</code> is execute-only and names
+a new direct-child output bundle. Without it, execution is temporary.</p>
+<p>The workspace root comes from server configuration, never tool arguments.
+Responses contain value-free review/summary metadata, not output rows or mapping
+literals. Existing transport/work budgets still apply; these byte settings do
+not enlarge source-free profiling or serialized response budgets. Unknown
+arguments, including <code>root</code> and <code>approved</code>, are rejected without reflection.
+Configuration creation and human confirmation remain local CLI operations.
+Installed fictional acceptance with MCP SDK1/SDK2 does not authorize private
+data access or issue a local preservation receipt.</p>
+<pre><code class="language-bash">mkdir -p /path/to/synthetic-workspace
+</code></pre>
+<p>Inputs, safe profiles, reviewed specs, rules, and outputs used through generator
+file tools must remain below this directory. Server-owned temporary storage,
+audit logs and authentication files have separate administrator-configured
+locations. The workspace setting is an application path boundary, not an
+operating-system sandbox.</p>
+<h2 id="mcp-client-configuration">MCP Client Configuration<a class="headerlink" href="#mcp-client-configuration" title="Permanent link">&para;</a></h2>
+<p>Use the installed console commands:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;test-data-agent-generator&quot;: {
+      &quot;command&quot;: &quot;test-data-agent-mcp-generator&quot;,
+      &quot;env&quot;: {
+        &quot;TEST_DATA_AGENT_WORKSPACE_ROOT&quot;: &quot;/path/to/synthetic-workspace&quot;,
+        &quot;TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS&quot;: &quot;120&quot;
+      }
+    },
+    &quot;test-data-agent-trino&quot;: {
+      &quot;command&quot;: &quot;test-data-agent-mcp-trino&quot;,
+      &quot;env&quot;: {
+        &quot;TRINO_HOST&quot;: &quot;trino.example.internal&quot;,
+        &quot;TRINO_PORT&quot;: &quot;443&quot;,
+        &quot;TRINO_USER&quot;: &quot;synthetic_data_reader&quot;,
+        &quot;TRINO_HTTP_SCHEME&quot;: &quot;https&quot;,
+        &quot;TRINO_ALLOWED_CATALOGS&quot;: &quot;hive,iceberg&quot;,
+        &quot;TRINO_ALLOWED_SCHEMAS&quot;: &quot;test_data,staging&quot;,
+        &quot;TRINO_QUERY_MAX_EXECUTION_TIME&quot;: &quot;30s&quot;,
+        &quot;TRINO_QUERY_MAX_RUN_TIME&quot;: &quot;45s&quot;,
+        &quot;TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES&quot;: &quot;1GB&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>Give the Trino identity only the required metadata and SELECT access through
+database grants; no write or administration rights are needed. Catalog/schema
+allowlists do not create those grants. <code>TRINO_ALLOWED_TABLE_COLUMNS</code> narrows
+safe table profiling, but is not a universal per-tool ACL for metadata, counts,
+rule probes or optional <code>run_safe_select</code>. Use database grants for strict
+table/column isolation; see the <a href="../../reference/mcp-permissions/#trino-tool-rights">permission matrix</a>.</p>
+<p>Do not place a password or token directly in a committed MCP configuration.
+Use the client's secret mechanism or an environment injected by the runtime.</p>
+<h2 id="safe-generator-sequence">Safe Generator Sequence<a class="headerlink" href="#safe-generator-sequence" title="Permanent link">&para;</a></h2>
+<p>For selective transformation review, call <code>review_transformation</code> with
+workspace-relative <code>input_path</code>, <code>policy_path</code> and optional <code>table_name</code>.
+It reads a fixed local snapshot in the format selected by the saved policy and
+returns <code>review_only</code>, <code>snapshot_sha256</code> and the same value-free review as CLI
+<code>transform-review</code>. Referenced mapping files stay local to the policy directory.
+The tool writes no artifacts, creates no approval receipt, executes no
+transformation and connects to no database. It is separate from ordinary
+source-free generator operations.</p>
+<p>The stable <code>1.6.0</code> generator registers <code>execute_transformation</code>
+with workspace-relative <code>input_path</code>, <code>policy_path</code>, new <code>output_path</code>, mandatory
+<code>snapshot_sha256</code>, optional <code>table_name</code>/existing <code>receipt_path</code>, and optional
+<code>max_total_input_bytes</code>/<code>max_output_bytes</code> run caps. It consumes the same exact
+snapshots and budgets as CLI execution and returns <code>transformation_completed</code>,
+digest, provenance and budget summaries, never dataset rows or mapping literals.
+Explicit replacements may permute sensitive source values under the same
+field-independent contract. Review retains a value-free sensitivity note;
+mapped values stay in the selected local artifact, never MCP responses. This
+does not grant direct preservation or an implicit copy fallback.</p>
+<p>Preservation requires a matching receipt issued separately by the human local
+controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
+Changed inputs invalidate receipts; workspace escapes, existing destinations,
+unsupported actions and budget violations fail closed without copying fallback.
+Registration does not authorize a dataset. Changed activation requires fresh
+independent safety review and executable evidence.
+Changed public activation still requires matching contracts, executable safety
+evidence and independent exact-SHA review. A receipt never authorizes database
+access or external APIs.</p>
+<ol>
+<li>Put a CSV file, CSV folder, or safe profile below the workspace root.</li>
+<li>Call <code>plan_dataset</code> with that source, a new agent workspace, count, seed,
+   and output format.</li>
+<li>Stop and review the written <code>dataset_spec.yaml</code>.</li>
+<li>Call <code>inspect_dataset_plan</code> and record
+   <code>review.current_spec_sha256</code>.</li>
+<li>Call <code>approve_dataset_plan</code> with that exact fingerprint only after review.</li>
+<li>Report summaries and artifact paths, not generated rows.</li>
+</ol>
+<p>Use <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
+<code>validate_dataset</code> separately when an advanced client needs control over each
+pipeline stage. Direct <code>generate_dataset</code> and <code>export_dataset</code> do not require a
+planning approval argument; configure the client's confirmation policy before
+enabling these writing tools. Permission to invoke <code>approve_dataset_plan</code> is
+not evidence that the human reviewed the displayed specification.</p>
+<p>For the planning/approval workflow, embed <code>business_rules</code> in the reviewed
+DatasetSpec. Direct <code>generate_dataset</code> and <code>export_dataset</code> calls can instead
+provide <code>business_rules_path</code> or a bounded structured <code>business_rules_payload</code>.
+Use one rule source: external rules cannot be combined with embedded rules.</p>
+<p>Generator MCP reads newline-framed requests through the same bounded transport
+used by Trino MCP. Each request receives a fresh non-resettable budget. The
+default boundary rejects raw frames above 1 MiB, JSON deeper than 100 levels,
+JSON with more than 10,000 structural nodes, or an individual scalar above
+256 KiB before MCP/Pydantic materialization. Complete JSON-RPC responses are
+limited to 4 MiB and overflow becomes a fixed local error.
+Typed argument-validation failures also become the fixed
+<code>Tool arguments failed validation</code> error; rejected caller values and nested
+Pydantic diagnostics are not returned.
+Malformed typed requests are rejected before SDK dispatch with fixed
+<code>Invalid request parameters</code> text, and malformed notifications are dropped;
+their caller-controlled values do not enter SDK logs or retained exceptions.
+Each server process admits at most 32 active requests. Excess requests receive
+a fixed bounded capacity error, and disconnect or teardown clears retained
+request state. Trino execution is separately capped at eight concurrent
+operations per process.</p>
+<h2 id="safe-trino-sequence">Safe Trino Sequence<a class="headerlink" href="#safe-trino-sequence" title="Permanent link">&para;</a></h2>
+<p>The default aggregate-only tools are source-literal-free and contain only
+metadata and aggregate profiling operations:</p>
+<ul>
+<li><code>list_catalogs</code>, <code>list_schemas</code>, <code>list_tables</code>, <code>describe_table</code>;</li>
+<li><code>profile_table</code>, <code>profile_table_safe</code>, <code>profile_column</code>;</li>
+<li><code>profile_foreign_key</code>, <code>profile_temporal_ordering</code>, <code>profile_formula_rule</code>;</li>
+<li><code>profile_conditional_required</code>, <code>profile_conditional_allowed_values</code>;</li>
+<li><code>profile_aggregate_mapping</code>.</li>
+</ul>
+<p>Catalog and schema discovery returns only names present in the configured
+allowlists. Tables may be listed only after their catalog and schema pass those
+allowlists. Backend-controlled driver and enumeration failures are exposed as
+the fixed <code>Trino request failed</code> error without retaining the original text.</p>
+<p>This default aggregate-only surface has no row-returning diagnostic. Its
+successful responses, validation and database errors, and metadata-only audit
+records do not contain source-cell literals.</p>
+<ol>
+<li>Call <code>list_catalogs</code>, <code>list_schemas</code>, and <code>list_tables</code>.</li>
+<li>Call <code>describe_table</code>.</li>
+<li>Call <code>profile_table_safe</code> for an allowlisted table.</li>
+<li>Pass that response to generator <code>plan_trino_dataset</code> with a new workspace,
+   explicit count, seed, and output format.</li>
+<li>Stop and review the written <code>dataset_spec.yaml</code>.</li>
+<li>Call <code>inspect_dataset_plan</code> and record <code>review.current_spec_sha256</code>.</li>
+<li>Call <code>approve_dataset_plan</code> with that value as <code>reviewed_spec_sha256</code> only
+   after the human reviewed that exact spec fingerprint.</li>
+<li>Do not export or relay source rows.</li>
+</ol>
+<p>Both catalog and schema allowlists are mandatory by default. HTTPS is the
+default. Plain HTTP requires an explicit override and is intended only for an
+isolated local Trino instance.</p>
+<p>The explicit opt-in row-returning tool <code>run_safe_select</code> is not exposed by
+default. Trusted clients that need it must set <code>TRINO_ENABLE_SAFE_SELECT=true</code>.
+The review-first planning sequence above does not require it. Its bounded
+row-shaped result masks every string, including names and addresses missed by
+heuristic classification, plus non-string fields or values recognized as
+sensitive. Other non-string source values may remain, so enabling it does not
+make returned rows source-free, anonymous, or suitable for relay to an LLM or
+generated output.</p>
+<h2 id="expected-result">Expected Result<a class="headerlink" href="#expected-result" title="Permanent link">&para;</a></h2>
+<p>The default generator and default aggregate-only Trino tools return compact
+metadata:</p>
+<pre><code class="language-text">rows: customers=25, orders=25
+seed: 12345
+validation: passed
+synthetic: true
+source rows copied: false
+</code></pre>
+<p>Generated files stay in the workspace. These default tools do not return
+dataset or source rows; explicit opt-in row-returning tools are outside this
+expected result.</p>
+<h2 id="failure-conditions">Failure Conditions<a class="headerlink" href="#failure-conditions" title="Permanent link">&para;</a></h2>
+<p>The server rejects:</p>
+<ul>
+<li>paths outside the workspace, including existing symlink escapes;</li>
+<li>existing output files and non-empty output directories;</li>
+<li>unrestricted SQL, DDL, DML, joins, CTEs, and subqueries;</li>
+<li>likely PII projections and raw sensitive rule literals;</li>
+<li>non-Trino or oversized inline planning profiles;</li>
+<li>DatasetSpec input passed to <code>plan_dataset</code> instead of <code>generate_dataset</code>;</li>
+<li>missing Trino allowlists;</li>
+<li>requests exceeding configured input, output, query, or execution limits.</li>
+</ul>
+<p>See <a href="../../mcp_examples/">MCP Tools</a> and
+<a href="../../reference/configuration/">Configuration</a> for details.</p>
+<p>Preservation approval is never an MCP capability. The registered separate
+workspace execution consumer cannot issue local receipts, return rows or
+broaden source-free generator authority. Changed public activation requires the
+scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.</p>
+<p><a id="configured-sql-sessions-16-rc"></a></p>
+<h2 id="configured-sql-sessions">Configured SQL Sessions<a class="headerlink" href="#configured-sql-sessions" title="Permanent link">&para;</a></h2>
+<p>The running generator server registers <code>configured_query_session</code> with an
+instance-owned session manager. Use only an authorized administrator-configured
+PostgreSQL or Trino source. A saved batch profile and
+<a href="../../reference/cli/#configured-sql-sessions-16-rc">bounded query references</a>
+are workspace files; tool arguments never select endpoints or credentials.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Arguments</th>
+<th>Result and lifetime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>open</code></td>
+<td><code>profile</code>, <code>references</code>, positive <code>max_total_bytes</code>, <code>max_review_bytes</code>, <code>max_output_bytes</code></td>
+<td>Capture once; return metadata review, opaque <code>handle</code>, digest, expiry and local approval descriptor.</td>
+</tr>
+<tr>
+<td><code>review</code></td>
+<td><code>handle</code></td>
+<td>Reuse the same frozen batch; no database reconnection.</td>
+</tr>
+<tr>
+<td><code>validate</code></td>
+<td><code>handle</code>, exact <code>snapshot_sha256</code></td>
+<td>Validate temporary output; retain the session until expiry or close.</td>
+</tr>
+<tr>
+<td><code>execute</code></td>
+<td><code>handle</code>, exact <code>snapshot_sha256</code>, new direct-child <code>destination</code></td>
+<td>Verify any required local receipt, validate and publish; close the session.</td>
+</tr>
+<tr>
+<td><code>close</code></td>
+<td><code>handle</code></td>
+<td>Remove owned snapshots and receipts; the handle cannot be reused.</td>
+</tr>
+</tbody>
+</table>
+<p>Responses contain review/summary metadata, never captured rows, query text,
+mapping literals or connection secrets. <code>local_approval</code> contains an owned
+temporary root, <code>batch.yaml</code>, a fixed receipt filename, digest and input/review
+limits. These references help the local operator invoke the existing CLI:</p>
+<pre><code class="language-bash">test-data-agent transform-batch approve /owned/root batch.yaml local-session-receipt.json \
+  --snapshot-sha256 REVIEWED_DIGEST \
+  --max-total-input-bytes REVIEWED_INPUT_LIMIT --max-review-bytes REVIEWED_REVIEW_LIMIT
+</code></pre>
+<p>Use the exact metadata values while the session is alive. The CLI opens the
+controlling terminal for confirmation; MCP has no approval operation or boolean.
+This descriptor itself grants no authority. Direct or fallback preservation
+requires a valid exact receipt; explicit mappings retain their separate safety
+checks. Changed local bytes cannot produce a receipt for the frozen batch.</p>
+<p>Expiry, refusal and shutdown remove owned inputs and receipts. Execution retains
+only the selected validated output bundle inside the parent workspace. Expired
+or closed handles refuse without silently recapturing. Start a new explicit
+session and review its new digest if another capture is needed. Cumulative byte
+admission is not refunded on close or failure; restart the owning server only
+after resolving the refusal and reviewing its configured limits.</p>
+<p>Cleanup failure returns a fixed incomplete-cleanup error and latches the owner
+unhealthy; further work refuses. Preserve the failure evidence and inspect local
+temporary storage before restarting. Default bounds and overrides are documented
+in <a href="../../reference/configuration/#configured-sql-session-bounds-16-rc">configuration</a>.
+The entrypoint closes all sessions in a shutdown handler even if transport fails.
+Custom SDK embedding must explicitly inject a session owner and close it; the
+module-level SDK object creates no SQL sessions.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../transformation/" class="btn btn-neutral float-left" title="Transform Local Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../ai_integration/" class="btn btn-neutral float-right" title="Connect An AI Client">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../transformation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../ai_integration/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

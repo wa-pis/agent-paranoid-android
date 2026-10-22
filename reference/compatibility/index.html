@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/reference/compatibility/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Compatibility Surfaces - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Compatibility Surfaces";
+        var mkdocs_page_input_path = "reference/compatibility.md";
+        var mkdocs_page_url = "/agent-paranoid-android/reference/compatibility/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Compatibility Surfaces</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/compatibility.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="compatibility-surfaces">Compatibility Surfaces<a class="headerlink" href="#compatibility-surfaces" title="Permanent link">&para;</a></h1>
+<p>This inventory covers aliases and wrappers retained while the package
+converges on its <code>1.0</code> public API. New code should use the canonical surface,
+but retained entries remain tested for their stated window.</p>
+<p>The contracts below describe stable <code>1.6.0</code>. Migration notes identify older
+versions only when their behavior differs.</p>
+<h2 id="command-aliases">Command Aliases<a class="headerlink" href="#command-aliases" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Retained command</th>
+<th>Canonical command</th>
+<th>Status</th>
+<th>Support window</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>profile-csv-folder</code></td>
+<td><code>profile-example</code></td>
+<td>Supported alias</td>
+<td>Through all <code>1.x</code> releases</td>
+</tr>
+<tr>
+<td><code>generate-from-csv-folder</code></td>
+<td><code>generate-from-example</code></td>
+<td>Supported alias</td>
+<td>Through all <code>1.x</code> releases</td>
+</tr>
+</tbody>
+</table>
+<p>The aliases accept the canonical command's options and reach the same
+application dispatch. Help output labels the canonical command. They are not
+currently deprecated.</p>
+<h2 id="python-compatibility-wrappers">Python Compatibility Wrappers<a class="headerlink" href="#python-compatibility-wrappers" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Retained import</th>
+<th>Canonical import</th>
+<th>Status</th>
+<th>Support window</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_data_agent.business_rules</code></td>
+<td><code>test_data_agent.rules.models</code></td>
+<td>Supported wrapper</td>
+<td>Through all <code>1.x</code> releases</td>
+</tr>
+<tr>
+<td><code>test_data_agent.business_validator</code></td>
+<td><code>test_data_agent.rules.validation</code></td>
+<td>Supported wrapper</td>
+<td>Through all <code>1.x</code> releases</td>
+</tr>
+<tr>
+<td><code>test_data_agent.rules_engine</code></td>
+<td><code>test_data_agent.rules.engine</code></td>
+<td>Supported wrapper</td>
+<td>Through all <code>1.x</code> releases</td>
+</tr>
+<tr>
+<td><code>test_data_agent.scenario</code></td>
+<td><code>test_data_agent.rules.scenarios</code></td>
+<td>Supported wrapper</td>
+<td>Through all <code>1.x</code> releases</td>
+</tr>
+</tbody>
+</table>
+<p>These modules re-export the canonical objects; they do not maintain parallel
+implementations. Their <code>__all__</code> lists define the retained names. New code
+should import from <code>test_data_agent.rules</code>.</p>
+<h2 id="transitional-model-access">Transitional Model Access<a class="headerlink" href="#transitional-model-access" title="Permanent link">&para;</a></h2>
+<p><code>AgentSummary</code> subclasses currently support <code>summary["field"]</code> and
+<code>summary.get("field")</code> in addition to typed attributes. This mapping-style
+access is transitional and retained through all <code>1.x</code> releases. New code
+should use <code>summary.field</code> so type checkers can validate the access.</p>
+<p>Mapping-style access is not deprecated yet. Any future deprecation must first
+ship a warning and migration note, then remain available for at least one
+feature release and 90 days. Removal cannot occur before <code>2.0</code>.</p>
+<h2 id="already-removed">Already Removed<a class="headerlink" href="#already-removed" title="Permanent link">&para;</a></h2>
+<p>The old <code>GenerationSpec</code> API was deprecated in <code>0.2.0</code> and removed in <code>0.6.0</code>.
+It is not a retained compatibility surface. Loaders reject its shape with a
+link to <a href="../../operations/migrating-to-0.6/">Migrating To 0.6</a>.</p>
+<p>Safe legacy profile JSON with top-level <code>columns</code> remains a supported input
+adapter. It is converted to safe profile metadata, not treated as a generation
+specification.</p>
+<h2 id="deprecation-policy">Deprecation Policy<a class="headerlink" href="#deprecation-policy" title="Permanent link">&para;</a></h2>
+<p>For a currently supported alias or wrapper:</p>
+<ol>
+<li>publish the replacement and migration example;</li>
+<li>mark the surface deprecated in this inventory and the changelog;</li>
+<li>emit a non-secret, non-row deprecation warning where practical;</li>
+<li>retain it for at least one feature release and 90 days;</li>
+<li>remove it only in a release whose compatibility policy permits the break.</li>
+</ol>
+<p>Urgent security fixes may shorten the window. The security advisory and
+release notes must identify the affected surface and safe replacement.</p>
+<p>Contract tests cover the CLI aliases, wrapper identity and behavior, and
+transitional summary access. See <a href="../stability/">Public Stability</a> for the
+broader compatibility rules.</p>
+<p><a id="transformation-candidate-scope"></a></p>
+<h2 id="transformation-scope">Transformation Scope<a class="headerlink" href="#transformation-scope" title="Permanent link">&para;</a></h2>
+<p>Stable <code>1.6.0</code> includes the transformation workflows; published <code>1.5.0</code> does not.
+That composition registers the single-source and saved-profile common
+CLI/MCP workflows plus configured SQL sessions. Ordinary generation APIs remain
+source-free. The running generator server adds <code>common_transformation</code> and
+<code>configured_query_session</code>; custom SDK embedding must explicitly inject its
+workspace/session owner and close that owner on shutdown. Final exact-SHA safety
+and release gates remain required. See the
+<a href="../cli/#implemented-rc-execution-candidate">single-source CLI contract</a> and
+<a href="../cli/#closed-common-profile-workflow-candidate">common-profile contract</a>.
+Command discovery is not dataset approval. The finite fictional stable campaign
+completed with recorded limits; its evidence does not approve changed activation.</p>
+<p>Imported <code>FieldProfile</code> and <code>FieldSpec</code> distributions accept empty <code>{}</code> or a
+supported typed <code>kind</code>. Nonempty objects with missing, non-string or unknown
+kinds are rejected with a value-free diagnostic. Previously accepted opaque
+distribution dictionaries must be converted to supported metadata before use;
+they cannot be forwarded to advisor/provider requests.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

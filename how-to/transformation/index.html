@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/how-to/transformation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Transform Local Data - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Transform Local Data";
+        var mkdocs_page_input_path = "how-to/transformation.md";
+        var mkdocs_page_url = "/agent-paranoid-android/how-to/transformation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Transform Local Data</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#choose-an-action-for-each-field">Choose An Action For Each Field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#review-before-execution">Review Before Execution</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#conditions-for-preservation">Conditions For Preservation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multiple-inputs-and-databases">Multiple Inputs And Databases</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-To Guides</li>
+      <li class="breadcrumb-item active">Transform Local Data</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/transformation.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="transform-local-data">Transform Local Data<a class="headerlink" href="#transform-local-data" title="Permanent link">&para;</a></h1>
+<p>Use selective transformation when each output row must correspond to an input
+row. Unlike synthetic generation, the result has mixed origin and may contain
+explicitly replaced or approved preserved source values. Treat the destination
+as potentially sensitive; validation is not an anonymity certificate.</p>
+<h2 id="choose-an-action-for-each-field">Choose An Action For Each Field<a class="headerlink" href="#choose-an-action-for-each-field" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>drop</code></td>
+<td>Remove the field.</td>
+</tr>
+<tr>
+<td><code>synthesize</code></td>
+<td>Generate new values using the declared generation policy.</td>
+</tr>
+<tr>
+<td><code>substitute</code></td>
+<td>Apply an explicit typed mapping, optionally shared by a domain.</td>
+</tr>
+<tr>
+<td><code>replace_text</code></td>
+<td>Apply explicit exact-text mappings. Field mappings override file-wide mappings without cascading.</td>
+</tr>
+<tr>
+<td><code>preserve</code></td>
+<td>Retain an eligible non-sensitive field only after exact local approval.</td>
+</tr>
+</tbody>
+</table>
+<p>For an unmatched mapping, select rejection, synthesis or eligible preservation
+explicitly. A preserve fallback has the same approval requirements as direct
+preservation. Explicit mapped replacements may equal another source value,
+including a sensitive permutation; this is not permission for implicit copying.
+Mapping values never belong in logs, summaries, provider requests or MCP replies.</p>
+<h2 id="review-before-execution">Review Before Execution<a class="headerlink" href="#review-before-execution" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Prepare a valid behavior policy, source and any local mapping files. Use a
+   new destination distinct from every input.</li>
+<li>Run <code>transform-review SOURCE POLICY.yaml</code>. Review the value-free field
+   decisions and record the displayed <code>snapshot_sha256</code>.</li>
+<li>To edit an already valid policy locally, use
+   <code>transform-review SOURCE POLICY.yaml --decide --edit-actions</code>, then <code>SAVE</code>.
+   Review the saved bytes again. Saving is not approval.</li>
+<li>If any action preserves values, obtain the receipt in your own interactive
+   local terminal with
+   <code>transform-approve SOURCE POLICY.yaml RECEIPT --snapshot-sha256 SHA</code>.</li>
+<li>Execute with
+   <code>transform-execute SOURCE POLICY.yaml DESTINATION --snapshot-sha256 SHA</code>,
+   adding <code>--receipt RECEIPT</code> when required. Inspect provenance and validation.</li>
+</ol>
+<p><code>SOURCE</code>, <code>POLICY.yaml</code>, <code>RECEIPT</code>, <code>DESTINATION</code> and <code>SHA</code> above are placeholders,
+not a ready-to-run dataset approval. Use installed <code>COMMAND --help</code> for options.
+Never supply real data to a provider while preparing the policy.</p>
+<h2 id="conditions-for-preservation">Conditions For Preservation<a class="headerlink" href="#conditions-for-preservation" title="Permanent link">&para;</a></h2>
+<p>Every preserved field needs an explicit non-sensitive decision, no positive or
+conflicting sensitivity evidence, and a bounded operator comment. Sensitive,
+unknown and disputed fields remain blocked. DECIMAL preservation is blocked by
+default. Approval binds the exact source, classification, policy and referenced
+mapping bytes. Any bound input change requires fresh review and approval.</p>
+<p>Only the controlling local terminal can issue the receipt. Piped confirmation,
+an agent flag and MCP approval cannot replace it. A matching receipt permits
+only its reviewed plan; it does not authorize another dataset.</p>
+<h2 id="multiple-inputs-and-databases">Multiple Inputs And Databases<a class="headerlink" href="#multiple-inputs-and-databases" title="Permanent link">&para;</a></h2>
+<p>Use a <a href="../../reference/configuration/#closed-common-transformation-profile">common saved profile</a>
+with <code>transform-batch</code> for multiple inputs and final linked validation. Creation
+saves configuration only. Validation and execution consume the exact reviewed
+digest and any required local receipt.</p>
+<p>Configured SQL sessions use administrator allowlists and read-only budgets to
+capture once. Later steps reuse the same frozen snapshot without reconnecting.
+Sessions enforce admission, expiry and cleanup. MCP consumers stay workspace
+confined and return metadata, not rows.</p>
+<p>See the <a href="../../reference/cli/#implemented-rc-execution-candidate">CLI contract</a>
+for formats and arguments, <a href="../../reference/mcp-permissions/">MCP permissions</a>
+for integration rights, and <a href="../../reference/configuration/">Configuration</a>
+for schemas and budgets. Historical RC anchors remain valid links.</p>
+              
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../trino/" class="btn btn-neutral float-left" title="Profile Through Trino"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mcp/" class="btn btn-neutral float-right" title="Connect An MCP Client">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../trino/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../mcp/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

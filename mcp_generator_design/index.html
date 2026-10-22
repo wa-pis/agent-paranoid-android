@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/mcp_generator_design/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Generator MCP Design Rationale - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Generator MCP Design Rationale";
+        var mkdocs_page_input_path = "mcp_generator_design.md";
+        var mkdocs_page_url = "/agent-paranoid-android/mcp_generator_design/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Generator MCP Design Rationale</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/mcp_generator_design.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="generator-mcp-design-rationale">Generator MCP Design Rationale<a class="headerlink" href="#generator-mcp-design-rationale" title="Permanent link">&para;</a></h1>
+<p>This document explains what the AI integration does, why its boundaries exist,
+and where each responsibility lives in the codebase. Use
+<a href="../reference/mcp-permissions/">MCP Permissions</a> for the complete current tool
+inventory and required process, database and review rights.</p>
+<h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
+<p>The default review-first AI workflow should inspect a source safely, create a
+reviewable generation contract, generate deterministic synthetic data,
+validate it, and export it without receiving production rows or gaining
+unrestricted filesystem or database access.</p>
+<p>The implementation keeps planning and orchestration in the AI layer while all
+generation and validation decisions remain deterministic Python code.</p>
+<p>The explicit opt-in row-returning tool <code>run_safe_select</code> is intentionally
+narrower than an arbitrary read-only SQL client. It requires a literal bounded
+<code>LIMIT</code>, rejects unrestricted projections and likely sensitive fields, and also
+rejects joins, CTEs, subqueries, ordering, table functions, and <code>UNNEST</code>.
+It masks every returned string, including heuristic false negatives. Other
+non-string source values may remain, so default aggregate-only tools should be
+used for profiling.</p>
+<h2 id="why-two-mcp-servers">Why Two MCP Servers<a class="headerlink" href="#why-two-mcp-servers" title="Permanent link">&para;</a></h2>
+<p>The integration deliberately separates source inspection from generation:</p>
+<ul>
+<li><code>mcp_trino_server.py</code> has read-only access to an allowlisted Trino surface.</li>
+<li>the ordinary synthetic tools in <code>mcp_generator_server.py</code> use a configured
+  local workspace and need no database connection.</li>
+</ul>
+<p>This separation follows least privilege. Database credentials do not need to be
+available to the generator, and the Trino server does not need permission to
+write output files. A compromised or mistaken tool call therefore has a smaller
+blast radius.</p>
+<p>The separate configured SQL transformation session can capture an authorized
+database into owned temporary snapshots. It requires additional adapter,
+network, database and storage rights plus its own activation acceptance; it is
+outside the aggregate-profile-to-synthetic pipeline below. A local process
+inherits its OS user's rights; the workspace setting alone is not a sandbox.</p>
+<pre><code class="language-text">Trino or CSV
+    |
+    v
+Safe profile metadata
+    |
+    v
+DatasetSpec 1.1 (legacy 1.0 remains readable)
+    |
+    v
+Human review + fresh consent for the exact current spec
+    |
+    v
+Deterministic generator
+    |
+    v
+Schema + relationship + constraint validation
+    |
+    v
+Synthetic files + effective spec + report + manifest
+</code></pre>
+<p>Only safe profile metadata crosses the source/generator boundary: names, types,
+null ratios, cardinalities, ranges, non-sensitive categories, and masked
+patterns. Source rows and raw sensitive values do not cross it.</p>
+<h2 id="tool-logic">Tool Logic<a class="headerlink" href="#tool-logic" title="Permanent link">&para;</a></h2>
+<p>The <a href="../reference/mcp-permissions/#generator-tool-rights">generator rights table</a>
+describes all 14 console-registered tools, their inputs, effects and approvals.
+The console entrypoint owns the workspace and session lifetime; the module-level
+SDK object has only the 12 base tools. Transformation activation/release
+acceptance is separate from registration. The ordinary
+<code>approve_dataset_plan</code> receipt is not a source-preservation receipt and cannot
+authorize transformation preservation; MCP has no preservation approval issuer.</p>
+<p><code>export_dataset</code> intentionally regenerates data from a <code>DatasetSpec</code>. It does
+not accept arbitrary row files, because a generic conversion tool could be used
+to export production data.</p>
+<h2 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">&para;</a></h2>
+<h3 id="trino-source">Trino Source<a class="headerlink" href="#trino-source" title="Permanent link">&para;</a></h3>
+<ol>
+<li>The AI calls allowlisted metadata and aggregate profiling tools in
+   <code>mcp_trino_server.py</code>.</li>
+<li>The Trino server returns a compact safe profile payload.</li>
+<li>The AI passes that payload to <code>plan_trino_dataset</code> as <code>profile_payload</code>,
+   with an explicit workspace, count and seed.</li>
+<li>The generator server validates the profile, writes a versioned spec and
+   stops before generation.</li>
+<li>The client inspects the plan, presents the full current <code>dataset_spec.yaml</code>
+   for human review and obtains fresh, explicit consent for that exact file.</li>
+<li>After rechecking the file and fingerprint, it calls <code>approve_dataset_plan</code>
+   with <code>reviewed_spec_sha256</code> from <code>inspect_dataset_plan</code>.</li>
+</ol>
+<p>No local copy of the source table is required.</p>
+<h3 id="csv-source">CSV Source<a class="headerlink" href="#csv-source" title="Permanent link">&para;</a></h3>
+<ol>
+<li>The CSV must be inside <code>TEST_DATA_AGENT_WORKSPACE_ROOT</code>.</li>
+<li><code>plan_dataset</code> detects a CSV file or folder and invokes safe profiling.</li>
+<li>Sensitive columns retain masked patterns, never raw top values.</li>
+<li>The agent writes a reviewable generation contract and stops for approval.</li>
+<li>The client inspects the plan, presents the full current specification and
+   obtains fresh, explicit human consent. It rechecks the file and fingerprint
+   before calling <code>approve_dataset_plan</code> with that reviewed fingerprint.</li>
+<li>Approved generation uses distributions and a seed, not source-row
+   shuffling. Editing the file requires another review and new consent; a
+   summary or fingerprint alone is not human specification acceptance.</li>
+</ol>
+<p>The lower-level <code>profile_csv</code> and <code>infer_dataset_spec</code> tools remain available
+when a client needs explicit control over intermediate artifacts. These are
+lower-level operations, rather than the persisted review-first plan lifecycle.
+See <a href="../how-to/mcp/">MCP usage</a> for the consent and resume procedure.</p>
+<p>Direct CSV and example-folder workflows compare complete generated rows against
+the source before writing output. An exact match stops generation without
+including the matched values in the error.</p>
+<h2 id="safety-decisions">Safety Decisions<a class="headerlink" href="#safety-decisions" title="Permanent link">&para;</a></h2>
+<h3 id="workspace-boundary">Workspace Boundary<a class="headerlink" href="#workspace-boundary" title="Permanent link">&para;</a></h3>
+<p>Ordinary generator MCP tool paths are resolved against
+<code>TEST_DATA_AGENT_WORKSPACE_ROOT</code>. Paths outside that root are rejected after
+resolution, which also blocks traversal through existing symlinks.
+Owned runtime temporary storage and separately configured audit/authentication
+files have different locations; see <a href="../reference/mcp-permissions/#minimum-process-rights">minimum process rights</a>.</p>
+<p>MCP output files must be new, and generation folders must be new or empty. This
+prevents accidental overwrites and avoids mixing a new synthetic dataset with
+stale files from an earlier run.</p>
+<p>Implementation: <code>src/test_data_agent/mcp_generator_server.py</code>.</p>
+<h3 id="shared-deployment-audit">Shared Deployment Audit<a class="headerlink" href="#shared-deployment-audit" title="Permanent link">&para;</a></h3>
+<p>Both MCP servers can write metadata-only, HMAC-authenticated audit events when
+the operator configures an audit path and key. Audit records never contain tool
+arguments, SQL, profiles, rows, return values, or exception messages. Invalid
+audit configuration prevents tool execution. See
+<a href="../operations/audit-logging/">MCP Audit Logging</a>.</p>
+<h3 id="safe-profiles">Safe Profiles<a class="headerlink" href="#safe-profiles" title="Permanent link">&para;</a></h3>
+<p>Fields marked sensitive, or inferred as sensitive from their name or semantic
+type, may use masked-pattern or synthetic-identifier distributions. Sensitive
+integer/float fields also support coarse <code>numeric_shape</code> or a <code>numeric</code>
+distribution with a non-identity scale factor. Raw categorical distributions
+for sensitive fields are rejected; exact sensitive Trino extrema and percentiles
+are not accepted as safe profiles.</p>
+<p>Implementation: <code>src/test_data_agent/safety.py</code> and
+<code>src/test_data_agent/generation/planner.py</code>.</p>
+<h3 id="synthetic-sensitive-values">Synthetic Sensitive Values<a class="headerlink" href="#synthetic-sensitive-values" title="Permanent link">&para;</a></h3>
+<p>Sensitive values are generated independently from the source. Emails use the
+reserved <code>example.test</code> domain, phones use a fictional 555 range, and SSN-like
+values use an invalid <code>000</code> prefix.</p>
+<p>Implementation: <code>src/test_data_agent/generation/entity_generator.py</code>.</p>
+<h3 id="no-rows-in-mcp-responses">No Rows In MCP Responses<a class="headerlink" href="#no-rows-in-mcp-responses" title="Permanent link">&para;</a></h3>
+<p>Generator tools write datasets to the workspace and return only paths, row
+counts, versions, and validation results. This keeps large payloads out of the
+model context and reduces the chance of accidental disclosure in prompts,
+logs, or chat history.</p>
+<p>Business-rule generation follows the same boundary. Direct <code>generate_dataset</code>
+and <code>export_dataset</code> responses include the rule fingerprint, rule/pass fail
+counts, validity, truncation status and <code>business_validation_report_path</code>.
+<code>approve_dataset_plan</code> returns its compact generation summary and bundle paths;
+the rule summary and report remain in the hashed workspace bundle rather than
+separate response keys. Bounded, value-free rule diagnostics remain in that
+artifact.</p>
+<h3 id="structured-business-rules">Structured Business Rules<a class="headerlink" href="#structured-business-rules" title="Permanent link">&para;</a></h3>
+<p>Business rules may be embedded in the reviewed <code>DatasetSpec</code>, so the same
+rules reach deterministic generation, review-first approval, validation and
+export regardless of the source or output adapter. <code>generate_dataset</code> and
+<code>export_dataset</code> also accept one workspace <code>business_rules_path</code> or inline
+<code>business_rules_payload</code> when the spec has no embedded rules. Combining rule
+sources is rejected; supplied rules are saved in the effective spec.
+Rule models forbid
+unknown fields, cap list and expression sizes, and permit only constants,
+field names, basic arithmetic, and explicit <code>sum</code>/<code>count</code> aggregate helpers.
+The server also rejects requests whose DatasetSpec row counts and rule set
+would exceed the configured estimated evaluation budget.</p>
+<p>Before generation, <code>rules/contract.py</code> verifies every entity and field
+reference against the DatasetSpec. Literal assignments and comparisons against
+sensitive fields fail closed. Other literals undergo the shared content, size
+and type checks, including exact DECIMAL shape validation and its explicitly
+reviewed non-sensitive <code>numeric_measure</code> handling. No output folder is
+published when this boundary fails.</p>
+<h3 id="provenance-manifest">Provenance Manifest<a class="headerlink" href="#provenance-manifest" title="Permanent link">&para;</a></h3>
+<p>Every generated bundle includes <code>generation_manifest.json</code> with:</p>
+<ul>
+<li>package version</li>
+<li>DatasetSpec schema version</li>
+<li>SHA-256 fingerprint of the effective spec</li>
+<li>seed and output format</li>
+<li>row counts</li>
+<li>validation status</li>
+<li>optional business-rule fingerprint, rule count, pass/fail counts, validity,
+  and error-truncation status</li>
+<li><code>synthetic: true</code></li>
+<li><code>source_rows_copied: false</code></li>
+</ul>
+<p>The MCP validation tool requires this manifest and checks that its fingerprint
+matches the supplied effective spec. Manifest output hashes also bind the data,
+validation artifacts and any <code>business_validation_report.json</code>; missing or
+changed bound artifacts fail validation. This prevents validating a bundle
+against an unrelated contract or accepting a deleted rule report.</p>
+<p>Implementation: <code>src/test_data_agent/io/artifacts.py</code>.</p>
+<p>Review-first agent generation also writes <code>approval_receipt.json</code> beside the
+workspace plan. The receipt binds the random plan identifier and safe-profile
+fingerprint to the exact effective-spec fingerprint confirmed by the caller.
+The fingerprint is recomputed immediately before generation; mismatches fail
+without publishing output.</p>
+<h2 id="why-datasetspec-is-versioned">Why DatasetSpec Is Versioned<a class="headerlink" href="#why-datasetspec-is-versioned" title="Permanent link">&para;</a></h2>
+<p><code>DatasetSpec</code> is the contract between the AI planner and deterministic code.
+Newly constructed specs use <code>schema_version: "1.1"</code>; readers explicitly support
+both <code>1.0</code> and <code>1.1</code>. The serialized version permits evolution without silently
+changing old contracts. Exact <code>decimal</code> fields require <code>1.1</code> and their declared
+precision/scale and <code>decimal_range</code>; they cannot be silently read as floats.</p>
+<p>Both supported versions validate:</p>
+<ul>
+<li>unique entity and field names</li>
+<li>valid primary-key references</li>
+<li>relationship entity/field references</li>
+<li>constraint entity/field references</li>
+<li>scoped privacy-rule references</li>
+</ul>
+<p>Older specs without <code>schema_version</code> load as version 1.0 for compatibility.
+Package version and spec schema version are independent.</p>
+<p>Implementation: <code>src/test_data_agent/core/dataset.py</code> and
+<code>src/test_data_agent/core/entity.py</code>.</p>
+<h2 id="why-the-effective-spec-is-saved">Why The Effective Spec Is Saved<a class="headerlink" href="#why-the-effective-spec-is-saved" title="Permanent link">&para;</a></h2>
+<p>Generation may override the seed, count, or output format supplied in the
+original spec. The output folder therefore receives an effective
+<code>dataset_spec.yaml</code> containing the values actually used. Validation and the
+manifest fingerprint refer to this effective spec, making a run reproducible.</p>
+<p>Implementation: <code>src/test_data_agent/io/workflows.py</code>.</p>
+<h2 id="output-location">Output Location<a class="headerlink" href="#output-location" title="Permanent link">&para;</a></h2>
+<p>For an output folder such as <code>generated/orders_run</code>, the bundle is:</p>
+<pre><code class="language-text">generated/orders_run/
+  dataset_spec.yaml
+  generation_manifest.json
+  validation_report.json
+  orders.csv
+  customers.csv
+</code></pre>
+<p>There is one data file per entity. The extension is selected by the requested
+CSV, JSON, SQL, or Parquet format. <code>plan_dataset</code> exposes CSV, JSON and Parquet
+selection; <code>plan_trino_dataset</code> and direct generation/export also accept SQL.
+See the
+<a href="../reference/source-output-matrix/">source/output matrix</a> for interface details.</p>
+<h2 id="module-ownership">Module Ownership<a class="headerlink" href="#module-ownership" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>core/</code>: versioned Pydantic domain contracts.</li>
+<li><code>adapters/</code>: conversion of safe CSV, Trino, JSON, and older profile metadata.</li>
+<li><code>profiling/</code>: schema, distribution, relationship, and constraint inference.</li>
+<li><code>generation/</code>: seeded row generation and deterministic constraint solving.</li>
+<li><code>validation/</code>: executable schema, relationship, and constraint checks.</li>
+<li><code>io/</code>: artifact reading, writing, manifests, and reusable workflows.</li>
+<li><code>safety.py</code>: profile and source-row reuse invariants.</li>
+<li><code>mcp_trino_server.py</code>: read-only source-side tools.</li>
+<li><code>mcp_generator_server.py</code>: workspace-side AI tools.</li>
+<li><code>scripts/run_ai_demo.py</code>: local profile-to-CSV demonstration.</li>
+</ul>
+<h2 id="alternatives-intentionally-rejected">Alternatives Intentionally Rejected<a class="headerlink" href="#alternatives-intentionally-rejected" title="Permanent link">&para;</a></h2>
+<p>These restrictions describe the ordinary aggregate-profile-to-synthetic
+pipeline. Separately registered mixed-origin transformation consumers remain
+behind their distinct snapshot, classification and local-receipt contracts;
+this pipeline grants them no source-preservation authority.</p>
+<ul>
+<li>One MCP server with both database credentials and broad filesystem access.</li>
+<li>Arbitrary unrestricted SQL tools.</li>
+<li>Returning raw or generated datasets directly in MCP responses.</li>
+<li>Giving the planning client the explicit opt-in row-returning tool
+  <code>run_safe_select</code>; it is not needed by <code>profile_table_safe</code> -&gt;
+  <code>plan_trino_dataset</code>.</li>
+<li>Exporting or converting arbitrary row files.</li>
+<li>Building output by copying, shuffling, or duplicating source rows.</li>
+<li>Treating free-form LLM reasoning as validation.</li>
+</ul>
+<p>These alternatives are convenient, but they weaken isolation, auditability, or
+the guarantee that output is synthetic.</p>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<p>The main coverage is in:</p>
+<ul>
+<li><code>tests/test_mcp_generator_server.py</code></li>
+<li><code>tests/test_safety.py</code></li>
+<li><code>tests/test_ai_trino_workflow.py</code></li>
+<li><code>tests/test_dataset_spec_contract.py</code></li>
+<li><code>tests/test_domain_agnostic_pipeline.py</code></li>
+</ul>
+<p>The local end-to-end demo is:</p>
+<pre><code class="language-bash">python3 scripts/run_ai_demo.py \
+  --profile examples/trino_safe_profile.json \
+  --output out/ai_demo \
+  --count 100 \
+  --seed 12345
+</code></pre>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

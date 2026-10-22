@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/manual-release-runbook/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Manual Release Runbook - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Manual Release Runbook";
+        var mkdocs_page_input_path = "manual-release-runbook.md";
+        var mkdocs_page_url = "/agent-paranoid-android/manual-release-runbook/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Manual Release Runbook</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/manual-release-runbook.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="manual-release-runbook">Manual Release Runbook<a class="headerlink" href="#manual-release-runbook" title="Permanent link">&para;</a></h1>
+<p>This is the copy-and-paste path for publishing a release without an AI
+assistant. It uses the repository's existing checks and GitHub workflows. AI
+review is not required, but the release still requires an independent human
+approval recorded at an HTTPS URL and bound to the exact release commit.</p>
+<p>Do not move, replace, or delete a tag after it has been pushed. If a published
+tag fails, fix the problem in a new version or release candidate.</p>
+<p>Create a new release candidate when runtime behavior, public APIs,
+dependencies, packaging, security boundaries, containers, or published
+artifact integrity change. A stable promotion from an accepted candidate may
+contain only the version, changelog, documentation, acceptance evidence, and
+generated release metadata allowed by <a href="../release/">the release policy</a>.</p>
+<h2 id="1-prerequisites">1. Prerequisites<a class="headerlink" href="#1-prerequisites" title="Permanent link">&para;</a></h2>
+<p>Run these commands from a clean checkout:</p>
+<pre><code class="language-bash">export VERSION=&quot;X.Y.Z&quot;
+export TAG=&quot;v${VERSION}&quot;
+export PREVIOUS_TAG=&quot;vPREVIOUS_VERSION&quot;
+
+gh auth status
+git config --get gpg.format
+git config --get user.signingkey
+git fetch origin main --tags
+git switch main
+git pull --ff-only origin main
+git status --short
+</code></pre>
+<p><code>gpg.format</code> must be <code>ssh</code>. The configured signing key must match an entry in
+<code>.github/release-signers</code>. Stop if the worktree is not clean or if the version
+already exists on GitHub or PyPI.</p>
+<pre><code class="language-bash">git ls-remote --tags origin &quot;refs/tags/${TAG}&quot;
+python3 -m pip index versions agent-paranoid-android
+</code></pre>
+<p>The first command must print nothing for the new tag.</p>
+<h2 id="2-prepare-the-release-pull-request">2. Prepare The Release Pull Request<a class="headerlink" href="#2-prepare-the-release-pull-request" title="Permanent link">&para;</a></h2>
+<p>Create a focused branch:</p>
+<pre><code class="language-bash">git switch -c &quot;codex/release-${VERSION}&quot;
+</code></pre>
+<p>Update the version and release-facing documentation. At minimum, inspect:</p>
+<ul>
+<li><code>pyproject.toml</code>;</li>
+<li><code>src/test_data_agent/version.py</code>;</li>
+<li>the root package version in <code>uv.lock</code>;</li>
+<li><code>CHANGELOG.md</code>;</li>
+<li>README and release-facing documentation;</li>
+<li>hard-coded stable-version assertions in <code>tests/test_documentation.py</code>.</li>
+</ul>
+<p>Regenerate and check the lockfile, then run the complete local gates:</p>
+<pre><code class="language-bash">uv lock
+uv lock --check
+scripts/check_release.sh
+uv run mkdocs build --strict
+</code></pre>
+<p>Review the exact changes, stage only the intended files, and create a signed
+conventional commit:</p>
+<pre><code class="language-bash">git status --short
+git diff
+git add -p
+git diff --cached
+git commit -S -m &quot;chore(release): prepare ${VERSION}&quot;
+git push -u origin &quot;codex/release-${VERSION}&quot;
+gh pr create --base main --head &quot;codex/release-${VERSION}&quot; --title &quot;chore(release): prepare ${VERSION}&quot; --body &quot;Prepare ${VERSION}; no tag or publication is performed by this PR.&quot;
+</code></pre>
+<p>Add any intended untracked file by its exact path before committing. Do not use
+<code>git add .</code>.</p>
+<p>Wait for all required checks and the independent human review. Merge only when
+the PR is clean, mergeable, approved, and green:</p>
+<pre><code class="language-bash">gh pr checks --watch
+</code></pre>
+<h2 id="3-pin-the-exact-main-commit">3. Pin The Exact Main Commit<a class="headerlink" href="#3-pin-the-exact-main-commit" title="Permanent link">&para;</a></h2>
+<p>After the PR is merged:</p>
+<pre><code class="language-bash">git switch main
+git pull --ff-only origin main
+export COMMIT=&quot;$(git rev-parse HEAD)&quot;
+test -z &quot;$(git status --porcelain)&quot;
+printf '%s\n' &quot;${COMMIT}&quot;
+gh run list --commit &quot;${COMMIT}&quot; --limit 20
+</code></pre>
+<p>Record successful exact-commit URLs for these four gates:</p>
+<ul>
+<li>CI;</li>
+<li>Containers;</li>
+<li>Documentation;</li>
+<li>Security.</li>
+</ul>
+<p>Set them as shell variables for later use:</p>
+<pre><code class="language-bash">export CI_URL=&quot;https://github.com/wa-pis/agent-paranoid-android/actions/runs/REPLACE_ME&quot;
+export CONTAINERS_URL=&quot;https://github.com/wa-pis/agent-paranoid-android/actions/runs/REPLACE_ME&quot;
+export DOCS_URL=&quot;https://github.com/wa-pis/agent-paranoid-android/actions/runs/REPLACE_ME&quot;
+export SECURITY_URL=&quot;https://github.com/wa-pis/agent-paranoid-android/actions/runs/REPLACE_ME&quot;
+</code></pre>
+<p>The independent reviewer must review this exact commit, state that no
+release-blocking defect remains, and record the conclusion in a GitHub issue,
+PR comment, or other stable HTTPS location. Save that URL:</p>
+<pre><code class="language-bash">export APPROVAL_URL=&quot;https://github.com/wa-pis/agent-paranoid-android/issues/REPLACE_ME&quot;
+</code></pre>
+<h2 id="4-build-reproducible-ubuntu-artifacts">4. Build Reproducible Ubuntu Artifacts<a class="headerlink" href="#4-build-reproducible-ubuntu-artifacts" title="Permanent link">&para;</a></h2>
+<p>Run the no-publish preflight against the exact commit:</p>
+<pre><code class="language-bash">gh workflow run release-preflight.yml --ref main --field &quot;commit=${COMMIT}&quot;
+gh run list --workflow release-preflight.yml --commit &quot;${COMMIT}&quot; --limit 5
+export PREFLIGHT_RUN=&quot;REPLACE_WITH_RUN_ID&quot;
+gh run watch &quot;${PREFLIGHT_RUN}&quot; --exit-status
+export PREFLIGHT_DIR=&quot;$(mktemp -d)&quot;
+gh run download &quot;${PREFLIGHT_RUN}&quot; --name &quot;release-preflight-${COMMIT}&quot; --dir &quot;${PREFLIGHT_DIR}&quot;
+cat &quot;${PREFLIGHT_DIR}/ARTIFACT_SHA256&quot;
+shasum -a 256 &quot;${PREFLIGHT_DIR}&quot;/*.whl &quot;${PREFLIGHT_DIR}&quot;/*.tar.gz
+</code></pre>
+<p>The two locally calculated hashes must match <code>ARTIFACT_SHA256</code>.</p>
+<h2 id="5-prepare-the-acceptance-manifest">5. Prepare The Acceptance Manifest<a class="headerlink" href="#5-prepare-the-acceptance-manifest" title="Permanent link">&para;</a></h2>
+<p>Start from the previous signed manifest and edit a temporary copy:</p>
+<pre><code class="language-bash">export MANIFEST=&quot;$(mktemp &quot;${TMPDIR:-/tmp}/${TAG#v}-acceptance.XXXXXX&quot;)&quot;
+git cat-file tag &quot;${PREVIOUS_TAG}&quot; | awk '/^{/{copy=1} /^-----BEGIN SSH SIGNATURE-----/{copy=0} copy' &gt; &quot;${MANIFEST}&quot;
+${EDITOR:-vi} &quot;${MANIFEST}&quot;
+python3 -m json.tool &quot;${MANIFEST}&quot;
+</code></pre>
+<p>Keep the schema intact and update every release-specific field:</p>
+<ul>
+<li><code>release.tag</code> to <code>${TAG}</code>;</li>
+<li><code>release.reviewed_commit</code> to <code>${COMMIT}</code>;</li>
+<li>each approval's reviewer, <code>reviewed_commit</code>, and URL;</li>
+<li>every gate's commit and exact successful run URL;</li>
+<li>wheel and sdist basenames and SHA-256 values from the Ubuntu preflight;</li>
+<li>finding evidence only when its disposition or evidence changed.</li>
+</ul>
+<p>The manifest must contain exactly the keys accepted by
+<code>scripts/check_release_acceptance.py</code>. Do not put prose before or after the
+JSON.</p>
+<h2 id="6-create-and-verify-the-local-tag">6. Create And Verify The Local Tag<a class="headerlink" href="#6-create-and-verify-the-local-tag" title="Permanent link">&para;</a></h2>
+<p>Confirm the remote tag is still absent, then create a signed annotated tag:</p>
+<pre><code class="language-bash">test -z &quot;$(git ls-remote --tags origin &quot;refs/tags/${TAG}&quot;)&quot;
+git tag -s &quot;${TAG}&quot; -F &quot;${MANIFEST}&quot; &quot;${COMMIT}&quot;
+python3 scripts/check_release_tag.py &quot;${TAG}&quot;
+python3 scripts/check_release_identity.py &quot;${TAG}&quot; &quot;${COMMIT}&quot; .github/release-signers
+python3 scripts/check_release_acceptance.py &quot;${TAG}&quot; &quot;${COMMIT}&quot; &quot;${PREFLIGHT_DIR}&quot;
+git -c gpg.ssh.allowedSignersFile=.github/release-signers verify-tag &quot;${TAG}&quot;
+</code></pre>
+<p>If a check fails and the tag has not been pushed, delete only the local tag,
+fix the manifest, and repeat this section:</p>
+<pre><code class="language-bash">git tag -d &quot;${TAG}&quot;
+</code></pre>
+<p>Never run that command after the tag exists on the remote.</p>
+<h2 id="7-authorize-and-publish">7. Authorize And Publish<a class="headerlink" href="#7-authorize-and-publish" title="Permanent link">&para;</a></h2>
+<p>Bind publication to the exact accepted commit and read the value back:</p>
+<pre><code class="language-bash">gh variable set RELEASE_ACCEPTED_COMMIT --body &quot;${COMMIT}&quot;
+test &quot;$(gh variable get RELEASE_ACCEPTED_COMMIT)&quot; = &quot;${COMMIT}&quot;
+git push origin &quot;${TAG}&quot;
+</code></pre>
+<p>The tag starts the GitHub Release and Containers workflows. The Release
+workflow dispatches PyPI Trusted Publishing after the GitHub assets are
+created. Find the run IDs and wait for all three workflows:</p>
+<pre><code class="language-bash">gh run list --commit &quot;${COMMIT}&quot; --limit 20
+gh run watch REPLACE_WITH_RELEASE_RUN_ID --exit-status
+gh run watch REPLACE_WITH_CONTAINERS_RUN_ID --exit-status
+gh run watch REPLACE_WITH_PYPI_RUN_ID --exit-status
+</code></pre>
+<p>Confirm that the GitHub Release is stable and that PyPI is public:</p>
+<pre><code class="language-bash">gh release view &quot;${TAG}&quot; --json tagName,url,isDraft,isPrerelease,publishedAt,assets
+python3 -m pip index versions agent-paranoid-android
+</code></pre>
+<h2 id="8-verify-the-public-release">8. Verify The Public Release<a class="headerlink" href="#8-verify-the-public-release" title="Permanent link">&para;</a></h2>
+<p>Run the repository's read-only post-publish verifier:</p>
+<pre><code class="language-bash">gh workflow run verify-published-release.yml --ref main --field &quot;tag=${TAG}&quot;
+gh run list --workflow verify-published-release.yml --limit 5
+gh run watch REPLACE_WITH_VERIFY_RUN_ID --exit-status
+</code></pre>
+<p>Optionally repeat a small clean-install smoke locally:</p>
+<pre><code class="language-bash">export SMOKE_DIR=&quot;$(mktemp -d)&quot;
+python3 -m venv &quot;${SMOKE_DIR}/venv&quot;
+&quot;${SMOKE_DIR}/venv/bin/python&quot; -m pip install --no-cache-dir &quot;agent-paranoid-android[postgres]==${VERSION}&quot;
+&quot;${SMOKE_DIR}/venv/bin/test-data-agent&quot; --version
+&quot;${SMOKE_DIR}/venv/bin/test-data-agent&quot; doctor
+&quot;${SMOKE_DIR}/venv/bin/test-data-agent&quot; demo --output &quot;${SMOKE_DIR}/demo&quot;
+</code></pre>
+<p>Record the final workflow URLs, wheel and sdist hashes, and immutable GHCR
+digests in the release evidence issue or release evidence document.</p>
+<h2 id="recovery-rules">Recovery Rules<a class="headerlink" href="#recovery-rules" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A pushed tag is immutable. Never move, replace, or delete it.</li>
+<li>If a tag-triggered build fails before publication, fix the defect in a new
+  version or release candidate.</li>
+<li>If the GitHub Release exists but PyPI dispatch failed before uploading, rerun
+  the existing artifacts with:</li>
+</ul>
+<p><code>bash
+  gh workflow run publish-pypi.yml --ref main --field "tag=${TAG}"</code></p>
+<ul>
+<li>If public verification fails, do not rebuild or mutate published artifacts.
+  Investigate the evidence and release a new version when code or artifacts
+  must change.</li>
+<li>Do not use <code>--admin</code>, bypass required checks, or publish with a local PyPI
+  token. This repository publishes through GitHub OIDC Trusted Publishing.</li>
+</ul>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

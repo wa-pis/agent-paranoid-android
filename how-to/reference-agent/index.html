@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/how-to/reference-agent/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Run The Reference Agent - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Run The Reference Agent";
+        var mkdocs_page_input_path = "how-to/reference-agent.md";
+        var mkdocs_page_url = "/agent-paranoid-android/how-to/reference-agent/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Run The Reference Agent</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/reference-agent.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="run-the-reference-agent">Run The Reference Agent<a class="headerlink" href="#run-the-reference-agent" title="Permanent link">&para;</a></h1>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/reference_agent.py"><code>examples/reference_agent.py</code></a>
+is a runnable application-layer example built only from the public Python API.
+It demonstrates the complete review-first flow without a provider SDK,
+credentials, or network access.</p>
+<p>The included <code>BaselineAdvisorClient</code> is a deterministic safe stand-in. It
+returns the baseline <code>DatasetSpec</code> unchanged. Replace only its <code>complete</code>
+method with a provider-specific structured-output call described in the
+<a href="../../reference/advisor/">Advisor API</a>.</p>
+<p>To use the included OpenAI adapter instead, install only its optional extra:</p>
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[openai]&quot;
+export OPENAI_API_KEY=&quot;&lt;read from your secret manager&gt;&quot;
+</code></pre>
+<p>Do not put the key in source files, command arguments, fixtures, logs, or
+workspace artifacts.</p>
+<h2 id="1-plan-and-propose">1. Plan And Propose<a class="headerlink" href="#1-plan-and-propose" title="Permanent link">&para;</a></h2>
+<p>From a repository checkout:</p>
+<pre><code class="language-bash">python3 examples/reference_agent.py plan \
+  tests/fixtures/example_dataset \
+  --workspace out/reference-agent \
+  --count 25 \
+  --seed 12345
+</code></pre>
+<p>For a real OpenAI proposal, add <code>--advisor openai</code>. The default model is
+<code>gpt-5.6</code>; use <code>--model</code> to select another model available to your project:</p>
+<pre><code class="language-bash">python3 examples/reference_agent.py plan \
+  tests/fixtures/example_dataset \
+  --workspace out/openai-agent \
+  --count 25 \
+  --seed 12345 \
+  --advisor openai
+</code></pre>
+<p>This profiles the source, builds a safe advisor exchange, persists the
+validated proposal, and stops with:</p>
+<pre><code class="language-json">{
+  &quot;phase&quot;: &quot;awaiting_approval&quot;,
+  &quot;approval_required&quot;: true,
+  &quot;next_action&quot;: &quot;review_and_approve&quot;
+}
+</code></pre>
+<p>No <code>generated/</code> folder exists at this point.</p>
+<h2 id="2-review">2. Review<a class="headerlink" href="#2-review" title="Permanent link">&para;</a></h2>
+<p>Inspect these files:</p>
+<ul>
+<li><code>out/reference-agent/profile.json</code>: safe metadata, not source rows;</li>
+<li><code>out/reference-agent/dataset_spec.yaml</code>: exact proposed generation contract;</li>
+<li><code>out/reference-agent/advisor_review.json</code>: fingerprint-bound request and
+  proposal.</li>
+</ul>
+<p>Read the current fingerprint without changing the workspace:</p>
+<pre><code class="language-bash">python3 examples/reference_agent.py status out/reference-agent
+</code></pre>
+<p>Record <code>review.current_spec_sha256</code> only after reviewing
+<code>dataset_spec.yaml</code>. If the spec changes, run <code>status</code> again and review the new
+hash.</p>
+<h2 id="3-approve-and-generate">3. Approve And Generate<a class="headerlink" href="#3-approve-and-generate" title="Permanent link">&para;</a></h2>
+<p>Pass the exact reviewed fingerprint:</p>
+<pre><code class="language-bash">python3 examples/reference_agent.py approve \
+  out/reference-agent \
+  --reviewed-spec-sha256 &lt;review.current_spec_sha256&gt;
+</code></pre>
+<p>A stale or different hash fails before generation. A successful approval runs
+deterministic generation, validation, and source-row reuse checks. The
+manifest reports:</p>
+<pre><code class="language-json">{
+  &quot;synthetic&quot;: true,
+  &quot;source_rows_copied&quot;: false
+}
+</code></pre>
+<p>The example never auto-approves, sends source rows to a model, or returns
+dataset rows in its JSON status output.</p>
+<p>The OpenAI request uses separate developer and user roles for trusted policy
+and untrusted metadata, requests a structured <code>AdvisorProposal</code>, sets
+<code>store=False</code>, and rejects incomplete responses. The package validates the
+proposal again before writing it to the workspace.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

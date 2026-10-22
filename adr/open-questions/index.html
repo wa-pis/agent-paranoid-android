@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/adr/open-questions/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Open questions, superseded prose and implementation gaps - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Open questions, superseded prose and implementation gaps";
+        var mkdocs_page_input_path = "adr/open-questions.md";
+        var mkdocs_page_url = "/agent-paranoid-android/adr/open-questions/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Open questions, superseded prose and implementation gaps</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/adr/open-questions.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="open-questions-superseded-prose-and-implementation-gaps">Open questions, superseded prose and implementation gaps<a class="headerlink" href="#open-questions-superseded-prose-and-implementation-gaps" title="Permanent link">&para;</a></h1>
+<p>Snapshot: 2026-09-29. This is not a new release checklist and does not turn
+unapproved suggestions into required work. Keep three classes separate:
+<strong>a product decision is missing</strong>, <strong>an accepted decision is not implemented or
+verified</strong>, and <strong>historical documentation needs reconciliation</strong>.</p>
+<h2 id="decisions-not-settled-by-existing-authority">Decisions not settled by existing authority<a class="headerlink" href="#decisions-not-settled-by-existing-authority" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Question</th>
+<th>Safe disposition and next authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q-01</td>
+<td>Should different DATETIME spellings/offsets be equal mapping keys because they denote the same instant?</td>
+<td>Not implied by field formatting or timezone conversion. Retain unsupported/fail-closed execution where no contract exists; owner must select equality/collision semantics before expanding it. <a href="../0023-field-types-null-time/">ADR-0023</a>.</td>
+</tr>
+<tr>
+<td>Q-02</td>
+<td>What are nullable internal-formula semantics?</td>
+<td>Deferred, <strong>not a 1.6 RC blocker</strong>. Existing private code remains non-public; a future formula feature needs its own contract. <a href="../0026-transformation-scope/">ADR-0026</a>.</td>
+</tr>
+<tr>
+<td>Q-03</td>
+<td>May a narrow DECIMAL preservation exception override a numeric-shape false positive?</td>
+<td>Not active. Provenance of sensitivity evidence must first distinguish shape-only from semantic/content evidence, with exact binding, executable tests and independent review. Do not infer permission from a non-sensitive declaration. <a href="../0008-exact-decimal/">ADR-0008</a>, <a href="../0021-local-preservation-approval/">ADR-0021</a>.</td>
+</tr>
+<tr>
+<td>Q-04</td>
+<td>May external scripts/API callbacks act as replacement providers?</td>
+<td>Unapproved suggestion, not implementation scope. Keep unsupported; owner must explicitly select a trust, data-access and execution boundary before any implementation. <a href="../0022-behavior-policies-mappings/">ADR-0022</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>No approval is requested as part of this documentation task. In particular,
+Q-02/Q-04 must not be used to stall already-agreed work. If Q-01 or Q-03 is needed
+for a concrete route, identify that route and ask the narrow question then.</p>
+<h2 id="accepted-decisions-with-remaining-engineering-evidence">Accepted decisions with remaining engineering evidence<a class="headerlink" href="#accepted-decisions-with-remaining-engineering-evidence" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Remaining work</th>
+<th>What must not be claimed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I-01</td>
+<td>Complete the common transformation core and public wizard/noninteractive/agent execution with existing approval gates.</td>
+<td>A private helper, temporary publisher or read-only transform-review is not installed public execution.</td>
+</tr>
+<tr>
+<td>I-02</td>
+<td>Demonstrate capacity across participating SQL capture, mappings, review, execution and output stages; complete required route evidence.</td>
+<td>CSV replacement 300k×50 does not prove SQL scale, all twelve routes or arbitrary-width 1M×100 capacity.</td>
+</tr>
+<tr>
+<td>I-03</td>
+<td>Finish accepted key/domain/relationship and supported native-type integration.</td>
+<td>Type parsing, a domain model or one adapter test is not complete cross-input relationship acceptance.</td>
+</tr>
+<tr>
+<td>I-04</td>
+<td>Reconcile original client findings and inspect/run only available scripts on fictional baseline/candidate inputs.</td>
+<td>Private/unavailable client data and future integration feedback are not passed evidence.</td>
+</tr>
+<tr>
+<td>I-05</td>
+<td>Complete safety activation evidence, exact-candidate independent review, required GitHub gates and public RC verification.</td>
+<td>Accepted architecture and AI evidence do not replace human/platform approval or authorize stable 1.6.0.</td>
+</tr>
+</tbody>
+</table>
+<p>The uncommitted query-limit implementation on <code>codex/1-6-query-limits</code> is a WIP
+checkpoint with focused evidence in progress.md, not a new approved public
+adapter contract. No new hard-RSS/wire guarantee or platform restriction is added
+by I-02. Public API details not yet accepted remain design work behind the gate,
+not facts reconstructed from private function signatures.</p>
+<h2 id="known-documentary-conflicts">Known documentary conflicts<a class="headerlink" href="#known-documentary-conflicts" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Earlier text</th>
+<th>Governing decision and reconciliation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D-01</td>
+<td>Later sections of policy-contract.md and safety-boundary.md still describe internal totals/formula recomputation as transformation acceptance.</td>
+<td>Explicit owner scope correction on 2026-09-28 and <a href="../0026-transformation-scope/">ADR-0026</a> supersede that requirement. Keep historical/private evidence; do not delete source-free rule support.</td>
+</tr>
+<tr>
+<td>D-02</td>
+<td>Older policy/report prose describes retention as equality and formatted output percentages as unavailable.</td>
+<td><a href="../0025-action-origin-reporting/">ADR-0025</a> governs the user-facing three-origin report. Equality safety checks and historical manifest-v1 evidence remain distinct.</td>
+</tr>
+<tr>
+<td>D-03</td>
+<td>Earlier policy prose treats same-instant DATETIME values as identity replacements, while the later owner clarification explicitly leaves temporal-key equivalence undecided.</td>
+<td>Do not promote that sentence into a complete execution contract. Q-01 remains open; the recorded formatting decision does not resolve it.</td>
+</tr>
+<tr>
+<td>D-04</td>
+<td>Initial-slice policy text says the CSV parser does not change the process-global field limit.</td>
+<td>PR #594 introduced scoped coordination/restoration for internal CSV reads. This is stale implementation narration, not a reason to undo accepted scalar-limit support. External unsynchronized changes remain outside the coordination guarantee.</td>
+</tr>
+<tr>
+<td>D-05</td>
+<td>The general roadmap still names 1.3.x as current work, while release evidence records 1.5.0 and the active change targets 1.6.0rc1.</td>
+<td>Use immutable release evidence for shipped status and the active owner-approved plan for current scope. Roadmap reconciliation must not invent dates, integrations or new priorities.</td>
+</tr>
+<tr>
+<td>D-06</td>
+<td>Historical progress/tasks retain early helper limitations and obsolete blockers.</td>
+<td>Use the most recent explicit decision and exact evidence, not the oldest unchecked sentence. A task checkbox is neither authority nor an equal-sized estimate of remaining effort.</td>
+</tr>
+</tbody>
+</table>
+<p>The register preserves these conflicts visibly rather than silently rewriting
+history or declaring the entire prose corpus reconciled. The notes added to the
+active decision documents point readers here; detailed cleanup belongs to the
+next documentation pass for the affected supported behavior.</p>
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/policy-contract.md">Policy contract with dated owner decisions</a></li>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/safety-boundary.md">Safety boundary</a></li>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/resumption-plan.md">Resumption plan</a></li>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/client-acceptance.md">Client acceptance</a></li>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/csv-scale-acceptance.md">CSV scale evidence</a></li>
+<li><a href="../../release-evidence-1.5.0/">Release evidence</a>, <a href="../../roadmap/">roadmap</a></li>
+</ul>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

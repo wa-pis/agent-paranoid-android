@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/acceptance-matrix/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Final Acceptance Matrix Plan - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Final Acceptance Matrix Plan";
+        var mkdocs_page_input_path = "acceptance-matrix.md";
+        var mkdocs_page_url = "/agent-paranoid-android/acceptance-matrix/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Final Acceptance Matrix Plan</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/acceptance-matrix.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="final-acceptance-matrix-plan">Final Acceptance Matrix Plan<a class="headerlink" href="#final-acceptance-matrix-plan" title="Permanent link">&para;</a></h1>
+<p><strong>Status: finite campaign completed for stable 1.6.0.</strong>
+<a href="../release-evidence-1.6.0/">Final evidence and limitations</a> and the
+<a href="../release-ledger-1.6.0.json">value-free case ledger</a> bind the results to exact
+main <code>258c035c22408becf17ab090635710a50dda8ccc</code> and its Ubuntu wheel.
+The sequence below remains the repeatable acceptance plan for future changes. The implementation
+agent owns preparation and execution; actual human review remains the operator's
+step. Track completion in OpenSpec change <code>cross-interface-acceptance</code>.</p>
+<p>Existing successful tests are a starting point. They do not establish completed
+acceptance of all interfaces, options or a later commit.</p>
+<h2 id="executable-campaign">Executable campaign<a class="headerlink" href="#executable-campaign" title="Permanent link">&para;</a></h2>
+<p><code>scripts/accept_cross_interface_matrix.py</code> runs the 600 logical handoff cells
+against an installed wheel, with two seeded repeats per cell. Supply the isolated
+interpreter, installed package directory, exact candidate SHA and a new evidence
+JSON path. Its worker must complete successfully and reap the MCP server before
+the controller accepts the result. Bind the externally supplied SHA to the actual
+wheel/sdist hashes in the final evidence; a package path alone is not that proof.</p>
+<p>Acquisition is prepared once per route and an independently authored reviewed
+specification then exercises shared generation semantics. Database aggregates in
+this matrix are fictional stand-ins. Separate disposable PostgreSQL and Trino
+integration runs establish live acquisition; the 600 cells do not represent 600
+independent live profiling/inference runs.</p>
+<p><code>tests/test_acceptance_option_pairs.py</code> defines a finite covering array over nine
+representative option axes, with explicit compatibility constraints. Its current
+52 behavioral cases cover all 464 feasible pairs among 18,560 feasible
+combinations. The ledger records its chosen values and limits. It does not claim
+all values of every model property or all triples. Boundary, option-family,
+all-rule-family, publication and safety cases live in the companion
+<code>test_acceptance_option_families.py</code>, <code>test_acceptance_option_interactions.py</code> and
+<code>test_negative_rule_overlap.py</code> suites. The lexical property/flag inventory is
+navigation evidence, not a behavioral coverage measurement. Retained metadata
+such as identifier prefixes is distinguished from effective generation controls.</p>
+<p><code>scripts/accept_container_workloads.py</code> runs actual hardened CLI/stdio workloads;
+the container workflow saves their evidence for all three targets on both
+architectures. The CI PostgreSQL and Trino jobs exercise fictional restricted
+readers independently of the aggregate stand-ins. Record their exact SHA,
+dependency versions and real versus emulated architecture in the final ledger.</p>
+<h2 id="coverage-and-sequence">Coverage and sequence<a class="headerlink" href="#coverage-and-sequence" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Required scope</th>
+<th>Existing foundation / remaining work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0. Freeze inventory</td>
+<td>One final SHA, wheel/sdist hashes, versions, source routes, schemas/options, public Python API, CLI parser, actual MCP <code>tools/list</code></td>
+<td>Contract fixtures and installed-package checks exist; create the expected case ledger and map coverage before running.</td>
+</tr>
+<tr>
+<td>1. Common contract</td>
+<td>All 10 source routes × 4 outputs × 5 modes; all seven field types</td>
+<td><code>test_source_output_matrix.py</code> already has 200 core cases. Rerun on the final build; add the options/rules below.</td>
+</tr>
+<tr>
+<td>2. Installed interfaces</td>
+<td>The same 200 logical compositions through each of Python, CLI and real stdio MCP</td>
+<td>Target 600 logical cells at the current inventory. Existing Python/source tests and selected CLI/MCP parity cases do not prove this whole layer.</td>
+</tr>
+<tr>
+<td>3. Options and rules</td>
+<td>Every public option/family; defaults, boundaries, invalid requests, compatible pairs and targeted interactions</td>
+<td>Reuse rule, scalar, mode and publication suites; add missing cross-interface cases, not only more snapshots.</td>
+</tr>
+<tr>
+<td>4. Trust boundaries</td>
+<td>Tool effects, approvals, paths, DB grants, SQL policy, secrets/redaction, audit, budgets, failure/recovery and cleanup</td>
+<td>Existing direct-service, transport and safety suites; add installed-process and deployment evidence.</td>
+</tr>
+<tr>
+<td>5. Environments</td>
+<td>Supported Python/dependency profiles, installed extras, MCP 1/2, three container targets on both architectures</td>
+<td>Existing CI covers many profiles and container health. Actual container workloads and the complete acceptance ledger remain required.</td>
+</tr>
+<tr>
+<td>6. Acquisition and transformation</td>
+<td>Disposable fictional PostgreSQL/Trino end-to-end acquisition; separate local/transformation session gates</td>
+<td>Mocked DB aggregates are not live acquisition evidence. Keep preservation authority and mixed-origin outputs separate from synthetic generation.</td>
+</tr>
+<tr>
+<td>7. Evidence</td>
+<td>Actual assistant-client run, human review, final coverage report, clean rerun after repairs</td>
+<td>Close only when all required cases pass on the exact final SHA; release acceptance remains separate.</td>
+</tr>
+</tbody>
+</table>
+<p>The ten routes are those in the <a href="../reference/source-output-matrix/">source/output matrix</a>.
+The four outputs are CSV, JSON, Parquet and generated SQL INSERT bundles. The
+five modes are valid, edge, load_test, mixed and negative. Expected counts must
+be regenerated from the final inventory; MCP compatibility repetitions are
+environment runs, not additional logical source/output cells.</p>
+<h2 id="use-the-real-interface-contracts">Use the real interface contracts<a class="headerlink" href="#use-the-real-interface-contracts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Python:</strong> verify documented public imports and generation/artifact APIs
+  against the installed wheel, not only an editable checkout.</li>
+<li><strong>CLI:</strong> use installed subprocesses, actual profiling/inference commands and
+  reviewed YAML/JSON specs. Check JSON stdout, stderr/exit contracts, help,
+  retained aliases and override precedence. Remove source-tree import paths.</li>
+<li><strong>MCP:</strong> call installed entrypoints through a real stdio client, not imported
+  helper functions. Exercise both supported SDK major versions. For source
+  routes without an MCP profiler, explicitly prepare safe metadata outside MCP,
+  then pass it through the supported profile/spec handoff. Never substitute raw
+  row conversion for the generation transition.</li>
+<li><strong>Planning/agent workflow:</strong> test plan → inspect → actual review → approve →
+  completion, stale fingerprints, edited specs, interruption and recovery.
+  Automated fictional approval fixtures and actual manual acceptance are
+  different evidence.</li>
+</ul>
+<p><code>plan_dataset</code> has narrower convenience arguments: sources csv/csv-folder/profile,
+formats csv/json/parquet and modes valid/negative/mixed. MCP generation/export
+can consume a reviewed DatasetSpec carrying edge/load_test, SQL output, locale,
+load multiplier and embedded business rules. Do not invent planning-tool flags
+or silently drop those settings. Record any wrapper limitation and its tested
+supported route; missing common generation semantics is a failure.</p>
+<p>MCP has no overwrite argument. Test its existing-destination refusal. Test CLI
+folder <code>--overwrite</code> separately for success, rollback and interruption. Provider
+advisors have no MCP tool: test their actual Python/CLI contracts with fictional
+transports and no external provider call.</p>
+<h2 id="option-and-rule-inventory">Option and rule inventory<a class="headerlink" href="#option-and-rule-inventory" title="Permanent link">&para;</a></h2>
+<p>Use the final typed schemas and discovery/parser inventories as the checklist,
+including nested properties. Each accepted option needs omitted/default and
+non-default behavior, applicable minimum/maximum and just-outside-invalid values,
+plus explicit conflict/unsupported-type cases. Cover every compatible option
+pair; list incompatible pairs and verify rejection. Continuous values and
+arbitrary formulas cannot be an exhaustive Cartesian product.</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Required cases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fields</td>
+<td>integer, float, decimal, boolean, string, date, datetime; nullable/null ratios including 0/1, semantic type, sensitivity, identifiers and independent key domains.</td>
+</tr>
+<tr>
+<td>Distributions</td>
+<td>synthetic_identifier, masked_patterns, numeric, decimal_range, numeric_shape, boolean, date_range, datetime_range, categorical, string_pattern; every declared option and compatible field type, malformed bounds/weights/shapes, decimal precision/scale.</td>
+</tr>
+<tr>
+<td>Generation</td>
+<td>Explicit seed/replay and seed bounds; locale; entity counts and explicit overrides; all modes; invalid ratios; default ×10 load and custom multiplier; exact explicit count; numeric scale_factor.</td>
+</tr>
+<tr>
+<td>Validation and privacy</td>
+<td>Every validation toggle and fail_fast; mandatory privacy/schema/constraint/business enforcement where required; privacy rules/settings, sensitive names/content and declared numeric-measure vetoes.</td>
+</tr>
+<tr>
+<td>Relationships/native constraints</td>
+<td>Every relationship/constraint type and status, active versus declared counts, missing references, incompatible fields, null/empty keys, cardinality, independent tables, formula/conditional/temporal/aggregate semantics.</td>
+</tr>
+<tr>
+<td>Business rules</td>
+<td>Field bounds/required/allowed values, conditions including null/ranges, temporal ordering, formula assign/check, assignment audit, FK, aggregates, scenarios/weights and exact comparison tolerance.</td>
+</tr>
+<tr>
+<td>Rule delivery</td>
+<td>Embedded DatasetSpec, external rule file and bounded MCP payload; equivalent effective contract, one application, conflict refusal and standalone reload validation.</td>
+</tr>
+<tr>
+<td>Artifacts/I/O</td>
+<td>All outputs reread and revalidate; null versus empty text, boolean/date operands, exact DECIMAL, wide integers, timestamp offsets, CSV escaping/spreadsheet inertness, marked Parquet scalars, custom filenames/entity mappings, legacy unmarked bundles.</td>
+</tr>
+</tbody>
+</table>
+<p>Run every business-rule family across all four outputs and Python/CLI/MCP through
+the reviewed specification. Add explicit high-risk interactions beyond pairwise:</p>
+<ul>
+<li>DECIMAL × assign/check/aggregate rounding × serialization/revalidation.</li>
+<li>FK/cardinality × load_test multiplier × explicit count override.</li>
+<li>Null/empty text × conditional rules × CSV/Parquet round trip.</li>
+<li>Privacy classification × categories/numeric_measure × interface/report toggles.</li>
+<li>Mixed/negative × overlapping rules × expected-versus-unexpected failures.</li>
+<li>Business-rule delivery × native constraints × validation toggles.</li>
+<li>Multi-entity profiles × custom artifact names × overwrite/publication failure.</li>
+</ul>
+<h2 id="verify-outcomes-not-only-successful-exits">Verify outcomes, not only successful exits<a class="headerlink" href="#verify-outcomes-not-only-successful-exits" title="Permanent link">&para;</a></h2>
+<p>For every applicable successful cell, compare effective spec/rule fingerprints,
+typed restored values, entity counts, relationships, mode, seed, validation
+sections and manifest provenance. Re-run the same explicit seed in the same
+environment. Normalize only declared volatile paths/timestamps; do not normalize
+away decimal precision, invalid cells or meaningful report differences. Do not
+claim byte identity between different dependency/runtime environments.</p>
+<p>Valid/edge/load cases must satisfy their reviewed contract. Negative/mixed cases
+must retain intended invalid cells through every output and report the expected
+rule failures honestly. They must not become valid because an adapter repaired
+values or validation was omitted. Unexpected additional violations fail the
+case. Synthetic bundles must report synthetic provenance with no source-row
+reuse; use fictional sentinel checks and actual logical comparison, not the
+manifest flag alone. SQL reload must never execute SQL.</p>
+<h2 id="permission-failure-and-recovery-campaign">Permission, failure and recovery campaign<a class="headerlink" href="#permission-failure-and-recovery-campaign" title="Permanent link">&para;</a></h2>
+<p>Use the <a href="../reference/mcp-permissions/">MCP rights inventory</a> as the per-tool list:
+all 14 console generator tools, 13 default Trino tools and the optional row tool.
+Exercise each operation variant and optional argument, default versus opted-in
+discovery, and console versus embedded-runtime ownership where supported.</p>
+<p>Required refusal cases include out-of-root/symlink paths; existing outputs;
+input nested under a replacement destination; stale/missing fingerprints in
+planning approval and stale/missing receipts in preservation consumers;
+unknown/malformed arguments; unsafe SQL and excluded catalog/schema; restricted
+DB grants; response/input/depth/work/deadline limits; audit admission failure;
+transport cancellation/disconnect; and temporary/publication cleanup failure.
+Verify no unintended artifacts, no changed old bundle after rollback, no leaked
+source literals/secrets in default responses or errors, and no retained
+server/session work after teardown. Direct generation/export has no server
+planning-receipt gate; verify its client/operator review policy separately.
+Do not mistake column selectors for universal table/column authorization.</p>
+<p>Default aggregate-only profiling and generator responses must remain row-free.
+The explicit opt-in <code>run_safe_select</code> intentionally returns bounded masked rows;
+verify its masking, budgets, registration opt-in and isolation from generation
+and LLM disclosure, rather than requiring that tool to return no rows.</p>
+<p>Use bounded small/medium/near-limit load fixtures and pre-allocation refusal
+cases. Record duration and the enforced budgets; cooperative deadlines and
+payload estimates do not prove an exact peak-memory or hard OS timing ceiling.</p>
+<p>Local transformation, common saved-profile consumers and configured SQL sessions
+form a separate fictional campaign. Verify local-terminal receipt requirements,
+changed-input invalidation, review/validate/execute, capture-once/no-reconnect,
+expiry, admission, close/shutdown and cleanup failure. Agents/MCP cannot issue
+preservation approval. No plan item activates a gated extension or permits
+source rows to enter synthetic output or default MCP responses.</p>
+<h2 id="environment-and-deployment-runs">Environment and deployment runs<a class="headerlink" href="#environment-and-deployment-runs" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Python 3.11–3.14, locked dependencies and the declared minimum profiles for
+  base, parquet, mcp, trino, postgres, openai and gigachat; use the reviewed
+  dependency constraints rather than guessing new version pins.</li>
+<li>Real stdio MCP 1.28.1 and the reviewed supported 2.x profile (currently 2.2.0);
+  record exact resolved versions. Required Parquet cases need its extra.
+  Missing extras must produce safe diagnostics in deliberately minimal installs;
+  they are blocked prerequisites in an all-capabilities acceptance run.</li>
+<li>Installed wheel and sdist smoke outside the checkout; three container targets
+  × AMD64/ARM64 under non-root/read-only/capability/network/mount restrictions.
+  Run actual CLI generation and MCP requests, not only health checks. Images
+  without PyArrow test supported workloads and explicit missing-extra behavior;
+  Parquet generation uses a properly provisioned installation.</li>
+<li>Disposable fictional PostgreSQL and Trino: component/JDBC/wildcard/query
+  acquisition, strict read-only identities, denied access, aggregates → reviewed
+  spec → outputs, teardown. No production endpoints or secrets in evidence.</li>
+<li>Actual assistant-client/version smoke with fictional data and human spec
+  review, including connection settings, supported client tool policy and final
+  artifact checks. Do not replace this with an automated SDK claim.
+  When continuing an existing prepared plan, resume the same conversation and
+  inspect its workspace instead of replaying planning. Record actual session/tool
+  event references and the current full-file byte and semantic hashes. Human
+  review and specific consent must follow preparation and display of that exact
+  current file; earlier consent is not reusable. Reinspect before approval,
+  validate the result and verify artifacts and the client's own process teardown.
+  Configuration preflight, mocked launcher checks and an assistant's completed
+  turn do not prove actual resume, human tool confirmation or normal client exit.</li>
+</ul>
+<h2 id="run-entry-points-and-evidence">Run entry points and evidence<a class="headerlink" href="#run-entry-points-and-evidence" title="Permanent link">&para;</a></h2>
+<p>Start with existing suites rather than writing a replacement runner. Useful
+anchors include <code>test_source_output_matrix.py</code>, <code>test_universal_business_rules.py</code>,
+<code>test_portable_scalar_artifacts.py</code>, <code>test_generation_modes_and_folder_overwrite.py</code>,
+<code>test_mcp_client_workflow.py</code>, <code>test_mcp_sdk_roundtrip.py</code>, both MCP transport
+suites, <code>test_cli*.py</code>, <code>test_client_*acceptance.py</code>, <code>test_transformation_*</code> and
+the disposable-database integration suites. Add missing installed coverage and
+a ledger comparison before calling these anchors the complete campaign.</p>
+<p>Run <code>scripts/check_release.sh</code>, documentation/contract tests, strict MkDocs and
+<code>openspec validate --all --strict</code> on the final SHA. Use the existing CI,
+Containers, Documentation and Security workflows for their actual supported
+profiles. A documentation-only skip or a successful container health check
+cannot stand in for the workloads above; explicitly run/dispatch the required
+existing jobs and add missing workload acceptance where needed.</p>
+<p>The report must include each stable case ID and axes, expected outcome,
+passed/failed/blocked/not_applicable status, exact SHA/build hashes, environment,
+test/command and run URL, artifact hashes and a value-free failure or N/A reason.
+Keep source rows, SQL literals, mappings, credentials and provider text out.
+Every required cell must pass; a missing run/dependency/environment is blocked.
+Contract-inapplicable cases need a reason and their supported alternative, not
+silent exclusion. Preserve actual skipped-test reasons in the report.</p>
+<p>After any repair, supersede earlier acceptance and rerun affected cases plus
+the full final gate on the new SHA. If a release is subsequently authorized,
+follow the existing <a href="../release/">Release Process</a>: independent exact-commit
+review, four exact-main gates, Ubuntu no-publish hashes, signed acceptance/tag
+and public verification. This campaign does not replace or authorize publication.</p>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

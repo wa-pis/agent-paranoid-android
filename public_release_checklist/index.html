@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/public_release_checklist/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Public Release Checklist - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Public Release Checklist";
+        var mkdocs_page_input_path = "public_release_checklist.md";
+        var mkdocs_page_url = "/agent-paranoid-android/public_release_checklist/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Start Here</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-To Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Integrations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Help</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../history/">History And Maintenance</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Agent Paranoid Android</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Public Release Checklist</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/public_release_checklist.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="public-release-checklist">Public Release Checklist<a class="headerlink" href="#public-release-checklist" title="Permanent link">&para;</a></h1>
+<p>Use this checklist before making the repository public or cutting the first
+public release.</p>
+<h2 id="repository-content">Repository Content<a class="headerlink" href="#repository-content" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Confirm <code>LICENSE</code>, <code>SECURITY.md</code>, <code>CONTRIBUTING.md</code>, README, changelog, and
+  architecture diagrams are present.</li>
+<li>Confirm checked-in fixtures are synthetic and use reserved/example domains,
+  phone ranges, and hostnames.</li>
+<li>Run a secret scan over the working tree and reachable Git history.</li>
+<li>Confirm author and committer emails are public-safe.</li>
+<li>Confirm no local paths, private hostnames, production table names, or company
+  identifiers remain in docs, examples, or tests.</li>
+</ul>
+<h2 id="quality-gates">Quality Gates<a class="headerlink" href="#quality-gates" title="Permanent link">&para;</a></h2>
+<p>Run:</p>
+<pre><code class="language-bash">scripts/check_release.sh
+python3 -m pip wheel --no-deps . -w /tmp/agent-paranoid-android-wheel
+</code></pre>
+<p>The release gate must pass before publishing. The wheel build confirms package
+metadata and entry points are valid.</p>
+<p>For a release containing GigaChat, also install isolated base, <code>gigachat</code>, and
+<code>all</code> wheels on every supported Python version. Run
+<code>doctor --require-extra gigachat</code> and the fake-SDK provider suite with network
+access and credentials absent. Any live GigaChat smoke is separate, manual,
+synthetic-only, and never a required release gate.</p>
+<p>Review the latest <a href="../security-review-2026-08-01-rc2/">RC2 security review</a> and
+repeat its automated evidence collection against the release commit.</p>
+<h2 id="github-settings">GitHub Settings<a class="headerlink" href="#github-settings" title="Permanent link">&para;</a></h2>
+<p>Enable or verify these repository settings after publishing:</p>
+<ul>
+<li>Secret scanning and push protection.</li>
+<li>Dependabot alerts.</li>
+<li>Dependabot security updates.</li>
+<li>GitHub private vulnerability reporting.</li>
+<li>Branch protection for <code>main</code>.</li>
+<li>Required CI status checks before merge.</li>
+<li>Require linear history if the project will avoid merge commits.</li>
+<li>Require verified signed commits on protected branches and reject unsigned
+  commits at the merge gate.</li>
+<li>Disallow force-pushes to protected branches after the initial history cleanup.</li>
+<li>Create a <code>pypi</code> environment for the tokenless publish job.</li>
+<li>Configure a matching PyPI Trusted Publisher for
+  <code>wa-pis/agent-paranoid-android</code>, workflow <code>publish-pypi.yml</code>, environment
+  <code>pypi</code>.</li>
+</ul>
+<h2 id="maintainer-identity">Maintainer Identity<a class="headerlink" href="#maintainer-identity" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Upload the public SSH signing key to GitHub as an SSH signing key.</li>
+<li>Verify that new local commits show the GitHub <code>Verified</code> badge.</li>
+<li>Use <code>onepis2word@gmail.com</code> for author and committer identity unless a more
+  suitable public noreply address is configured.</li>
+</ul>
+<h2 id="release-notes">Release Notes<a class="headerlink" href="#release-notes" title="Permanent link">&para;</a></h2>
+<p>Before creating a tag:</p>
+<ul>
+<li>Move relevant <code>CHANGELOG.md</code> entries from <code>Unreleased</code> to the release version.</li>
+<li>Run <code>release-preflight.yml</code> for the exact accepted commit, download its
+  temporary artifact, and record the Ubuntu-derived wheel and source-
+  distribution digests from <code>ARTIFACT_SHA256</code> in the signed acceptance
+  manifest. Confirm its full release gate passed and the preflight has no
+  publication or write permissions.</li>
+<li>Confirm CI, Containers, Documentation, and Security have successful runs for
+  the exact accepted commit. If a push run is absent, dispatch the gate manually
+  from the unchanged <code>main</code> tip; manual container runs must not publish images.</li>
+<li>Mention safety guarantees and known limitations.</li>
+<li>Include upgrade or migration notes when CLI, MCP, schema, or artifact formats
+  change.</li>
+<li>Use <code>1.1.0rc1</code> as the new minor release candidate for the GigaChat addition
+  because it changes dependencies, packaging, public CLI behavior, and an
+  external security boundary; documentation alone does not require another
+  candidate.</li>
+<li>Use <code>1.1.0rc2</code> for the reviewed CLI automation and artifact-integrity change
+  because it adds a public command and JSON contract and changes runtime error,
+  exit-code, and overwrite behavior. Re-run base/optional entrypoint, JSON,
+  cancellation, help-width, completion, and isolated-wheel gates. Do not tag
+  or publish it from the implementation PR.</li>
+<li>Promote stable <code>1.1.0</code> only from the accepted RC2 runtime with the documented
+  version- and documentation-only diff. Derive wheel and sdist hashes in Linux
+  before creating the protected stable tag.</li>
+<li>Use <code>1.2.0rc2</code> to supersede the published RC1 whose post-publish checksum
+  verification exposed a portable-bundle staging mismatch. Require exact-commit
+  approval and verify the public <code>*.sigstore.json</code> bundle against both Python
+  distributions before considering stable <code>1.2.0</code>.</li>
+<li>Promote stable <code>1.2.0</code> only through a version- and documentation-only diff
+  from the publicly accepted RC2 runtime.</li>
+<li>Promote stable <code>1.3.0</code> only through a version- and documentation-only diff
+  from the publicly accepted RC1 runtime. Preserve the accepted component,
+  JDBC, wildcard, and query installed-wheel evidence for PostgreSQL and Trino
+  and bind the promotion commit to a separate exact-commit review.</li>
+<li>Promote stable <code>1.3.1</code> only through a version- and documentation-only diff
+  from the publicly accepted RC2 tree. Preserve the accepted Ubuntu artifact
+  preflight and public package/container evidence, and bind the promotion commit
+  to a separate exact-commit review.</li>
+<li>Promote stable <code>1.3.2</code> only through a version- and documentation-only diff
+  from publicly accepted <code>1.3.2rc2</code>. Retain generation-contract migration notes
+  and bind final approval and Ubuntu hashes to the exact stable main commit.</li>
+<li>Avoid publishing exploit details before fixes are available.</li>
+<li>Sign the version tag and verify it locally before pushing.</li>
+<li>Confirm the tag-triggered release workflow publishes wheel, source
+  distribution, CycloneDX SBOM, SHA-256 checksums, provenance, and SBOM
+  attestations.</li>
+<li>Confirm the GitHub Release includes exactly one <code>*.sigstore.json</code> build
+  provenance bundle, that its checksum is recorded, and that the downloaded
+  bundle verifies both distributions against the tag and <code>release.yml</code>.</li>
+<li>Confirm the release workflow invokes the PyPI workflow after creating the
+  GitHub Release and uploads the same wheel and source distribution with
+  verified tag-bound provenance, Trusted Publishing, and publish attestations.</li>
+<li>Confirm the container workflow publishes separate amd64/arm64 CLI, generator
+  MCP, and Trino MCP manifests to GHCR.</li>
+<li>Verify each image digest has BuildKit SBOM/provenance, a GitHub attestation,
+  and a valid keyless Cosign signature from <code>containers.yml</code>.</li>
+<li>Run <code>python scripts/check_dependency_licenses.py</code> in the locked all-extras and
+  documentation environments. Investigate every unknown or unapproved license;
+  do not bypass the allowlist for a release.</li>
+<li>Confirm all GHCR packages intended for public use are public and inherit
+  repository access.</li>
+<li>Dispatch <code>Verify Published Release</code> for the immutable release tag and retain
+  the successful run URL, exact commit, package hashes, and three image digests
+  in the release evidence. Confirm its public-wheel agent approval and audit
+  verification steps also pass without repository fixtures.</li>
+</ul>
+              
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
