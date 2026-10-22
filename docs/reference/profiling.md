@@ -26,6 +26,12 @@ amount-like column name. Explicit sensitive names and secrets retain protection;
 sensitive profiles omit ranges as well as source categories. Ambiguous financial
 columns require review; local category permission is not declassification.
 
+NaN, infinity and overflowing exponent text are not finite numeric evidence.
+A column containing them is not inferred as a complete numeric distribution.
+Folder cache format 7 recomputes older cached profiles. Reprofile saved standalone
+artifacts and review the new specification rather than trusting old nonfinite
+extrema; existing approved plans are not silently rewritten.
+
 Generated string identifiers use the `synthetic_` prefix. This changes exact
 seeded identifier output relative to earlier releases, without changing the
 profile or specification schema version.

@@ -22,6 +22,11 @@ Generation remains seeded and valid; all row, payload, disk and execution
 budgets apply before allocation. An oversized request fails rather than truncates.
 This mode produces data for load testing; it does not send traffic or run a benchmark.
 
+`valid`, `edge` and `load_test` reject a nonzero `--invalid-ratio`. Omit
+`--invalid-ratio` for these modes (an explicit zero is also accepted), or select
+`mixed`/`negative` when invalid values are intentional. Rejected combinations
+exit 2 before publishing output; they do not modify the input specification.
+
 DatasetSpec `generate --overwrite` replaces the entire destination folder,
 including obsolete files. Without the flag, nonempty folders are rejected.
 Generation, rules and validation finish before replacing existing output.
@@ -36,3 +41,16 @@ existing bundle-replacement contract. Transformation permissions do not change.
 The default `load_multiplier` is omitted from serialization to preserve existing
 specification fingerprints. Custom multipliers and materialized exact-count specs
 change fingerprints and require fresh plan review.
+
+## Replaying a seeded run
+
+Keep the same seed, ordered specification, generation settings, business rules,
+package version and dependency environment when replaying a run. Reordering
+entities or fields can change ordinary values and null masks even with the same
+seed. Preserve the generated manifest and its fingerprints with the reviewed
+specification; a seed alone is not a complete replay record.
+
+Synthetic identifier domains have a narrower order-independent namespace
+guarantee. That does not imply that every row or non-identifier field is
+order-independent. See the runnable
+[business-rules example](../how-to/business-rules.md) for a seeded CLI invocation.

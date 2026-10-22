@@ -82,10 +82,24 @@ revision; these earlier limitations remain visible for reviewed-commit CI. No li
 preservation approval, dataset permission or new runtime activation follows
 from these fictional tests or documentation exports.
 
-## Remaining Delivery
+## Public Delivery — 2026-10-22
 
-Review/merge and main-only Pages deployment remain pending. The deployment job
-must verify the exact committed identity, entry page and download hashes before
-recording public success. A failed post-deployment check requires the documented
-previous-artifact recovery; automatic public rollback is not claimed. Keep this
-OpenSpec active until those delivery checks and user feedback are recorded.
+PR #631 merged at `d10145be9f01085eb1648b7192045ab020095b20` after required
+checks passed. The blocking dependency audit was cleared by updating only the
+locked OpenTelemetry API to 1.45.1; the exported dependency set then passed
+pip-audit without exceptions. Dependency ranges were retained.
+
+[Documentation run 39842360108](https://github.com/wa-pis/agent-paranoid-android/actions/runs/39842360108)
+successfully built, deployed, publicly verified and retained the native mike state.
+An independent invocation of `scripts.verify_documentation` against
+`https://wa-pis.github.io/agent-paranoid-android/` also passed with the expected
+identity: package 1.6.0 at `258c035c22408becf17ab090635710a50dda8ccc`,
+documentation revision `d10145be9f01085eb1648b7192045ab020095b20`, maintained
+stable guidance. Verification included the public entry page, version selector,
+stable alias, download manifest and SHA-256 hashes of PDF, standalone HTML,
+Markdown ZIP and offline-site ZIP.
+
+No package version was changed or republished. Earlier local suite limitations
+remain historical evidence; they are not relabelled as new runtime acceptance.
+Collect user feedback before archiving. A failed future deployment still uses
+the documented previous-artifact recovery; no automatic rollback is claimed.

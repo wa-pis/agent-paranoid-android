@@ -552,7 +552,10 @@ def apply_dataset_mode_options(spec: DatasetSpec, *, mode: str, invalid_ratio: f
         spec.generation_settings.mode = GenerationMode(mode)
         spec.generation_settings.invalid_ratio = invalid_ratio
     elif invalid_ratio:
-        raise ValueError("--invalid-ratio requires --mode mixed or --mode negative")
+        raise ValueError(
+            "the selected mode does not support a nonzero --invalid-ratio; "
+            "omit --invalid-ratio or use --mode mixed or --mode negative"
+        )
     else:
         spec.generation_settings.mode = GenerationMode(mode)
         spec.generation_settings.invalid_ratio = 0.0

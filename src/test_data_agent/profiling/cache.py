@@ -20,7 +20,7 @@ from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_pat
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
 DEFAULT_RULE_SAMPLE_ROWS = 50_000
-PROFILE_CACHE_FORMAT_VERSION = 6
+PROFILE_CACHE_FORMAT_VERSION = 7
 
 
 def csv_folder_fingerprint(

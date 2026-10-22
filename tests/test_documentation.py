@@ -502,6 +502,12 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "source-output-contract-parity",
         "cross-interface-acceptance",
         "rc5-release",
+        "external-feedback-1-6",
+        "reviewed-numeric-csv-profiling",
+        "relational-profile-utility",
+        "trino-authenticated-profiling",
+        "bounded-profile-statistics",
+        "feedback-cli-contract-clarity",
         "versioned-task-oriented-documentation",
     }
 
@@ -862,12 +868,12 @@ def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
         "MT-03": "2026-08-15-1-2-0-mcp-malformed-log-redaction",
     }
 
-    assert "No currently accepted product-level issues" in known_issues
     assert security_history.count(
         "**Status:** resolved in stable `1.2.0`."
     ) == len(archives)
     for finding, archive in archives.items():
         assert f"## {finding}:" in security_history
+        assert f"## {finding}:" not in known_issues
         assert archive in security_history
         assert archive not in roadmap
 
