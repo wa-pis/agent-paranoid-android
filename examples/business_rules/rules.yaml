@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=../../schemas/business_rules.schema.json
+# All names and literals are fictional. Run with this folder's dataset_spec.yaml.
+# This is the standalone BusinessRules object: no outer business_rules: key.
+
+field_rules:
+  # All FieldRule options: required, membership and inclusive numeric bounds.
+  - table: orders
+    field: quantity
+    required: true
+    allowed_values: [1, 2, 3]
+    min_value: 1
+    max_value: 3
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, cancelled]
+  # Quote exact decimal literals. Precision and scale belong to DatasetSpec.
+  - table: orders
+    field: total
+    required: true
+    min_value: "0.00"
+    max_value: "40.00"
+
+row_rules:
+  # Equality: cancellation requires a reason.
+  - type: conditional_required
+    table: orders
+    when: {field: status, equals: cancelled}
+    required_fields: [reason]
+
+  # Inequality: a paid order must use one of the allowed delivery methods.
+  - type: conditional_allowed_values
+    table: orders
+    field: delivery_method
+    when: {field: status, not_equals: cancelled}
+    allowed_values: [ground, air]
+
+  # Membership in a set. required_fields may contain several fields.
+  - type: conditional_required
+    table: orders
+    when: {field: status, in_values: [paid, cancelled]}
+    required_fields: [marker, delivery_method]
+
+  # Predicates in one when block are ANDed. Bounds are inclusive.
+  - type: conditional_allowed_values
+    table: orders
+    field: size_band
+    when: {field: quantity, gte: 1, lte: 3}
+    allowed_values: [small]
+
+  # Explicit null tests differ from omitting a predicate.
+  - type: conditional_required
+    table: orders
+    when: {field: note, equals: null}
+    required_fields: [marker]
+  - type: conditional_required
+    table: orders
+    when: {field: note, not_equals: null}
+    required_fields: [marker]
+
+  # Strict ordering. Dates are non-null and generated in separate ranges.
+  - type: temporal_ordering
+    table: orders
+    start_field: created_at
+    end_field: fulfilled_at
+    allow_equal: false
+  # Non-strict ordering is the default; shown explicitly for discoverability.
+  - type: temporal_ordering
+    table: orders
+    start_field: created_at
+    end_field: fulfilled_at
+    allow_equal: true
+
+  # assign is the default: calculate the target before validation.
+  - type: formula
+    table: orders
+    field: subtotal
+    expression: quantity * unit_price
+    mode: assign
+    tolerance: 0
+  - type: formula
+    table: orders
+    field: total
+    expression: (subtotal - discount) + fee
+    mode: assign
+    tolerance: 0
+  # check never assigns: verify the existing result from the earlier rule.
+  # Unary minus, division, parentheses and all four binary operators are shown.
+  - type: formula
+    table: orders
+    field: total
+    expression: (quantity * unit_price + (-discount) + fee) / 1
+    mode: check
+    tolerance: 0
+
+cross_table_rules:
+  # Validation only. The matching DatasetSpec relationship generates the FK.
+  - type: foreign_key
+    child_table: orders
+    child_field: customer_id
+    parent_table: customers
+    parent_field: customer_id
+
+  # Compare SUM(total) with a bounded expression over this whole table.
+  # Despite the section name, aggregate_formula has one table, no GROUP BY.
+  - type: aggregate_formula
+    table: orders
+    field: total
+    expression: sum('subtotal') - sum('discount') + sum('fee')
+    tolerance: 0
+
+  # field: "*" compares row count. Explicit expected overrides evaluation of
+  # expression (the expression is still syntax/reference checked).
+  # This fixed assertion intentionally binds the example to 24 order rows.
+  - type: aggregate_formula
+    table: orders
+    field: "*"
+    expression: count()
+    expected: 24
+    tolerance: 0
+
+scenarios:
+  # Positive relative weights, not exact percentages. One scenario is drawn
+  # per row, independently across tables; row/field rules run afterwards.
+  - name: paid_ground
+    weight: 3
+    field_values:
+      orders:
+        status: paid
+        delivery_method: ground
+        reason: null
+        note: checked
+        marker: ready
+        size_band: small
+  - name: cancelled_air
+    weight: 1
+    field_values:
+      orders:
+        status: cancelled
+        delivery_method: air
+        reason: synthetic_cancel
+        note: null
+        marker: ready
+        size_band: small

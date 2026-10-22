@@ -129,3 +129,28 @@ statistical privacy guarantees that the project does not provide.
   checked
 - **AND** the result is not presented as differential privacy, anonymity, or
   protection against re-identification
+
+### Requirement: Business-Rule Format Is Reviewable And Executable
+
+The standalone BusinessRules format SHALL have a JSON Schema generated from
+its runtime model and an annotated, source-free example covering every current
+rule family, condition predicate and optional model field. The example SHALL
+include a compatible DatasetSpec and executable generation/validation evidence.
+Documentation SHALL distinguish assignment from checks, structural schema
+validation from runtime privacy/reference validation, and approximate scenario
+weights from exact quotas. This does not change runtime rule semantics.
+
+#### Scenario: Reader explores the complete business-rule format
+
+- **GIVEN** the complete checked-in example and its companion specification
+- **WHEN** generation runs in valid mode with the documented seed
+- **THEN** native and business-rule validation succeed without source data
+- **AND** rules can be supplied separately or embedded in the reviewed spec
+
+#### Scenario: Models change without updating the reference
+
+- **GIVEN** a new rule family, model field or changed structural contract
+- **WHEN** schema freshness and example contract tests run
+- **THEN** missing schema/example coverage fails the checks
+- **AND** unsupported formula or condition capabilities are not inferred
+  from JSON Schema alone

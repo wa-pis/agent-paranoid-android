@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Complete annotated business-rules example with a runnable DatasetSpec,
+  condition/formula/aggregate/scenario reference and a generated standalone
+  JSON Schema checked against the runtime contract.
+
 ### Changed
 
 - Refresh agent prompts and both portable skills for current CLI/MCP planning,
