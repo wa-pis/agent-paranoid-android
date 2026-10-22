@@ -257,6 +257,38 @@ def validate_dataset_artifacts(
     return report
 
 
+def discover_relationships_command(args: argparse.Namespace) -> int:
+    from test_data_agent.core.limits import enforce_profile_payload_size, enforce_output_payload_size
+    from test_data_agent.io.artifacts import dataset_profile_fingerprint
+    from test_data_agent.io.path_policy import atomic_binary_writer
+    from test_data_agent.profiling.budget import LocalProfileBudget
+    from test_data_agent.relationship_discovery import (
+        RelationshipDiscoveryReport, mine_relationship_candidates,
+    )
+
+    ensure_paths_distinct(args.profile, args.output)
+    require_output_suffix(args.output, {".json"}, "relationship report")
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
+    budget = LocalProfileBudget()
+    profile = load_profile_or_spec(args.profile)
+    if not isinstance(profile, DatasetProfile):
+        raise ValueError("relationship discovery expects a dataset profile")
+    enforce_profile_payload_size(len(profile.model_dump_json().encode("utf-8")))
+    candidates = mine_relationship_candidates(profile, budget=budget)
+    report = RelationshipDiscoveryReport(
+        profile_fingerprint=dataset_profile_fingerprint(profile), candidates=candidates,
+    )
+    payload = report.model_dump_json(indent=2).encode("utf-8")
+    enforce_profile_payload_size(len(payload))
+    enforce_output_payload_size(len(payload), label="relationship report")
+    budget.check_deadline("relationship report serialization")
+    with atomic_binary_writer(
+        args.output, check_publication=lambda: budget.check_deadline("relationship report publication"),
+    ) as handle:
+        handle.write(payload)
+    return 0
+
+
 def infer_dataset_spec_command(args: argparse.Namespace) -> int:
     ensure_paths_distinct(args.profile, args.output)
     ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))

@@ -6,6 +6,10 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- `discover-relationships PROFILE --output report.json` exports bounded,
+  metadata-only foreign-key/temporal hypotheses for human review, without
+  database/provider access or relationship activation.
+
 - `infer-spec --entity-count ENTITY=COUNT` supports unequal reviewed table sizes
   without changing `--count`; optional `--max-total-rows` rejects oversized
   inference plans before specification publication. The same options are
