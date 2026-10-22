@@ -134,7 +134,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br>Documentation 05abb21d0325156ba99fb3c4b81d2180573d4801
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -160,6 +160,10 @@ reviewed DatasetSpec to select <code>load_test</code> for that staged workflow.
 Generation remains seeded and valid; all row, payload, disk and execution
 budgets apply before allocation. An oversized request fails rather than truncates.
 This mode produces data for load testing; it does not send traffic or run a benchmark.</p>
+<p><code>valid</code>, <code>edge</code> and <code>load_test</code> reject a nonzero <code>--invalid-ratio</code>. Omit
+<code>--invalid-ratio</code> for these modes (an explicit zero is also accepted), or select
+<code>mixed</code>/<code>negative</code> when invalid values are intentional. Rejected combinations
+exit 2 before publishing output; they do not modify the input specification.</p>
 <p>DatasetSpec <code>generate --overwrite</code> replaces the entire destination folder,
 including obsolete files. Without the flag, nonempty folders are rejected.
 Generation, rules and validation finish before replacing existing output.
@@ -173,6 +177,16 @@ existing bundle-replacement contract. Transformation permissions do not change.<
 <p>The default <code>load_multiplier</code> is omitted from serialization to preserve existing
 specification fingerprints. Custom multipliers and materialized exact-count specs
 change fingerprints and require fresh plan review.</p>
+<h2 id="replaying-a-seeded-run">Replaying a seeded run<a class="headerlink" href="#replaying-a-seeded-run" title="Permanent link">&para;</a></h2>
+<p>Keep the same seed, ordered specification, generation settings, business rules,
+package version and dependency environment when replaying a run. Reordering
+entities or fields can change ordinary values and null masks even with the same
+seed. Preserve the generated manifest and its fingerprints with the reviewed
+specification; a seed alone is not a complete replay record.</p>
+<p>Synthetic identifier domains have a narrower order-independent namespace
+guarantee. That does not imply that every row or non-identifier field is
+order-independent. See the runnable
+<a href="../../how-to/business-rules/">business-rules example</a> for a seeded CLI invocation.</p>
               
 
             </div>
