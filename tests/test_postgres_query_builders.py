@@ -120,6 +120,7 @@ def test_resolved_wildcard_snapshot_keeps_aggregate_builders_explicit() -> None:
 def test_primary_key_query_keeps_key_order_and_column_scope() -> None:
     query = build_primary_keys_query(postgres_config(), "crm", "customers")
 
+    assert "cardinality(con.conkey) AS key_column_count" in query.sql
     assert "unnest(con.conkey) WITH ORDINALITY" in query.sql
     assert query.parameters == ("crm", "customers", "id", "tier")
     assert query.sql.endswith("ORDER BY con.conname, key.position")

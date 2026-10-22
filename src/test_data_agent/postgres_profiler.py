@@ -11,6 +11,7 @@ from datetime import date, datetime
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.privacy import (
     LocalCategoryField,
     infer_sensitive_from_name,
@@ -172,6 +173,25 @@ class PostgresProfiler:
         entity_name = f"{self.config.source_id}.{schema}.{table}"
         column_rows = self.fetch_query(build_columns_query(self.config, schema, table))
         columns = self._complete_columns(schema, table, column_rows)
+        primary_key_rows = self.fetch_query(
+            build_primary_keys_query(self.config, schema, table)
+        )
+        primary_keys = [_required_text(row, "column_name") for row in primary_key_rows]
+        column_names = {_required_text(column, "column_name") for column in columns}
+        if len(primary_keys) != len(set(primary_keys)) or any(
+            key not in column_names for key in primary_keys
+        ):
+            raise PostgresProfileError("PostgreSQL primary-key metadata is invalid")
+        for row in primary_key_rows:
+            if _positive_int(row.get("key_column_count"), "primary-key column count") > 1:
+                raise PostgresProfileError(
+                    "PostgreSQL composite primary keys are unsupported; "
+                    "provide a reviewed generation specification"
+                )
+            if _positive_int(row.get("ordinal_position"), "primary-key column order") != 1:
+                raise PostgresProfileError("PostgreSQL primary-key metadata is invalid")
+        if len(primary_keys) > 1:
+            raise PostgresProfileError("PostgreSQL primary-key metadata is invalid")
         row_count = _non_negative_int(
             _single_row(
                 self.fetch_query(
@@ -205,14 +225,15 @@ class PostgresProfiler:
             },
             source_type="postgres",
         ).entities[0]
-        primary_key_rows = self.fetch_query(
-            build_primary_keys_query(self.config, schema, table)
-        )
-        primary_keys = [_required_text(row, "column_name") for row in primary_key_rows]
-        if len(primary_keys) != len(set(primary_keys)) or any(
-            key not in {field.name for field in profile.fields} for key in primary_keys
-        ):
-            raise PostgresProfileError("PostgreSQL primary-key metadata is invalid")
+        for key in primary_keys:
+            field = profile.field(key)
+            if field.data_type not in {FieldType.INTEGER, FieldType.STRING}:
+                raise PostgresProfileError(
+                    "PostgreSQL primary-key type is unsupported for automatic inference; "
+                    "provide a reviewed generation specification"
+                )
+            field.is_identifier = True
+            field.distribution = {"kind": "synthetic_identifier"}
         return profile.model_copy(update={"primary_key_candidates": primary_keys})
 
     def _complete_columns(
