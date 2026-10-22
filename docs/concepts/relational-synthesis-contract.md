@@ -139,3 +139,20 @@ manifests. Older saved reports without this field remain readable.
 Evidence contains metadata and counts, not key values or temporal endpoints.
 Collection shares the existing generation work and deadline budget and does
 not add a second scan of generated rows or change seeded generation.
+
+## Proposed relational extensions
+
+Existing mixed/negative business rules can create synthetic missing-parent
+references. They do not provide an exact orphan-count selector, configurable
+fan-out allocation or measured source fan-out fidelity. The separate
+[controlled relational scenarios proposal](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios)
+records those optional extensions and their acceptance criteria; no new option
+is enabled by that proposal.
+
+Formulas currently support assign/check without a conditional predicate;
+conditional-required and conditional-allowed-values rules use predicates.
+Scenario weights cannot emulate a predicate. The separate
+[conditional formula/EAV proposal](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/reviewed-eav-expressions)
+records the remaining work. EAV source rows are not automatically pivoted or
+retained; explicit target modeling and independently generated key domains
+remain necessary.
