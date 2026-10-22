@@ -19,7 +19,7 @@
 - [x] Run strict OpenSpec validation, focused documentation tests and strict MkDocs
       build; record exact commands/results and any unavailable checks.
 - [x] Review content reduction through local task walkthroughs and record evidence.
-- [ ] Publish from a reviewed merge and verify the exact deployed identity/downloads.
+- [x] Publish from a reviewed merge and verify the exact deployed identity/downloads.
 - [ ] Collect user feedback and archive only after publication checks complete.
 
 See `inventory.md` and `verification.md`. The full-suite timing failures are

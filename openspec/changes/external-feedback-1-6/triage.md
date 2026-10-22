@@ -58,3 +58,9 @@ At intake, #631 is open. The public root responds, but `documentation.json`
 returns HTTP 404. Successful older Pages jobs and PR builds do not prove the new
 versioned site or exports shipped. Require merge, main deployment, public identity,
 stable alias and all export hashes before marking publication complete.
+
+Update: #631 merged as `d10145be9f01085eb1648b7192045ab020095b20`.
+Main documentation run 39842360108 completed build, Pages deployment, public
+verification and mike-state retention. Independent public identity, stable alias
+and all four download hash checks passed. Publication is complete; no package
+release is implied. See the versioned-documentation verification record.

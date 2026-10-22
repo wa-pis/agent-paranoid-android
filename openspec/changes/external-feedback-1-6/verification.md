@@ -45,3 +45,8 @@ remains separate and open at intake. The public root responds, but the new
 `documentation.json` identity endpoint returns HTTP 404. Do not mark the new
 documentation published until merge, deployment and public identity/export
 verification succeed.
+
+Follow-up: publication completed through merged #631, revision
+`d10145be9f01085eb1648b7192045ab020095b20`, Documentation run 39842360108.
+Independent `scripts.verify_documentation` passed against the public site with
+that expected identity, including stable/version aliases and all download hashes.

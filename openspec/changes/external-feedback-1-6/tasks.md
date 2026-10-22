@@ -20,6 +20,6 @@
 - [ ] P1: deliver relational planning and utility evidence after candidate review.
 - [ ] P2: deliver bounded numeric/temporal/Parquet statistics and query cost evidence.
 - [ ] P2: finish remaining CLI/validation contract clarifications.
-- [ ] Merge and publicly verify the versioned documentation work separately.
+- [x] Merge and publicly verify the versioned documentation work separately.
 - [ ] Run exact-source release gates for the eventual runtime candidate; no release authorized here.
 - [ ] Archive completed changes only after their checks and merge are recorded.
