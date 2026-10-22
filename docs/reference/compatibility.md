@@ -4,11 +4,8 @@ This inventory covers aliases and wrappers retained while the package
 converges on its `1.0` public API. New code should use the canonical surface,
 but retained entries remain tested for their stated window.
 
-Stable `1.6.0` preparation promotes the publicly accepted `1.6.0rc5` runtime
-without changing these compatibility contracts. Its exact-commit review,
-release gates and publication remain separate requirements; see the
-[release status](../1.6.0-release-status.md). References to `1.5.0` below describe
-the earlier stable release, not an exclusion from the prepared `1.6.0` scope.
+The contracts below describe stable `1.6.0`. Migration notes identify older
+versions only when their behavior differs.
 
 ## Command Aliases
 
@@ -72,10 +69,11 @@ Contract tests cover the CLI aliases, wrapper identity and behavior, and
 transitional summary access. See [Public Stability](stability.md) for the
 broader compatibility rules.
 
-## Transformation Candidate Scope
+<a id="transformation-candidate-scope"></a>
 
-Published `1.5.0` does not include the transformation workflows accepted in
-`1.6.0rc5` and retained by the prepared `1.6.0` promotion.
+## Transformation Scope
+
+Stable `1.6.0` includes the transformation workflows; published `1.5.0` does not.
 That composition registers the single-source and saved-profile common
 CLI/MCP workflows plus configured SQL sessions. Ordinary generation APIs remain
 source-free. The running generator server adds `common_transformation` and
@@ -84,8 +82,8 @@ workspace/session owner and close that owner on shutdown. Final exact-SHA safety
 and release gates remain required. See the
 [single-source CLI contract](cli.md#implemented-rc-execution-candidate) and
 [common-profile contract](cli.md#closed-common-profile-workflow-candidate).
-Command discovery is not dataset approval or completion of the separate
-transformation/session acceptance campaign.
+Command discovery is not dataset approval. The finite fictional stable campaign
+completed with recorded limits; its evidence does not approve changed activation.
 
 Imported `FieldProfile` and `FieldSpec` distributions accept empty `{}` or a
 supported typed `kind`. Nonempty objects with missing, non-string or unknown

@@ -9,8 +9,7 @@ rows to shuffle, duplicate, or export.
 
 ## Trust Boundaries
 
-Selective transformation is a separate mixed-origin surface in the 1.6 RC composition,
-not synthetic generation. Its implemented RC [execution and approval contract](../reference/cli.md#implemented-rc-execution-candidate)
+Selective transformation is a separate mixed-origin surface in stable `1.6.0`. Its [execution and approval contract](../reference/cli.md#implemented-rc-execution-candidate)
 requires local interactive approval of exact input/review bytes before any
 explicitly non-sensitive field can be preserved. Agent execution can only
 consume an existing matching receipt; it cannot issue or broaden approval.
@@ -151,7 +150,7 @@ reviewing profiles or specifications.
 Before publishing a generated dataset:
 
 This checklist applies to synthetic generation, not the gated mixed-origin
-transformation candidate. A transformed bundle must not be relabelled synthetic
+transformation workflow. A transformed bundle must not be relabelled synthetic
 merely because validation passed: its action provenance and any matching local
 preservation receipt remain separate requirements.
 
@@ -169,7 +168,7 @@ review sequence.
 
 ### Configured SQL Transformation Sessions
 
-The separately selected 1.6 RC query workflow captures one allowlisted read-only
+The separately selected configured query workflow captures one allowlisted read-only
 result using administrator configuration, then reviews and validates frozen
 local bytes without reconnecting. It does not expand ordinary profiling or
 source-free generation authority. MCP returns only metadata and consumes an

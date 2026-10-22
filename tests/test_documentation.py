@@ -198,14 +198,12 @@ def test_documentation_navigation_leads_with_database_workflows() -> None:
         "Add Business Rules",
         "Profile PostgreSQL",
         "Profile Through Trino",
+        "Transform Local Data",
     ]
     assert [next(iter(item)) for item in navigation["Integrations"]] == [
         "Connect An MCP Client",
         "Connect An AI Client",
-        "Use The GigaChat Advisor",
-        "Build A Provider Adapter",
-        "Build A Semantic Provider",
-        "Run The Reference Agent",
+        "Containers",
     ]
 
 
@@ -510,6 +508,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "trino-authenticated-profiling",
         "bounded-profile-statistics",
         "feedback-cli-contract-clarity",
+        "versioned-task-oriented-documentation",
     }
 
     transformation = changes / "selective-source-transformation"
@@ -840,7 +839,7 @@ def test_database_source_docs_publish_stable_contracts() -> None:
         "qualified column wildcard",
         "`profile-query`",
     ):
-        assert expected in approach
+        assert expected.casefold() in approach.casefold()
 
     budgets = (ROOT / "docs/operations/resource-budgets.md").read_text()
     for expected in (
@@ -1049,11 +1048,19 @@ def test_relational_synthesis_contract_bounds_preservation_claims() -> None:
 
 def test_required_user_documentation_exists_and_is_navigable() -> None:
     config = (ROOT / "mkdocs.yml").read_text()
+    indexes = "\n".join(
+        (ROOT / "docs" / path).read_text()
+        for path in ("history.md", "reference/index.md", "reference/configuration.md")
+    )
 
     assert "site_url: https://wa-pis.github.io/agent-paranoid-android/" in config
     for relative_path in REQUIRED_NAV_DOCS:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
-        assert relative_path in config, relative_path
+        # Detailed reference/history is one index away, not repeated in every sidebar.
+        assert relative_path in config or Path(relative_path).name in indexes, relative_path
+    assert "rc5-release-status.md" not in config
+    assert "release-evidence-1.6.0rc5.md" not in config
+    assert "history.md" in config and "downloads.md" in config and "versions.md" in config
     for relative_path in HISTORICAL_DOCS:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
     for hidden_from_primary_nav in (
@@ -1071,10 +1078,12 @@ def test_installation_documents_dependency_budgets() -> None:
     installation = (
         ROOT / "docs" / "getting-started" / "installation.md"
     ).read_text()
+    footprint = (ROOT / "docs/reference/dependency-compatibility.md").read_text()
 
-    assert "Maximum installed distributions" in installation
+    assert "installation-footprint" in installation
+    assert "Maximum installed distributions" in footprint
     for maximum in (10, 11, 20, 25, 35):
-        assert f"| {maximum} |" in installation
+        assert f"| {maximum} |" in footprint
     assert 'pip install "agent-paranoid-android[all]"' not in installation
     assert f'"agent-paranoid-android=={PROJECT_VERSION}"' in installation
     for extra in ("parquet", "mcp", "mcp,trino", "openai"):
@@ -1101,10 +1110,18 @@ def test_documentation_workflow_deploys_only_from_main() -> None:
     assert "name: github-pages" in workflow
     assert "pages: write" in workflow
     assert "id-token: write" in workflow
-    assert "permissions: {}" in workflow
-    assert "needs: deploy" in workflow
+    jobs = yaml.safe_load(workflow)["jobs"]
+    assert jobs["verify"]["permissions"] == {"contents": "read"}
+    assert jobs["build"]["permissions"] == {"contents": "read", "actions": "read"}
+    assert jobs["verify"]["needs"] == ["build", "deploy"]
+    assert jobs["retain"]["permissions"] == {"contents": "write"}
+    assert jobs["retain"]["needs"] == "verify"
+    assert "git push origin refs/heads/docs-site-candidate:refs/heads/gh-pages" in workflow
+    assert "--force" not in workflow
+    assert "scripts.verify_documentation" in workflow
+    assert "--verify-release" in workflow
     assert "Agent Paranoid Android" in workflow
-    assert "group: docs-build-${{ github.ref }}" in workflow
+    assert "group: docs-publication-${{ github.ref }}" in workflow
     assert "group: github-pages" in workflow
     assert "cancel-in-progress: false" in workflow
     action_lines = [

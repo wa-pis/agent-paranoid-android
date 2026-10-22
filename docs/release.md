@@ -2,6 +2,15 @@
 
 Use this process before merging release candidates or creating tags.
 
+## Versioned Documentation
+
+Follow [Publishing Documentation](development/documentation.md) for mike version
+management, the verified stable catalog, offline exports and deployed identity
+checks. Advance the stable documentation pointer only after the package's public
+verification succeeds. Documentation revisions are separate from package source;
+historical evidence is retained unchanged; later guide corrections carry their
+own documentation revision.
+
 ## Preflight
 
 1. Review `openspec/project.md` and the affected capability specs.

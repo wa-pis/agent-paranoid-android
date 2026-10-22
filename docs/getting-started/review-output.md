@@ -4,7 +4,7 @@ A successful command is not the end of the review. Use the artifacts in the
 bundle to decide whether the synthetic dataset is safe and useful.
 
 This page describes synthetic-generation bundles. The gated mixed-origin
-transformation candidate has a separate review contract: validation does not
+transformation workflow has a separate review contract: validation does not
 make its output synthetic, and action provenance and any required exact-snapshot
 local preservation receipt must also be checked. See
 [Selective Transformation](../reference/cli.md#implemented-rc-execution-candidate).
@@ -64,10 +64,10 @@ still reject the entire export without partial publication. Keep the specificati
 manifest and encoding metadata described in the [source/output matrix](../reference/source-output-matrix.md). Privacy failures never authorize publication of source values.
 
 These synthetic manifest checks do not apply to the separately gated selective
-transformation candidate. Its bundle records mixed origin, action provenance
+transformation workflow. Its bundle records mixed origin, action provenance
 and any exact-input preservation authority; it must not claim fully synthetic
 or anonymous output. Transformation validation failure prevents publication.
-See the [candidate execution contract](../reference/cli.md#implemented-rc-execution-candidate).
+See the [execution contract](../reference/cli.md#implemented-rc-execution-candidate).
 
 ## Assurance Levels
 

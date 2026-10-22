@@ -1,9 +1,7 @@
 # Profile PostgreSQL
 
-!!! note "Availability"
-    Stable `1.5.0` includes the exact component/allowlist PostgreSQL workflow,
-    credential-free JDBC-style endpoints, qualified column wildcards, and the
-    aggregate-only `profile-query` command. These are retained in stable `1.6.0`; see [release status](../1.6.0-release-status.md).
+Database profiling is available in stable `1.6.0` and requires explicit
+read-only configuration, allowlists and resource budgets.
 
 Install the optional driver:
 

@@ -1,12 +1,8 @@
 # Connect An MCP Client
 
-Stable `1.6.0` promotes the publicly accepted `1.6.0rc5`
-runtime. The workflows below describe that unchanged composition; headings
-labelled “1.6 RC” retain their existing links. Check the
-[1.6.0 release status](../1.6.0-release-status.md) and installation guide before
-selecting a package. Stable publication and the finite fictional
-transformation/session campaign passed; see the
-[exact evidence and limits](../release-evidence-1.6.0.md).
+These workflows describe stable `1.6.0`. Start with a workspace-confined
+server and enable only tools required for your task. For local preservation
+approval use [Transform Local Data](transformation.md); MCP cannot issue it.
 
 The project exposes two MCP servers with separate trust boundaries:
 
@@ -32,8 +28,7 @@ no network, while the Trino worker receives no generator workspace mount.
 ## Generator-Only Quickstart
 
 Install the optional MCP support in a dedicated environment. Use the version
-selected in [Installation](../getting-started/installation.md); for a candidate,
-install its reviewed wheel instead of assuming it is already published.
+selected in [Installation](../getting-started/installation.md).
 
 ```bash
 python3 -m venv /path/to/mcp-env
@@ -184,12 +179,14 @@ configured SQL transformation session has its own connection requirements.
 
 <a id="closed-common-profile-candidate"></a>
 
-### Common-Profile Workflow (1.6 RC)
+<a id="common-profile-workflow-16-rc"></a>
 
-Published `1.6.0rc5` registers `common_transformation` in the generator console
-server. Stable `1.5.0` does not include this tool. Registration does not grant
-access to a dataset or complete the separately gated transformation/session
-acceptance campaign.
+### Common-Profile Workflow
+
+Stable `1.6.0` provides `common_transformation` in the generator console
+server. Registration grants no dataset permission or preservation approval.
+Stable acceptance has [finite recorded limits](../release-evidence-1.6.0.md);
+changed activation still needs its own review.
 It accepts `operation` (`review`, `validate`, `execute`), workspace-relative
 `profile`, and positive explicit `max_total_bytes`, `max_review_bytes`,
 `max_output_bytes`. Validation/execution require the exact reviewed
@@ -269,7 +266,7 @@ The tool writes no artifacts, creates no approval receipt, executes no
 transformation and connects to no database. It is separate from ordinary
 source-free generator operations.
 
-The published `1.6.0rc5` generator also registers `execute_transformation`
+The stable `1.6.0` generator registers `execute_transformation`
 with workspace-relative `input_path`, `policy_path`, new `output_path`, mandatory
 `snapshot_sha256`, optional `table_name`/existing `receipt_path`, and optional
 `max_total_input_bytes`/`max_output_bytes` run caps. It consumes the same exact
@@ -284,8 +281,8 @@ Preservation requires a matching receipt issued separately by the human local
 controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
 Changed inputs invalidate receipts; workspace escapes, existing destinations,
 unsupported actions and budget violations fail closed without copying fallback.
-Stable `1.5.0` does not include this consumer. Its registration does not complete
-the broader transformation/session acceptance campaign or authorize a dataset.
+Registration does not authorize a dataset. Changed activation requires fresh
+independent safety review and executable evidence.
 Changed public activation still requires matching contracts, executable safety
 evidence and independent exact-SHA review. A receipt never authorizes database
 access or external APIs.
@@ -411,7 +408,9 @@ broaden source-free generator authority. Changed public activation requires the
 scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.
 
 
-## Configured SQL Sessions (1.6 RC)
+<a id="configured-sql-sessions-16-rc"></a>
+
+## Configured SQL Sessions
 
 The running generator server registers `configured_query_session` with an
 instance-owned session manager. Use only an authorized administrator-configured

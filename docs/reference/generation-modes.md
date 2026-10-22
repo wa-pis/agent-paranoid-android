@@ -1,7 +1,6 @@
 # Generation modes and folder replacement
 
-These capabilities shipped in `1.6.0rc4`, following published RC3. See the
-[RC4 release evidence](../release-evidence-1.6.0rc4.md).
+These modes are available in stable `1.6.0`.
 
 `edge` generates valid lower and upper numeric/decimal/date/time bounds,
 zero when in range, both allowed booleans, all declared categories and string

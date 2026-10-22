@@ -3,13 +3,10 @@
 Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.
 
-Stable `1.6.0` preparation retains the publicly accepted `1.6.0rc5` runtime and
-the settings below without changing their defaults or permissions. See the
-[release status](../1.6.0-release-status.md) for publication readiness; sections
-labelled “1.6 RC” describe the accepted promotion baseline. Historical stable
-`1.5.0` includes the JDBC-style endpoint, qualified column wildcard and SQL query
-source settings, but not the later transformation/session consumers. Existing
-component settings and exact allowlists remain supported.
+These settings describe stable `1.6.0`. Historical anchors remain available.
+Configuration and tool registration do not grant dataset permission or local
+preservation approval. Existing component settings and exact allowlists remain
+supported.
 
 All byte values are integer bytes unless stated otherwise.
 
@@ -22,10 +19,11 @@ does not read provider credentials or test remote reachability.
 
 <a id="closed-common-transformation-profile"></a>
 
-## Common Transformation Profile (1.6 RC)
+<a id="common-transformation-profile-16-rc"></a>
 
-Published `1.6.0rc5` registers the common CLI/MCP workflow; stable `1.5.0`
-does not include it. Its versioned reference profile combines two or more inputs
+## Common Transformation Profile
+
+Stable `1.6.0` provides the common CLI/MCP workflow. Its versioned reference profile combines two or more inputs
 with one independently reviewed DatasetSpec for final linked validation:
 
 ```yaml
@@ -106,10 +104,12 @@ does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
 
 <a id="private-transformation-input-limits-16-development"></a>
 
-## Transformation Input Limits (1.6 RC)
+<a id="transformation-input-limits-16-rc"></a>
+
+## Transformation Input Limits
 
 These settings apply to transformation acquisition, decoding and policy-aware
-review preflight in the 1.6 RC composition, plus CSV profiling/trace shape checks.
+review preflight in stable `1.6.0`, plus CSV profiling/trace shape checks.
 They do not change source-free profiling/MCP budgets or themselves establish
 end-to-end capacity. Remaining pipeline caps still apply. The fictional private replacement-only CSV scenario
 passed 300,000 rows × 50 columns; see
@@ -164,7 +164,7 @@ instead of being silently capped. If the trace exhausts its smaller per-run
 budget, `limit_exceeded` reports origin `trace_run` and explicitly names
 `trace_csv_review_request(max_cells=...)` as the parameter to increase within
 the session/profile ceiling. Changing only the ceiling does not change that
-explicit per-run argument. Registered 1.6 RC CLI/MCP request boundaries
+explicit per-run argument. Registered CLI/MCP request boundaries
 retain typed value-free limit failures. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
 budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
@@ -386,7 +386,7 @@ catalog or schema identifier to 255 characters.
 | `TRINO_PORT` | `8080` | Trino port |
 | `TRINO_USER` | `test_data_agent` | Trino user |
 | `TRINO_HTTP_SCHEME` | `https` | `https` or explicitly allowed `http` |
-| `TRINO_AUTH_METHOD` | `none` | Optional methods in the 1.6 RC runtime: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
+| `TRINO_AUTH_METHOD` | `none` | Optional methods in stable `1.6.0`: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
 | `TRINO_AUTH_SECRET_ENV` | unset | Name of a runtime environment variable containing the Basic password or JWT, not the secret itself |
 | `TRINO_AUTH_CERTIFICATE_ENV` | unset | Name of a runtime environment variable containing the client certificate path |
 | `TRINO_AUTH_KEY_ENV` | unset | Name of a runtime environment variable containing the private-key path |
@@ -402,20 +402,20 @@ catalog or schema identifier to 255 characters.
 | `TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` | `1GB` | Trino physical scan budget |
 | `TRINO_DEPLOYMENT_PROFILE` | `trusted-local` | `trusted-local` permits an unset cumulative scan ceiling; `shared-hardened` requires a finite `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` |
 
-The 1.6 RC Kerberos/GSSAPI methods require their driver's optional
+The Kerberos/GSSAPI methods require their driver's optional
 `requests_kerberos` / `requests_gssapi` dependencies and existing runtime
 credentials. They use mutual authentication without delegation.
 `profile-query --adapter trino --trino-oauth-browser` explicitly opts
 into opening the configured Trino HTTPS authentication route at a local terminal
 when `TRINO_AUTH_METHOD=oauth2`. It never prints authentication URLs; pipes reject
-before connection. This flag is registered in `1.6.0rc5`; MCP never installs a
+before connection. This is a local-only flag; MCP never installs a
 browser callback.
 Python applications can explicitly supply their own trusted redirect callback.
 The auth object is reused within one client; OAuth token caching remains the
 driver's implementation, including its optional operating-system keyring backend.
 These local checks do not prove remote reachability or authorize live access.
 
-The 1.6 RC OAuth2 HTTP adapter also guards the driver's direct token polling:
+The OAuth2 HTTP adapter also guards the driver's direct token polling:
 requests must target the configured HTTPS Trino host and port, use verified TLS,
 and fit the remaining invocation/request deadline. Environment proxies and netrc
 are not inherited. Other token-server origins fail closed; this is not evidence
@@ -495,7 +495,9 @@ Do not enable either override for production or production-adjacent Trino.
 Plain HTTP is intended only for an isolated local integration environment.
 
 
-## Configured SQL Session Bounds (1.6 RC)
+<a id="configured-sql-session-bounds-16-rc"></a>
+
+## Configured SQL Session Bounds
 
 The generator MCP entrypoint reads these administrator settings once at startup.
 They bound the instance-owned `configured_query_session` manager, not ordinary
