@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 565bd933c412f0f8acf4d7bb2a1345955791aff4
+  <br>Documentation 85f8a72e41b6cdac5ef42c6747a055ff9122689a
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -332,6 +332,13 @@ signed 64-bit negative seeds for compatibility. Oversized seeds fail closed
 without truncation or hashing, bounding synthetic identifier width.</p>
 <p>Business validation failure details contain rule location and condition only;
 conditional allowed-values failures never embed the rejected cell value.</p>
+<p>Temporal sampling must compute whole-second offsets with integer timedelta days
+and seconds. Float total_seconds can round long fractional spans upward and
+violate a reviewed maximum. Preserve the existing second-resolution policy;
+calendar grain is unknown unless a separate reviewed typed contract is active.</p>
+<p>A partial temporal bound that reverses the interval after applying the existing
+2020/2025 defaults must reject with a value-free explicit-bounds hint. Do not
+silently clamp it to a date outside the supplied interval.</p>
               
 </div>
 
