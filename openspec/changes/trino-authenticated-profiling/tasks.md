@@ -5,10 +5,13 @@
 - [x] A4: Test missing credentials, unsupported modes, URL credentials, HTTP overrides, certificate failures and sanitized 401/403 handling.
 - [x] A5: Place secret canaries in fake errors/config and assert absence from logs, repr, JSON, audit, profiles and MCP/CLI responses.
 - [x] A6: Re-run allowlist, read-only, invocation budget and optional-dependency tests.
-- [ ] A7: Update database-source-configuration/MCP contracts, .env example without credentials, guides and release candidate evidence.
+- [x] A7: Update database-source-configuration/MCP contracts, .env example without credentials, guides and release candidate evidence.
 - [x] A8: Leave live authenticated acceptance explicitly pending unless separately authorized and available.
 
 A3 evidence: the user tentatively identified version 1.6.0; the selected auth
 method is unavailable. The historical 401 remains unconfirmed. A separately
 reproduced untyped-driver exception-context gap is fixed and covered by tests.
-A7 candidate evidence and documentation are prepared; full PR CI remains pending.
+A7 documentation and candidate evidence passed full green CI in #640, merged as
+`b58eb02e46144a3d6d311ca81945dedcbad03cfb`. A3 remains open solely for unavailable
+historical configuration evidence; it does not reopen the independently fixed
+exception-context defect.

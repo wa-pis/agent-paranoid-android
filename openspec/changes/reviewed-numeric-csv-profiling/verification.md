@@ -64,3 +64,11 @@ omitted, while present storage evidence changes the profile fingerprint.
 
 Full candidate CI remains pending. No package publication, live database access,
 source-fidelity claim or automatic phone declassification is established.
+
+
+Merged checkpoint: #645 passed full green CI and merged as
+`80145958b579540b6852c6860de27f41a591c79d`, superseding the pending CI statement
+above. Main documentation deployment 39921070445 completed successfully.
+The combined exact-source runtime candidate release gate subsequently passed
+with 4603 tests and 91.90% coverage. N7 candidate verification is complete;
+no package release or additional source authorization is implied.

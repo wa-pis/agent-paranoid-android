@@ -44,3 +44,12 @@ exception before the same detachment fix was applied there. This shared path
 is exercised after Trino metadata discovery; fixing only the outer adapter
 would leave those failures attached. PostgreSQL receives the same fixed error
 on this shared path without changing its message or category.
+
+
+## Merged candidate checkpoint
+
+PR #640 passed full green CI and merged as
+`b58eb02e46144a3d6d311ca81945dedcbad03cfb`. This supersedes the pending CI
+statement above. A7 documentation and contract checks are complete. A3 historical
+authentication evidence and live authenticated acceptance remain unavailable;
+neither is inferred from fake-driver test success.

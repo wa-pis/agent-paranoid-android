@@ -7,7 +7,7 @@
 - [x] R6: Specify optional controlled orphan/fan-out scenarios independently from valid FK generation; never infer source row mappings.
 - [x] R7: Evaluate EAV conditional-formula/pivot requests and record support or an explicit separate proposal.
 - [x] R8: Exercise unequal parent/child sizes, nullable keys, empty relations and deterministic replay through CLI and direct services.
-- [ ] R9: Update synthetic-generation/dataset-validation baselines, docs, contracts and candidate migration evidence.
+- [x] R9: Update synthetic-generation/dataset-validation baselines, docs, contracts and candidate migration evidence.
 
 ## R2 implementation evidence
 
@@ -114,3 +114,15 @@
   authorized transformation/I/O change. Neither proposal activates a feature.
 - R9 and umbrella candidate/release gates remain open. These are explicit
   feasibility dispositions, not claims that the follow-up implementations shipped.
+
+
+## R9 merged candidate checkpoint
+
+Per-entity sizing (#635), offline relationship discovery (#636), utility evidence
+(#638) and the explicitly separate scenario/EAV proposals (#639) passed CI and
+merged. The synthetic-generation and dataset-validation baselines, report
+contract fixtures and migration guide cover the active additive behavior.
+The combined exact-source release gate on the subsequent candidate passed
+4603 tests with 91.90% coverage. This closes the implemented relational slice;
+`controlled-relational-scenarios` and `reviewed-eav-expressions` retain their own
+unchecked implementation and activation tasks. No package release is claimed.
