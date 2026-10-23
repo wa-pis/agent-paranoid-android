@@ -6,6 +6,11 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- CSV profiles retain optional finite numeric-storage evidence without clearing
+  phone sensitivity. Reviewed `infer-spec --decimal-fields` mappings can supply
+  independent synthetic `numeric_measure` ranges for eligible CSV measures.
+  Protected names and key bindings remain excluded; folder caches move to format 8.
+
 - Parquet profiling computes bounded non-null distinctness during the existing
   sensitivity scan, with exact, lower-bound and unknown evidence. It preserves
   source-value suppression and does not infer keys or identifier pools.

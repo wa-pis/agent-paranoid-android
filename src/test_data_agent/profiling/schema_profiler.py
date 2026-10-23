@@ -31,6 +31,7 @@ from test_data_agent.core.privacy import (
 )
 from test_data_agent.csv_profiler import (
     _csv_sensitive_value_type,
+    _numeric_storage_type,
     detect_csv_dialect,
     detect_csv_encoding,
     infer_data_type,
@@ -258,6 +259,11 @@ def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
         unique_ratio_kind="exact",
         sensitive=sensitive,
         semantic_type=semantic_type,
+        numeric_storage_type=_numeric_storage_type(
+            semantic_type, len(non_null),
+            all(parse_int(value) is not None for value in non_null),
+            all(parse_float(value) is not None for value in non_null),
+        ),
         is_identifier=is_identifier,
     )
 
@@ -391,6 +397,9 @@ class FieldAccumulator:
             unique_ratio_kind="lower_bound" if self.distinct_overflow else "exact",
             sensitive=sensitive,
             semantic_type=semantic_type,
+            numeric_storage_type=_numeric_storage_type(
+                semantic_type, self.non_null_count, self.possible_int, self.possible_float,
+            ),
             is_identifier=is_identifier,
         )
         profile.distribution = self.distribution(profile)

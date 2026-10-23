@@ -105,3 +105,16 @@ endpoint defaults (minimum 2020-01-01, maximum 2025-01-01). A maximum before
 2020 or minimum after 2025 now rejects instead of silently clamping an inverted
 interval. Supply both ordered bounds for earlier or later periods. Failure leaves
 previous dataset artifacts unchanged and publishes no new manifest.
+
+## CSV numeric replacement evidence
+
+Reprofile CSV folders to replace cache format 7 with format 8. Ambiguous numeric
+phone-like fields may now include optional `numeric_storage_type`; sensitivity
+and masked patterns are unchanged. Old ambiguous profiles cannot opt into a
+numeric replacement without fresh storage evidence. Independently authored
+`numeric_measure` decimal ranges use the existing `infer-spec --decimal-fields`
+contract. Re-review changed profile/spec fingerprints. In an awaiting-approval workspace,
+copy the reviewed field while preserving planned generation settings, run
+`agent-review` and approve the new fingerprint. Do not mutate an already approved
+plan; replan changed source/profile evidence. DatasetSpec version 1.1 and unaffected legacy hashes
+remain unchanged; see [profiling](profiling.md#reviewed-csv-numeric-replacements).

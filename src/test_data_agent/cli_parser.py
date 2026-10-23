@@ -324,7 +324,7 @@ def register_dataset_commands(
     infer_spec_parser.add_argument("--entity-count", action="append", type=entity_count, default=[], metavar="ENTITY=COUNT", help="Override one exact entity name; repeat for different entities. Takes precedence over --count.")
     infer_spec_parser.add_argument("--max-total-rows", type=positive_int, help="Reject inference if the sum of planned entity counts exceeds this ceiling. This planning guard is not persisted in the spec.")
     infer_spec_parser.add_argument("--business-rules", type=Path, help="Embed typed business rules in the inferred specification for review and all generation interfaces.")
-    infer_spec_parser.add_argument("--decimal-fields", type=Path, help="Reviewed JSON/YAML mapping ENTITY.FIELD to exact decimal FieldSpec with synthetic bounds.")
+    infer_spec_parser.add_argument("--decimal-fields", type=Path, help="Reviewed JSON/YAML mapping ENTITY.FIELD to exact decimal FieldSpec with synthetic bounds; CSV numeric replacements require numeric_measure.")
     infer_spec_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing spec file.")
 
     profile_csv_parser = subparsers.add_parser(

@@ -47,13 +47,14 @@ class FieldProfile(BaseModel):
     unique_ratio_kind: Literal["unspecified", "exact", "lower_bound"] = "unspecified"
     sensitive: bool = False
     semantic_type: str | None = None
+    numeric_storage_type: Literal["integer", "float"] | None = None
     is_identifier: bool = False
     distribution: dict[str, Any] = Field(default_factory=dict, repr=False)
 
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
-        for name in ("decimal_precision", "decimal_scale"):
+        for name in ("decimal_precision", "decimal_scale", "numeric_storage_type"):
             if getattr(self, name) is None:
                 payload.pop(name, None)
         return payload

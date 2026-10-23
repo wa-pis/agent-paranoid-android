@@ -44,7 +44,7 @@ columns require review; local category permission is not declassification.
 
 NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-Folder cache format 7 recomputes older cached profiles. Reprofile saved standalone
+Folder cache format 8 recomputes older cached profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.
 
@@ -82,3 +82,42 @@ lineage and output types after no-row schema inspection, before row-count and
 column aggregates. Exact PostgreSQL scopes preflight before connection;
 wildcards first require bounded metadata expansion. Invalid inputs publish no
 partial trusted profile.
+
+## Reviewed CSV numeric replacements
+
+Positive numeric text can resemble a phone. Profiling keeps that classification,
+masked patterns and sensitivity. When every non-null value parses as finite
+numeric storage, ambiguous phone-like CSV columns additionally carry
+`numeric_storage_type: integer|float`. This metadata contains no source values,
+extrema or decimal precision; it does not establish that a field is a measure.
+A late nonnumeric value, nonfinite value, formatted phone or recognized secret
+cannot supply this complete numeric evidence. No majority threshold is used.
+
+For a genuine measure, provide an independently authored synthetic range using
+`infer-spec profile.json --decimal-fields reviewed.json --output dataset_spec.yaml`.
+The JSON/YAML mapping uses the exact `ENTITY.FIELD` and a complete FieldSpec:
+
+```json
+{"events.quantity": {"name": "quantity", "data_type": "decimal",
+  "semantic_type": "numeric_measure", "distribution": {
+    "kind": "decimal_range", "precision": 8, "scale": 3,
+    "min": "1.001", "max": "2.002"}}}
+```
+
+These are fictional generation bounds, not inferred source bounds. Protected
+names, identifiers, primary-key candidates and relationship endpoints reject
+this replacement. Fields explicitly marked sensitive for another reason also reject. Native CSV numeric
+fields can use the same authored range. Declared SQL/Parquet DECIMAL retains its
+existing precision/scale contract. Review the resulting spec before generation.
+The source profile remains sensitive; the advisor cannot automatically clear
+its classification. For an awaiting-approval agent workspace, infer to a separate file, copy only
+the reviewed field into `dataset_spec.yaml`, preserve the planned generation
+settings, run `agent-review`, and approve the newly reported fingerprint.
+Do not overwrite the workspace spec with default inference settings.
+
+Folder cache format 8 recomputes older profiles. An old ambiguous profile without
+storage evidence requires fresh profiling; saved profiles/plans are not silently
+upgraded. Evidence changes the profile fingerprint, and edited synthetic bounds
+change the spec fingerprint. Obtain new review/approval after either change.
+Absent evidence is omitted from serialization so unaffected legacy fingerprints
+remain stable. DatasetSpec stays at schema version 1.1: no new spec field or flag.

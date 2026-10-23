@@ -65,7 +65,7 @@ keys and omits lower-bound child distinct ratios from numeric evidence. Older
 profiles and other producers default to `unspecified`, not proven exact; reprofile
 old folder artifacts to obtain the new uncertainty metadata. This statistic is
 unrelated to the planned percentage of unchanged values after transformation.
-Cache format 7 invalidates older folder caches and recomputes their evidence,
+Cache format 8 invalidates older folder caches and recomputes their evidence,
 including finite numeric statistics and repeated-identifier pool sizes.
 Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
@@ -180,7 +180,7 @@ This structural check does not establish a native CSV parser peak-memory bound.
 CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
-format 7 invalidates older inferred bindings; reprofile saved artifacts.
+format 8 invalidates older inferred bindings; reprofile saved artifacts.
 
 
 Parquet distinctness reuses the scalar sensitivity scan and retains at most
@@ -198,3 +198,11 @@ Never materialize an arbitrary iterable before cardinality validation. Query
 category scope/type checks follow no-row schema inspection but precede row-count
 and column aggregates. Keep the default 20-value preservation policy; recovery
 omits the opt-in rather than silently truncating or raising a global limit.
+
+CSV `numeric_storage_type` is complete finite storage evidence for a phone-like
+column, not a declassification or precision claim. Keep source sensitivity and
+masked distributions. Only an independently authored `numeric_measure`
+`decimal_range` supplied through `infer-spec --decimal-fields` may replace an
+eligible CSV measure in the generation spec. Protected names, identifiers and
+key/relationship bindings veto replacement. Cache format 8 invalidates older
+folder evidence; changed profile/spec fingerprints require fresh review.
