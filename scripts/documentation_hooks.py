@@ -72,6 +72,12 @@ def on_nav(nav, config, files):
     from mkdocs_print_site_plugin.urls import get_page_key
 
     config.extra["navigation_pages"] = list(nav.pages)
+    for page in nav.pages:
+        russian = page.file.src_uri.startswith("ru/")
+        for direction in ("previous_page", "next_page"):
+            neighbor = getattr(page, direction)
+            if neighbor and neighbor.file.src_uri.startswith("ru/") != russian:
+                setattr(page, direction, None)
     config.extra["historical_urls"] = {
         file.url
         for file in files.documentation_pages()

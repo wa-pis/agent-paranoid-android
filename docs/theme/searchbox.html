@@ -1,0 +1,5 @@
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="{{ ('ru/search.html' if russian else 'search.html') | url }}" method="get">
+    <input type="text" name="q" placeholder="{{ 'Поиск по документации' if russian else gettext('Search docs') }}" aria-label="{{ 'Поиск по документации' if russian else gettext('Search docs') }}" title="{{ 'Введите поисковый запрос' if russian else gettext('Type search term here') }}" />
+  </form>
+</div>

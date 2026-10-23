@@ -1,19 +1,19 @@
 {% extends "base.html" %}
+{% set russian = page_language == "ru" or (page and page.file.src_uri.startswith("ru/")) %}
 {% block extrahead %}
 {{ super() }}
 {% if (page and page.meta.historical) or (config.extra.documentation and config.extra.documentation.status == 'Development / not stable') %}<meta name="robots" content="noindex">{% endif %}
 {% endblock %}
 {% block site_name %}
-{% if page and page.file.src_uri.startswith('ru/') %}
+{% if russian %}
 <a href="{{ 'ru/' | url }}" class="icon icon-home">{{ config.site_name }}</a>
 {% else %}{{ super() }}{% endif %}
 {% endblock %}
 {% block mobile_nav %}
 <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-<a href="{{ ('ru/' if page and page.file.src_uri.startswith('ru/') else '') | url }}">{{ config.site_name }}</a>
+<a href="{{ ('ru/' if russian else '') | url }}">{{ config.site_name }}</a>
 {% endblock %}
 {% block site_nav %}
-{% set russian = page and page.file.src_uri.startswith('ru/') %}
 <div lang="{{ 'ru' if russian else 'en' }}">
 {% for section in nav %}
   {% if section.title == 'Русский' %}
@@ -27,7 +27,6 @@
 </div>
 {% endblock %}
 {% block content %}
-{% set russian = page and page.file.src_uri.startswith('ru/') %}
 {% if page %}
 {% set english_url = page.url[3:] if russian else page.url %}
 {% set russian_url = 'ru/' ~ english_url %}

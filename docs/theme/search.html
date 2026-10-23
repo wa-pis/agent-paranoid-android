@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% block content %}
+<nav class="language-switch" aria-label="Language / Язык">
+{% if russian %}
+  <a href="{{ 'search.html' | url }}" hreflang="en" lang="en">English</a> · <strong lang="ru" aria-current="true">Русский</strong>
+{% else %}
+  <strong lang="en" aria-current="true">English</strong> · <a href="{{ 'ru/search.html' | url }}" hreflang="ru" lang="ru">Русский</a>
+{% endif %}
+</nav>
+<div lang="{{ 'ru' if russian else 'en' }}">
+  <h1 id="search">{{ 'Результаты поиска' if russian else gettext('Search Results') }}</h1>
+  <form id="content_search" action="{{ ('ru/search.html' if russian else 'search.html') | url }}" method="get">
+    <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+    <input name="q" id="mkdocs-search-query" type="text" class="search_input search-query ui-autocomplete-input" placeholder="{{ 'Поиск по документации' if russian else gettext('Search the Docs') }}" aria-label="{{ 'Поиск по документации' if russian else gettext('Search the Docs') }}" autocomplete="off" autofocus title="{{ 'Введите поисковый запрос' if russian else gettext('Type search term here') }}">
+  </form>
+  <div id="mkdocs-search-results" class="search-results" data-no-results-text="{{ 'Ничего не найдено' if russian else gettext('No results found') }}">
+    {{ 'Поиск…' if russian else gettext('Searching...') }}
+  </div>
+</div>
+{% endblock %}

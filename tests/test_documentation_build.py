@@ -302,6 +302,40 @@ nav:
     assert {entry["version"] for entry in versions} == {"1.6.0", "next"}
 
 
+def test_russian_search_and_navigation_keep_the_language(tmp_path, monkeypatch):
+    from bs4 import BeautifulSoup
+    from mkdocs.commands.build import build
+    from mkdocs.config import load_config
+    from urllib.parse import urljoin
+
+    monkeypatch.delenv("MIKE_DOCS_VERSION", raising=False)
+    monkeypatch.delenv("DOCS_IDENTITY", raising=False)
+    site = tmp_path / "site"
+    build(load_config(str(docs.ROOT / "mkdocs.yml"), site_dir=str(site)))
+    for path, russian in (
+        ("ru/index.html", True),
+        ("ru/getting-started/first-csv/index.html", True),
+        ("ru/search.html", True),
+        ("search.html", False),
+    ):
+        page = BeautifulSoup((site / path).read_text(), "html.parser")
+        base = "https://docs.invalid/versions/stable/"
+        target = base + ("ru/search.html" if russian else "search.html")
+        for form in page.select("#rtd-search-form, #content_search"):
+            assert urljoin(base + path, form["action"]) == target
+        assert ("Начало" in page.select_one(".wy-menu-vertical").get_text()) == russian
+        home = page.select_one(".wy-breadcrumbs li a")["href"]
+        assert urljoin(base + path, home) == base + ("ru/" if russian else "")
+    search = BeautifulSoup((site / "ru/search.html").read_text(), "html.parser")
+    assert search.select_one("h1").get_text() == "Результаты поиска"
+    assert search.select_one("#mkdocs-search-results")["data-no-results-text"] == "Ничего не найдено"
+    for path in ("ru/index.html", "history/index.html"):
+        page = BeautifulSoup((site / path).read_text(), "html.parser")
+        for link in page.select(".rst-footer-buttons a"):
+            target = urljoin("https://docs.invalid/" + path, link["href"])
+            assert ("/ru/" in target) == path.startswith("ru/")
+
+
 @pytest.mark.parametrize(
     "path",
     ["https://example.invalid/image.png", "file:///etc/passwd", "../outside.txt"],
