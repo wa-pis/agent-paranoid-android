@@ -206,7 +206,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation b58eb02e46144a3d6d311ca81945dedcbad03cfb
+  <br>Documentation 7ff706da1cfcb5e0b7fa66cd2b4e58ca2615ef9a
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -248,7 +248,7 @@ Censored distinct counts do not infer a pool; source identifiers are not preserv
 </tr>
 <tr>
 <td>Parquet</td>
-<td>Distinctness is currently unknown, even with row-group statistics. No pool or primary key is inferred from it. Missing null statistics also block automatic spec inference.</td>
+<td>One bounded scalar scan reports exact or lower-bound non-null distinctness; binary, composite and nonfinite numeric evidence stays unknown. No pool or primary key is inferred from it. Missing null statistics also block automatic spec inference.</td>
 </tr>
 </tbody>
 </table>
@@ -277,6 +277,14 @@ seeded identifier output relative to earlier releases, without changing the
 profile or specification schema version.
 Short string patterns reserve random suffix space instead of filling the entire
 requested length with a prefix.</p>
+<p>Parquet reuses its sensitivity inspection for distinct counting: at most 10,000
+private SHA-256 scalar digests per column, with the existing cell, expanded-byte
+and local deadline limits. The denominator is inspected non-null rows. A new
+distinct value beyond the cap changes <code>unique_ratio_kind</code> to <code>lower_bound</code>;
+repetitions at the cap do not. Unsupported equality remains unknown. Null ratios
+still require complete valid row-group statistics. Digests never leave the
+profiler. Reprofile older Parquet artifacts and review changed fingerprints;
+existing approved plans are not updated automatically.</p>
               
 </div>
 
