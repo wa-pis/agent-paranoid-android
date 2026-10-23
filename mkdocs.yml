@@ -10,6 +10,7 @@ theme:
   name: readthedocs
   highlightjs: false
   custom_dir: docs/theme
+  static_templates: [ru/search.html]
 
 hooks:
   - scripts/documentation_hooks.py
