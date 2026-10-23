@@ -130,6 +130,7 @@ def _field_profile_from_column(
         unique_ratio=unique_ratio,
         sensitive=sensitive,
         semantic_type=semantic_type,
+        numeric_storage_type=column.get("numeric_storage_type"),
         is_identifier=is_identifier,
         distribution=_distribution_from_profile_column(
             name,

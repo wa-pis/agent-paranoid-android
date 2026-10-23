@@ -8,7 +8,7 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldProfile, FieldType
-from test_data_agent.core.privacy import is_sensitive_field
+from test_data_agent.core.privacy import is_sensitive_field, validate_local_category_field
 from test_data_agent.safety import assert_profile_safe, assert_spec_safe
 
 
@@ -41,8 +41,16 @@ def infer_dataset_spec(
         f"{entity.name}.{field.name}" for entity in profile.entities
         for field in entity.fields if field.data_type == FieldType.DECIMAL
     }
-    if set(overrides) - decimal_names:
-        raise ValueError("reviewed decimal fields must match decimal profile fields")
+    csv_replacement_names: set[str] = set()
+    if profile.source_type in {"csv", "csv_folder"}:
+        related = {(edge.parent_entity, edge.parent_field) for edge in profile.relationships}
+        related.update((edge.child_entity, edge.child_field) for edge in profile.relationships)
+        csv_replacement_names = {
+            f"{entity.name}.{field.name}" for entity in profile.entities for field in entity.fields
+            if (entity.name, field.name) not in related and field.name not in entity.primary_key_candidates
+        }
+    if set(overrides) - (decimal_names | csv_replacement_names):
+        raise ValueError("reviewed decimal fields must match decimal profile fields or eligible CSV numeric fields")
     entities: list[EntitySpec] = []
     for entity in profile.entities:
         if any(field.null_ratio is None for field in entity.fields):
@@ -54,7 +62,10 @@ def infer_dataset_spec(
                 row_count=resolved_counts[entity.name],
                 primary_key=primary_key,
                 fields=[
-                    _infer_field(field, overrides.get(f"{entity.name}.{field.name}"))
+                    _infer_field(
+                        field, overrides.get(f"{entity.name}.{field.name}"),
+                        csv_numeric_replacement=f"{entity.name}.{field.name}" in csv_replacement_names,
+                    )
                     for field in entity.fields
                 ],
             )
@@ -70,7 +81,11 @@ def infer_dataset_spec(
     return spec
 
 
-def _infer_field(field: FieldProfile, reviewed: FieldSpec | None) -> FieldSpec:
+def _infer_field(
+    field: FieldProfile, reviewed: FieldSpec | None, *, csv_numeric_replacement: bool = False,
+) -> FieldSpec:
+    if reviewed is not None and csv_numeric_replacement and field.data_type != FieldType.DECIMAL:
+        return _reviewed_csv_numeric_field(field, reviewed)
     if field.data_type == FieldType.DECIMAL:
         if reviewed is None:
             raise ValueError(
@@ -94,3 +109,26 @@ def _infer_field(field: FieldProfile, reviewed: FieldSpec | None) -> FieldSpec:
         semantic_type=field.semantic_type, is_identifier=field.is_identifier,
         distribution=field.distribution,
     )
+
+
+def _reviewed_csv_numeric_field(field: FieldProfile, reviewed: FieldSpec) -> FieldSpec:
+    """Use an independently authored synthetic range, never source numeric bounds."""
+    try:
+        validate_local_category_field(
+            field_name=field.name,
+            semantic_type=None if field.semantic_type == "phone" else field.semantic_type,
+            sensitive=field.sensitive and field.semantic_type != "phone",
+        )
+    except ValueError:
+        raise ValueError("reviewed CSV numeric replacement cannot override protected field names") from None
+    if field.is_identifier or (field.sensitive and field.semantic_type != "phone"):
+        raise ValueError("reviewed CSV numeric replacement cannot override sensitive or identifier fields")
+    if field.data_type not in {FieldType.INTEGER, FieldType.FLOAT} and field.numeric_storage_type is None:
+        raise ValueError("reviewed CSV numeric replacement requires finite numeric storage evidence; reprofile the CSV")
+    if (
+        reviewed.name != field.name or reviewed.data_type != FieldType.DECIMAL
+        or reviewed.semantic_type != "numeric_measure" or reviewed.sensitive or reviewed.is_identifier
+        or not isinstance(reviewed.typed_distribution, DecimalRangeDistribution)
+    ):
+        raise ValueError("reviewed CSV numeric replacement requires a matching numeric_measure decimal_range field")
+    return reviewed.model_copy(deep=True)

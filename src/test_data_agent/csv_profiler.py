@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator, model_serializer
 from test_data_agent.core.csv_reader import ScopedDictReader
@@ -115,6 +115,7 @@ class CSVColumnProfile(BaseModel):
     approx_distinct_count: int | None
     sensitive: bool
     semantic_type: str | None = None
+    numeric_storage_type: Literal["integer", "float"] | None = None
     top_values: list[dict[str, Any]] = Field(default_factory=list)
     masked_patterns: list[dict[str, Any]] = Field(default_factory=list)
     min_value: int | float | str | None = None
@@ -129,7 +130,7 @@ class CSVColumnProfile(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
-        for name in ("decimal_precision", "decimal_scale"):
+        for name in ("decimal_precision", "decimal_scale", "numeric_storage_type"):
             if getattr(self, name) is None:
                 payload.pop(name, None)
         return payload
@@ -450,6 +451,9 @@ class CSVColumnAccumulator:
             approx_distinct_count=min(len(self.distinct_digests), MAX_DISTINCT_DIGESTS - 1),
             sensitive=sensitive,
             semantic_type=semantic_type,
+            numeric_storage_type=_numeric_storage_type(
+                semantic_type, self.non_null_count, self.all_int, self.all_float,
+            ),
             top_values=top_values,
             masked_patterns=masked_patterns,
             **({} if sensitive else self.range_stats(base_type)),
@@ -535,10 +539,24 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
         approx_distinct_count=len(counts),
         sensitive=sensitive,
         semantic_type=semantic_type,
+        numeric_storage_type=_numeric_storage_type(
+            semantic_type, len(non_null),
+            all(parse_int(value) is not None for value in non_null),
+            all(parse_float(value) is not None for value in non_null),
+        ),
         top_values=top_values,
         masked_patterns=masked_patterns,
         **stats,
     )
+
+
+def _numeric_storage_type(
+    semantic_type: str | None, non_null: int, all_integer: bool, all_float: bool,
+) -> Literal["integer", "float"] | None:
+    """Retain finite scalar storage evidence without clearing phone sensitivity."""
+    if semantic_type != "phone" or not non_null:
+        return None
+    return "integer" if all_integer else "float" if all_float else None
 
 
 def infer_semantic_type(name: str, values: list[str], *, max_chars: int | None = None) -> str | None:

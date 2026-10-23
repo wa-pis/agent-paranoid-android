@@ -1,20 +1,36 @@
 ## ADDED Requirements
 
-### Requirement: Reviewed Numeric Measure Profiling
+### Requirement: Reviewed CSV Numeric Replacement
 
-A numeric-measure declaration SHALL be field-scoped and enforced by deterministic
-code. It SHALL NOT authorize raw sensitive values or automatic declassification.
+CSV profiling SHALL retain phone sensitivity, masking and source-free metadata
+when numeric text resembles a phone. An optional typed `numeric_storage_type`
+SHALL describe integer or finite floating storage only when every inspected
+non-null value satisfies it; no majority vote or source extrema SHALL authorize
+a synthetic numeric replacement.
 
-#### Scenario: A numeric measure resembles a phone
-- **GIVEN** a newly constructed numeric measure and a reviewed declaration
-- **WHEN** either CSV profiling path processes it
-- **THEN** both paths agree on the permitted numeric type and safe metadata
-- **AND** no source row is used as generated output
+`infer-spec --decimal-fields` SHALL accept independently authored synthetic
+`numeric_measure` DECIMAL ranges for eligible CSV fields. Protected names,
+identifiers, primary-key candidates and relationship endpoints SHALL reject.
+The declaration SHALL match the field name and use a validated finite bounded
+`decimal_range`; it SHALL NOT alter the source profile or authorize copied rows.
+Declared SQL/Parquet DECIMAL precision/scale checks SHALL remain unchanged.
 
-#### Scenario: A numeric sample contains a rare secret
-- **WHEN** a sample contains a recognizable secret or protected identifier
-- **THEN** majority numeric values do not suppress the privacy gate
-- **AND** the value is absent from diagnostics, artifacts and provider requests
+#### Scenario: A reviewed measure resembles a phone
+- **GIVEN** numeric phone-like text with complete finite storage evidence
+- **WHEN** a matching reviewed synthetic numeric_measure range is supplied
+- **THEN** the generated spec uses that range and the source profile stays sensitive
+- **AND** the profile, provider request and diagnostics contain no source numeric values
+
+#### Scenario: Late sensitive or malformed content
+- **WHEN** an otherwise numeric column includes a formatted phone, secret, nonfinite or nonnumeric outlier
+- **THEN** incomplete numeric storage evidence does not permit replacement
+- **AND** sensitive names and identifiers cannot be overridden by a declaration
+
+#### Scenario: Old ambiguous profile and saved approval
+- **WHEN** an old ambiguous profile lacks numeric storage evidence
+- **THEN** replacement requires new profiling and folder cache formats before 8 are recomputed
+- **AND** changed evidence or synthetic bounds changes the relevant fingerprint and requires new review
+- **AND** absent evidence remains omitted so unaffected old profile fingerprints are stable
 
 ### Requirement: Finite CSV Numeric Evidence
 
