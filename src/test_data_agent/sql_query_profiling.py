@@ -25,6 +25,10 @@ from test_data_agent.sql_query_source import (
 )
 
 
+_SUMMARY_BATCH_COLUMNS = 8
+_SUMMARY_WRAPPER_BYTES = 65_536
+
+
 class SqlQueryProfileError(RuntimeError):
     """A source-free query profiling failure."""
 
@@ -66,16 +70,15 @@ def profile_validated_query(
             ),
             "row count",
         )
-        profile_columns = [
-            _profile_column(
-                plan,
-                column,
-                row_count,
-                fetch_query,
-                categories.get(column.name),
+        profile_columns: list[dict[str, object]] = []
+        for start in range(0, len(columns), _SUMMARY_BATCH_COLUMNS):
+            batch = columns[start:start + _SUMMARY_BATCH_COLUMNS]
+            summaries = _fetch_column_summaries(plan, batch, fetch_query)
+            profile_columns.extend(
+                _profile_column(plan, column, row_count, fetch_query,
+                                categories.get(column.name), summary)
+                for column, summary in zip(batch, summaries, strict=True)
             )
-            for column in columns
-        ]
         profile = legacy_profile_to_dataset_profile(
             {
                 "table": plan.entity_name,
@@ -221,12 +224,63 @@ def _local_categories(
     return selected
 
 
+def _column_summary_query(plan: ValidatedSqlQuery, column: QueryResultColumn) -> TrustedProfileQuery:
+    profile_type = coerce_profile_type(column.data_type)
+    if profile_type in {ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL}:
+        return build_query_numeric_shape_query(plan, column.name)
+    return build_query_column_summary_query(
+        plan, column.name,
+        temporal_bounds=(profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
+                         and not infer_sensitive_from_name(column.name)
+                         and column.name in plan.safe_temporal_output_fields),
+    )
+
+
+def _fetch_column_summaries(
+    plan: ValidatedSqlQuery, columns: Sequence[QueryResultColumn], fetch_query: QueryFetcher,
+) -> list[dict[str, object]]:
+    if not 1 <= len(columns) <= _SUMMARY_BATCH_COLUMNS:
+        raise SqlQueryProfileError("SQL query summary batch size is invalid")
+    if len(columns) == 1:
+        return [_single_row(fetch_query(_column_summary_query(plan, columns[0])))]
+    import sqlglot
+    from sqlglot import exp
+
+    suffix = f' FROM ({plan.sql}) AS "__apa_source"'
+    expressions = []
+    aliases: list[tuple[int, str, str]] = []
+    for index, column in enumerate(columns):
+        original = _column_summary_query(plan, column).sql
+        if not original.endswith(suffix):
+            raise SqlQueryProfileError("SQL query summary shape is invalid")
+        projection = sqlglot.parse_one(original[:-len(suffix)], read=plan.adapter.value)
+        if not isinstance(projection, exp.Select):
+            raise SqlQueryProfileError("SQL query summary shape is invalid")
+        for aggregate in projection.expressions:
+            if not isinstance(aggregate, exp.Alias) or not aggregate.alias:
+                raise SqlQueryProfileError("SQL query summary alias is invalid")
+            name = aggregate.alias
+            alias = f"__apa_{index}_{name}"
+            expressions.append(exp.alias_(aggregate.this.copy(), alias, quoted=True).sql(dialect=plan.adapter.value))
+            aliases.append((index, name, alias))
+    sql = "SELECT " + ", ".join(expressions) + suffix
+    if len(sql.encode("utf-8")) - len(plan.sql.encode("utf-8")) > _SUMMARY_WRAPPER_BYTES:
+        raise SqlQueryProfileError("SQL query summary wrapper budget exceeded")
+    row = _single_row(fetch_query(TrustedProfileQuery(sql)))
+    summaries: list[dict[str, object]] = [{} for _ in columns]
+    for index, name, alias in aliases:
+        if alias in row:
+            summaries[index][name] = row[alias]
+    return summaries
+
+
 def _profile_column(
     plan: ValidatedSqlQuery,
     column: QueryResultColumn,
     row_count: int,
     fetch_query: QueryFetcher,
     local_category_field: LocalCategoryField | None,
+    summary: dict[str, object],
 ) -> dict[str, object]:
     profile_type = coerce_profile_type(column.data_type)
     temporal_bounds = (
@@ -237,14 +291,6 @@ def _profile_column(
     numeric_shape = profile_type in {
         ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL,
     }
-    summary = _single_row(
-        fetch_query(
-            build_query_numeric_shape_query(plan, column.name)
-            if numeric_shape else build_query_column_summary_query(
-                plan, column.name, temporal_bounds=temporal_bounds
-            )
-        )
-    )
     summary_row_count = _non_negative_int(summary.get("row_count"), "row count")
     non_null_count = _non_negative_int(
         summary.get("non_null_count"), "non-null count"

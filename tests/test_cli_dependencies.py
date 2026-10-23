@@ -1,4 +1,6 @@
 import ast
+import subprocess
+import sys
 from pathlib import Path
 from types import ModuleType
 
@@ -105,3 +107,21 @@ def _top_level_imports(module: ModuleType) -> set[str]:
         elif isinstance(node, ast.Import):
             imports.update(alias.name for alias in node.names)
     return imports
+
+
+def test_cli_import_without_sql_optional_dependencies() -> None:
+    script = """
+import builtins
+original_import = builtins.__import__
+def without_sql(name, *args, **kwargs):
+    if name.split(".")[0] in {"sqlglot", "psycopg", "trino"}:
+        raise ModuleNotFoundError("optional SQL module absent", name=name)
+    return original_import(name, *args, **kwargs)
+builtins.__import__ = without_sql
+from test_data_agent.cli import main
+assert callable(main)
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", script], capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr

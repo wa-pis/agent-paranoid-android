@@ -97,3 +97,31 @@ partial category set. Sensitive names, identifiers, quasi-identifiers, free text
 and content vetoes remain absolute. A global environment override would not bind
 permissions to a reviewed artifact and is not introduced. The current fix adds
 no new preservation option or source-value authority.
+
+
+## Query batching (S8)
+
+Keep the no-row schema inspection and row count separate. Partition authorized
+output columns in their existing order into groups of at most eight. Reuse the
+current column builders and parse only their trusted aggregate projections with
+the existing SQLGlot dependency; rename result aliases deterministically and
+render in the adapter dialect. Preserve the original source SQL exactly as the
+single FROM subquery. Generated wrapper overhead is capped at 64 KiB. A partial
+last group of one retains the existing single-column SQL/result contract.
+
+Each result contains at most 72 scalar summary cells, split back into the same
+per-column count/numeric/temporal validators. Do not batch category literals.
+Process and release one bounded batch before fetching the next. Missing counts,
+inconsistent row counts or driver failures return no trusted partial profile.
+The original profile order, serialization and fingerprints stay stable for
+fixed aggregates; source-query policy/fingerprints are not rewritten.
+
+Do not equate fewer requests with extra resource authority. PostgreSQL keeps
+actual statement, cumulative result-row/cell and invocation/statement-time limits.
+Trino keeps actual statement and conservative per-statement scan accounting,
+with original profiled columns charged up front and all executed projections,
+AST/SQL work and result bytes charged by the client. Bounds are unchanged.
+The derived query appears once per batch; optimizer scan count and latency are
+not inferred from this shape. No temporary writes/materialization are introduced.
+Query-source profiles are the repeated-derived-query target; normal PostgreSQL
+and Trino table profiling are unchanged in this optimization.

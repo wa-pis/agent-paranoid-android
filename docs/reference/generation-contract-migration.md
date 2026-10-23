@@ -118,3 +118,12 @@ copy the reviewed field while preserving planned generation settings, run
 `agent-review` and approve the new fingerprint. Do not mutate an already approved
 plan; replan changed source/profile evidence. DatasetSpec version 1.1 and unaffected legacy hashes
 remain unchanged; see [profiling](profiling.md#reviewed-csv-numeric-replacements).
+
+
+## Query-summary batching
+
+Query-source summary batching changes trusted internal SQL and request counts,
+not profile/spec schemas. Fixed aggregate evidence keeps the same profile
+fingerprint; there is no silent reclassification or saved-plan promotion.
+Existing statement, scan, result and time limits remain enforced independently.
+Real source changes still require normal profile review.

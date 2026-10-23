@@ -4,6 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from tests.query_summary_fixtures import batch_aggregate_rows
 
 import test_data_agent.sql_query_adapters as adapters_module
 from test_data_agent.postgres_client import PostgresResultColumn
@@ -64,6 +65,12 @@ def trino_config() -> TrinoConfig:
 
 
 def aggregate_rows(sql: str) -> list[dict[str, object]]:
+    if 'AS "__apa_0_' in sql:
+        common = {"row_count": 3, "has_negative": False, "has_positive": True, "max_abs_magnitude": 2}
+        return batch_aggregate_rows(sql, [
+            {**common, "non_null_count": 3, "distinct_count": 3},
+            {"row_count": 3, "non_null_count": 3, "distinct_count": 2},
+            {**common, "non_null_count": 2, "distinct_count": 2}])
     if "max_abs_magnitude" in sql:
         is_id = 'count("order_id")' in sql
         return [
@@ -171,6 +178,7 @@ def test_postgres_query_source_uses_metadata_then_aggregates(
     assert infer_dataset_spec(profile).entities[0].row_count == 3
     assert "source-only" not in profile.model_dump_json()
     assert all("SELECT *" not in sql.upper() for sql in session.sql)
+    assert len(session.sql) == 4  # metadata, no-row schema, row count, one batch
 
 
 class FakeTrinoClient:
@@ -230,6 +238,8 @@ def test_trino_query_source_requires_and_uses_table_column_allowlist(
     with pytest.raises(ValueError, match="decimal_range distribution"):
         infer_dataset_spec(profile)
     assert all("SELECT *" not in sql.upper() for sql in FakeTrinoClient.sql)
+
+    assert len(FakeTrinoClient.sql) == 4  # includes source authorization metadata
 
 
 def test_trino_query_source_rejects_missing_column_allowlist_before_client(

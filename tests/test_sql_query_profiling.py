@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import replace
 
 import pytest
+from tests.query_summary_fixtures import batch_aggregate_rows
 
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.field import FieldType
@@ -44,6 +46,10 @@ def test_authorized_grouped_profile_is_wrapped_and_bounded(tmp_path, adapter, ex
         assert query.sql != query_plan.sql
         if exhausted:
             raise RuntimeError("fictional backend budget detail must stay private")
+        if 'AS "__apa_0_' in query.sql:
+            summary = {"row_count": 2, "non_null_count": 2, "distinct_count": 2,
+                       "has_negative": False, "has_positive": True, "max_abs_magnitude": 1}
+            return batch_aggregate_rows(query.sql, [summary, summary])
         if "non_null_count" in query.sql:
             return [{"row_count": 2, "non_null_count": 2, "distinct_count": 2,
                 "has_negative": False, "has_positive": True, "max_abs_magnitude": 1}]
@@ -105,6 +111,12 @@ class FakeResults:
                 {"value": "paid", "count": 2},
                 {"value": "shipped", "count": 1},
             ]
+        if 'AS "__apa_0_' in query.sql:
+            common = {"row_count": 3, "has_negative": False, "has_positive": True, "max_abs_magnitude": 2}
+            return batch_aggregate_rows(query.sql, [
+                {**common, "non_null_count": 3, "distinct_count": 3},
+                {"row_count": 3, "non_null_count": 3, "distinct_count": 2},
+                {**common, "non_null_count": 2, "distinct_count": 2}])
         if "max_abs_magnitude" in query.sql:
             is_order_id = 'count("order_id")' in query.sql
             non_null = 3 if is_order_id else 2
@@ -287,11 +299,11 @@ def test_query_profile_statement_count_scales_with_fields(
         ),
     )
 
-    # One no-row schema request, one row count, and one aggregate per column;
+    # One no-row schema request, one row count, and one bounded summary batch;
     # only an explicit local category adds one.
-    assert len(results.queries) == 5 + preserve_category
-    assert sum("AS distinct_count" in query.sql for query in results.queries) == 3
-    assert sum("AS max_abs_magnitude" in query.sql for query in results.queries) == 2
+    assert len(results.queries) == 3 + preserve_category
+    assert sum(len(re.findall(r'AS "__apa_\d+_distinct_count"', query.sql)) for query in results.queries) == 3
+    assert sum(len(re.findall(r'AS "__apa_\d+_max_abs_magnitude"', query.sql)) for query in results.queries) == 2
     assert sum("GROUP BY" in query.sql for query in results.queries) == preserve_category
 
 
@@ -378,7 +390,7 @@ def test_schema_drift_and_aggregate_mismatch_fail_closed() -> None:
 
     def invalid_counts(query: TrustedProfileQuery) -> list[dict[str, object]]:
         if "non_null_count" in query.sql:
-            return [{"row_count": 3, "non_null_count": 4, "distinct_count": 4}]
+            return batch_aggregate_rows(query.sql, [{"row_count": 3, "non_null_count": 4, "distinct_count": 4}] * 3)
         return [{"row_count": 3}]
 
     with pytest.raises(SqlQueryProfileError, match="aggregate counts"):
@@ -440,8 +452,8 @@ def test_query_repeated_identifier_pool_survives_larger_generation(adapter):
 
     def fetch(query: TrustedProfileQuery) -> list[dict[str, object]]:
         rows = results.fetch(query)
-        if 'count("order_id")' in query.sql:
-            rows = [{**row, "distinct_count": 2} for row in rows]
+        if "__apa_0_distinct_count" in query.sql:
+            rows = [{**row, "__apa_0_distinct_count": 2} for row in rows]
         return rows
 
     profile = profile_validated_query(

@@ -1,5 +1,6 @@
 """Source-free numeric evidence and aggregate cost across narrow/wide schemas."""
 import pytest
+from tests.query_summary_fixtures import batch_aggregate_rows
 
 from test_data_agent.sql_query_source import SqlQueryAdapter, ValidatedSqlQuery
 from test_data_agent.sql_query_profiling import QueryResultColumn, profile_validated_query
@@ -27,14 +28,15 @@ def test_query_numeric_evidence_and_aggregate_count(adapter, data_type, width, a
         assert "SELECT *" not in query.sql.upper()
         if "non_null_count" not in query.sql:
             return [{"row_count": 4}]
-        return [{"row_count": 4, "non_null_count": 3, "distinct_count": 1 if all_zero else 2,
+        metrics = {"row_count": 4, "non_null_count": 3, "distinct_count": 1 if all_zero else 2,
             "has_negative": False, "has_positive": not all_zero,
             "max_abs_magnitude": None if all_zero else -1,
             "zero_count": 3 if all_zero else 1, "subunit_count": 0 if all_zero else 2,
-            "min_subunit_magnitude": None if all_zero else -3}]
+            "min_subunit_magnitude": None if all_zero else -3}
+        return batch_aggregate_rows(query.sql, [metrics] * 8) if 'AS "__apa_0_' in query.sql else [metrics]
     profile = profile_validated_query(plan, describe_query=describe, fetch_query=fetch)
-    assert len(seen) == width + 2  # no-row schema, row count, one summary per field
-    assert sum("max_abs_magnitude" in query for query in seen) == width
+    assert len(seen) == 2 + (width + 7) // 8  # schema, row count, bounded batches
+    assert sum("max_abs_magnitude" in query for query in seen) == (width + 7) // 8
     for field in profile.entities[0].fields:
         assert field.null_ratio == 0.25
         assert field.distribution["kind"] == "numeric_shape"

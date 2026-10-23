@@ -203,3 +203,13 @@ suppress their displayed traceback. Raise the fixed `SqlQueryProfileError`
 after leaving the handler so `__cause__` and `__context__` retain no driver
 response objects. Test synthetic secret canaries at direct, CLI and audited MCP
 boundaries; preserve existing output artifacts on failure.
+
+
+SQL query profiling batches at most eight column summaries per trusted SELECT.
+Keep the original authorized source SQL unchanged and include it once per batch.
+Alias only generated aggregate result fields; retain per-field temporal guards,
+category preflight and count validation. Bound wrapper overhead to 64 KiB and
+retain at most 72 aggregate cells per batch. Do not combine category literals
+into these summaries. Actual statement/scan-estimate charges, cumulative
+projection/profiled-column work, result bytes/cells and deadlines remain separate
+and unchanged. Table profiling is not batched by this query-source optimization.

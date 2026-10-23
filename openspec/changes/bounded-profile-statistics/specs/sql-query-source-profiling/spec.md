@@ -36,3 +36,32 @@ their existing upper/result-row budget checks.
 - **WHEN** the requested entity or field is outside the exact authorized output
 - **THEN** profiling rejects before fetching a row-count or column aggregate
 - **AND** no trusted partial profile is published
+
+
+### Requirement: Bounded Batched Query Summaries
+
+Query-source profiling SHALL combine at most eight column summaries per trusted
+aggregate SELECT and include the original authorized source query once per batch.
+It SHALL bound generated wrapper overhead to 64 KiB and retain existing per-field
+sensitivity, temporal authorization, local-category and aggregate count checks.
+Batching SHALL NOT authorize source-row output, writes, a wider caller SQL subset
+or increased resource limits.
+
+Actual statements and scan estimates SHALL remain separately charged from
+profiled/projected columns and result bytes/cells. Malformed or incomplete
+batch results SHALL fail without a trusted partial profile. Fixed aggregate
+evidence SHALL preserve profile serialization and fingerprints.
+
+#### Scenario: A wide query has 48 numeric columns
+- **WHEN** either SQL adapter profiles its authorized derived output
+- **THEN** after bounded authorization metadata, schema inspection, row count and six bounded summary batches use eight profiling requests
+- **AND** adapter authorization metadata requests remain additional and budgeted
+- **AND** independently requested local categories remain separate bounded requests
+
+#### Scenario: A batch exhausts an invocation allowance
+- **WHEN** statement, scan, profiled-column, result or time work exceeds its existing limit
+- **THEN** profiling fails closed without raising the allowance or publishing a partial trusted profile
+
+#### Scenario: Batch result shape is incomplete
+- **WHEN** an expected column lacks valid aggregate counts
+- **THEN** profile construction rejects without substituting another column's evidence
