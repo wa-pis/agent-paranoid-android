@@ -66,7 +66,7 @@ before the fix. Integer timedelta day/second arithmetic fixes all three without
 changing second-resolution sampling. Twelve direct endpoint cases cover lower
 and upper selection, subsecond intervals, different compatible offsets and
 extreme DATE endpoints. Alongside existing aggregate-to-generation, fallback,
-CSV, SQL-profile and RC4 tests, 160 tests passed. Full CI remains pending.
+CSV, SQL-profile and RC4 tests, 160 tests passed.
 
 This is an independent boundary defect, not proof of the external report's
 cause. Monthly source grain remains unknown and is not inferred from extrema;
@@ -82,7 +82,8 @@ historical report's cause.
 
 Final temporal verification: 286 temporal, SQL, CSV, generation-contract, golden
 artifact and documentation tests passed. Mypy (156 sources), Ruff, strict MkDocs
-and strict OpenSpec passed. Full CI for this temporal follow-up remains pending.
+and strict OpenSpec passed. Temporal follow-up #643 completed full green CI
+and merged as `85f8a72e41b6cdac5ef42c6747a055ff9122689a`.
 
 
 ## Category work and scope (S7)
