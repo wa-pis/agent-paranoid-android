@@ -151,7 +151,7 @@ fan-out allocation or measured source fan-out fidelity. Reviewed DatasetSpec
 exact synthetic orphan counts and generated-parent allocations in Unreleased
 source. They do not infer source histograms or reproduce source row mappings.
 Their executable acceptance is recorded in the
-[controlled relational scenario change](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios).
+[controlled relational scenario change](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-10-23-controlled-relational-scenarios).
 
 Formulas support optional reviewed typed predicates in assign/check mode.
 False predicates skip evaluation and are reported separately from successful

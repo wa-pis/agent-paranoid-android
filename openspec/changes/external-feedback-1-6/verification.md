@@ -75,3 +75,30 @@ including stable/version identity and all four download hashes. The package
 identity remains published 1.6.0 (`258c035c22408becf17ab090635710a50dda8ccc`);
 new source features are Unreleased. No new package release or live database
 acceptance is claimed.
+
+
+## Archive verification
+
+The completed changes were archived only after their merged state, absent failed
+checks and complete task lists were inspected. The CLI clarification (#632),
+reviewed numeric CSV (#645), relational utility (#635/#636/#638/#639) and
+controlled scenarios (#649) now live under openspec/changes/archive/2026-10-23-*
+with their original evidence. The existing active-inventory documentation check
+and guide link were updated. No baseline spec was reapplied: those deltas are
+already in main and the archive operation uses --skip-specs. No runtime or schema
+file changes are part of archival.
+
+| Completed change | Archive |
+| --- | --- |
+| CLI clarification | [record](../archive/2026-10-23-feedback-cli-contract-clarity/tasks.md) |
+| Reviewed numeric CSV | [record](../archive/2026-10-23-reviewed-numeric-csv-profiling/tasks.md) |
+| Relational utility | [record](../archive/2026-10-23-relational-profile-utility/tasks.md) |
+| Controlled relational scenarios | [record](../archive/2026-10-23-controlled-relational-scenarios/tasks.md) |
+
+Documentation checkpoint #650 merged as e59c9c01d3ec94c625bc3050bf476fa21989ce27
+with all eight applicable checks successful. Documentation run 39942957128
+completed; independent public verification passed with that expected identity,
+stable/version destinations and all four download hashes. Historical Trino
+configuration and profile provenance remain unconfirmed, without a reproduced
+remaining adapter defect. No live database acceptance or package release is
+claimed.

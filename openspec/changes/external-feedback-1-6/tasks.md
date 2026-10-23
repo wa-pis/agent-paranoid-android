@@ -23,7 +23,7 @@
 - [x] P2: finish remaining CLI/validation contract clarifications.
 - [x] Merge and publicly verify the versioned documentation work separately.
 - [x] Run exact-source release gates for runtime candidates through #649; no release authorized here.
-- [ ] Archive completed changes only after their checks and merge are recorded.
+- [x] Archive completed changes only after their checks and merge are recorded.
 
 
 ## Implemented slice and separate proposals
@@ -42,3 +42,13 @@ The source-free `controlled-relational-scenarios` and `reviewed-eav-expressions`
 implementation/activation slices are complete in main. Source-row pivot/unpivot
 remains a separate explicitly authorized transformation/I/O extension. No new
 package release follows from these source changes.
+
+
+## Completed change archives
+
+After verifying merged state and successful checks, the completed CLI clarification,
+reviewed numeric CSV, relational utility and controlled relational scenario changes
+were moved to archive/2026-10-23-<change-id>. Main specifications already contain
+their reviewed deltas, so archival deliberately skips duplicate baseline updates.
+Historical A3/S4 evidence gaps and the separate EAV transformation proposal remain
+active. Package publication is outside this work.
