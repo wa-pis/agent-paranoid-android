@@ -136,3 +136,13 @@ without truncation or hashing, bounding synthetic identifier width.
 
 Business validation failure details contain rule location and condition only;
 conditional allowed-values failures never embed the rejected cell value.
+
+
+Temporal sampling must compute whole-second offsets with integer timedelta days
+and seconds. Float total_seconds can round long fractional spans upward and
+violate a reviewed maximum. Preserve the existing second-resolution policy;
+calendar grain is unknown unless a separate reviewed typed contract is active.
+
+A partial temporal bound that reverses the interval after applying the existing
+2020/2025 defaults must reject with a value-free explicit-bounds hint. Do not
+silently clamp it to a date outside the supplied interval.

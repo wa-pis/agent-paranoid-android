@@ -4,7 +4,7 @@
 - [x] S3: Verify all SQL numeric summary builders and existing DECIMAL dispatch for consistent safe shape evidence, without extra raw-value queries.
 - [ ] S4: Investigate provenance/version of external profiles missing supported metadata; implement only independently reproduced adapter gaps with safety regressions.
 - [x] S5: Add bounded Parquet distinct evidence with exact/lower-bound/unknown semantics; test row-group null statistics unavailable or malformed.
-- [ ] S6: Specify bounded temporal granularity; reproduce the final report's apparent out-of-range date independently before treating it as a defect.
+- [x] S6: Specify bounded temporal granularity; reproduce the final report's apparent out-of-range date independently before treating it as a defect.
 - [ ] S7: Verify category name/scope preflight; document bounded limit recovery and evaluate explicit capped configuration without silent truncation.
 - [ ] S8: Measure per-column aggregate query costs with fake clients; batch only if the existing budgets and safety invariants are preserved.
   - [x] Measure narrow/wide query and Trino table profiles; verify existing PostgreSQL table counts.
@@ -13,3 +13,8 @@
 
 S5 implementation and focused evidence are complete; full candidate CI remains
 part of S9. No package release or live database verification is claimed.
+
+S6 disposition: the independently reproduced long fractional-interval overshoot
+is corrected with regression tests. Bounded month-start evidence/generation is
+specified as a future reviewed extension in design.md, not an active inference
+capability. The historical external date remains unconfirmed.

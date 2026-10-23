@@ -87,3 +87,21 @@ retain unknown values. Newly profiled scalar columns may have `exact` or
 fingerprints require fresh plan review. This adds no primary-key nomination,
 identifier pool or source key reuse. Missing null metadata still blocks automatic
 spec inference. Existing dataset/profile schema versions remain unchanged.
+
+
+### Long fractional datetime intervals
+
+Datetime range sampling now computes its whole-second span with integer
+arithmetic. Very long fractional intervals previously could round the maximum
+admissible offset up and exceed the upper bound by a microsecond. Replaying such
+an affected specification may produce different values after upgrading; compare
+the manifest's generator version. The existing second-resolution policy,
+missing-bound fallbacks and schema version are unchanged. This does not add
+monthly/calendar inference or certify source-period fidelity.
+
+
+A partial date/time bound must also be compatible with the existing missing
+endpoint defaults (minimum 2020-01-01, maximum 2025-01-01). A maximum before
+2020 or minimum after 2025 now rejects instead of silently clamping an inverted
+interval. Supply both ordered bounds for earlier or later periods. Failure leaves
+previous dataset artifacts unchanged and publishes no new manifest.
