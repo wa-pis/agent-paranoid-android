@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 85f8a72e41b6cdac5ef42c6747a055ff9122689a
+  <br>Documentation 1523f340c89e57bbf33c641f82c289428b8747cb
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -375,6 +375,12 @@ composite and nonfinite numeric values stay unknown. Do not serialize digests
 or nominate primary keys/pools from this evidence. Invalid or absent metadata
 null counts remain unknown independently. A row-count mismatch rejects the
 profile; existing decoded-byte/cell/deadline limits remain in force.</p>
+<p>Local-category validation must reject invalid fields/positive-integer limits
+before iteration and stop upon the first candidate beyond the configured cap.
+Never materialize an arbitrary iterable before cardinality validation. Query
+category scope/type checks follow no-row schema inspection but precede row-count
+and column aggregates. Keep the default 20-value preservation policy; recovery
+omits the opt-in rather than silently truncating or raising a global limit.</p>
               
 </div>
 
