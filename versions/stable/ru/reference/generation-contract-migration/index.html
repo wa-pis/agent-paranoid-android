@@ -193,7 +193,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1523f340c89e57bbf33c641f82c289428b8747cb
+  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -212,6 +212,17 @@
 <p>Mixed/negative публикуют controlled-invalid data только в допустимом представлении с отчётом. CLI возвращает validation_failed/exit 1. Parquet может использовать marked scalar columns; direct Arrow consumer должен учитывать apa.scalar_encoding. Privacy остаётся обязательной для всех режимов.</p>
 <p>Standalone validate проверяет значения при включённой privacy section. CSV numeric operands интерпретируются по заявленному типу для revalidation; это не ослабляет pre-export проверку generated strings. Связи назначаются round-robin, numeric sampling uniform: сохранение корреляций и source fan-out не обещается.</p>
 <p>После 1.6.0 main также исправляет numeric CSV evidence/cache и scalar PostgreSQL PK profiling. Описание исправлений не меняет содержимое выпущенного wheel. Подробности и точная история: <a href="../../../reference/generation-contract-migration/">оригинальная миграция — English</a>.</p>
+<h2 id="csv">Сведения о числовом хранении CSV<a class="headerlink" href="#csv" title="Permanent link">&para;</a></h2>
+<p>Перепрофилируйте CSV-папки: формат кэша 8 заменяет формат 7. Неоднозначные поля
+могут получить <code>numeric_storage_type</code>, сохраняя чувствительность и маскировку.
+Для старого неоднозначного профиля без этих сведений сначала нужно новое
+профилирование. Явный синтетический <code>numeric_measure</code>/<code>decimal_range</code> задаётся
+через существующий <code>infer-spec --decimal-fields</code>; исходные границы не выводятся.
+Проверьте изменённые отпечатки. В ожидающем подтверждения workspace перенесите
+только проверенное поле, сохраните настройки генерации плана и выполните
+<code>agent-review</code> с подтверждением нового отпечатка. Для изменённого источника или
+профиля создайте новый план; уже подтверждённый план не редактируйте. DatasetSpec остаётся версии 1.1.
+Подробнее: <a href="../profiling/#reviewed-csv-numeric-replacements">профилирование</a>.</p>
               
 </div>
 
