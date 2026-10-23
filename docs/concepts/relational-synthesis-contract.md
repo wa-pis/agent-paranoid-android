@@ -151,10 +151,9 @@ fan-out allocation or measured source fan-out fidelity. The separate
 records those optional extensions and their acceptance criteria; no new option
 is enabled by that proposal.
 
-Formulas currently support assign/check without a conditional predicate;
-conditional-required and conditional-allowed-values rules use predicates.
-Scenario weights cannot emulate a predicate. The separate
-[conditional formula/EAV proposal](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/reviewed-eav-expressions)
-records the remaining work. EAV source rows are not automatically pivoted or
-retained; explicit target modeling and independently generated key domains
-remain necessary.
+Formulas support optional reviewed typed predicates in assign/check mode.
+False predicates skip evaluation and are reported separately from successful
+checks. See [conditional formulas](../how-to/business-rules.md#conditional-formulas-and-synthetic-eav-models)
+and the source-free EAV example. Scenario weights remain probabilistic assignments,
+not predicates. EAV source rows are not automatically pivoted or retained;
+explicit target modeling and independently generated key domains remain necessary.

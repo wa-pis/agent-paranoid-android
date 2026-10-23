@@ -127,3 +127,14 @@ not profile/spec schemas. Fixed aggregate evidence keeps the same profile
 fingerprint; there is no silent reclassification or saved-plan promotion.
 Existing statement, scan, result and time limits remain enforced independently.
 Real source changes still require normal profile review.
+
+
+## Optional conditional formulas
+
+Formula rules add optional `when` with the existing typed Condition semantics.
+Absent/null predicates serialize as omitted and retain prior hashes and seeded
+behavior. Reports add eligible/evaluated/skipped counters only for conditional
+formulas; strict consumers should accept these additive counters. DatasetSpec
+stays at 1.1. Reviewed conditional branches change the rules/spec fingerprint
+and require renewed plan review. Conditional writer conflicts reject before
+publication; no existing source access or privacy permission is expanded.

@@ -23,6 +23,10 @@ Free-form LLM validation cannot establish invariants. Silently repairing conflic
 Sources: [generation and rules](../agent-guides/generation-and-rules.md), [relational contract](../concepts/relational-synthesis-contract.md), [validation specification](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/dataset-validation/spec.md).
 Executable anchors: [business rules](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/tests/test_business_rules.py), [generation hardening](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/tests/test_generation_contract_hardening.py), [identifier pools](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/tests/test_identifier_pool.py).
 
+The additive conditional-formula contract follows this deterministic rule decision;
+see the [business-rules baseline](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/business-rules/spec.md)
+and [source-free example](https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/business_rules/conditional_eav.json).
+
 ## Revisit when
 
 A new rule family needs defined executable semantics and validation; prose or a prototype alone is insufficient.

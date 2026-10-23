@@ -376,6 +376,17 @@
           "const": "formula",
           "title": "Type",
           "type": "string"
+        },
+        "when": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Condition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [

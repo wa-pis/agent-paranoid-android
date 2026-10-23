@@ -5,7 +5,10 @@ from __future__ import annotations
 from test_data_agent.core.limits import (
     GenerationBudget, GenerationLimitError, enforce_business_rule_evaluations,
 )
-from test_data_agent.rules.contract import estimate_business_rule_evaluations_for_rows
+from test_data_agent.rules.contract import (
+    estimate_business_rule_evaluations_for_rows, validate_business_rule_literals,
+    validate_business_rules_for_spec,
+)
 
 from typing import Any, TYPE_CHECKING
 
@@ -14,7 +17,7 @@ if TYPE_CHECKING:
 from test_data_agent.core.field import FieldSpec
 from test_data_agent.rules.typed_values import numeric_row, formula_value
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 
 from test_data_agent.rules.models import (
     AggregateFormulaRule,
@@ -36,6 +39,18 @@ MAX_TOTAL_REPORTED_RULE_ERRORS = 1_000
 
 
 class RuleResult(BaseModel):
+    eligible_row_count: int | None = Field(default=None, ge=0)
+    evaluated_row_count: int | None = Field(default=None, ge=0)
+    skipped_row_count: int | None = Field(default=None, ge=0)
+
+    @model_serializer(mode="wrap")
+    def serialize(self, handler: Any) -> dict[str, Any]:
+        result: dict[str, Any] = handler(self)
+        for name in ("eligible_row_count", "evaluated_row_count", "skipped_row_count"):
+            if getattr(self, name) is None:
+                result.pop(name, None)
+        return result
+
     rule_type: str
     application: str | None = None
     assigned_row_count: int = Field(default=0, ge=0)
@@ -74,6 +89,11 @@ def validate_business_rules(
 ) -> BusinessValidationReport:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
+    if any(isinstance(rule, FormulaRule) and rule.when is not None for rule in rules.row_rules):
+        if spec is None:
+            validate_business_rule_literals(rules)
+        else:
+            validate_business_rules_for_spec(rules, spec)
     enforce_business_rule_evaluations(estimate_business_rule_evaluations_for_rows(
         rules, {table: len(rows) for table, rows in rows_by_table.items()},
     ))
@@ -228,7 +248,15 @@ def validate_formula(
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
     result = RuleResult(rule_type="formula")
+    if rule.when is not None:
+        result.eligible_row_count = result.evaluated_row_count = result.skipped_row_count = 0
     for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
+        if rule.when is not None:
+            if not condition_matches(row, rule.when, budget=budget):
+                result.skipped_row_count = (result.skipped_row_count or 0) + 1
+                continue
+            result.eligible_row_count = (result.eligible_row_count or 0) + 1
+            result.evaluated_row_count = (result.evaluated_row_count or 0) + 1
         try:
             expected = formula_value(rule.expression, row, target, budget=budget)
         except GenerationLimitError:

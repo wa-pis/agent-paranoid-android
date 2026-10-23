@@ -11,7 +11,10 @@ from decimal import Decimal, localcontext, Context
 from test_data_agent.core.limits import (
     GenerationBudget, GenerationLimitError, enforce_business_rule_evaluations,
 )
-from test_data_agent.rules.contract import estimate_business_rule_evaluations_for_rows
+from test_data_agent.rules.contract import (
+    estimate_business_rule_evaluations_for_rows, validate_business_rule_literals,
+    validate_business_rules_for_spec,
+)
 
 from typing import Any, Literal, TYPE_CHECKING
 
@@ -35,6 +38,7 @@ from test_data_agent.rules.models import (
     ForeignKeyRule,
     FormulaRule,
     TemporalOrderingRule,
+    validate_conditional_formula_writers,
 )
 from test_data_agent.rules.scenarios import apply_scenarios
 from test_data_agent.rules.validation import (
@@ -85,9 +89,14 @@ def apply_business_rules(
     *,
     budget: GenerationBudget | None = None,
     spec: DatasetSpec | None = None,
+    assignment_counts: dict[int, int] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
+    if spec is None:
+        validate_business_rule_literals(rules)
+    else:
+        validate_business_rules_for_spec(rules, spec)
     enforce_business_rule_evaluations(estimate_business_rule_evaluations_for_rows(
         rules, {table: len(rows) for table, rows in rows_by_table.items()}, mode=mode,
     ))
@@ -97,7 +106,8 @@ def apply_business_rules(
         for entity in budget.iter_rule_work(spec.entities):
             for row in budget.iter_rule_work(rows_by_table.get(entity.name, [])):
                 row.update(numeric_row(row, entity, budget=budget))
-    apply_valid_defaults(rows_by_table, rules, field_defaults=field_defaults, budget=budget, spec=spec)
+    apply_valid_defaults(rows_by_table, rules, field_defaults=field_defaults, budget=budget, spec=spec,
+                         assignment_counts=assignment_counts)
 
     selected_mode = GenerationMode(mode)
     if selected_mode == GenerationMode.EDGE:
@@ -127,9 +137,11 @@ def apply_valid_defaults(
     field_defaults: Mapping[str, Mapping[str, Any]] | None = None,
     budget: GenerationBudget | None = None,
     spec: DatasetSpec | None = None,
+    assignment_counts: dict[int, int] | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
+    validate_conditional_formula_writers(rules.row_rules)
     for field_rule in budget.iter_rule_work(rules.field_rules):
         for row in budget.iter_rule_work(rows_by_table.get(field_rule.table, [])):
             if field_rule.required and row.get(field_rule.field) in (None, ""):
@@ -145,7 +157,7 @@ def apply_valid_defaults(
             ):
                 row[field_rule.field] = field_rule.allowed_values[0]
 
-    for row_rule in budget.iter_rule_work(rules.row_rules):
+    for rule_index, row_rule in budget.iter_rule_work(enumerate(rules.row_rules)):
         if isinstance(row_rule, ConditionalRequiredRule):
             for row in budget.iter_rule_work(rows_by_table.get(row_rule.table, [])):
                 if not condition_matches(row, row_rule.when, budget=budget):
@@ -176,6 +188,8 @@ def apply_valid_defaults(
             if row_rule.mode == "check":
                 continue
             for row in budget.iter_rule_work(rows_by_table.get(row_rule.table, [])):
+                if row_rule.when is not None and not condition_matches(row, row_rule.when, budget=budget):
+                    continue
                 failed = False
                 try:
                     entity = spec.entity(row_rule.table) if spec is not None else None
@@ -189,6 +203,8 @@ def apply_valid_defaults(
                     failed = True
                 if failed:
                     raise ValueError(f"formula evaluation failed for {row_rule.table}.{row_rule.field}")
+                if assignment_counts is not None:
+                    assignment_counts[rule_index] = assignment_counts.get(rule_index, 0) + 1
 
 
 def apply_edge_cases(
@@ -406,6 +422,10 @@ def apply_invalid_case(
         row[rule.end_field] = (start - timedelta(microseconds=1)).isoformat()
         return
     if isinstance(rule, FormulaRule):
+        if rule.when is not None:
+            force_condition_match(row, rule.when, budget=budget)
+            if not condition_matches(row, rule.when, budget=budget):
+                raise ValueError("formula predicate cannot select a controlled-invalid row")
         row[rule.field] = perturbed_formula_value(
             row.get(rule.field),
             rule.tolerance,

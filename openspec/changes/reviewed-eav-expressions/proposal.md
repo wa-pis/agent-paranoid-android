@@ -1,13 +1,14 @@
 # Change Proposal: reviewed-eav-expressions
 
 ## Status
-Proposed follow-up to relational-profile-utility R7. Planning only: this does not
-add a formula `when` option, pivot command or broader expression evaluator.
+Implementation candidate for relational-profile-utility R7: optional typed
+formula `when` and a source-free EAV target example. Candidate gates remain
+open; source pivot/unpivot and broader expressions are not implemented.
 
 ## Current support and gap
 Conditional-required/allowed-values rules already accept typed predicates.
-FormulaRule supports assign/check but has no predicate field; StrictRuleModel
-rejects extra keys. The bounded expression AST permits arithmetic and approved
+Before this change FormulaRule supported assign/check without a predicate;
+StrictRuleModel rejected the `when` key. The bounded expression AST permits arithmetic and approved
 calls, not Python conditional expressions. Scenario weights are probabilistic
 assignments and cannot stand in for a predicate. EAV inputs are not automatically
 pivoted/unpivoted, and metadata-only discovery cannot recover row-level attribute
@@ -34,5 +35,5 @@ I/O/transformation proposal and cannot be enabled by this synthetic proposal.
 ## Compatibility and acceptance
 Omitted predicates retain current output, rule counts and fingerprints. Public
 schema/API/MCP/CLI changes require documentation, safety/privacy regressions and
-RC acceptance. Do not silently accept unsupported payload keys while this change
-is only proposed; keep current deterministic rejection and recovery guidance.
+RC acceptance. Unsupported payload keys and expression syntax remain deterministic rejections.
+See design.md for writer conflicts, null semantics and report compatibility.
