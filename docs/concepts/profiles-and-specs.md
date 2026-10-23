@@ -144,3 +144,17 @@ package version, `spec_sha256`,
 reproduced later.
 
 The complete field reference is in [DatasetSpec](../dataset_profile_and_spec.md).
+
+
+## Date and time bounds
+
+A reviewed `date_range` or `datetime_range` supplies sampling bounds. Missing
+endpoints use 2020-01-01 and 2025-01-01. Supply both ordered endpoints for an
+earlier or later period: a partial bound that reverses the effective interval
+now rejects with a recovery hint. Generation keeps previous output artifacts
+unchanged on this failure.
+
+Datetime sampling retains its whole-second offset policy and the lower
+endpoint's microseconds. Very long fractional intervals use integer duration
+arithmetic to stay within the maximum. Range endpoints alone do not establish
+monthly or other calendar granularity; source-period fidelity remains unmeasured.

@@ -410,7 +410,10 @@ def ranged_datetime(
         high = high.replace(tzinfo=low.tzinfo)
     elif high.tzinfo is not None and low.tzinfo is None:
         low = low.replace(tzinfo=high.tzinfo)
-    seconds = max(0, int((high - low).total_seconds()))
+    if low > high:
+        raise ValueError("date/time range effective minimum exceeds maximum; supply ordered explicit bounds")
+    interval = high - low
+    seconds = interval.days * 86_400 + interval.seconds
     value = low + timedelta(seconds=rng.randint(0, seconds))
     return value.date().isoformat() if date_only else value.isoformat()
 

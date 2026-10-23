@@ -45,6 +45,12 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Date/time ranges whose supplied partial bound conflicts with a default endpoint
+  now reject with an explicit-bounds recovery hint instead of silently clamping.
+
+- Datetime sampling uses an exact whole-second span so very long fractional
+  intervals cannot round a generated value above the reviewed upper endpoint.
+
 - Trino SQL-query profiling and shared SQL aggregate profiling detach untyped
   driver and TLS failures from public
   errors, preventing retained secret-bearing exception context. Existing CLI

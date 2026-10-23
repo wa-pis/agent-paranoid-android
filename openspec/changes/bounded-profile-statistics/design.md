@@ -29,3 +29,43 @@ value marks overflow; repetitions at the cap remain exact. Binary/composite and
 nonfinite numeric equality remain unknown. The metadata null policy stays
 independent. No primary-key nomination or identifier pool is added by this
 change. Full row-count consistency is checked before publishing evidence.
+
+
+## Temporal bounds and granularity (S6)
+
+A fictional interval from year 1000 to year 3000 with an upper fraction of
+.999999 independently reproduces a one-microsecond overshoot. Converting its
+`timedelta.total_seconds()` float to int rounds the allowed maximum up. Compute
+whole seconds from integer days and seconds instead. This keeps existing
+second-resolution sampling, lower microseconds, offset handling and missing-bound
+fallbacks; it does not establish the cause of the external report's date.
+
+Min/max dates do not establish a calendar grain. A bounded future month-start
+route must separate candidate evidence from reviewed generation configuration:
+
+- Evidence is metadata only: inspected non-null count and counts satisfying an
+  explicit calendar predicate, with unknown on missing/incomplete evidence.
+  A min/max interval alone never yields a month-start declaration. Empty input
+  is unknown; partial coverage is a candidate, not a fidelity claim.
+- Local profiling reuses its existing bounded scan. SQL uses trusted aggregate
+  predicates only, charged to existing result-cell, query, deadline and scan
+  budgets; no raw date projections or source-value lists are introduced.
+- The first reviewed calendar model should support DATE month starts, with
+  explicit inclusive bounds, rather than conflate timestamp timezone/calendar
+  semantics. Select uniformly among eligible first-of-month dates. An interval
+  with no eligible date rejects before generation or publication.
+- Unknown grain preserves current day/second range generation. A reviewed grain
+  must be typed, fingerprint-bound and separately checked in validation and all
+  output formats. Source frequencies are not reproduced. Old profiles and plans
+  do not acquire a grain automatically; approval must be renewed after changes.
+- Runtime/calendar schema changes, provider summaries and candidate release
+  acceptance need their own implementation tests before activation. The current
+  bounds correction activates no new inferred calendar behavior.
+
+
+A second independent reproduction supplies only maximum 2010-01-01. The default
+minimum 2020-01-01 exceeds it, and the previous zero-clamping returned 2020
+outside the supplied maximum. Reject reversed effective intervals before row
+publication, with a fixed hint to supply ordered explicit endpoints. The same
+check rejects a supplied minimum beyond the default maximum; endpoint defaults
+and valid intervals are unchanged. Do not silently clamp contradictory intervals.

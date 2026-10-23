@@ -28,7 +28,8 @@ decoded-byte and deadline limits. Ruff, mypy (156 source files), strict MkDocs
 and strict OpenSpec validation passed. Existing schema fields suffice: no schema
 version change. Reprofiling changes profile fingerprints and requires new review.
 An additional 248 CLI, I/O workflow, agent planning/approval and advisor tests
-passed. Full PR CI remains pending; there is no package release claim.
+passed. Parquet follow-up #642 completed full green CI and merged as
+`7ff706da1cfcb5e0b7fa66cd2b4e58ca2615ef9a`. No package release is claimed.
 
 ## SQL S3 and S8 measurements
 
@@ -51,6 +52,34 @@ batching evaluation remains open.
 ## Remaining evidence
 
 Historical profile provenance remains unconfirmed. The user tentatively
-identified installed version 1.6.0 but supplied no source configuration. Temporal
-granularity/out-of-range reproduction, category recovery and bounded batching
-evaluation remain separate unchecked tasks. No live database was used.
+identified installed version 1.6.0 but supplied no source configuration. Historical temporal provenance, category recovery and bounded batching
+evaluation remain open; independent bounds defects and the future calendar
+design are documented below. No live database was used.
+
+
+## Independent temporal reproduction (S6)
+
+Fictional reviewed bounds 1000-01-01 through 3000-01-01 plus .999999 seconds
+reproduce an output one microsecond above the upper endpoint when the RNG
+selects its largest offset. Three naive/positive/negative-offset cases failed
+before the fix. Integer timedelta day/second arithmetic fixes all three without
+changing second-resolution sampling. Twelve direct endpoint cases cover lower
+and upper selection, subsecond intervals, different compatible offsets and
+extreme DATE endpoints. Alongside existing aggregate-to-generation, fallback,
+CSV, SQL-profile and RC4 tests, 160 tests passed. Full CI remains pending.
+
+This is an independent boundary defect, not proof of the external report's
+cause. Monthly source grain remains unknown and is not inferred from extrema;
+the bounded reviewed extension is specified in design.md for future activation.
+
+
+A separate partial-bound reproducer returned 2020 for a supplied maximum of
+2010. Four DATE/DATETIME partial-bound tests failed before the effective-order
+check; they now reject instead of silently clamping. Two CLI regressions verify
+that an existing dataset is unchanged and no manifest is published. The complete
+18-case temporal matrix passes. Neither independent defect establishes the
+historical report's cause.
+
+Final temporal verification: 286 temporal, SQL, CSV, generation-contract, golden
+artifact and documentation tests passed. Mypy (156 sources), Ruff, strict MkDocs
+and strict OpenSpec passed. Full CI for this temporal follow-up remains pending.
