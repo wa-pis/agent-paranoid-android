@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1523f340c89e57bbf33c641f82c289428b8747cb
+  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -298,6 +298,17 @@ endpoint defaults (minimum 2020-01-01, maximum 2025-01-01). A maximum before
 2020 or minimum after 2025 now rejects instead of silently clamping an inverted
 interval. Supply both ordered bounds for earlier or later periods. Failure leaves
 previous dataset artifacts unchanged and publishes no new manifest.</p>
+<h2 id="csv-numeric-replacement-evidence">CSV numeric replacement evidence<a class="headerlink" href="#csv-numeric-replacement-evidence" title="Permanent link">&para;</a></h2>
+<p>Reprofile CSV folders to replace cache format 7 with format 8. Ambiguous numeric
+phone-like fields may now include optional <code>numeric_storage_type</code>; sensitivity
+and masked patterns are unchanged. Old ambiguous profiles cannot opt into a
+numeric replacement without fresh storage evidence. Independently authored
+<code>numeric_measure</code> decimal ranges use the existing <code>infer-spec --decimal-fields</code>
+contract. Re-review changed profile/spec fingerprints. In an awaiting-approval workspace,
+copy the reviewed field while preserving planned generation settings, run
+<code>agent-review</code> and approve the new fingerprint. Do not mutate an already approved
+plan; replan changed source/profile evidence. DatasetSpec version 1.1 and unaffected legacy hashes
+remain unchanged; see <a href="../profiling/#reviewed-csv-numeric-replacements">profiling</a>.</p>
               
 </div>
 

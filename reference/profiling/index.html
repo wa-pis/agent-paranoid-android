@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1523f340c89e57bbf33c641f82c289428b8747cb
+  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -267,7 +267,7 @@ sensitive profiles omit ranges as well as source categories. Ambiguous financial
 columns require review; local category permission is not declassification.</p>
 <p>NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-Folder cache format 7 recomputes older cached profiles. Reprofile saved standalone
+Folder cache format 8 recomputes older cached profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.</p>
 <p>Generated string identifiers use the <code>synthetic_</code> prefix. This changes exact
@@ -298,6 +298,38 @@ lineage and output types after no-row schema inspection, before row-count and
 column aggregates. Exact PostgreSQL scopes preflight before connection;
 wildcards first require bounded metadata expansion. Invalid inputs publish no
 partial trusted profile.</p>
+<h2 id="reviewed-csv-numeric-replacements">Reviewed CSV numeric replacements<a class="headerlink" href="#reviewed-csv-numeric-replacements" title="Permanent link">&para;</a></h2>
+<p>Positive numeric text can resemble a phone. Profiling keeps that classification,
+masked patterns and sensitivity. When every non-null value parses as finite
+numeric storage, ambiguous phone-like CSV columns additionally carry
+<code>numeric_storage_type: integer|float</code>. This metadata contains no source values,
+extrema or decimal precision; it does not establish that a field is a measure.
+A late nonnumeric value, nonfinite value, formatted phone or recognized secret
+cannot supply this complete numeric evidence. No majority threshold is used.</p>
+<p>For a genuine measure, provide an independently authored synthetic range using
+<code>infer-spec profile.json --decimal-fields reviewed.json --output dataset_spec.yaml</code>.
+The JSON/YAML mapping uses the exact <code>ENTITY.FIELD</code> and a complete FieldSpec:</p>
+<pre><code class="language-json">{&quot;events.quantity&quot;: {&quot;name&quot;: &quot;quantity&quot;, &quot;data_type&quot;: &quot;decimal&quot;,
+  &quot;semantic_type&quot;: &quot;numeric_measure&quot;, &quot;distribution&quot;: {
+    &quot;kind&quot;: &quot;decimal_range&quot;, &quot;precision&quot;: 8, &quot;scale&quot;: 3,
+    &quot;min&quot;: &quot;1.001&quot;, &quot;max&quot;: &quot;2.002&quot;}}}
+</code></pre>
+<p>These are fictional generation bounds, not inferred source bounds. Protected
+names, identifiers, primary-key candidates and relationship endpoints reject
+this replacement. Fields explicitly marked sensitive for another reason also reject. Native CSV numeric
+fields can use the same authored range. Declared SQL/Parquet DECIMAL retains its
+existing precision/scale contract. Review the resulting spec before generation.
+The source profile remains sensitive; the advisor cannot automatically clear
+its classification. For an awaiting-approval agent workspace, infer to a separate file, copy only
+the reviewed field into <code>dataset_spec.yaml</code>, preserve the planned generation
+settings, run <code>agent-review</code>, and approve the newly reported fingerprint.
+Do not overwrite the workspace spec with default inference settings.</p>
+<p>Folder cache format 8 recomputes older profiles. An old ambiguous profile without
+storage evidence requires fresh profiling; saved profiles/plans are not silently
+upgraded. Evidence changes the profile fingerprint, and edited synthetic bounds
+change the spec fingerprint. Obtain new review/approval after either change.
+Absent evidence is omitted from serialization so unaffected legacy fingerprints
+remain stable. DatasetSpec stays at schema version 1.1: no new spec field or flag.</p>
               
 </div>
 

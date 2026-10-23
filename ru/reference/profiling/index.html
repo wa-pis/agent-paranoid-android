@@ -192,7 +192,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1523f340c89e57bbf33c641f82c289428b8747cb
+  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -265,6 +265,31 @@ DatasetSpec. Не обрезайте реальное перечисление �
 быть положительными целыми числами. Для SQL область и происхождение категории
 проверяются после запроса схемы без строк и до подсчёта строк и агрегатов.
 Некорректный запрос не публикует частичный доверенный профиль.</p>
+<h2 id="reviewed-csv-numeric-replacements">Явная синтетическая замена числового CSV-поля<a class="headerlink" href="#reviewed-csv-numeric-replacements" title="Permanent link">&para;</a></h2>
+<p>Положительные числа могут выглядеть как телефон. Профиль сохраняет чувствительность
+и маскировку. Если все непустые значения проходят конечный числовой разбор, он
+добавляет <code>numeric_storage_type: integer|float</code>. Это сведения о хранении, без
+исходных значений, границ или доказательства финансовой точности. Поздний выброс,
+форматированный телефон, NaN, бесконечность или распознанный секрет не разрешают
+замену по числовому большинству.</p>
+<p>Для настоящей меры используйте <code>infer-spec profile.json --decimal-fields reviewed.json
+--output dataset_spec.yaml</code>. В JSON/YAML сопоставьте <code>ENTITY.FIELD</code> с полным
+FieldSpec: совпадающее <code>name</code>, <code>data_type: decimal</code>, <code>semantic_type: numeric_measure</code>
+и <code>distribution</code> вида <code>decimal_range</code> с независимо заданными синтетическими
+<code>precision</code>, <code>scale</code>, <code>min</code>, <code>max</code>. Пример и ограничения приведены в
+<a href="../../../reference/profiling/#reviewed-csv-numeric-replacements">английском справочнике</a>.
+Исходные границы не извлекаются. Защищённые имена, идентификаторы, кандидаты
+первичного ключа и концы связей отклоняют замену. SQL/Parquet DECIMAL сохраняет
+прежнее требование совпадения объявленных precision/scale.</p>
+<p>Проверьте спецификацию перед генерацией. Профиль остаётся чувствительным;
+советник не снимает классификацию автоматически. В ожидающем подтверждения agent-workspace создайте отдельную спецификацию
+через infer-spec, перенесите только проверенное поле в <code>dataset_spec.yaml</code>,
+сохраните настройки генерации плана, выполните <code>agent-review</code> и подтвердите
+новый отпечаток. Не заменяйте настройки плана значениями infer-spec по умолчанию.
+Формат кэша папки 8 требует перепрофилирования старого кэша. Старый неоднозначный
+профиль без сведений о хранении также нужно построить заново. Сохранённые планы
+не обновляются молча: изменение профиля или диапазона требует новой проверки.
+При отсутствии сведений поле не сериализуется; DatasetSpec остаётся версии 1.1.</p>
               
 </div>
 

@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 1523f340c89e57bbf33c641f82c289428b8747cb
+  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -270,7 +270,7 @@ keys and omits lower-bound child distinct ratios from numeric evidence. Older
 profiles and other producers default to <code>unspecified</code>, not proven exact; reprofile
 old folder artifacts to obtain the new uncertainty metadata. This statistic is
 unrelated to the planned percentage of unchanged values after transformation.
-Cache format 7 invalidates older folder caches and recomputes their evidence,
+Cache format 8 invalidates older folder caches and recomputes their evidence,
 including finite numeric statistics and repeated-identifier pool sizes.
 Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.</p>
@@ -367,7 +367,7 @@ This structural check does not establish a native CSV parser peak-memory bound.<
 <p>CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
-format 7 invalidates older inferred bindings; reprofile saved artifacts.</p>
+format 8 invalidates older inferred bindings; reprofile saved artifacts.</p>
 <p>Parquet distinctness reuses the scalar sensitivity scan and retains at most
 10,000 private SHA-256 scalar digests per column. Complete supported equality
 reports exact non-null distinctness; overflow reports lower_bound. Binary,
@@ -381,6 +381,13 @@ Never materialize an arbitrary iterable before cardinality validation. Query
 category scope/type checks follow no-row schema inspection but precede row-count
 and column aggregates. Keep the default 20-value preservation policy; recovery
 omits the opt-in rather than silently truncating or raising a global limit.</p>
+<p>CSV <code>numeric_storage_type</code> is complete finite storage evidence for a phone-like
+column, not a declassification or precision claim. Keep source sensitivity and
+masked distributions. Only an independently authored <code>numeric_measure</code>
+<code>decimal_range</code> supplied through <code>infer-spec --decimal-fields</code> may replace an
+eligible CSV measure in the generation spec. Protected names, identifiers and
+key/relationship bindings veto replacement. Cache format 8 invalidates older
+folder evidence; changed profile/spec fingerprints require fresh review.</p>
               
 </div>
 
