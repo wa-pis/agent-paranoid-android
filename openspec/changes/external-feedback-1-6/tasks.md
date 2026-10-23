@@ -22,7 +22,7 @@
 - [x] P2: deliver bounded numeric/temporal/Parquet statistics and query cost evidence (#642–#646).
 - [x] P2: finish remaining CLI/validation contract clarifications.
 - [x] Merge and publicly verify the versioned documentation work separately.
-- [x] Run exact-source release gates for the runtime candidate through #646; no release authorized here.
+- [x] Run exact-source release gates for runtime candidates through #649; no release authorized here.
 - [ ] Archive completed changes only after their checks and merge are recorded.
 
 
@@ -32,10 +32,13 @@ Merged checkpoints: CLI contracts #632; metadata keys #633; source/output pool
 matrix #634; per-entity sizing #635; relationship discovery #636; utility evidence
 #638; separate scenario/EAV feasibility #639; Trino safe failures #640; bounded
 statistics #642; temporal endpoints #643; category preflight #644; reviewed CSV
-numeric declarations #645. Documentation publication is independently verified.
+numeric declarations #645; query batching #646; conditional formulas/EAV modeling
+#648; exact controlled relational scenarios #649. Documentation publication is
+independently verified through #649.
 
 The remaining historical evidence tasks (Trino configuration and external profile
 provenance) require unavailable external information; they are not runtime fixes.
-The proposed `controlled-relational-scenarios` and `reviewed-eav-expressions`
-changes retain separate implementation/activation tasks. Neither their feature
-completion nor a new package release follows from closing the implemented slice.
+The source-free `controlled-relational-scenarios` and `reviewed-eav-expressions`
+implementation/activation slices are complete in main. Source-row pivot/unpivot
+remains a separate explicitly authorized transformation/I/O extension. No new
+package release follows from these source changes.

@@ -142,14 +142,16 @@ Evidence contains metadata and counts, not key values or temporal endpoints.
 Collection shares the existing generation work and deadline budget and does
 not add a second scan of generated rows or change seeded generation.
 
-## Proposed relational extensions
+## Reviewed relational extensions
 
 Existing mixed/negative business rules can create synthetic missing-parent
 references. They do not provide an exact orphan-count selector, configurable
-fan-out allocation or measured source fan-out fidelity. The separate
-[controlled relational scenarios proposal](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios)
-records those optional extensions and their acceptance criteria; no new option
-is enabled by that proposal.
+fan-out allocation or measured source fan-out fidelity. Reviewed DatasetSpec
+[explicit scenarios](#explicit-relational-scenarios-unreleased) now provide
+exact synthetic orphan counts and generated-parent allocations in Unreleased
+source. They do not infer source histograms or reproduce source row mappings.
+Their executable acceptance is recorded in the
+[controlled relational scenario change](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios).
 
 Formulas support optional reviewed typed predicates in assign/check mode.
 False predicates skip evaluation and are reported separately from successful
