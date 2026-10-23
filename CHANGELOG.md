@@ -40,6 +40,11 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- SQL query profiling combines up to eight column summaries per trusted SELECT,
+  preserving aggregate evidence and existing invocation/scan limits while reducing
+  repeated derived-query requests. Table profiling and local-category queries
+  retain their existing execution paths.
+
 - Refresh agent prompts and both portable skills for current CLI/MCP planning,
   exact-spec review, recovery and local transformation approval. Wheels now
   include prompt templates alongside complete skill metadata and references;

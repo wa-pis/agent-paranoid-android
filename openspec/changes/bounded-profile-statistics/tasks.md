@@ -6,9 +6,9 @@
 - [x] S5: Add bounded Parquet distinct evidence with exact/lower-bound/unknown semantics; test row-group null statistics unavailable or malformed.
 - [x] S6: Specify bounded temporal granularity; reproduce the final report's apparent out-of-range date independently before treating it as a defect.
 - [x] S7: Verify category name/scope preflight; document bounded limit recovery and evaluate explicit capped configuration without silent truncation.
-- [ ] S8: Measure per-column aggregate query costs with fake clients; batch only if the existing budgets and safety invariants are preserved.
+- [x] S8: Measure per-column aggregate query costs with fake clients; batch only if the existing budgets and safety invariants are preserved.
   - [x] Measure narrow/wide query and Trino table profiles; verify existing PostgreSQL table counts.
-  - [ ] Evaluate a bounded batching design and retain separate invocation/scan accounting before implementation.
+  - [x] Evaluate a bounded batching design and retain separate invocation/scan accounting before implementation.
 - [ ] S9: Regenerate affected schemas/cache contracts, update docs/changelog and run candidate gates.
 
 S5 implementation and focused evidence are complete; full candidate CI remains

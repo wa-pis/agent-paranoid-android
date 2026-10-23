@@ -8,6 +8,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 import pytest
+from tests.query_summary_fixtures import batch_aggregate_rows
 
 from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
@@ -188,6 +189,11 @@ def reviewed_spec() -> DatasetSpec:
 
 
 def aggregate(sql):
+    if 'AS "__apa_0_' in sql:
+        return batch_aggregate_rows(sql, [
+            aggregate(f'min_temporal "{name}"' if name in {"day", "at"} else "")[0]
+            for name in COLUMNS
+        ])
     if "min_temporal" in sql:
         value = datetime(2023, 2, 1) if '"at"' in sql else date(2023, 2, 1)
         return [

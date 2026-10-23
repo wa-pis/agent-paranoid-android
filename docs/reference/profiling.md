@@ -121,3 +121,35 @@ upgraded. Evidence changes the profile fingerprint, and edited synthetic bounds
 change the spec fingerprint. Obtain new review/approval after either change.
 Absent evidence is omitted from serialization so unaffected legacy fingerprints
 remain stable. DatasetSpec stays at schema version 1.1: no new spec field or flag.
+
+
+## Bounded query-summary batches
+
+`profile-query` combines up to eight column summaries in one trusted aggregate
+SELECT over the already authorized derived query. For a fixed 48-column schema,
+that is eight profiling requests after source metadata authorization: one no-row
+schema check, one row count and six summary batches, instead of fifty. Adapter
+authorization metadata is additional (normally one request; PostgreSQL wildcard
+discovery may add another), so the ordinary total is nine instead of fifty-one. Each explicit local-category field still
+adds its own bounded category query. Normal table profiling is unchanged.
+
+A batch retains each field's non-null/distinct counts, numeric prevalence and
+permitted temporal bounds. Sensitive temporal suppression and category preflight
+remain field-scoped. Only aggregate expressions are combined; the authorized
+source query appears once, with no temp table, source-row return, expanded SQL
+subset or wider authorization. Incomplete/malformed aggregates fail without a
+trusted partial profile. The added wrapper is limited to 64 KiB beyond the source
+SQL, and at most eight fields/72 summary cells are retained per batch.
+
+PostgreSQL still charges actual statements and cumulative result rows/cells,
+with its read-only session, statement timeout and invocation deadline. Trino
+still charges actual statements, every projected/profiled column, database
+payload bytes and its per-statement conservative scan estimate against the
+cumulative invocation allowance. These controls are separate; fewer network
+requests does not grant more fields, source access or larger configured limits.
+A wider result can exhaust the existing result/cell budget and fails closed.
+
+For unchanged aggregate evidence, profile serialization and fingerprints are
+unchanged; no schema or cache migration is required. Re-review any genuinely
+changed profile. Fake-client statement counts are not measured live latency,
+physical scan counts or a source-snapshot consistency guarantee.

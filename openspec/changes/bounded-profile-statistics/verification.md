@@ -105,3 +105,30 @@ Final category verification on the temporal follow-up base: 183 focused category
 SQL adapter, PostgreSQL profiler and documentation tests passed. Mypy (156
 source files), Ruff, strict MkDocs and strict OpenSpec passed. Full candidate
 CI remains pending.
+
+
+## Bounded query-summary batches (S8)
+
+Eight new narrow/wide statement-count cases failed before batching and pass
+with bounded summaries. The 18-case new matrix covers both dialects, widths
+1/2/8/9/48, incomplete-column rejection, independent invocation statement/scan/
+profiled-column limits and identical profile serialization/fingerprints versus
+the former single-column reference. A width of 48 uses eight profiling requests after source metadata authorization
+instead of fifty. Adapter authorization is additional and remains budgeted. Existing table-profile counts are unchanged.
+
+381 focused SQL source/output, numeric statistics, RC4, authentication/category,
+adapter and temporal tests passed before the two added fingerprint-reference
+cases; final verification follows after their combined rerun. No live database,
+latency or physical scan measurement is claimed. Full candidate CI remains open
+under S9, and historical external profile provenance remains unconfirmed.
+
+
+Final S8 candidate verification: `scripts/check_release.sh` passed with 4602
+passed and 23 skipped tests and 91.90% coverage. Ruff, mypy, compilation,
+dependency/license compatibility, operational resource budgets, both generated
+schema freshness checks and deterministic quickstart smoke all passed. The
+quickstart reported no copied source rows. The isolated test runtime used the
+lock-compatible Python 3.11 dependency selection; controlling-terminal tests
+ran with the required local terminal access. Live database integration was
+explicitly disabled. Strict MkDocs and strict OpenSpec validation passed.
+Provider CI for this candidate remains pending under S9.
