@@ -53,7 +53,7 @@ positive orphans also reject a conflicting foreign-key business check. Ordinary
 check failure still prevents valid publication. These are explicit conflicts,
 not silently disabled rules.
 
-## Execution and evidence still to implement
+## Execution and evidence contract
 
 Keep omitted-scenario paths byte-compatible. For explicit scenarios, generate a
 valid synthetic baseline, retain its null mask, and perform allocation in the
@@ -92,3 +92,10 @@ CLI, Python generation or MCP; no runtime scenario has shipped. Actual snapshot
 validation, allocation, evidence, public schemas/docs and full exact-source
 candidate gates remain open. Live database/source-row access is neither needed
 nor authorized by this design.
+
+
+Private execution now implements bounded generated-key previews, dependency-order
+allocation, count-only observations and atomic commit with deadline rollback.
+Its 14 new synthetic cases and 150 focused regression tests pass. Public
+registration and mandatory export/report reconciliation remain unimplemented;
+this private result does not prove public activation or publication safety.

@@ -21,3 +21,22 @@ strict OpenSpec validation passed. Full release gates will run against the
 complete execution candidate before PR/activation. Actual generated snapshot
 preflight, allocation, expected-invalid reconciliation, public schemas, examples
 and end-to-end acceptance remain open and are not proved by these static tests.
+
+## Private execution follow-up
+
+The private executor allocates only generated key projections, checks actual
+sizes/types/null eligibility and exact totals, follows the existing relationship
+dependency order, then reconciles scoped and unscoped relationships before any
+original mutation. Commit deadline failures restore prior values without
+restarting the budget. Evidence contains edge names and counts, never keys.
+
+14 new synthetic execution cases cover deterministic replay, exact nonuniform
+fan-out and orphans, one-to-one excess children, frozen all-null masks, malformed
+snapshots, actual nullable-total mismatch, deadline rollback, omitted declarations,
+dependency chains, late failure of a second target, synthetic string orphan
+namespace and projection cell limits. 150 focused cases passed; Ruff and mypy
+(158 sources) passed. No live database or public generation call was used.
+
+DatasetSpec registration, report/writer reconciliation, public schemas/docs,
+full candidate release checks and exact-head CI/merge remain open. The private
+helper is not a shipped end-user feature.

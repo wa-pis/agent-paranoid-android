@@ -17,7 +17,7 @@ from test_data_agent.core.distribution import (
     DateTimeRangeDistribution,
 )
 from test_data_agent.core.field import FieldSpec, FieldType
-from test_data_agent.core.relationship import RelationshipType
+from test_data_agent.core.relationship import Relationship, RelationshipType
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import Condition, condition_matches
 from test_data_agent.rules.typed_values import formula_value, numeric_row, aggregate_mapping_values
@@ -50,6 +50,30 @@ def apply_relationships(
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
+    for relationship in budget.iter_rule_work(_ordered_relationships(spec, budget=budget)):
+        parent_rows = rows_by_entity.get(relationship.parent_entity, [])
+        child_rows = rows_by_entity.get(relationship.child_entity, [])
+        parent_values = [row.get(relationship.parent_field) for row in budget.iter_rule_work(parent_rows) if row.get(relationship.parent_field) is not None]
+        if not parent_values:
+            continue
+        child_field = spec.entity(relationship.child_entity).field(relationship.child_field)
+        child_rows = [
+            row for row in budget.iter_rule_work(child_rows)
+            if not (child_field.nullable and row.get(relationship.child_field) is None)
+        ]
+        if relationship.relationship_type == RelationshipType.ONE_TO_ONE and len(child_rows) > len(parent_values):
+            raise ValueError(
+                f"one_to_one relationship has more child rows than parent rows: "
+                f"{relationship.parent_entity}->{relationship.child_entity}"
+            )
+        for index, child_row in budget.iter_rule_work(enumerate(child_rows)):
+            if relationship.relationship_type == RelationshipType.ONE_TO_ONE:
+                child_row[relationship.child_field] = parent_values[index]
+            else:
+                child_row[relationship.child_field] = parent_values[index % len(parent_values)]
+
+
+def _ordered_relationships(spec: DatasetSpec, *, budget: GenerationBudget) -> list[Relationship]:
     relationships = [r for r in budget.iter_rule_work(spec.relationships) if r.status != "rejected"]
     writers: dict[tuple[str, str], list[int]] = defaultdict(list)
     for index, relationship in budget.iter_rule_work(enumerate(relationships)):
@@ -79,28 +103,7 @@ def apply_relationships(
                       for index, group in budget.iter_rule_work(groups.items())}
     # Inside a cycle retain legacy input order and unconditional final validation.
     order = [index for group in budget.iter_rule_work(group_order) for index in budget.iter_rule_work(groups) if groups[index] == group]
-    for index in budget.iter_rule_work(order):
-        relationship = relationships[index]
-        parent_rows = rows_by_entity.get(relationship.parent_entity, [])
-        child_rows = rows_by_entity.get(relationship.child_entity, [])
-        parent_values = [row.get(relationship.parent_field) for row in budget.iter_rule_work(parent_rows) if row.get(relationship.parent_field) is not None]
-        if not parent_values:
-            continue
-        child_field = spec.entity(relationship.child_entity).field(relationship.child_field)
-        child_rows = [
-            row for row in budget.iter_rule_work(child_rows)
-            if not (child_field.nullable and row.get(relationship.child_field) is None)
-        ]
-        if relationship.relationship_type == RelationshipType.ONE_TO_ONE and len(child_rows) > len(parent_values):
-            raise ValueError(
-                f"one_to_one relationship has more child rows than parent rows: "
-                f"{relationship.parent_entity}->{relationship.child_entity}"
-            )
-        for index, child_row in budget.iter_rule_work(enumerate(child_rows)):
-            if relationship.relationship_type == RelationshipType.ONE_TO_ONE:
-                child_row[relationship.child_field] = parent_values[index]
-            else:
-                child_row[relationship.child_field] = parent_values[index % len(parent_values)]
+    return [relationships[index] for index in order]
 
 
 def ordered_formula_constraints(
