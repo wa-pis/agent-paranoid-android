@@ -71,6 +71,9 @@ def generate_dataset(
     if spec.business_rules is not None:
         from test_data_agent.rules.contract import validate_business_rules_for_spec
         validate_business_rules_for_spec(spec.business_rules, spec)
+    if spec.relational_scenarios:
+        from test_data_agent.rules.relational_scenarios import prepare_relational_scenarios
+        prepare_relational_scenarios(spec, tuple(spec.relational_scenarios), seed=seed, budget=budget)
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = create_faker(spec.generation_settings.locale)
     faker.seed_instance(seed)
@@ -98,7 +101,7 @@ def generate_dataset(
                     faker,
                     seed,
                     # Rule-controlled negative cases require a valid formula baseline.
-                    mode=GenerationMode.VALID if spec.business_rules is not None and mode in {GenerationMode.NEGATIVE, GenerationMode.MIXED} else mode,
+                    mode=GenerationMode.VALID if spec.relational_scenarios or spec.business_rules is not None and mode in {GenerationMode.NEGATIVE, GenerationMode.MIXED} else mode,
                     invalid_ratio=invalid_ratio,
                     semantic_provider=semantic_provider,
                     identifier_domains=identifier_domains,

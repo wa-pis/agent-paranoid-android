@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Reviewed `relational_scenarios` support exact synthetic orphan counts and generated-parent fan-out, with mandatory reconciliation and count-only requested/observed evidence. Expected invalid datasets remain invalid; omitted declarations preserve existing seeded behavior.
+
 - Add reviewed typed conditional formulas with explicit skipped evidence, bounded disjoint EAV branches and a source-free runnable example.
 
 - CSV profiles retain optional finite numeric-storage evidence without clearing

@@ -182,3 +182,20 @@ fidelity without changing generation or legacy report readability.
 - **WHEN** an operator compares a utility spec hash to the generation manifest or a changed spec
 - **THEN** the same effective spec has the same canonical hash and a changed spec differs
 - **AND** old reports lacking utility evidence remain readable
+
+### Requirement: Explicit Relational Scenario Reconciliation
+
+A spec containing relational_scenarios SHALL receive mandatory final schema,
+privacy, native/business constraint and exact requested/observed relationship
+reconciliation even when optional validation settings are disabled. Evidence
+SHALL bind the effective spec and resolved sizes, return counts without keys,
+and distinguish matching controlled-invalid expectations from dataset validity.
+
+#### Scenario: Controlled invalid counts match the declaration
+- **WHEN** generated missing-parent references and fan-out match every declared quota
+- **THEN** expectations_met may be true while ordinary validity and validation_valid remain false
+- **AND** SQL export requiring valid foreign keys rejects before publication
+
+#### Scenario: A writer receives changed rows
+- **WHEN** final rows violate a quota, an unscoped relationship or a mandatory invariant
+- **THEN** the writer rejects before publishing replacement artifacts

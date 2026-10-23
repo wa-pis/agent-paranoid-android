@@ -18,6 +18,7 @@ from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_g
 from test_data_agent.validation.constraint_validator import TemporalMetrics, validate_constraints
 from test_data_agent.validation.relationship_validator import RelationshipMetrics, validate_relationships
 from test_data_agent.validation.schema_validator import validate_schema
+from test_data_agent.validation.relational_scenarios import RelationalScenarioEvidence, inspect_relational_scenarios
 
 
 class ValidationSection(BaseModel):
@@ -57,11 +58,12 @@ class DatasetValidationReport(BaseModel):
     settings: ValidationSettings = Field(default_factory=ValidationSettings)
     business_validation: BusinessValidationReport | None = Field(default=None)
     utility: ValidationUtilityEvidence | None = None
+    relational_scenarios: RelationalScenarioEvidence | None = None
 
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
-        for name in ("business_validation", "utility"):
+        for name in ("business_validation", "utility", "relational_scenarios"):
             if getattr(self, name) is None:
                 payload.pop(name, None)
         return payload
@@ -77,19 +79,20 @@ def validate_dataset(
     settings = spec.validation_settings.model_copy(deep=True)
     metrics: list[RelationshipMetrics] = []
     temporal_metrics: list[TemporalMetrics] = []
+    mandatory = bool(spec.relational_scenarios)
     validators: list[tuple[str, bool, Callable[[], list[str]]]] = [
-        ("schema", settings.validate_schema, lambda: validate_schema(rows_by_entity, spec)),
+        ("schema", settings.validate_schema or mandatory, lambda: validate_schema(rows_by_entity, spec)),
         (
             "relationships",
-            settings.validate_relationships,
+            settings.validate_relationships or mandatory,
             lambda: validate_relationships(rows_by_entity, spec, budget=budget, metrics=metrics),
         ),
         (
             "constraints",
-            settings.validate_constraints,
+            settings.validate_constraints or mandatory,
             lambda: validate_constraints(rows_by_entity, spec, budget=budget, temporal_metrics=temporal_metrics),
         ),
-        ("privacy", settings.validate_privacy, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec, parse_numeric_strings=True)),
+        ("privacy", settings.validate_privacy or mandatory, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec, parse_numeric_strings=True)),
     ]
     sections: list[ValidationSection] = []
     for name, enabled, validator in validators:
@@ -128,11 +131,15 @@ def validate_dataset(
                          "executed" if "constraints" in executed else "not_run"),
         temporal_metrics=temporal_metrics,
     )
+    scenario_evidence = (inspect_relational_scenarios(rows_by_entity, spec, tuple(spec.relational_scenarios), budget=budget)
+                         if spec.relational_scenarios else None)
     budget.check("validation evidence")
     return DatasetValidationReport(
+        relational_scenarios=scenario_evidence,
         utility=utility,
         business_validation=business,
-        valid=not any(item.failed for item in sections),
+        valid=not any(item.failed for item in sections) and (scenario_evidence is None or
+            scenario_evidence.expectations_met and all(item.valid for item in scenario_evidence.observations)),
         sections=sections,
         settings=settings,
     )
@@ -166,7 +173,11 @@ def assert_generated_dataset_valid(
     assert_spec_safe(spec)
     if validate_generated_row_privacy(rows_by_entity, spec):
         raise GenerationValidationError("generated dataset failed post-solve privacy validation")
-    if spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}:
+    if spec.relational_scenarios:
+        evidence = inspect_relational_scenarios(rows_by_entity, spec, tuple(spec.relational_scenarios), budget=budget)
+        if not evidence.expectations_met:
+            raise GenerationValidationError("generated dataset failed relational scenario reconciliation")
+    elif spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}:
         return
     if validate_schema(rows_by_entity, spec):
         raise GenerationValidationError("generated dataset failed post-solve type validation")
@@ -174,5 +185,5 @@ def assert_generated_dataset_valid(
         validate_business_rules_for_spec(spec.business_rules, spec)
         if not validate_business_rules(rows_by_entity, spec.business_rules, budget=budget, spec=spec).valid:
             raise GenerationValidationError("generated dataset failed post-solve business-rule validation")
-    if validate_relationships(rows_by_entity, spec, budget=budget) or validate_constraints(rows_by_entity, spec, budget=budget):
+    if (not spec.relational_scenarios and validate_relationships(rows_by_entity, spec, budget=budget)) or validate_constraints(rows_by_entity, spec, budget=budget):
         raise GenerationValidationError("generated dataset failed post-solve constraint validation")

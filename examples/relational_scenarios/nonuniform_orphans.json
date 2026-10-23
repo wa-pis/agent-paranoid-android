@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.1",
+  "entities": [
+    {
+      "name": "parents",
+      "row_count": 3,
+      "fields": [
+        {
+          "name": "key",
+          "data_type": "integer",
+          "nullable": false,
+          "null_ratio": 0.0,
+          "sensitive": false,
+          "semantic_type": null,
+          "is_identifier": true,
+          "distribution": {
+            "kind": "synthetic_identifier",
+            "prefix": null
+          }
+        }
+      ],
+      "primary_key": "key"
+    },
+    {
+      "name": "children",
+      "row_count": 6,
+      "fields": [
+        {
+          "name": "parent_key",
+          "data_type": "integer",
+          "nullable": false,
+          "null_ratio": 0.0,
+          "sensitive": false,
+          "semantic_type": null,
+          "is_identifier": true,
+          "distribution": {}
+        }
+      ],
+      "primary_key": null
+    }
+  ],
+  "relationships": [
+    {
+      "parent_entity": "parents",
+      "parent_field": "key",
+      "child_entity": "children",
+      "child_field": "parent_key",
+      "relationship_type": "many_to_one",
+      "confidence": 1.0,
+      "status": "inferred"
+    }
+  ],
+  "constraints": [],
+  "relational_scenarios": [
+    {
+      "parent_entity": "parents",
+      "parent_field": "key",
+      "child_entity": "children",
+      "child_field": "parent_key",
+      "orphan_count": 2,
+      "fanout_counts": [
+        3,
+        1,
+        0
+      ]
+    }
+  ],
+  "privacy_rules": [],
+  "privacy_settings": {
+    "default_classification": "internal",
+    "pii_classification": "sensitive",
+    "secret_classification": "secret",
+    "treat_unknown_as_sensitive": true,
+    "allow_raw_sensitive_values": false,
+    "max_safe_categories": 20
+  },
+  "local_category_fields": [],
+  "generation_settings": {
+    "seed": null,
+    "mode": "mixed",
+    "invalid_ratio": 0.0,
+    "output_format": "json",
+    "locale": null
+  },
+  "validation_settings": {
+    "validate_schema": true,
+    "validate_relationships": true,
+    "validate_constraints": true,
+    "validate_privacy": true,
+    "fail_fast": false
+  }
+}

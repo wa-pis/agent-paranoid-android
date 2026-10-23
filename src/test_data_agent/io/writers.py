@@ -314,7 +314,7 @@ def write_dataset_rows(
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("dataset export")
-    if spec is not None and spec.business_rules is not None:
+    if spec is not None and (spec.business_rules is not None or spec.relational_scenarios):
         from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
         assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     root = output_folder.absolute()
@@ -384,7 +384,7 @@ def write_single_entity_rows(
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("single-entity export")
-    if spec is not None and spec.business_rules is not None:
+    if spec is not None and (spec.business_rules is not None or spec.relational_scenarios):
         from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
         assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     if len(rows_by_entity) != 1:

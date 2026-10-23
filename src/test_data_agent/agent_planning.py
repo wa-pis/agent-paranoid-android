@@ -447,6 +447,13 @@ def plan_warnings(spec: DatasetSpec) -> list[str]:
             "2020-01-01 for a missing minimum and 2025-01-01 for a missing maximum; "
             "source-period fidelity is unmeasured. Review explicit bounds before approval."
         )
+    if spec.relational_scenarios:
+        warnings.append(
+            f"{len(spec.relational_scenarios)} explicit relational scenario(s) request "
+            f"{sum(item.orphan_count for item in spec.relational_scenarios)} synthetic missing-parent references; "
+            "review generated parent ordinal allocations in dataset_spec.yaml. "
+            "Expected invalid references remain invalid; source fidelity is unmeasured."
+        )
     confidence = minimum_inference_confidence(spec)
     if confidence is not None and confidence < 1.0:
         warnings.append(

@@ -1,8 +1,10 @@
 # Change Proposal: controlled-relational-scenarios
 
 ## Status
-Proposed follow-up to relational-profile-utility R6. This proposal enables no
-runtime behavior and does not claim that the new options already exist.
+Implementation candidate following relational-profile-utility R6. The isolated
+candidate registers reviewed DatasetSpec declarations across generation and
+mandatory validation/writers. Public delivery still requires full candidate
+gates and green exact-head CI/merge. No package release is requested.
 
 ## Problem and current support
 Valid FK assignment binds generated child rows to generated parent keys.

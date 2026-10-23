@@ -130,3 +130,7 @@ approved agent workspaces and every output format. DECIMAL formulas and aggregat
 use exact arithmetic with one target-scale HALF_UP rounding. See
 [business rules](docs/how-to/business-rules.md) and the
 [source/output contract](docs/reference/source-output-matrix.md).
+
+Reviewed [relational scenarios](docs/concepts/relational-synthesis-contract.md#explicit-relational-scenarios-unreleased)
+can specify exact synthetic missing-parent counts and generated parent fan-out
+in DatasetSpec (Unreleased); expected invalid references remain explicitly invalid.
