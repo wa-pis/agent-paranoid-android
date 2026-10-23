@@ -125,3 +125,28 @@ on a count override failure, retained SQL FK rejection, non-key type checks,
 review warnings, one-to-one observation validity, CLI exit statuses and row-free
 MCP consumption. Strict docs and all 17 baseline OpenSpec capabilities pass;
 full local release and exact-head provider CI/merge remain pending.
+
+## Merged delivery checkpoint after #649
+
+Conditional formulas/source-free EAV modeling merged in #648 as
+`25a221b70f95a0e9d11e8191a2301dedac9aa690`. Explicit controlled relational
+scenarios merged in #649 as `9b2e02b1e2ad50ce14213b296c32528349578fce`, after
+all 38 applicable checks succeeded on exact final head
+`534f0ce351761b3dd092159a36e269beaadeb3c9` (five non-applicable publication/tag
+jobs skipped). The branch was CLEAN and merged with an exact-head match.
+
+The final full local release gate passed 4701 tests, 23 skipped, with 92.03%
+coverage, dependency/resource/schema checks and deterministic synthetic
+quickstart. The final candidate and managed runtime/schema trees matched SHA256
+`55096093aab2e1cb4276cb3e75aa220202b0d40452c3a19bcd2a09835d787b90`.
+The focused suite passed 169 cases, including three reproduced unrelated native
+key-type regressions corrected before merge. No runtime changes followed the
+final gate.
+
+Documentation run 39942192547 for merged #649 completed successfully. Independent
+scripts/verify_documentation.py verification passed against the public site with
+expected documentation revision `9b2e02b1e2ad50ce14213b296c32528349578fce`,
+including stable/version identity and all four download hashes. The package
+identity remains published 1.6.0 (`258c035c22408becf17ab090635710a50dda8ccc`);
+new source features are Unreleased. No new package release or live database
+acceptance is claimed.

@@ -5,7 +5,7 @@
 - [x] Implement bounded fan-out assignment using generated parent ordinals only.
 - [x] Record requested/observed violations and fan-out evidence without source values or fidelity claims.
 - [x] Test omitted-option compatibility, zero/all-null/empty/impossible plans, deterministic replay and no partial publication.
-- [ ] Update public contracts, documentation, OpenSpec baselines and run exact-source candidate gates before activation.
+- [x] Update public contracts, documentation, OpenSpec baselines and run exact-source candidate gates before activation.
 
 
 ## Private preflight foundation
@@ -41,7 +41,7 @@ This does not activate a public generation option or close publication gates.
 - [x] Exercise Python, CLI and row-free MCP plus JSON/CSV/Parquet publication and SQL rejection.
 - [x] Update schemas, advisor contract fixture, EN/RU documentation, example, changelog and baseline specs.
 - [x] Complete the full local release gate and record exact-source evidence.
-- [ ] Complete all exact-head provider CI checks and merge the candidate.
+- [x] Complete all exact-head provider CI checks and merge the candidate.
 
 The candidate has 32 preflight, 14 private atomic-execution and 16 public-interface
 synthetic test cases. No live database, source rows, release tag or package
@@ -55,3 +55,14 @@ Review follow-up: ordinary unrelated FLOAT/BOOLEAN/DECIMAL edges retain native
 key support alongside selected integer/string scenarios. Three reproductions
 failed before the correction and pass afterward; 169 focused cases pass.
 The changed runtime requires a fresh complete local gate and final-head CI.
+
+## Merged acceptance
+
+#649 merged after all 38 applicable final-head checks passed. The final local
+release gate passed 4701 tests (23 skipped), 92.03% coverage and all resource,
+schema, dependency and quickstart checks. Public-interface acceptance now has
+19 cases; preparation/execution/interface cases total 65. Production source and
+schema hashes matched the tested candidate. Documentation deployment and
+independent public identity/stable/four-download verification passed. See
+verification.md for exact commit, run and content identities. All implementation
+and activation tasks in this change are complete; no package release is implied.

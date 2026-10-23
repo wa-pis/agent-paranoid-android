@@ -126,3 +126,13 @@ The combined exact-source release gate on the subsequent candidate passed
 4603 tests with 91.90% coverage. This closes the implemented relational slice;
 `controlled-relational-scenarios` and `reviewed-eav-expressions` retain their own
 unchecked implementation and activation tasks. No package release is claimed.
+
+
+## Follow-up activation checkpoint
+
+The separately specified source-free follow-ups are implemented and merged:
+conditional formulas/EAV target modeling #648 and explicit controlled relational
+scenarios #649. #649 passed all 38 applicable exact-head checks after the final
+4701-test local release gate (92.03% coverage). Its documentation deployment and
+independent public identity/download verification passed. Source-row pivot/unpivot
+and source-distribution fidelity remain outside these synthetic capabilities.

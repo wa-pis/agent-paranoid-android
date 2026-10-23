@@ -1,10 +1,9 @@
 # Change Proposal: controlled-relational-scenarios
 
 ## Status
-Implementation candidate following relational-profile-utility R6. The isolated
-candidate registers reviewed DatasetSpec declarations across generation and
-mandatory validation/writers. Public delivery still requires full candidate
-gates and green exact-head CI/merge. No package release is requested.
+Delivered in main through #649 after the full local release gate and all 38
+applicable exact-head CI checks passed. EN/RU documentation was published and
+independently verified. New package publication remains outside this task.
 
 ## Problem and current support
 Valid FK assignment binds generated child rows to generated parent keys.
