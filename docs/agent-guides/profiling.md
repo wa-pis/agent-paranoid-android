@@ -181,3 +181,12 @@ CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
 format 7 invalidates older inferred bindings; reprofile saved artifacts.
+
+
+Parquet distinctness reuses the scalar sensitivity scan and retains at most
+10,000 private SHA-256 scalar digests per column. Complete supported equality
+reports exact non-null distinctness; overflow reports lower_bound. Binary,
+composite and nonfinite numeric values stay unknown. Do not serialize digests
+or nominate primary keys/pools from this evidence. Invalid or absent metadata
+null counts remain unknown independently. A row-count mismatch rejects the
+profile; existing decoded-byte/cell/deadline limits remain in force.

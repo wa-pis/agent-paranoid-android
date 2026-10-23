@@ -2,25 +2,27 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+import hashlib
+import math
 from pathlib import Path
 from decimal import Decimal
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
-    enforce_input_files, enforce_parquet_metadata_limits,
+    InputLimitError, enforce_input_files, enforce_parquet_metadata_limits,
 )
 from test_data_agent.core.parquet_limits import inspect_parquet_batch
 from test_data_agent.core.privacy import infer_sensitive_from_name, infer_sensitive_value_type
 from test_data_agent.csv_profiler import CSVProfile, CSVColumnProfile
-from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile, csv_profile_to_dataset_spec
+from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
+from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.profiling.budget import LocalProfileBudget
 
 
 def parquet_file_to_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
-    profile = csv_profile_to_dataset_profile(_parquet_metadata_as_csv_profile(path, table_name=table_name))
-    profile.source_type = "parquet"
-    return profile
+    return _parquet_dataset_profile(path, table_name=table_name)
 
 
 def parquet_file_to_dataset_spec(
@@ -30,11 +32,10 @@ def parquet_file_to_dataset_spec(
     count: int | None = None,
     seed: int | None = None,
 ) -> DatasetSpec:
-    return csv_profile_to_dataset_spec(
-        _parquet_metadata_as_csv_profile(path, table_name=table_name),
-        count=count,
-        seed=seed,
-    )
+    spec = infer_dataset_spec(parquet_file_to_dataset_profile(path, table_name=table_name), count=count)
+    if seed is not None:
+        spec.generation_settings.seed = seed
+    return spec
 
 
 def dataset_profile_from_parquet(path: Path, table_name: str | None = None) -> DatasetProfile:
@@ -56,7 +57,7 @@ def dataset_spec_from_parquet(
     )
 
 
-def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) -> CSVProfile:
+def _parquet_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
     budget = LocalProfileBudget()
     budget.check_deadline("Parquet profiling preflight")
     try:
@@ -69,35 +70,67 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
     enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
     arrow_schema = parquet_file.schema_arrow
     row_count = parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0
-    sensitive = _parquet_sensitive_columns(parquet_file, budget=budget)
+    evidence = _inspect_parquet_columns(parquet_file, budget=budget)
     columns = []
-    for index, field in enumerate(arrow_schema):
+    for index, arrow_field in enumerate(arrow_schema):
         budget.check_deadline("Parquet field metadata")
-        null_count = _parquet_null_count(parquet_file.metadata, index, field.name)
+        null_count = _parquet_null_count(parquet_file.metadata, index, arrow_field.name)
         columns.append(CSVColumnProfile(
-            name=field.name,
-            data_type=_csv_data_type_from_arrow(field.type),
-            decimal_precision=field.type.precision if str(field.type).startswith("decimal") else None,
-            decimal_scale=field.type.scale if str(field.type).startswith("decimal") else None,
-            nullable=field.nullable,
+            name=arrow_field.name,
+            data_type=_csv_data_type_from_arrow(arrow_field.type),
+            decimal_precision=arrow_field.type.precision if str(arrow_field.type).startswith("decimal") else None,
+            decimal_scale=arrow_field.type.scale if str(arrow_field.type).startswith("decimal") else None,
+            nullable=arrow_field.nullable,
             null_count=null_count,
             null_ratio=(round(null_count / row_count, 6) if row_count else 0.0)
             if null_count is not None else None,
             approx_distinct_count=None,
-            sensitive=sensitive[index],
+            sensitive=evidence[index].sensitive,
         ))
     budget.check_deadline("Parquet profile complete")
-    return CSVProfile(
-        source_type="parquet",
-        table=table_name or path.stem,
-        row_count=row_count,
-        columns=columns,
-    )
+    profile = csv_profile_to_dataset_profile(CSVProfile(
+        source_type="parquet", table=table_name or path.stem,
+        row_count=row_count, columns=columns,
+    ))
+    profile.source_type = "parquet"
+    entity = profile.entities[0]
+    for result, observed in zip(entity.fields, evidence, strict=True):
+        budget.check_deadline("Parquet distinct evidence")
+        if observed.rows != row_count:
+            raise InputLimitError("Parquet inspection row count is inconsistent")
+        if observed.unknown:
+            continue
+        result.unique_ratio = len(observed.digests) / observed.non_null if observed.non_null else 0.0
+        result.unique_ratio_kind = "lower_bound" if observed.overflow else "exact"
+    # Distinct counts alone do not establish a semantic primary key or relationship.
+    budget.check_deadline("Parquet profile complete")
+    return profile
 
 
 def _parquet_sensitive_columns(parquet_file: Any, *, budget: LocalProfileBudget | None = None) -> list[bool]:
-    """Inspect bounded local values; retain only sensitivity flags, never rows."""
-    flags = [infer_sensitive_from_name(field.name) for field in parquet_file.schema_arrow]
+    """Compatibility helper for the existing bounded sensitivity inspection."""
+    return [item.sensitive for item in _inspect_parquet_columns(parquet_file, budget=budget)]
+
+
+MAX_PARQUET_DISTINCT_DIGESTS = 10_000
+
+
+@dataclass
+class _ParquetColumnEvidence:
+    sensitive: bool
+    rows: int = 0
+    non_null: int = 0
+    digests: set[bytes] = field(default_factory=set, repr=False)
+    overflow: bool = False
+    unknown: bool = False
+
+
+def _inspect_parquet_columns(
+    parquet_file: Any, *, budget: LocalProfileBudget | None = None,
+) -> list[_ParquetColumnEvidence]:
+    """One bounded scan retains sensitivity and capped, private scalar digests."""
+    observations = [_ParquetColumnEvidence(infer_sensitive_from_name(item.name))
+                    for item in parquet_file.schema_arrow]
     budget = budget or LocalProfileBudget()
     expanded = 0
     total_cells = 0
@@ -115,9 +148,35 @@ def _parquet_sensitive_columns(parquet_file: Any, *, budget: LocalProfileBudget 
                 evidence = str(value) if type(value) in (int, float, Decimal) else value
                 # Binary/composite content is unsupported evidence, not proof of safety.
                 if isinstance(value, (bytes, list, tuple, dict)) or infer_sensitive_value_type(evidence):
-                    flags[index] = True
+                    observations[index].sensitive = True
+                _observe_distinct(observations[index], value)
     budget.check_deadline("Parquet sensitivity inspection")
-    return flags
+    return observations
+
+
+def _observe_distinct(evidence: _ParquetColumnEvidence, value: Any) -> None:
+    evidence.rows += 1
+    if value is None:
+        return
+    evidence.non_null += 1
+    if evidence.unknown:
+        return
+    if isinstance(value, (bytes, list, tuple, dict)) or (
+        isinstance(value, float) and not math.isfinite(value)
+    ) or (isinstance(value, Decimal) and not value.is_finite()):
+        evidence.unknown = True
+        evidence.digests.clear()
+        return
+    # Arrow fixes the scalar type per field; normalize signed floating zero.
+    text = "0" if isinstance(value, (float, Decimal)) and value == 0 else str(value)
+    encoded = f"{type(value).__name__}:{text}".encode("utf-8")
+    digest = hashlib.sha256(encoded).digest()
+    if digest in evidence.digests:
+        return
+    if len(evidence.digests) < MAX_PARQUET_DISTINCT_DIGESTS:
+        evidence.digests.add(digest)
+    else:
+        evidence.overflow = True
 
 
 def _parquet_null_count(metadata: Any, index: int, field_name: str) -> int | None:

@@ -19,3 +19,13 @@ Measure query counts for narrow and wide fictional schemas. Batch aggregates onl
 within SQL-size, column, result-cell, deadline and scan limits. No temporary table
 or other write is permitted. Category preflight can reject names/scopes before
 access; actual cardinality still requires bounded aggregate evidence.
+
+
+Parquet S5: reuse the existing scalar inspection rather than opening a second
+reader. Count a bounded private set of SHA-256 encodings of Arrow-native scalar
+values, normalize signed floating zero, and expose only the non-null distinct
+ratio plus existing exact/lower_bound kind. At 10,000 retained digests, an unseen
+value marks overflow; repetitions at the cap remain exact. Binary/composite and
+nonfinite numeric equality remain unknown. The metadata null policy stays
+independent. No primary-key nomination or identifier pool is added by this
+change. Full row-count consistency is checked before publishing evidence.

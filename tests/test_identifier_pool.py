@@ -152,7 +152,7 @@ def test_folder_distinct_overflow_cannot_infer_a_pool(tmp_path):
 
 
 @pytest.mark.parametrize("statistics", [True, False])
-def test_parquet_unknown_distinctness_never_claims_pool_or_primary_key(tmp_path, statistics):
+def test_parquet_distinctness_alone_never_claims_pool_or_primary_key(tmp_path, statistics):
     from test_data_agent.adapters.parquet_dataset import parquet_file_to_dataset_profile
 
     pa = pytest.importorskip("pyarrow")
@@ -162,7 +162,8 @@ def test_parquet_unknown_distinctness_never_claims_pool_or_primary_key(tmp_path,
                    write_statistics=statistics)
     profile = parquet_file_to_dataset_profile(path)
     field = profile.entities[0].field("run_id")
-    assert field.unique_ratio is None
+    assert field.unique_ratio == 0.04
+    assert field.unique_ratio_kind == "exact"
     assert "pool_size" not in field.distribution
     assert profile.entities[0].primary_key_candidates == []
     if not statistics:

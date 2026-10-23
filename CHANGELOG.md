@@ -6,6 +6,10 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Parquet profiling computes bounded non-null distinctness during the existing
+  sensitivity scan, with exact, lower-bound and unknown evidence. It preserves
+  source-value suppression and does not infer keys or identifier pools.
+
 - Hash-bound validation `utility` evidence separates executed, undeclared and
   skipped relational/temporal checks, includes generated temporal check counts,
   and keeps unmeasured source integrity and unmodeled relationship counts unknown.

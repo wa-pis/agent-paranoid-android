@@ -22,7 +22,7 @@ Repeated-key pool evidence differs by source:
 | Single CSV / CSV folder | A complete bounded distinct count can supply a pool; censored or overflow counts cannot. |
 | PostgreSQL table / PostgreSQL or Trino query profile | Aggregate distinct counts can supply a pool for a repeated identifier. A declared PostgreSQL primary key uses fresh unique identifiers instead. |
 | Trino aggregate / legacy JSON profile | A supplied positive repeated distinct count can size the synthetic pool; approximate input remains approximate evidence about the source. |
-| Parquet | Distinctness is currently unknown, even with row-group statistics. No pool or primary key is inferred from it. Missing null statistics also block automatic spec inference. |
+| Parquet | One bounded scalar scan reports exact or lower-bound non-null distinctness; binary, composite and nonfinite numeric evidence stays unknown. No pool or primary key is inferred from it. Missing null statistics also block automatic spec inference. |
 
 A pool fixes the available synthetic domain, not the original key frequencies
 or source row mappings. Smaller output counts and nulls can leave pool members
@@ -53,3 +53,13 @@ seeded identifier output relative to earlier releases, without changing the
 profile or specification schema version.
 Short string patterns reserve random suffix space instead of filling the entire
 requested length with a prefix.
+
+
+Parquet reuses its sensitivity inspection for distinct counting: at most 10,000
+private SHA-256 scalar digests per column, with the existing cell, expanded-byte
+and local deadline limits. The denominator is inspected non-null rows. A new
+distinct value beyond the cap changes `unique_ratio_kind` to `lower_bound`;
+repetitions at the cap do not. Unsupported equality remains unknown. Null ratios
+still require complete valid row-group statistics. Digests never leave the
+profiler. Reprofile older Parquet artifacts and review changed fingerprints;
+existing approved plans are not updated automatically.
