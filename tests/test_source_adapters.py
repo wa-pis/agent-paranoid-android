@@ -208,7 +208,7 @@ def test_parquet_adapter_uses_complete_row_group_null_statistics(tmp_path: Path)
 
     assert profile.field("amount").null_ratio == 0.5
     assert profile.field("code").null_ratio == 0.0
-    assert profile.field("amount").unique_ratio_kind == "unspecified"
+    assert profile.field("amount").unique_ratio_kind == "exact"
 
 
 def test_parquet_adapter_does_not_treat_missing_statistics_as_measured(tmp_path: Path) -> None:
@@ -227,7 +227,7 @@ def test_parquet_public_profile_keeps_missing_null_statistics_unknown(tmp_path: 
     field = dataset_profile_from_parquet(path).entity("fictional-no-stats").field("amount")
 
     assert field.model_dump(mode="json")["null_ratio"] is None
-    assert field.model_dump(mode="json")["unique_ratio"] is None
+    assert field.model_dump(mode="json")["unique_ratio"] == 1.0
     from test_data_agent.generation.planner import infer_dataset_spec
 
     with pytest.raises(ValueError, match="unknown null statistics"):

@@ -77,3 +77,13 @@ upgrade; the new contract fixtures record the intentional report changes.
 Unknown source fidelity, fan-out and missing relationship coverage remain
 unknown. No source queries, new authorization, dependency, package publication
 or completed release-candidate acceptance is implied.
+
+
+### Parquet distinctness evidence
+
+Reprofile Parquet sources to obtain bounded non-null distinctness. Old profiles
+retain unknown values. Newly profiled scalar columns may have `exact` or
+`lower_bound` unique-ratio evidence using existing schema fields; changed profile
+fingerprints require fresh plan review. This adds no primary-key nomination,
+identifier pool or source key reuse. Missing null metadata still blocks automatic
+spec inference. Existing dataset/profile schema versions remain unchanged.
