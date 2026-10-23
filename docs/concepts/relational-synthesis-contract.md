@@ -157,3 +157,63 @@ checks. See [conditional formulas](../how-to/business-rules.md#conditional-formu
 and the source-free EAV example. Scenario weights remain probabilistic assignments,
 not predicates. EAV source rows are not automatically pivoted or retained;
 explicit target modeling and independently generated key domains remain necessary.
+
+## Explicit relational scenarios (Unreleased)
+
+A reviewed DatasetSpec may include `relational_scenarios`. Each declaration names
+`parent_entity`, `parent_field`, `child_entity`, `child_field`, an exact
+`orphan_count` (default 0), and optional `fanout_counts`. Counts describe independently
+authored synthetic behavior, never observed source histograms or row mappings.
+See the [runnable synthetic example](https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/relational_scenarios/nonuniform_orphans.json).
+
+```json
+{
+  "parent_entity": "parents", "parent_field": "key",
+  "child_entity": "children", "child_field": "parent_key",
+  "orphan_count": 2, "fanout_counts": [3, 1, 0]
+}
+```
+
+With three generated parent rows and six eligible children, this assigns three
+children to parent ordinal 0, one to ordinal 1, none to ordinal 2, and two unique
+synthetic keys with no parent. Ordinals address generated row positions, never
+source IDs. Children with generated null keys keep their nulls and do not enter
+the quota. Fan-out counts plus orphans must equal the actual non-null child count;
+a probabilistic null ratio may therefore make a requested allocation impossible.
+
+Positive orphan counts require `mixed` or `negative` mode and `invalid_ratio: 0`.
+Explicit scenarios use a valid synthetic field baseline, so unrelated fields do
+not receive random negative injection. An omitted declaration preserves existing
+seeded output and mode behavior. A separate deterministic RNG selects the child
+positions; replay needs the same ordered effective spec, seed and algorithm.
+
+Only matching integer or string keys on one unambiguous active edge are accepted.
+One-to-one and primary-key child targets require unique assigned keys. Fan-out
+requires distinct non-null generated parent keys for every positive ordinal.
+Conflicting key writers, negative business-rule injection, incompatible foreign-key
+business checks and global invalid ratios reject. Scenarios never resize tables:
+count overrides and load expansion are resolved first, then the authored quotas
+must still match. Requests are limited to 1,000 scenarios, one million parent
+ordinals per declaration, and existing row, cell, byte, work and deadline limits.
+
+Generation checks the complete generated key snapshot before committing changes;
+failed or stale allocation publishes no partial bundle. Native constraints,
+compatible business rules, schema and privacy remain mandatory. Writers reconcile
+the actual final rows again; disabling optional validation settings cannot bypass
+these checks for a spec with explicit scenarios.
+
+The validation report adds `relational_scenarios` with effective `spec_sha256`,
+resolved `sizes_sha256`, aggregate `expectations_met`, and count-only observations:
+requested/observed orphans, requested/observed fan-out, eligible and null children.
+Eligible minus observed orphans gives resolved references. Ambiguous repeated
+parent keys without an explicit fan-out return null observed fan-out.
+Expected missing references still set ordinary validity and manifest
+`validation_valid` to false; matching the scenario does not certify a valid dataset
+or source fidelity. CLI generation consequently returns the existing invalid-result
+exit status. The report and spec bind identity; they are not dataset approvals.
+
+CSV, JSON and Parquet can hold these explicitly controlled invalid datasets.
+PostgreSQL SQL export retains its valid-dataset requirement and rejects missing
+references before publishing DDL with foreign-key constraints. Valid fan-out
+allocations remain eligible for SQL export. No package release is implied by
+these Unreleased source changes.

@@ -40,3 +40,38 @@ namespace and projection cell limits. 150 focused cases passed; Ruff and mypy
 DatasetSpec registration, report/writer reconciliation, public schemas/docs,
 full candidate release checks and exact-head CI/merge remain open. The private
 helper is not a shipped end-user feature.
+
+## Complete-contract isolated candidate
+
+The candidate registers reviewed declarations through existing DatasetSpec
+loading, Python generation, CLI and MCP consumers. It adds mandatory final
+schema/privacy/native/business/scenario checks to generation and writer paths,
+including disabled-report cases. Expected controlled-invalid bundles keep
+validation_valid false; SQL export retains the valid-FK requirement.
+
+There are 32 preflight, 14 private execution and 16 interface acceptance cases.
+The interface suite passes (16 tests); strict whole-source Ruff and mypy (160
+sources) pass. The updated advisor response-schema fixture retains all other
+13 public fixtures unchanged. Strict MkDocs and all 17 baseline OpenSpec
+capabilities pass. Full release checks are running; no CI/merge, package release
+or live-server success is inferred from these focused results.
+
+## Full local gate checkpoint
+
+The exact candidate runtime/schema tree passed scripts/check_release.sh:
+4698 passed, 23 skipped, 92.03% coverage, plus lint, types, compile, dependency
+license/compatibility, direct privacy/SQL boundaries, operational budgets,
+schema freshness and deterministic synthetic quickstart. Runtime source/schema
+content SHA256: `055faf8ec0b33d2587da416167a3289d1edc560942e896a02751a3fdd3e7b4c6` (sorted relative file names + NUL +
+file bytes + NUL for src/**/*.py and schemas/*.json). The isolated runtime binds
+this candidate source directly, including subprocesses; no old installed package
+was used. TTY-dependent fictional tests ran outside the restrictive sandbox.
+Live Trino/PostgreSQL integration remained disabled. The 166-case focused suite,
+strict documentation build, change validation and all 17 baseline specifications
+also passed. A separate synthetic valid fan-out SQL render retained FK DDL and
+COMMIT. Provider CI/merge and public documentation deployment remain pending.
+
+After the local gate, final edits only normalize one EOF blank line and strengthen
+the existing disabled-report type-reconciliation test (16 interface tests still
+pass). Runtime behavior and schemas are unchanged. Provider CI must verify the
+complete final commit before merge. Strict docs and Ruff also pass again.

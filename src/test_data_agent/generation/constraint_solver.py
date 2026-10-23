@@ -35,7 +35,13 @@ def solve_constraints(
     budget.check("deterministic rule entry")
     enforce_dataset_rule_work(spec, budget=budget,
         row_counts={name: len(rows) for name, rows in rows_by_entity.items()})
-    apply_relationships(rows_by_entity, spec, budget=budget)
+    if spec.relational_scenarios:
+        from test_data_agent.generation.relational_scenarios import apply_prepared_relational_scenarios
+        from test_data_agent.rules.relational_scenarios import prepare_relational_scenarios
+        plan = prepare_relational_scenarios(spec, tuple(spec.relational_scenarios), seed=seed, budget=budget)
+        apply_prepared_relational_scenarios(rows_by_entity, spec, plan, seed=seed, budget=budget)
+    else:
+        apply_relationships(rows_by_entity, spec, budget=budget)
     apply_formula_constraints(rows_by_entity, spec, budget=budget)
     apply_temporal_constraints(rows_by_entity, spec, budget=budget)
     apply_conditional_required_constraints(rows_by_entity, spec, budget=budget)

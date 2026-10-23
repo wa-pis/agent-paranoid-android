@@ -31,3 +31,8 @@ and [source-free example](https://github.com/wa-pis/agent-paranoid-android/blob/
 
 A new rule family needs defined executable semantics and validation; prose or a prototype alone is insufficient.
 
+
+The additive explicit relational-scenario contract follows this decision;
+see the [relational synthesis contract](../concepts/relational-synthesis-contract.md#explicit-relational-scenarios-unreleased).
+It retains invalid status for requested orphans and uses generated parent
+ordinals only, without source histograms or row mappings.

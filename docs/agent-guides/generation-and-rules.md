@@ -156,3 +156,12 @@ assignments sharing a target require proven disjoint equality/membership sets.
 Schema-less calls enforce predicate literal privacy too. Keep the expression
 AST unchanged and predicate work on the same GenerationBudget. EAV examples
 remain independently authored models, never source-row pivots.
+
+Explicit DatasetSpec relational_scenarios bind exact synthetic orphan quotas and
+optional generated-parent ordinal fan-out to effective counts. Preparation lives
+in rules/relational_scenarios.py; generation allocates a bounded key preview and
+validation independently reconciles final counts. Controlled invalid references
+remain invalid even when expectations match. Scenario specs require mandatory
+schema/privacy/native/business/scenario reconciliation at generation and writer
+boundaries, regardless of optional reporting settings. Omitted declarations
+serialize as absent. See the relational synthesis contract for conflicts/limits.

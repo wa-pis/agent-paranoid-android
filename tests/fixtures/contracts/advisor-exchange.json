@@ -650,6 +650,14 @@
           "privacy_settings": {
             "$ref": "#/$defs/PrivacySettings"
           },
+          "relational_scenarios": {
+            "items": {
+              "$ref": "#/$defs/RelationalScenario"
+            },
+            "maxItems": 1000,
+            "title": "Relational Scenarios",
+            "type": "array"
+          },
           "relationships": {
             "items": {
               "$ref": "#/$defs/Relationship"
@@ -1167,6 +1175,66 @@
           }
         },
         "title": "PrivacySettings",
+        "type": "object"
+      },
+      "RelationalScenario": {
+        "additionalProperties": false,
+        "properties": {
+          "child_entity": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Child Entity",
+            "type": "string"
+          },
+          "child_field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Child Field",
+            "type": "string"
+          },
+          "fanout_counts": {
+            "anyOf": [
+              {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 1000000,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Fanout Counts"
+          },
+          "orphan_count": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Orphan Count",
+            "type": "integer"
+          },
+          "parent_entity": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Parent Entity",
+            "type": "string"
+          },
+          "parent_field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Parent Field",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parent_entity",
+          "parent_field",
+          "child_entity",
+          "child_field"
+        ],
+        "title": "RelationalScenario",
         "type": "object"
       },
       "Relationship": {

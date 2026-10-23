@@ -467,3 +467,14 @@ workflow.
 
 `tests/test_agent.py` covers the review-first agent workflow and confirms that
 planning does not write generated data.
+
+
+## Explicit relational scenarios (Unreleased)
+
+`core/relational_scenario.py` owns reviewed count declarations and count-only
+observation types. `rules/relational_scenarios.py` prepares bounded plans bound
+to effective spec/size/seed identity. `generation/relational_scenarios.py` owns
+atomic generated-key allocation in native relationship dependency order;
+`validation/relational_scenarios.py` independently reconciles final counts.
+Generation and writer entry points enforce the final contract even when optional
+reports are disabled. See the [relational synthesis contract](concepts/relational-synthesis-contract.md#explicit-relational-scenarios-unreleased).

@@ -82,7 +82,7 @@ unmeasured. Mandatory safety and scenario reconciliation run even with optional
 validation reporting disabled and after any writer reconciliation. Failed or
 stale plans leave existing outputs unchanged and publish no partial manifest.
 
-## Acceptance and current stage
+## Historical private foundation
 
 The private compiler and immutable model have 32 new fictional metadata tests;
 123 focused tests including merged conditional formulas and existing identifier/
@@ -99,3 +99,29 @@ allocation, count-only observations and atomic commit with deadline rollback.
 Its 14 new synthetic cases and 150 focused regression tests pass. Public
 registration and mandatory export/report reconciliation remain unimplemented;
 this private result does not prove public activation or publication safety.
+
+
+## Current complete-contract candidate
+
+The isolated candidate now registers the optional DatasetSpec list, compiles it
+before Faker/row allocation, and allocates relationships before native/business
+solving. Rules own preparation and identity; validation owns independent count
+observations; generation owns the bounded atomic key preview. Unspecified
+scenarios serialize as absent, preserving legacy payload identity.
+
+Mandatory generation/writer validation reconciles all requested counts,
+unscoped relationships, schema, privacy and compatible native/business rules.
+Report validation executes those mandatory sections for scenario specs even
+when optional settings are disabled. Exact quotas do not convert expected
+invalid references into a valid report or manifest. PostgreSQL SQL retains its
+valid-dataset gate, while explicitly invalid JSON/CSV/Parquet bundles remain
+labelled invalid. The new report binds effective spec/size identity without
+pretending a report-time placeholder seed is the actual generation seed.
+
+Public-interface acceptance adds 16 synthetic cases: omitted serialization,
+valid/controlled-invalid replay and evidence, signed-seed one-to-one allocation,
+non-bypassable reconciliation, JSON/CSV/Parquet bundles, unchanged prior output
+on a count override failure, retained SQL FK rejection, non-key type checks,
+review warnings, one-to-one observation validity, CLI exit statuses and row-free
+MCP consumption. Strict docs and all 17 baseline OpenSpec capabilities pass;
+full local release and exact-head provider CI/merge remain pending.

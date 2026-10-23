@@ -1,6 +1,7 @@
 """Reviewed synthetic relationship declarations; not a source-data mapping."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -23,3 +24,16 @@ class RelationalScenario(BaseModel):
     @property
     def edge(self) -> tuple[str, str, str, str]:
         return self.parent_entity, self.parent_field, self.child_entity, self.child_field
+
+
+@dataclass(frozen=True)
+class RelationalScenarioObservation:
+    edge: tuple[str, str, str, str]
+    requested_orphan_count: int
+    observed_orphan_count: int
+    requested_fanout_counts: tuple[int, ...] | None
+    observed_fanout_counts: tuple[int, ...] | None
+    eligible_child_count: int
+    null_child_count: int
+    valid: bool
+    expectations_met: bool
