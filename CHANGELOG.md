@@ -51,6 +51,10 @@ All notable changes to this project are documented here.
 - Datetime sampling uses an exact whole-second span so very long fractional
   intervals cannot round a generated value above the reviewed upper endpoint.
 
+- Local category validation stops at its configured ceiling instead of exhausting
+  an iterable, rejects untyped limits, and checks SQL category scope before
+  row-count aggregates. Existing preservation defaults and content checks remain.
+
 - Trino SQL-query profiling and shared SQL aggregate profiling detach untyped
   driver and TLS failures from public
   errors, preventing retained secret-bearing exception context. Existing CLI
