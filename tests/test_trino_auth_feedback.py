@@ -165,3 +165,29 @@ def test_missing_certificate_paths_are_runtime_only_and_value_free(tmp_path):
             username="fictional", http_scheme="https")
     assert CANARY not in str(caught.value)
     assert caught.value.__context__ is None
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("stage", ["schema", "row_count", "summary"])
+def test_shared_query_profiler_detaches_driver_errors(adapter, stage):
+    from test_data_agent.sql_query_profiling import QueryResultColumn, profile_validated_query
+    from test_data_agent.sql_query_source import ValidatedSqlQuery
+
+    plan = ValidatedSqlQuery(adapter, "fictional", "fictional.summary",
+        ("public", "orders") if adapter is SqlQueryAdapter.POSTGRES else ("lake", "safe", "orders"),
+        ("amount",), "a" * 64, "SELECT amount FROM public.orders")
+
+    def describe(query):
+        if stage == "schema":
+            raise requests.HTTPError(CANARY)
+        return (QueryResultColumn("amount", "bigint", True),)
+
+    def fetch(query):
+        if stage == "row_count" or "non_null_count" in query.sql:
+            raise requests.HTTPError(CANARY)
+        return [{"row_count": 1}]
+
+    with pytest.raises(SqlQueryProfileError, match="^SQL query source profiling failed$") as caught:
+        profile_validated_query(plan, describe_query=describe, fetch_query=fetch)
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert CANARY not in ''.join(traceback.format_exception(caught.value))

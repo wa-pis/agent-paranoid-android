@@ -41,7 +41,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
-- Trino SQL-query profiling detaches untyped driver and TLS failures from public
+- Trino SQL-query profiling and shared SQL aggregate profiling detach untyped
+  driver and TLS failures from public
   errors, preventing retained secret-bearing exception context. Existing CLI
   error categories and output files are preserved.
 

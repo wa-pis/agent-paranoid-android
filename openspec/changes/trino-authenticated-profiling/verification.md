@@ -16,8 +16,8 @@ unavailable. Fake drivers cover runtime secrets, TLS propagation, typed auth
 failure detachment, resource closure, credential-free endpoint parsing, optional
 integrated auth, nondelegation, value-free diagnostics and OAuth origin/deadlines.
 
-The feedback follow-up runs 293 tests successfully, with one pre-existing
-installed OAuth acceptance skip in the isolated environment. The new 25-test
+The feedback follow-up runs 331 tests successfully, with one pre-existing
+installed OAuth acceptance skip in the isolated environment. The new 31-test
 matrix covers HTTP 401/403 and TLS failures at connect, execute and fetch;
 missing, empty, multiline and oversized Basic/JWT secrets; all authenticated
 modes rejecting HTTP overrides; URL credentials and missing certificate files.
@@ -37,3 +37,10 @@ Live authenticated acceptance remains pending: no live server or secret was
 used. The public guide and credential-free environment example document the
 existing authentication reference and safe failure handling. Full candidate CI
 remains pending.
+
+A second reproducer covers schema, row-count and column-summary failures in the
+shared query profiler, for both SQL adapters. All six cases retained the raw
+exception before the same detachment fix was applied there. This shared path
+is exercised after Trino metadata discovery; fixing only the outer adapter
+would leave those failures attached. PostgreSQL receives the same fixed error
+on this shared path without changing its message or category.
