@@ -59,13 +59,13 @@ def profile_validated_query(
             plan,
             describe_query(build_no_row_schema_query(plan)),
         )
+        categories = _local_categories(plan, columns, local_category_fields)
         row_count = _non_negative_int(
             _single_row(fetch_query(build_query_row_count_query(plan))).get(
                 "row_count"
             ),
             "row count",
         )
-        categories = _local_categories(plan, columns, local_category_fields)
         profile_columns = [
             _profile_column(
                 plan,
@@ -159,7 +159,7 @@ def build_query_local_category_query(
     *,
     max_categories: int = 20,
 ) -> TrustedProfileQuery:
-    if max_categories < 1 or max_categories > 100:
+    if type(max_categories) is not int or max_categories < 1 or max_categories > 100:
         raise SqlQueryProfileError("SQL query category budget is invalid")
     if column not in plan.safe_local_category_output_fields:
         raise SqlQueryProfileError("SQL query local category field is not allowed")

@@ -69,3 +69,31 @@ outside the supplied maximum. Reject reversed effective intervals before row
 publication, with a fixed hint to supply ordered explicit endpoints. The same
 check rejects a supplied minimum beyond the default maximum; endpoint defaults
 and valid intervals are unchanged. Do not silently clamp contradictory intervals.
+
+## Local categories (S7)
+
+Keep the default source-preservation ceiling at 20. It is a disclosure policy,
+not evidence that a high-cardinality source is an enum. A concrete adapter gap
+was reproduced: the deterministic validator materialized an entire iterable
+before checking cardinality. Retain at most the configured ceiling and reject
+upon the next item. Invalid Boolean, fractional or string limits reject before
+iteration. SQL query profiling validates category output scope/lineage/types
+after its no-row schema query, before the first row-count aggregate. PostgreSQL
+exact-scope checks remain before connection; wildcard authorization still needs
+bounded metadata expansion. Builders preserve their existing sentinel and work
+budgets, with positive integer limits enforced.
+
+Recovery is to omit raw local-category preservation and use synthetic labels or
+an independently authored synthetic enum in a reviewed DatasetSpec. Do not
+silently truncate a source enum, raise a global ceiling or treat the generation
+privacy-settings field as a profiling permission.
+
+Evaluation of a future explicit configuration: use a field-scoped declaration
+with a ceiling from 1 to 100 and bounded scalar lengths, bound it to the source
+snapshot, profile/cache fingerprint and plan review, and charge its extra result
+rows/cells/bytes to the current invocation budget before queries. Query with
+ceiling+1 to detect overflow, validate all returned content, and publish no
+partial category set. Sensitive names, identifiers, quasi-identifiers, free text
+and content vetoes remain absolute. A global environment override would not bind
+permissions to a reviewed artifact and is not introduced. The current fix adds
+no new preservation option or source-value authority.

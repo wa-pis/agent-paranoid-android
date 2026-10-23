@@ -118,3 +118,15 @@ complete profile-to-generation workflow from an installed package.
 - **THEN** it produces a virtual-entity safe profile, reviewed spec,
   deterministic generated dataset, and successful validation
 - **AND** artifacts report synthetic output with no copied source rows
+
+### Requirement: Category Scope Preflight Before Row Aggregates
+
+SQL query profiling SHALL validate requested local-category scope, lineage and
+output type after no-row schema inspection and before row-count or column
+aggregates. Query-builder category limits SHALL be positive integers and retain
+their existing upper/result-row budget checks.
+
+#### Scenario: A requested category does not match authorized output
+- **WHEN** the requested entity or field is outside the exact authorized output
+- **THEN** profiling rejects before fetching a row-count or column aggregate
+- **AND** no trusted partial profile is published

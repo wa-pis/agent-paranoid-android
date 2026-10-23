@@ -228,8 +228,8 @@ def build_local_category_candidates_query(
         raise PostgresScopeError(
             "PostgreSQL local category field has a sensitive identifier"
         )
-    if max_categories < 1:
-        raise PostgresScopeError("PostgreSQL category limit must be positive")
+    if type(max_categories) is not int or max_categories < 1:
+        raise PostgresScopeError("PostgreSQL category limit must be a positive integer")
     candidate_limit = max_categories + 1
     if candidate_limit > config.limits.max_result_rows:
         raise PostgresScopeError(

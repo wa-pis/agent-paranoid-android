@@ -190,3 +190,11 @@ composite and nonfinite numeric values stay unknown. Do not serialize digests
 or nominate primary keys/pools from this evidence. Invalid or absent metadata
 null counts remain unknown independently. A row-count mismatch rejects the
 profile; existing decoded-byte/cell/deadline limits remain in force.
+
+
+Local-category validation must reject invalid fields/positive-integer limits
+before iteration and stop upon the first candidate beyond the configured cap.
+Never materialize an arbitrary iterable before cardinality validation. Query
+category scope/type checks follow no-row schema inspection but precede row-count
+and column aggregates. Keep the default 20-value preservation policy; recovery
+omits the opt-in rather than silently truncating or raising a global limit.

@@ -52,10 +52,10 @@ batching evaluation remains open.
 ## Remaining evidence
 
 Historical profile provenance remains unconfirmed. The user tentatively
-identified installed version 1.6.0 but supplied no source configuration. Historical temporal provenance, category recovery and bounded batching
-evaluation remain open; independent bounds defects and the future calendar
-design are documented below. No live database was used.
-
+identified installed version 1.6.0 but supplied no source configuration.
+Historical temporal provenance and bounded batching evaluation remain open.
+Independent bounds defects and category recovery are documented below. No live
+database was used.
 
 ## Independent temporal reproduction (S6)
 
@@ -83,3 +83,24 @@ historical report's cause.
 Final temporal verification: 286 temporal, SQL, CSV, generation-contract, golden
 artifact and documentation tests passed. Mypy (156 sources), Ruff, strict MkDocs
 and strict OpenSpec passed. Full CI for this temporal follow-up remains pending.
+
+
+## Category work and scope (S7)
+
+Nineteen fictional boundary cases cover stopping after the default 20-value
+ceiling plus one overflow sentinel, pre-iteration field/limit rejection, strict
+query-builder limit types, both adapters rejecting wrong output entity/field
+before row-count fetch, and CLI recovery without raw category preservation.
+All 17 initial cases reproduced their respective gaps before correction; two
+additional privacy/recovery cases passed. Existing PostgreSQL exact-scope
+pre-connection and wildcard bounded-metadata tests remain applicable.
+
+The focused existing adapter/privacy/builder suites passed 225 tests before the
+two added recovery cases. Mypy (156 files) and Ruff passed. The source default
+remains 20; no globally raised cap, silent truncation, schema change or new
+preservation permission is introduced. Full candidate CI remains pending.
+
+Final category verification on the temporal follow-up base: 183 focused category,
+SQL adapter, PostgreSQL profiler and documentation tests passed. Mypy (156
+source files), Ruff, strict MkDocs and strict OpenSpec passed. Full candidate
+CI remains pending.

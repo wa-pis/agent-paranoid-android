@@ -30,3 +30,19 @@ byte and deadline limits SHALL continue to apply to the complete scan.
 #### Scenario: Input inspection is incomplete
 - **WHEN** inspection fails a budget or observed row count differs from metadata
 - **THEN** no trusted partial profile is returned
+
+### Requirement: Bounded Local Category Validation Work
+
+Local category validation SHALL verify field eligibility and positive integer
+limits before consuming values. It SHALL retain no more than the configured
+category ceiling and reject upon the next item without exhausting an iterable.
+Existing sensitivity, uniqueness, scalar, length and free-text rules SHALL apply.
+
+#### Scenario: Too many candidate values are supplied
+- **WHEN** the iterable yields a value beyond the configured ceiling
+- **THEN** validation rejects without reading further values or truncating a trusted category set
+- **AND** the error does not contain source values
+
+#### Scenario: An invalid field or untyped limit is supplied
+- **WHEN** field eligibility or the positive-integer limit contract fails
+- **THEN** validation rejects before category-value iteration

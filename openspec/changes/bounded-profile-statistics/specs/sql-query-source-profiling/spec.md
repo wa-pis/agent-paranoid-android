@@ -24,3 +24,15 @@ all resource budgets without creating materialized or temporary database tables.
 - **WHEN** profiling cannot finish within its declared budget
 - **THEN** it fails without publishing a trusted partial profile
 - **AND** it does not issue database writes as a workaround
+
+### Requirement: Category Scope Preflight Before Row Aggregates
+
+SQL query profiling SHALL validate requested local-category scope, lineage and
+output type after no-row schema inspection and before row-count or column
+aggregates. Query-builder category limits SHALL be positive integers and retain
+their existing upper/result-row budget checks.
+
+#### Scenario: A requested category does not match authorized output
+- **WHEN** the requested entity or field is outside the exact authorized output
+- **THEN** profiling rejects before fetching a row-count or column aggregate
+- **AND** no trusted partial profile is published

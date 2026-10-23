@@ -162,14 +162,19 @@ def validate_local_category_values(
     validate_local_category_field(
         field_name=field_name, semantic_type=semantic_type, sensitive=sensitive,
     )
-    if max_categories < 1 or max_value_length < 1:
-        raise ValueError("local category limits must be positive")
+    if (
+        type(max_categories) is not int or type(max_value_length) is not int
+        or max_categories < 1 or max_value_length < 1
+    ):
+        raise ValueError("local category limits must be positive integers")
 
-    candidates = tuple(values)
+    candidates: list[Any] = []
+    for value in values:
+        if len(candidates) >= max_categories:
+            raise ValueError("local category cardinality exceeds its limit")
+        candidates.append(value)
     if not candidates:
         raise ValueError("local category values must not be empty")
-    if len(candidates) > max_categories:
-        raise ValueError("local category cardinality exceeds its limit")
 
     seen: set[tuple[type[object], object]] = set()
     for value in candidates:

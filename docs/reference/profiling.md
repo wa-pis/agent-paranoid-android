@@ -63,3 +63,22 @@ repetitions at the cap do not. Unsupported equality remains unknown. Null ratios
 still require complete valid row-group statistics. Digests never leave the
 profiler. Reprofile older Parquet artifacts and review changed fingerprints;
 existing approved plans are not updated automatically.
+
+
+## Local category limit recovery
+
+`--local-category ENTITY.FIELD` preserves only explicitly authorized, bounded,
+non-sensitive enums. The default source-preservation limit is 20 distinct values
+of at most 64 characters; names, content and identifier protections still apply.
+If a field exceeds that limit, omit its `--local-category` option and reprofile
+with synthetic labels, or author an independent synthetic enum in the reviewed
+DatasetSpec. Do not truncate a real enum or raise a global budget to force it
+through. DatasetSpec `privacy_settings.max_safe_categories` is not permission to
+increase source-profiling preservation.
+
+Category validation stops at the first item beyond its configured ceiling.
+Limits must be positive integers. SQL query profiles validate category scope,
+lineage and output types after no-row schema inspection, before row-count and
+column aggregates. Exact PostgreSQL scopes preflight before connection;
+wildcards first require bounded metadata expansion. Invalid inputs publish no
+partial trusted profile.
