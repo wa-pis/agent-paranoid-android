@@ -1,9 +1,13 @@
 # Change Proposal: reviewed-eav-expressions
 
 ## Status
-Implementation candidate for relational-profile-utility R7: optional typed
-formula `when` and a source-free EAV target example. Candidate gates remain
-open; source pivot/unpivot and broader expressions are not implemented.
+The optional typed formula `when` and source-free EAV target-model slice were
+delivered in #648 after the complete local release gate and all 38 applicable
+exact-head CI checks passed. Merge commit:
+`25a221b70f95a0e9d11e8191a2301dedac9aa690`; acceptance details are recorded in
+[tasks.md](tasks.md) and [verification.md](verification.md).
+Source-row pivot/unpivot and broader expressions remain separate unimplemented
+extensions. No package release or additional source authorization is implied.
 
 ## Current support and gap
 Conditional-required/allowed-values rules already accept typed predicates.
@@ -14,7 +18,7 @@ assignments and cannot stand in for a predicate. EAV inputs are not automaticall
 pivoted/unpivoted, and metadata-only discovery cannot recover row-level attribute
 relationships. Existing docs correctly require explicit modeled fields/rules.
 
-## Proposed conditional formula slice
+## Conditional formula contract
 Specify an additive optional typed predicate on FormulaRule, reusing Condition
 and its existing literal/name/privacy checks. Predicate false means no assignment
 and an explicitly skipped check, never a successful evaluated formula. Define
