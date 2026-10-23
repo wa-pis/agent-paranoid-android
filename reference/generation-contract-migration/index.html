@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
+  <br>Documentation eac35eee904278db499d53355fb2f8bc918e41c2
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -309,6 +309,12 @@ copy the reviewed field while preserving planned generation settings, run
 <code>agent-review</code> and approve the new fingerprint. Do not mutate an already approved
 plan; replan changed source/profile evidence. DatasetSpec version 1.1 and unaffected legacy hashes
 remain unchanged; see <a href="../profiling/#reviewed-csv-numeric-replacements">profiling</a>.</p>
+<h2 id="query-summary-batching">Query-summary batching<a class="headerlink" href="#query-summary-batching" title="Permanent link">&para;</a></h2>
+<p>Query-source summary batching changes trusted internal SQL and request counts,
+not profile/spec schemas. Fixed aggregate evidence keeps the same profile
+fingerprint; there is no silent reclassification or saved-plan promotion.
+Existing statement, scan, result and time limits remain enforced independently.
+Real source changes still require normal profile review.</p>
               
 </div>
 
