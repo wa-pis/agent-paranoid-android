@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 4f13d12bd27b0b6f2ca7606d854af158f70cf630
+  <br>Documentation 25a221b70f95a0e9d11e8191a2301dedac9aa690
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -339,6 +339,14 @@ calendar grain is unknown unless a separate reviewed typed contract is active.</
 <p>A partial temporal bound that reverses the interval after applying the existing
 2020/2025 defaults must reject with a value-free explicit-bounds hint. Do not
 silently clamp it to a date outside the supplied interval.</p>
+<p>FormulaRule accepts optional typed <code>when</code> using the existing Condition policy.
+False branches skip both assignment and expression validation, with explicit
+eligible/evaluated/skipped counters. Omitted predicates preserve old hashes and
+report shape. Predicate fields cannot be row-rule write targets; conditional
+assignments sharing a target require proven disjoint equality/membership sets.
+Schema-less calls enforce predicate literal privacy too. Keep the expression
+AST unchanged and predicate work on the same GenerationBudget. EAV examples
+remain independently authored models, never source-row pivots.</p>
               
 </div>
 

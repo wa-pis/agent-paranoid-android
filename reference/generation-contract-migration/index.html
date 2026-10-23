@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 4f13d12bd27b0b6f2ca7606d854af158f70cf630
+  <br>Documentation 25a221b70f95a0e9d11e8191a2301dedac9aa690
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -315,6 +315,14 @@ not profile/spec schemas. Fixed aggregate evidence keeps the same profile
 fingerprint; there is no silent reclassification or saved-plan promotion.
 Existing statement, scan, result and time limits remain enforced independently.
 Real source changes still require normal profile review.</p>
+<h2 id="optional-conditional-formulas">Optional conditional formulas<a class="headerlink" href="#optional-conditional-formulas" title="Permanent link">&para;</a></h2>
+<p>Formula rules add optional <code>when</code> with the existing typed Condition semantics.
+Absent/null predicates serialize as omitted and retain prior hashes and seeded
+behavior. Reports add eligible/evaluated/skipped counters only for conditional
+formulas; strict consumers should accept these additive counters. DatasetSpec
+stays at 1.1. Reviewed conditional branches change the rules/spec fingerprint
+and require renewed plan review. Conditional writer conflicts reject before
+publication; no existing source access or privacy permission is expanded.</p>
               
 </div>
 

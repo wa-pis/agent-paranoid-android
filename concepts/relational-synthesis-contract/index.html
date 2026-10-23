@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 4f13d12bd27b0b6f2ca7606d854af158f70cf630
+  <br>Documentation 25a221b70f95a0e9d11e8191a2301dedac9aa690
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -389,13 +389,12 @@ fan-out allocation or measured source fan-out fidelity. The separate
 <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios">controlled relational scenarios proposal</a>
 records those optional extensions and their acceptance criteria; no new option
 is enabled by that proposal.</p>
-<p>Formulas currently support assign/check without a conditional predicate;
-conditional-required and conditional-allowed-values rules use predicates.
-Scenario weights cannot emulate a predicate. The separate
-<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/reviewed-eav-expressions">conditional formula/EAV proposal</a>
-records the remaining work. EAV source rows are not automatically pivoted or
-retained; explicit target modeling and independently generated key domains
-remain necessary.</p>
+<p>Formulas support optional reviewed typed predicates in assign/check mode.
+False predicates skip evaluation and are reported separately from successful
+checks. See <a href="../../how-to/business-rules/#conditional-formulas-and-synthetic-eav-models">conditional formulas</a>
+and the source-free EAV example. Scenario weights remain probabilistic assignments,
+not predicates. EAV source rows are not automatically pivoted or retained;
+explicit target modeling and independently generated key domains remain necessary.</p>
               
 </div>
 

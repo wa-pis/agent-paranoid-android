@@ -111,6 +111,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#_8">Следующий шаг</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#eav-">Условные формулы и синтетическая EAV-модель</a>
+    </li>
     </ul></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Профилирование PostgreSQL</a></li>
@@ -222,7 +224,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 4f13d12bd27b0b6f2ca7606d854af158f70cf630
+  <br>Documentation 25a221b70f95a0e9d11e8191a2301dedac9aa690
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -299,6 +301,26 @@
 <p>При намеренных нарушениях команда 1.6.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (<code>expectations_met=true</code>, ноль unexpected и missing expected), а не отсутствие нарушений. Режим <code>negative</code> и <code>mixed</code> не разрешает PII. Точные поля правил и примеры всех категорий описаны в <a href="./">существующем руководстве</a>.</p>
 <h2 id="_8">Следующий шаг<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p><a href="../../getting-started/review-output/">Валидация</a>.</p>
+<h2 id="eav-">Условные формулы и синтетическая EAV-модель<a class="headerlink" href="#eav-" title="Permanent link">&para;</a></h2>
+<p>Формула в режиме <code>assign</code> или <code>check</code> принимает необязательное условие <code>when</code>.
+При ложном условии выражение не вычисляется, значение не меняется, строка
+считается пропущенной. Отчёт отдельно возвращает <code>eligible_row_count</code>,
+<code>evaluated_row_count</code> и <code>skipped_row_count</code>; пропуск не считается успехом.
+Правила без <code>when</code> сохраняют прежние отпечатки и поведение. <code>equals: null</code>
+выбирает пустое или отсутствующее значение; числовой диапазон его не выбирает.
+Неизвестное в DatasetSpec поле условия отклоняется до генерации.</p>
+<p>Поле условия нельзя изменять другими построчными правилами. Несколько формул
+назначения одного поля разрешены для доказуемо непересекающихся <code>equals</code> или
+<code>in_values</code> по одному полю. Пересечение, диапазон или недоказанная совместимость
+отклоняются. Проверки чувствительных литералов, точная арифметика DECIMAL,
+общий лимит работы и срок выполнения остаются обязательными.</p>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/business_rules/conditional_eav.json">Исполняемый пример EAV</a>
+использует заранее заданные синтетические атрибуты <code>ratio</code> и <code>total</code>, независимые
+идентификаторы и две условные формулы. Одна запись содержит один атрибут и одно
+значение. Отсутствие наблюдения отличается от пустого значения. Уникальность
+пары сущность/атрибут нужно объявить отдельно; пример допускает повторение.
+Преобразование исходных строк, сохранение ключей и разрешение дубликатов
+источника этим примером не выполняются.</p>
               
 </div>
 

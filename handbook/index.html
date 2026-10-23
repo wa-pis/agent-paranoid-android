@@ -209,7 +209,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 4f13d12bd27b0b6f2ca7606d854af158f70cf630
+  <br>Documentation 25a221b70f95a0e9d11e8191a2301dedac9aa690
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -879,7 +879,36 @@ that automatically bind a scenario to source rows. A passing rule report checks
 declared rules; it does not establish source fidelity or discover missing rules.
 Entity-attribute-value inputs are not automatically pivoted into business fields.
 Model the desired entities and declare relationships/rules explicitly before
-using the generation command above.</p></section><section class="print-page" id="how-to-postgresql" heading-number="2.2"><h1 id="how-to-postgresql-profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#how-to-postgresql-profile-postgresql" title="Permanent link">&para;</a></h1>
+using the generation command above.</p>
+<h2 id="how-to-business-rules-conditional-formulas-and-synthetic-eav-models">Conditional formulas and synthetic EAV models<a class="headerlink" href="#how-to-business-rules-conditional-formulas-and-synthetic-eav-models" title="Permanent link">&para;</a></h2>
+<p>A formula accepts an optional typed <code>when</code> condition in either <code>assign</code> or <code>check</code>
+mode. A false condition skips the expression entirely, so an unselected branch
+cannot divide by zero or overwrite a sampled value. Reports distinguish
+<code>eligible_row_count</code>, <code>evaluated_row_count</code> and <code>skipped_row_count</code>; skipped rows
+are not passed checks. Rules without <code>when</code> retain their old serialization,
+fingerprints and behavior. An explicit null condition value uses the existing
+condition semantics: <code>equals: null</code> selects null/missing, numeric ranges do not.
+A predicate field absent from the DatasetSpec rejects before generation.</p>
+<pre><code class="language-yaml">row_rules:
+  - type: formula
+    table: observations
+    field: value
+    when: {field: attribute, equals: ratio}
+    expression: numerator / divisor
+</code></pre>
+<p>Predicate fields cannot be row-rule assignment/repair targets. Multiple assigning
+formulas for one target require provably disjoint <code>equals</code>/<code>in_values</code> predicates
+on the same field; overlapping or unprovable branches reject before generation.
+Legacy unconditional assignments retain their previous order. Expressions keep
+the existing bounded arithmetic and exact DECIMAL rules; conditions share the
+same privacy checks, work allowance and deadline.</p>
+<p>The runnable <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/business_rules/conditional_eav.json">synthetic EAV example</a>
+uses a reviewed <code>ratio</code>/<code>total</code> vocabulary, generated identifier domains and two
+disjoint exact-decimal formulas. Vocabulary and formulas are authored independently
+of source rows. Each observation has one attribute/value; no source pivot,
+source-key retention or duplicate merge occurs. Missing observations differ from
+nullable values. Declare entity/attribute uniqueness separately if required;
+the example intentionally permits repeated generated pairs.</p></section><section class="print-page" id="how-to-postgresql" heading-number="2.2"><h1 id="how-to-postgresql-profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#how-to-postgresql-profile-postgresql" title="Permanent link">&para;</a></h1>
 <p>English · <a href="#ru-how-to-postgresql">Русский</a></p>
 <p>Database profiling is available in stable <code>1.6.0</code> and requires explicit
 read-only configuration, allowlists and resource budgets.</p>
@@ -3352,7 +3381,27 @@ test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-format
 </code></pre>
 <p>При намеренных нарушениях команда 1.6.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (<code>expectations_met=true</code>, ноль unexpected и missing expected), а не отсутствие нарушений. Режим <code>negative</code> и <code>mixed</code> не разрешает PII. Точные поля правил и примеры всех категорий описаны в <a href="#ru-how-to-business-rules">существующем руководстве</a>.</p>
 <h2 id="ru-how-to-business-rules-_8">Следующий шаг<a class="headerlink" href="#ru-how-to-business-rules-_8" title="Permanent link">&para;</a></h2>
-<p><a href="#ru-getting-started-review-output">Валидация</a>.</p></section><section class="print-page" id="ru-how-to-postgresql" heading-number="8.2.2"><h1 id="ru-how-to-postgresql-postgresql">Профилирование PostgreSQL<a class="headerlink" href="#ru-how-to-postgresql-postgresql" title="Permanent link">&para;</a></h1>
+<p><a href="#ru-getting-started-review-output">Валидация</a>.</p>
+<h2 id="ru-how-to-business-rules-eav-">Условные формулы и синтетическая EAV-модель<a class="headerlink" href="#ru-how-to-business-rules-eav-" title="Permanent link">&para;</a></h2>
+<p>Формула в режиме <code>assign</code> или <code>check</code> принимает необязательное условие <code>when</code>.
+При ложном условии выражение не вычисляется, значение не меняется, строка
+считается пропущенной. Отчёт отдельно возвращает <code>eligible_row_count</code>,
+<code>evaluated_row_count</code> и <code>skipped_row_count</code>; пропуск не считается успехом.
+Правила без <code>when</code> сохраняют прежние отпечатки и поведение. <code>equals: null</code>
+выбирает пустое или отсутствующее значение; числовой диапазон его не выбирает.
+Неизвестное в DatasetSpec поле условия отклоняется до генерации.</p>
+<p>Поле условия нельзя изменять другими построчными правилами. Несколько формул
+назначения одного поля разрешены для доказуемо непересекающихся <code>equals</code> или
+<code>in_values</code> по одному полю. Пересечение, диапазон или недоказанная совместимость
+отклоняются. Проверки чувствительных литералов, точная арифметика DECIMAL,
+общий лимит работы и срок выполнения остаются обязательными.</p>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/business_rules/conditional_eav.json">Исполняемый пример EAV</a>
+использует заранее заданные синтетические атрибуты <code>ratio</code> и <code>total</code>, независимые
+идентификаторы и две условные формулы. Одна запись содержит один атрибут и одно
+значение. Отсутствие наблюдения отличается от пустого значения. Уникальность
+пары сущность/атрибут нужно объявить отдельно; пример допускает повторение.
+Преобразование исходных строк, сохранение ключей и разрешение дубликатов
+источника этим примером не выполняются.</p></section><section class="print-page" id="ru-how-to-postgresql" heading-number="8.2.2"><h1 id="ru-how-to-postgresql-postgresql">Профилирование PostgreSQL<a class="headerlink" href="#ru-how-to-postgresql-postgresql" title="Permanent link">&para;</a></h1>
 <p><a href="#how-to-postgresql">English</a> · Русский</p>
 <h2 id="ru-how-to-postgresql-_1">Для чего это нужно<a class="headerlink" href="#ru-how-to-postgresql-_1" title="Permanent link">&para;</a></h2>
 <p>Используйте базу как источник разрешённых метаданных и агрегатов, когда CSV неудобен. Этот путь не предназначен для выгрузки строк или выполнения произвольного SQL.</p>
