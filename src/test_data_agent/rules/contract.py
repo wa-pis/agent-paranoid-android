@@ -27,6 +27,7 @@ from test_data_agent.rules.models import (
     ForeignKeyRule,
     FormulaRule,
     TemporalOrderingRule,
+    validate_conditional_formula_writers,
 )
 
 
@@ -41,6 +42,7 @@ def validate_business_rules_for_spec(
     if rules.rule_count == 0:
         raise BusinessRuleContractError("business rules must not be empty")
 
+    validate_conditional_formula_writers(rules.row_rules)
     entities = {entity.name: entity for entity in spec.entities}
     enforce_business_rule_evaluations(
         estimate_business_rule_evaluations(rules, spec)
@@ -105,6 +107,9 @@ def validate_business_rules_for_spec(
             _require_field(entities, row_rule.table, row_rule.start_field)
             _require_field(entities, row_rule.table, row_rule.end_field)
         elif isinstance(row_rule, FormulaRule):
+            if row_rule.when is not None:
+                condition_field = _require_field(entities, row_rule.table, row_rule.when.field)
+                _validate_condition_literals(row_rule.when, condition_field, row_rule.table)
             target_field = _require_field(
                 entities,
                 row_rule.table,
@@ -201,6 +206,7 @@ def validate_business_rules_for_spec(
 
 
 def validate_business_rule_literals(rules: BusinessRules) -> None:
+    validate_conditional_formula_writers(rules.row_rules)
     for field_rule in rules.field_rules:
         _validate_unbound_literals(
             [value for value in (field_rule.min_value, field_rule.max_value) if value is not None],
@@ -215,8 +221,8 @@ def validate_business_rule_literals(rules: BusinessRules) -> None:
     for row_rule in rules.row_rules:
         if isinstance(
             row_rule,
-            (ConditionalRequiredRule, ConditionalAllowedValuesRule),
-        ):
+            (ConditionalRequiredRule, ConditionalAllowedValuesRule, FormulaRule),
+        ) and row_rule.when is not None:
             condition_values = [
                 row_rule.when.equals, row_rule.when.not_equals,
                 row_rule.when.gte, row_rule.when.lte,
@@ -288,7 +294,8 @@ def estimate_business_rule_evaluations_for_rows(
                 condition_cost + len(row_rule.allowed_values)
             )
         elif isinstance(row_rule, FormulaRule):
-            estimated += row_count * expression_complexity(row_rule.expression)
+            condition_cost = (1 + len(row_rule.when.in_values or [])) if row_rule.when is not None else 0
+            estimated += row_count * (expression_complexity(row_rule.expression) + condition_cost)
         else:
             estimated += row_count
     if negative:

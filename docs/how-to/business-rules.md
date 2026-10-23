@@ -204,3 +204,39 @@ declared rules; it does not establish source fidelity or discover missing rules.
 Entity-attribute-value inputs are not automatically pivoted into business fields.
 Model the desired entities and declare relationships/rules explicitly before
 using the generation command above.
+
+
+## Conditional formulas and synthetic EAV models
+
+A formula accepts an optional typed `when` condition in either `assign` or `check`
+mode. A false condition skips the expression entirely, so an unselected branch
+cannot divide by zero or overwrite a sampled value. Reports distinguish
+`eligible_row_count`, `evaluated_row_count` and `skipped_row_count`; skipped rows
+are not passed checks. Rules without `when` retain their old serialization,
+fingerprints and behavior. An explicit null condition value uses the existing
+condition semantics: `equals: null` selects null/missing, numeric ranges do not.
+A predicate field absent from the DatasetSpec rejects before generation.
+
+```yaml
+row_rules:
+  - type: formula
+    table: observations
+    field: value
+    when: {field: attribute, equals: ratio}
+    expression: numerator / divisor
+```
+
+Predicate fields cannot be row-rule assignment/repair targets. Multiple assigning
+formulas for one target require provably disjoint `equals`/`in_values` predicates
+on the same field; overlapping or unprovable branches reject before generation.
+Legacy unconditional assignments retain their previous order. Expressions keep
+the existing bounded arithmetic and exact DECIMAL rules; conditions share the
+same privacy checks, work allowance and deadline.
+
+The runnable [synthetic EAV example](https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/business_rules/conditional_eav.json)
+uses a reviewed `ratio`/`total` vocabulary, generated identifier domains and two
+disjoint exact-decimal formulas. Vocabulary and formulas are authored independently
+of source rows. Each observation has one attribute/value; no source pivot,
+source-key retention or duplicate merge occurs. Missing observations differ from
+nullable values. Declare entity/attribute uniqueness separately if required;
+the example intentionally permits repeated generated pairs.

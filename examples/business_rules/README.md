@@ -77,7 +77,7 @@ match the companion spec; rule files do not declare a database schema.
 | `row_rules` / `conditional_required` | `type`, `table`, `when`, `required_fields` | None | For matching rows fill missing required fields from known defaults; validate presence |
 | `row_rules` / `conditional_allowed_values` | `type`, `table`, `field`, `when`, `allowed_values` | None | For matching rows select the first allowed value when needed; validate membership |
 | `row_rules` / `temporal_ordering` | `type`, `table`, `start_field`, `end_field` | `allow_equal: true` | Validate dates/timestamps and order; basic repair can set end equal to start, so strict order needs suitable generated inputs |
-| `row_rules` / `formula` | `type`, `table`, `field`, `expression` | `mode: assign`, `tolerance` described below | `assign` calculates a numeric target; `check` only checks its existing value |
+| `row_rules` / `formula` | `type`, `table`, `field`, `expression` | `mode: assign`, `when: null`, `tolerance` described below | `assign` calculates a numeric target; `check` only checks its existing value |
 | `cross_table_rules` / `foreign_key` | `type`, `child_table`, `child_field`, `parent_table`, `parent_field` | None | Validate membership in generated parent keys; declare the matching DatasetSpec relationship to generate FK values |
 | `cross_table_rules` / `aggregate_formula` | `type`, `table`, `field`, `expression` | `expected: null`, `tolerance` described below | Compare SUM(field), or row count for `field: "*"`, against an expression or explicit expectation; never assign totals |
 | `scenarios` item, no `type` | `name`, `weight` | `field_values: {}` | Apply the selected scenario's literal assignments for the current table/row |
@@ -191,3 +191,15 @@ python3 -m pytest tests/test_business_rules_reference.py
 Read the [task guide](../../docs/how-to/business-rules.md) for the introductory
 workflow and the [dataset schema](../../schemas/dataset_spec.schema.json) for
 embedding these rules in a complete specification.
+
+
+## Conditional formula branches
+
+`when` uses the existing typed Condition operators and null semantics. False
+conditions skip the expression and assignment; reports record eligible,
+evaluated and skipped rows separately. A predicate field cannot be written by
+row rules. Assignments sharing one target require disjoint equality/membership
+branches. See [conditional_eav.json](conditional_eav.json) for generated entity
+domains, a bounded authored attribute vocabulary and two exact DECIMAL branches.
+It permits repeated entity/attribute observations; no source pivot or duplicate
+merge is implied. Omitted conditions retain the old rule serialization and hash.

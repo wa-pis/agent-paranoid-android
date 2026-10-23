@@ -90,6 +90,8 @@ row_rules:
     table: orders
     field: total
     expression: (quantity * unit_price + (-discount) + fee) / 1
+    # Typed condition; all valid example quantities are in this range.
+    when: {field: quantity, gte: 1, lte: 3}
     mode: check
     tolerance: 0
 

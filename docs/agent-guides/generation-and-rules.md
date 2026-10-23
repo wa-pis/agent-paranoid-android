@@ -146,3 +146,13 @@ calendar grain is unknown unless a separate reviewed typed contract is active.
 A partial temporal bound that reverses the interval after applying the existing
 2020/2025 defaults must reject with a value-free explicit-bounds hint. Do not
 silently clamp it to a date outside the supplied interval.
+
+
+FormulaRule accepts optional typed `when` using the existing Condition policy.
+False branches skip both assignment and expression validation, with explicit
+eligible/evaluated/skipped counters. Omitted predicates preserve old hashes and
+report shape. Predicate fields cannot be row-rule write targets; conditional
+assignments sharing a target require proven disjoint equality/membership sets.
+Schema-less calls enforce predicate literal privacy too. Keep the expression
+AST unchanged and predicate work on the same GenerationBudget. EAV examples
+remain independently authored models, never source-row pivots.

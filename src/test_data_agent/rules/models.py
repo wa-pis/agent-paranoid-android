@@ -37,6 +37,8 @@ class StrictRuleModel(BaseModel):
         # Unspecified tolerance is type-dependent; preserve that intent on reload.
         if "tolerance" in type(self).model_fields and "tolerance" not in self.model_fields_set:
             result.pop("tolerance", None)
+        if isinstance(self, FormulaRule) and self.when is None:
+            result.pop("when", None)
         return result
 
 
@@ -89,6 +91,7 @@ class TemporalOrderingRule(StrictRuleModel):
 
 
 class FormulaRule(StrictRuleModel):
+    when: Condition | None = None
     mode: Literal["assign", "check"] = "assign"
     type: Literal["formula"]
     table: RuleIdentifier
@@ -169,7 +172,60 @@ class BusinessRules(StrictRuleModel):
             raise ValueError(
                 f"business rules must contain <= {MAX_BUSINESS_RULE_COUNT} rules"
             )
+        validate_conditional_formula_writers(self.row_rules)
         return self
+
+
+def _selection_values(condition: Condition | None) -> set[object] | None:
+    if condition is None or condition.gte is not None or condition.lte is not None or "not_equals" in condition.model_fields_set:
+        return None
+    values = ([condition.equals] if "equals" in condition.model_fields_set
+              else condition.in_values)
+    if values is None:
+        return None
+    result: set[object] = set()
+    for value in values:
+        if value is None:
+            result.add(None)
+        elif type(value) in {str, int, float, bool}:
+            try:
+                result.add(_rule_number(int(value) if isinstance(value, bool) else value))
+            except (ValueError, TypeError, ArithmeticError):
+                if not isinstance(value, str):
+                    return None
+                result.add(("text", value))
+        else:
+            return None
+    return result
+
+
+def validate_conditional_formula_writers(rules: list[RowRule]) -> None:
+    writes: set[tuple[str, str]] = set()
+    assignments: dict[tuple[str, str], list[FormulaRule]] = {}
+    for rule in rules:
+        if isinstance(rule, FormulaRule) and rule.mode == "assign":
+            writes.add((rule.table, rule.field))
+            assignments.setdefault((rule.table, rule.field), []).append(rule)
+        elif isinstance(rule, ConditionalRequiredRule):
+            writes.update((rule.table, field) for field in rule.required_fields)
+        elif isinstance(rule, ConditionalAllowedValuesRule):
+            writes.add((rule.table, rule.field))
+        elif isinstance(rule, TemporalOrderingRule):
+            writes.add((rule.table, rule.end_field))
+    for rule in rules:
+        if isinstance(rule, FormulaRule) and rule.when is not None:
+            if rule.when.field == rule.field or (rule.table, rule.when.field) in writes:
+                raise ValueError("formula predicate field must not be a row-rule target")
+    for group in assignments.values():
+        if not any(rule.when is not None for rule in group) or len(group) < 2:
+            continue
+        field = group[0].when.field if group[0].when is not None else None
+        seen: set[object] = set()
+        for rule in group:
+            values = _selection_values(rule.when)
+            if rule.when is None or rule.when.field != field or values is None or seen.intersection(values):
+                raise ValueError("conditional formula assignments require disjoint predicates")
+            seen.update(values)
 
 
 _ROW_RULE_ADAPTER: TypeAdapter[RowRule] = TypeAdapter(RowRule)

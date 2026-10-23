@@ -16,6 +16,7 @@ from test_data_agent.rules.contract import (
     validate_business_rules_for_spec,
 )
 from test_data_agent.rules.engine import apply_business_rules
+from test_data_agent.rules.conditions import condition_matches
 from test_data_agent.rules.models import BusinessRules, FormulaRule, business_rules_from_dict, load_business_rules
 from test_data_agent.rules.validation import BusinessValidationReport, validate_business_rules
 
@@ -51,6 +52,9 @@ def apply_and_validate_business_rules(
     budget = budget or GenerationBudget()
     if spec is not None:
         validate_business_rules_for_spec(rules, spec)
+    else:
+        validate_business_rule_literals(rules)
+    assignment_counts: dict[int, int] = {}
     expected_rule_failures: dict[int, int] = {}
     apply_business_rules(
         rows_by_table,
@@ -62,6 +66,7 @@ def apply_and_validate_business_rules(
         expected_rule_failures=expected_rule_failures,
         budget=budget,
         spec=spec,
+        assignment_counts=assignment_counts,
     )
     report = validate_business_rules(
         rows_by_table,
@@ -74,7 +79,7 @@ def apply_and_validate_business_rules(
         if isinstance(rule, FormulaRule):
             report.results[index].application = rule.mode
             if rule.mode == "assign":
-                report.results[index].assigned_row_count = len(rows_by_table.get(rule.table, []))
+                report.results[index].assigned_row_count = assignment_counts.get(index - len(rules.field_rules), 0)
     if spec is not None and mode not in {"mixed", "negative"}:
         _report_assigned_numeric_bounds(rows_by_table, rules, spec, report, budget=budget)
     return report
@@ -181,6 +186,8 @@ def _report_assigned_numeric_bounds(
         if not isinstance(distribution, NumericDistribution) or field.is_identifier:
             continue
         for row in budget.iter_rule_work(rows.get(rule.table, [])):
+            if rule.when is not None and not condition_matches(row, rule.when, budget=budget):
+                continue
             value = row.get(rule.field)
             if isinstance(value, bool) or not isinstance(value, (int, float)):
                 continue  # The unconditional schema validator handles wrong types.

@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.1",
+  "generation_settings": {
+    "seed": 7
+  },
+  "entities": [
+    {
+      "name": "observations",
+      "row_count": 12,
+      "fields": [
+        {
+          "name": "entity_id",
+          "data_type": "integer",
+          "is_identifier": true,
+          "distribution": {
+            "kind": "synthetic_identifier",
+            "pool_size": 3
+          }
+        },
+        {
+          "name": "attribute",
+          "data_type": "string",
+          "distribution": {
+            "kind": "categorical",
+            "categories": [
+              {
+                "value": "ratio",
+                "count": 1
+              },
+              {
+                "value": "total",
+                "count": 1
+              }
+            ]
+          }
+        },
+        {
+          "name": "numerator",
+          "data_type": "integer",
+          "distribution": {
+            "kind": "numeric",
+            "min_value": 2,
+            "max_value": 4
+          }
+        },
+        {
+          "name": "divisor",
+          "data_type": "integer",
+          "distribution": {
+            "kind": "numeric",
+            "min_value": 1,
+            "max_value": 2
+          }
+        },
+        {
+          "name": "value",
+          "data_type": "decimal",
+          "semantic_type": "numeric_measure",
+          "distribution": {
+            "kind": "decimal_range",
+            "precision": 10,
+            "scale": 3,
+            "min": "0.001",
+            "max": "9.999"
+          }
+        }
+      ]
+    }
+  ],
+  "business_rules": {
+    "row_rules": [
+      {
+        "type": "formula",
+        "table": "observations",
+        "field": "value",
+        "when": {
+          "field": "attribute",
+          "equals": "ratio"
+        },
+        "expression": "numerator / divisor"
+      },
+      {
+        "type": "formula",
+        "table": "observations",
+        "field": "value",
+        "when": {
+          "field": "attribute",
+          "equals": "total"
+        },
+        "expression": "numerator + divisor"
+      }
+    ]
+  }
+}

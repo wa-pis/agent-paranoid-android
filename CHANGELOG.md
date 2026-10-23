@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Add reviewed typed conditional formulas with explicit skipped evidence, bounded disjoint EAV branches and a source-free runnable example.
+
 - CSV profiles retain optional finite numeric-storage evidence without clearing
   phone sensitivity. Reviewed `infer-spec --decimal-fields` mappings can supply
   independent synthetic `numeric_measure` ranges for eligible CSV measures.
