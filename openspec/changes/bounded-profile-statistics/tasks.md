@@ -9,7 +9,7 @@
 - [x] S8: Measure per-column aggregate query costs with fake clients; batch only if the existing budgets and safety invariants are preserved.
   - [x] Measure narrow/wide query and Trino table profiles; verify existing PostgreSQL table counts.
   - [x] Evaluate a bounded batching design and retain separate invocation/scan accounting before implementation.
-- [ ] S9: Regenerate affected schemas/cache contracts, update docs/changelog and run candidate gates.
+- [x] S9: Regenerate affected schemas/cache contracts, update docs/changelog and run candidate gates.
 
 S5 implementation and focused evidence are complete; full candidate CI remains
 part of S9. No package release or live database verification is claimed.
@@ -23,3 +23,12 @@ S7 disposition: bounded iteration, positive integer limits and pre-row-aggregate
 category preflight are implemented. The default 20-category policy is retained;
 recovery and a future field-scoped capped option are specified without activating
 new preservation permissions. Full candidate CI remains in S9.
+
+
+S9 checkpoint: #646 passed all 38 CI checks on exact head
+`dbda88161fbcf64d352627e3be394a6767151f8e` and merged as
+`eac35eee904278db499d53355fb2f8bc918e41c2`. The corrected combined release
+gate passed 4603 tests with 91.90% coverage, resource budgets, generated schemas,
+dependency compatibility and deterministic synthetic quickstart. S4 remains
+open for unavailable historical profile provenance, not an unimplemented adapter
+fix. The future month-start and capped-category designs remain explicitly inactive.

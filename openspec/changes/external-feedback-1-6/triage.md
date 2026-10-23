@@ -64,3 +64,22 @@ Main documentation run 39842360108 completed build, Pages deployment, public
 verification and mike-state retention. Independent public identity, stable alias
 and all four download hash checks passed. Publication is complete; no package
 release is implied. See the versioned-documentation verification record.
+
+
+## Delivery checkpoint after #645
+
+The intake table above records the original investigation questions. Subsequent
+merged work resolves the independently reproduced implementation slices:
+reviewed numeric declarations (#645); key metadata/pools and entity sizing
+(#633–#635); offline hypotheses and utility (#636/#638); Trino sanitized errors
+(#640); bounded Parquet/SQL statistics (#642); temporal endpoint defects (#643);
+and category preflight/iteration (#644). CLI contract clarifications merged in
+#632. Separate controlled-scenario and conditional-EAV proposals were recorded
+in #639 and remain unimplemented.
+
+The user tentatively identified installed version 1.6.0 but has no authentication
+configuration details. The historical 401 and profile provenance are therefore
+unconfirmed. Candidate test success is not a substitute for those observations.
+The versioned documentation is published, including its Russian edition; the
+main documentation workflow for #645 (39921070445) completed successfully.
+The package version remains 1.6.0; no package release is claimed or authorized.

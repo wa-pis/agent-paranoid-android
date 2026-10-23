@@ -123,7 +123,7 @@ latency or physical scan measurement is claimed. Full candidate CI remains open
 under S9, and historical external profile provenance remains unconfirmed.
 
 
-Final S8 candidate verification: `scripts/check_release.sh` passed with 4602
+Final S8 candidate verification: `scripts/check_release.sh` passed with 4603
 passed and 23 skipped tests and 91.90% coverage. Ruff, mypy, compilation,
 dependency/license compatibility, operational resource budgets, both generated
 schema freshness checks and deterministic quickstart smoke all passed. The
@@ -132,3 +132,20 @@ lock-compatible Python 3.11 dependency selection; controlling-terminal tests
 ran with the required local terminal access. Live database integration was
 explicitly disabled. Strict MkDocs and strict OpenSpec validation passed.
 Provider CI for this candidate remains pending under S9.
+
+
+The SQLGlot import was initially eager: isolated base/optional-extra and docs CI
+correctly rejected ordinary package import without the SQL extra. A subprocess
+regression reproduced the failure with sqlglot/psycopg/trino imports blocked.
+Moving imports inside multi-field SQL batching restores the optional boundary;
+80 focused dependency, documentation and batching checks passed. The corrected
+exact-source candidate then passed the full release gate: 4603 passed, 23 skipped,
+91.90% coverage, including budgets, schema freshness and synthetic quickstart.
+
+
+Merged S8/S9 checkpoint: #646 completed 38 successful CI checks with no pending
+checks on `dbda88161fbcf64d352627e3be394a6767151f8e`, then merged as
+`eac35eee904278db499d53355fb2f8bc918e41c2`. This supersedes the pending CI
+statements above. Earlier category #644 also passed full green CI and merged
+as `1523f340c89e57bbf33c641f82c289428b8747cb`. Historical profile provenance
+(S4), live physical-scan/latency evidence and a package publication remain absent.
