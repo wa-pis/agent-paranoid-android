@@ -196,3 +196,10 @@ spawn worker. Its shared SQL supervisor accepts bounded IPC only after a clean
 exit and terminates/reaps stalled work. This bounds parent waiting and result
 IPC; it does not certify a hard worker-memory or network-wire byte ceiling,
 and OS process operations can exceed deadlines during OS failure.
+
+
+Trino SQL-query profiling must detach untyped driver/TLS exceptions as well as
+suppress their displayed traceback. Raise the fixed `SqlQueryProfileError`
+after leaving the handler so `__cause__` and `__context__` retain no driver
+response objects. Test synthetic secret canaries at direct, CLI and audited MCP
+boundaries; preserve existing output artifacts on failure.

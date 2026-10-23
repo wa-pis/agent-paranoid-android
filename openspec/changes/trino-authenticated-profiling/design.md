@@ -17,3 +17,11 @@ existing insecure overrides must not permit sending a password over HTTP.
 Classify failures from known typed driver/status data, never by returning or
 parsing arbitrary backend messages. Detach original exceptions where user-facing
 errors cross boundaries. Apply the same factory to query profiling and MCP.
+
+
+A separately reproduced gap is limited to untyped failures crossing
+`profile_trino_query_source`: raising inside the handler with `from None`
+hides the traceback but retains the driver exception in `__context__`.
+Raise the same fixed error after leaving the handler. Existing typed domain
+errors and all authentication defaults remain unchanged. This is not evidence
+that the historical external 401 had this cause.

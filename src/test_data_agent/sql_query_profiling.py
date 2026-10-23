@@ -95,7 +95,9 @@ def profile_validated_query(
     except SqlQueryProfileError:
         raise
     except Exception:
-        raise SqlQueryProfileError("SQL query source profiling failed") from None
+        pass
+    # Do not retain driver responses in a suppressed exception context.
+    raise SqlQueryProfileError("SQL query source profiling failed") from None
 
 
 def build_no_row_schema_query(plan: ValidatedSqlQuery) -> TrustedProfileQuery:

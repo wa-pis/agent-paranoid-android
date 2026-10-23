@@ -89,3 +89,17 @@ through safe profiling and deterministic generation.
 - **THEN** it uses a placeholder JDBC-style endpoint and mandatory allowlists
   to build a safe aggregate profile and deterministic generated output
 - **AND** no JDBC URL, credential, endpoint, or source row appears in artifacts
+
+
+### Requirement: Detached Trino Query Profiling Failures
+
+Trino query profiling SHALL detach untyped driver and TLS failures at its public
+boundary without altering authentication selection, verified HTTPS, allowlists
+or query budgets. Errors, logs and audit records SHALL contain no credential or
+raw driver response.
+
+#### Scenario: Untyped driver or TLS failure during query profiling
+- **WHEN** the driver raises an untyped HTTP 401/403 or TLS failure during connection, execution or fetch
+- **THEN** SQL-query profiling raises its fixed profile error without an original cause or context
+- **AND** CLI JSON retains the external-service error category and any existing output artifact
+- **AND** audited MCP errors and logs contain no driver message or credentials

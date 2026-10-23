@@ -133,7 +133,9 @@ def profile_trino_query_source(
     except (SqlQuerySourceError, SqlQueryProfileError):
         raise
     except Exception:
-        raise SqlQueryProfileError("SQL query source profiling failed") from None
+        pass
+    # Detach driver/TLS response objects as well as their displayed traceback.
+    raise SqlQueryProfileError("SQL query source profiling failed") from None
 
 
 def _postgres_source_columns(
