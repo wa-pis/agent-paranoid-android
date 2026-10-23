@@ -10,9 +10,6 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
-import sqlglot
-from sqlglot import exp
-
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.privacy import (
@@ -246,6 +243,9 @@ def _fetch_column_summaries(
         raise SqlQueryProfileError("SQL query summary batch size is invalid")
     if len(columns) == 1:
         return [_single_row(fetch_query(_column_summary_query(plan, columns[0])))]
+    import sqlglot
+    from sqlglot import exp
+
     suffix = f' FROM ({plan.sql}) AS "__apa_source"'
     expressions = []
     aliases: list[tuple[int, str, str]] = []
