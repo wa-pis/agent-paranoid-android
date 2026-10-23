@@ -79,6 +79,8 @@
   
   <li class="toctree-l1 current"><a class="reference internal current" href="#">Profile Through Trino</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#authentication-failures">Authentication failures</a>
+    </li>
     </ul></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a></li>
@@ -209,7 +211,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation e51e4f1c6d82ead6ac4c0b4b56727050507eadb0
+  <br>Documentation b58eb02e46144a3d6d311ca81945dedcbad03cfb
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -321,6 +323,17 @@ profile = profile_trino_query_source(
 safe profile, reviewed spec, generated rows, validation report, manifest, and a
 bounded result summary. See <a href="../../reference/configuration/">Configuration</a> and
 <a href="../../mcp_examples/">MCP Tools</a> for the full limits and tool contracts.</p>
+<h2 id="authentication-failures">Authentication failures<a class="headerlink" href="#authentication-failures" title="Permanent link">&para;</a></h2>
+<p>For a failed connection, record the installed package version and selected
+<code>TRINO_AUTH_METHOD</code> locally. Share only those details when investigating a failure;
+do not share passwords, tokens, connection URLs or raw driver responses.
+A reported HTTP 401 alone does not identify a configuration or compatibility issue.</p>
+<p>SQL-query profiling converts untyped HTTP 401/403 and TLS failures into the fixed
+<code>SQL query source profiling failed</code> error, without retaining the original
+exception cause or context. The CLI keeps its <code>external_service</code> category and
+leaves an existing output artifact unchanged. MCP returns its fixed Trino error
+and records value-free audit diagnostics. These boundaries do not establish
+successful authentication against a particular server.</p>
               
 </div>
 

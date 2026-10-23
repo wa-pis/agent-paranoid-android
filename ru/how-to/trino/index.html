@@ -98,6 +98,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#_3">Воспроизводимый инфраструктурный пример</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Ошибки аутентификации</a>
+    </li>
     </ul></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../transformation/">Трансформация локальных данных</a></li>
@@ -206,7 +208,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation e51e4f1c6d82ead6ac4c0b4b56727050507eadb0
+  <br>Documentation b58eb02e46144a3d6d311ca81945dedcbad03cfb
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -241,6 +243,17 @@ export TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES=1073741824
 <h2 id="_3">Воспроизводимый инфраструктурный пример<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>В репозитории есть examples/local_trino/run.sh и варианты run-jdbc.sh, run-wildcard.sh, run-query.sh. Они используют синтетический TPC-H tiny в одноразовом контейнере, удаляют контейнер и сохраняют безопасный профиль, spec, новые данные и отчёты. В этом аудите инфраструктурные сценарии не запускались.</p>
 <p>Query-source требует явного column scope, хранит fingerprint вместо текста SQL и результатов. Не обходите отказ через unrestricted/insecure flags. Успех проверяется по scope, коду завершения, профилю без строк и отчётам сгенерированного набора; ошибка авторизации требует исправления grants или сужения запроса.</p>
+<h2 id="_4">Ошибки аутентификации<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>При сбое запишите локально версию пакета и выбранный <code>TRINO_AUTH_METHOD</code>.
+Для разбора достаточно этих сведений: не передавайте пароли, токены, адреса
+подключения и необработанные ответы драйвера. Один код HTTP 401 не позволяет
+установить причину сбоя настройки или совместимости.</p>
+<p>Профилирование SQL-запроса преобразует нетипизированные ошибки HTTP 401/403
+и TLS в фиксированную ошибку <code>SQL query source profiling failed</code>, не сохраняя
+исходное исключение в cause или context. CLI сохраняет категорию
+<code>external_service</code> и прежний выходной файл. MCP возвращает фиксированную
+ошибку Trino, а аудит не содержит значений источника или секретов.
+Эти проверки не подтверждают успешный вход на конкретный сервер.</p>
               
 </div>
 

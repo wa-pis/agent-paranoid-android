@@ -211,7 +211,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation e51e4f1c6d82ead6ac4c0b4b56727050507eadb0
+  <br>Documentation b58eb02e46144a3d6d311ca81945dedcbad03cfb
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -1168,7 +1168,18 @@ profile = profile_trino_query_source(
 <p>The example removes its container on success or failure and leaves only the
 safe profile, reviewed spec, generated rows, validation report, manifest, and a
 bounded result summary. See <a href="#reference-configuration">Configuration</a> and
-<a href="#mcp_examples">MCP Tools</a> for the full limits and tool contracts.</p></section><section class="print-page" id="how-to-transformation" heading-number="2.4"><h1 id="how-to-transformation-transform-local-data">Transform Local Data<a class="headerlink" href="#how-to-transformation-transform-local-data" title="Permanent link">&para;</a></h1>
+<a href="#mcp_examples">MCP Tools</a> for the full limits and tool contracts.</p>
+<h2 id="how-to-trino-authentication-failures">Authentication failures<a class="headerlink" href="#how-to-trino-authentication-failures" title="Permanent link">&para;</a></h2>
+<p>For a failed connection, record the installed package version and selected
+<code>TRINO_AUTH_METHOD</code> locally. Share only those details when investigating a failure;
+do not share passwords, tokens, connection URLs or raw driver responses.
+A reported HTTP 401 alone does not identify a configuration or compatibility issue.</p>
+<p>SQL-query profiling converts untyped HTTP 401/403 and TLS failures into the fixed
+<code>SQL query source profiling failed</code> error, without retaining the original
+exception cause or context. The CLI keeps its <code>external_service</code> category and
+leaves an existing output artifact unchanged. MCP returns its fixed Trino error
+and records value-free audit diagnostics. These boundaries do not establish
+successful authentication against a particular server.</p></section><section class="print-page" id="how-to-transformation" heading-number="2.4"><h1 id="how-to-transformation-transform-local-data">Transform Local Data<a class="headerlink" href="#how-to-transformation-transform-local-data" title="Permanent link">&para;</a></h1>
 <p>English · <a href="#ru-how-to-transformation">Русский</a></p>
 <p>Use selective transformation when each output row must correspond to an input
 row. Unlike synthetic generation, the result has mixed origin and may contain
@@ -3452,7 +3463,18 @@ export TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES=1073741824
 <p>Отдельный explicit opt-in run_safe_select по умолчанию отсутствует. Его ограниченные строки могут содержать исходные нестроковые значения; маскирование не делает их анонимными. Эти строки не передаются генератору или LLM.</p>
 <h2 id="ru-how-to-trino-_3">Воспроизводимый инфраструктурный пример<a class="headerlink" href="#ru-how-to-trino-_3" title="Permanent link">&para;</a></h2>
 <p>В репозитории есть examples/local_trino/run.sh и варианты run-jdbc.sh, run-wildcard.sh, run-query.sh. Они используют синтетический TPC-H tiny в одноразовом контейнере, удаляют контейнер и сохраняют безопасный профиль, spec, новые данные и отчёты. В этом аудите инфраструктурные сценарии не запускались.</p>
-<p>Query-source требует явного column scope, хранит fingerprint вместо текста SQL и результатов. Не обходите отказ через unrestricted/insecure flags. Успех проверяется по scope, коду завершения, профилю без строк и отчётам сгенерированного набора; ошибка авторизации требует исправления grants или сужения запроса.</p></section><section class="print-page" id="ru-how-to-transformation" heading-number="8.2.4"><h1 id="ru-how-to-transformation-_1">Трансформация локальных данных<a class="headerlink" href="#ru-how-to-transformation-_1" title="Permanent link">&para;</a></h1>
+<p>Query-source требует явного column scope, хранит fingerprint вместо текста SQL и результатов. Не обходите отказ через unrestricted/insecure flags. Успех проверяется по scope, коду завершения, профилю без строк и отчётам сгенерированного набора; ошибка авторизации требует исправления grants или сужения запроса.</p>
+<h2 id="ru-how-to-trino-_4">Ошибки аутентификации<a class="headerlink" href="#ru-how-to-trino-_4" title="Permanent link">&para;</a></h2>
+<p>При сбое запишите локально версию пакета и выбранный <code>TRINO_AUTH_METHOD</code>.
+Для разбора достаточно этих сведений: не передавайте пароли, токены, адреса
+подключения и необработанные ответы драйвера. Один код HTTP 401 не позволяет
+установить причину сбоя настройки или совместимости.</p>
+<p>Профилирование SQL-запроса преобразует нетипизированные ошибки HTTP 401/403
+и TLS в фиксированную ошибку <code>SQL query source profiling failed</code>, не сохраняя
+исходное исключение в cause или context. CLI сохраняет категорию
+<code>external_service</code> и прежний выходной файл. MCP возвращает фиксированную
+ошибку Trino, а аудит не содержит значений источника или секретов.
+Эти проверки не подтверждают успешный вход на конкретный сервер.</p></section><section class="print-page" id="ru-how-to-transformation" heading-number="8.2.4"><h1 id="ru-how-to-transformation-_1">Трансформация локальных данных<a class="headerlink" href="#ru-how-to-transformation-_1" title="Permanent link">&para;</a></h1>
 <p><a href="#how-to-transformation">English</a> · Русский</p>
 <h2 id="ru-how-to-transformation-_2">Для чего это нужно<a class="headerlink" href="#ru-how-to-transformation-_2" title="Permanent link">&para;</a></h2>
 <p>Используйте эту opt-in операцию, когда нужна обработка один к одному по явной policy: drop, synthesize, substitute, replace_text и разрешённое preserve. Выход имеет смешанное происхождение (mixed-origin); его нельзя выдавать за полностью синтетический или анонимный набор.</p>
