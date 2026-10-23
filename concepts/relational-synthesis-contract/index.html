@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 9b2e02b1e2ad50ce14213b296c32528349578fce
+  <br>Documentation e59c9c01d3ec94c625bc3050bf476fa21989ce27
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -382,13 +382,15 @@ manifests. Older saved reports without this field remain readable.</p>
 <p>Evidence contains metadata and counts, not key values or temporal endpoints.
 Collection shares the existing generation work and deadline budget and does
 not add a second scan of generated rows or change seeded generation.</p>
-<h2 id="proposed-relational-extensions">Proposed relational extensions<a class="headerlink" href="#proposed-relational-extensions" title="Permanent link">&para;</a></h2>
+<h2 id="reviewed-relational-extensions">Reviewed relational extensions<a class="headerlink" href="#reviewed-relational-extensions" title="Permanent link">&para;</a></h2>
 <p>Existing mixed/negative business rules can create synthetic missing-parent
 references. They do not provide an exact orphan-count selector, configurable
-fan-out allocation or measured source fan-out fidelity. The separate
-<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios">controlled relational scenarios proposal</a>
-records those optional extensions and their acceptance criteria; no new option
-is enabled by that proposal.</p>
+fan-out allocation or measured source fan-out fidelity. Reviewed DatasetSpec
+<a href="#explicit-relational-scenarios-unreleased">explicit scenarios</a> now provide
+exact synthetic orphan counts and generated-parent allocations in Unreleased
+source. They do not infer source histograms or reproduce source row mappings.
+Their executable acceptance is recorded in the
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios">controlled relational scenario change</a>.</p>
 <p>Formulas support optional reviewed typed predicates in assign/check mode.
 False predicates skip evaluation and are reported separately from successful
 checks. See <a href="../../how-to/business-rules/#conditional-formulas-and-synthetic-eav-models">conditional formulas</a>
