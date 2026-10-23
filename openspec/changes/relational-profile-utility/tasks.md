@@ -4,8 +4,8 @@
 - [x] R3: Specify additive per-entity sizing and total row budgets; retain --count compatibility and reject oversized plans before allocation.
 - [x] R4: Reuse metadata-only relationship discovery as reviewable candidates; test ambiguous names, absent parents, different domains and unauthorized tables.
 - [x] R5: Add utility/coverage evidence for declared checks, unmodeled relationships, key-domain size and temporal evidence; distinguish unknown from measured zero.
-- [ ] R6: Specify optional controlled orphan/fan-out scenarios independently from valid FK generation; never infer source row mappings.
-- [ ] R7: Evaluate EAV conditional-formula/pivot requests and record support or an explicit separate proposal.
+- [x] R6: Specify optional controlled orphan/fan-out scenarios independently from valid FK generation; never infer source row mappings.
+- [x] R7: Evaluate EAV conditional-formula/pivot requests and record support or an explicit separate proposal.
 - [x] R8: Exercise unequal parent/child sizes, nullable keys, empty relations and deterministic replay through CLI and direct services.
 - [ ] R9: Update synthetic-generation/dataset-validation baselines, docs, contracts and candidate migration evidence.
 
@@ -95,3 +95,22 @@
   an empty dataset cannot be misrepresented as a fully valid generated bundle.
 - Validation leaves input files unchanged. This adds acceptance coverage, not
   zero-row generation support or relaxed schema/relationship enforcement.
+
+## R6/R7 reviewed dispositions
+
+- Existing mixed/negative business rules already produce synthetic missing-parent
+  cases; they do not promise targeted exact orphan counts or a source fan-out
+  histogram. The proposed `controlled-relational-scenarios` follow-up specifies
+  explicit edge/size binding, nullable eligibility, exact generated allocations,
+  conflict rejection, controlled-invalid evidence and shared budgets. Runtime
+  implementation and RC gates remain unchecked in that separate change.
+- Formula rules have assign/check without a predicate; strict payloads reject
+  unknown keys and the expression AST excludes Python conditional expressions.
+  Conditional-required/allowed-values rules already use typed predicates.
+  Scenario weights do not substitute for predicates, and EAV pivot is absent.
+- The proposed `reviewed-eav-expressions` follow-up specifies typed conditional
+  formula evaluation, skipped evidence, null/ordering/conflict semantics and
+  source-free target modeling. Source-row pivot/unpivot requires a separate
+  authorized transformation/I/O change. Neither proposal activates a feature.
+- R9 and umbrella candidate/release gates remain open. These are explicit
+  feasibility dispositions, not claims that the follow-up implementations shipped.

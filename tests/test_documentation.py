@@ -505,6 +505,8 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "external-feedback-1-6",
         "reviewed-numeric-csv-profiling",
         "relational-profile-utility",
+        "controlled-relational-scenarios",
+        "reviewed-eav-expressions",
         "trino-authenticated-profiling",
         "bounded-profile-statistics",
         "feedback-cli-contract-clarity",
