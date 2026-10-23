@@ -50,3 +50,8 @@ publication is part of this change. Full release/CI results remain pending.
 Local release gate: 4698 passed, 23 skipped, 92.03% coverage, with dependency,
 resource, schema and quickstart checks successful. Exact-head provider CI and
 merge remain open. The source/schema digest is recorded in verification.md.
+
+Review follow-up: ordinary unrelated FLOAT/BOOLEAN/DECIMAL edges retain native
+key support alongside selected integer/string scenarios. Three reproductions
+failed before the correction and pass afterward; 169 focused cases pass.
+The changed runtime requires a fresh complete local gate and final-head CI.

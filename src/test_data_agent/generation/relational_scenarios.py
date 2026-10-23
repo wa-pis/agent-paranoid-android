@@ -4,9 +4,12 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+import math
+from decimal import Decimal
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.decimal_units import decimal_to_text
 from test_data_agent.core.limits import (
     GenerationBudget, enforce_input_cell_count, enforce_output_payload_size, max_input_cell_chars,
 )
@@ -89,6 +92,12 @@ def apply_prepared_relational_scenarios(
         if edge.status != "rejected":
             fields[edge.parent_entity].add(edge.parent_field)
             fields[edge.child_entity].add(edge.child_field)
+    selected_keys = {(item.parent_entity, item.parent_field) for item in plan.scenarios} | {
+        (item.child_entity, item.child_field) for item in plan.scenarios}
+    key_types: dict[str, tuple[type, ...]] = {
+        "integer": (int,), "float": (int, float), "boolean": (bool,),
+        "decimal": (Decimal,), "string": (str,), "date": (str,), "datetime": (str,),
+    }
     preview: dict[str, list[dict[str, Any]]] = {}
     saved: list[tuple[dict[str, Any], str, Any, dict[str, Any]]] = []
     cells = payload = 0
@@ -110,7 +119,13 @@ def apply_prepared_relational_scenarios(
                 if value is None:
                     accepted = field.nullable
                 else:
-                    accepted = type(value) is int if field.data_type == "integer" else type(value) is str and bool(value)
+                    accepted = type(value) in key_types[field.data_type]
+                    if type(value) is str and (entity.name, name) in selected_keys:
+                        accepted &= bool(value)
+                    if type(value) is float:
+                        accepted &= math.isfinite(value)
+                    if type(value) is Decimal:
+                        decimal_to_text(value)
                 if not accepted or (type(value) is str and len(value) > max_input_cell_chars()) or (type(value) is int and value.bit_length() > 16384):
                     raise RelationalScenarioError("relational scenario generated key has an unsupported scalar type or size")
                 cells += 1

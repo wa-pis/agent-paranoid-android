@@ -152,3 +152,26 @@ def test_mcp_consumes_reviewed_spec_without_returning_generated_keys(tmp_path, m
     assert "14000001" not in json.dumps(result)
     report = json.loads((tmp_path / "out/validation_report.json").read_text())
     assert report["relational_scenarios"]["expectations_met"] and not report["valid"]
+
+
+@pytest.mark.parametrize("kind", ["float", "boolean", "decimal"])
+def test_explicit_scenario_keeps_unrelated_native_key_types_supported(kind):
+    source = configured()
+    payload = source.model_dump(mode="json")
+    field = {"name": "value", "data_type": kind}
+    if kind == "decimal":
+        field["distribution"] = {"kind": "decimal_range", "min": "-1.00", "max": "1.00", "precision": 4, "scale": 2}
+    payload["entities"].extend([
+        {"name": "metric_parents", "row_count": 3, "fields": [field]},
+        {"name": "metric_children", "row_count": 6, "fields": [field]},
+    ])
+    payload["relationships"].append({"parent_entity": "metric_parents", "parent_field": "value",
+        "child_entity": "metric_children", "child_field": "value", "confidence": 1})
+    source = DatasetSpec.model_validate(payload)
+    baseline = source.model_copy(deep=True)
+    baseline.relational_scenarios = []
+    ordinary = generate_dataset(baseline, seed=7)
+    actual = generate_dataset(source, seed=7)
+    assert actual["metric_parents"] == ordinary["metric_parents"]
+    assert actual["metric_children"] == ordinary["metric_children"]
+    assert validate_dataset(actual, source).valid

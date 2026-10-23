@@ -71,7 +71,13 @@ strict documentation build, change validation and all 17 baseline specifications
 also passed. A separate synthetic valid fan-out SQL render retained FK DDL and
 COMMIT. Provider CI/merge and public documentation deployment remain pending.
 
-After the local gate, final edits only normalize one EOF blank line and strengthen
-the existing disabled-report type-reconciliation test (16 interface tests still
-pass). Runtime behavior and schemas are unchanged. Provider CI must verify the
-complete final commit before merge. Strict docs and Ruff also pass again.
+## Review correction before merge
+
+Review identified an unrelated-edge compatibility defect: strict integer/string
+scenario-key admission was also applied to ordinary FLOAT/BOOLEAN/DECIMAL edges
+in the preview. Three new independent native-edge tests failed before the fix.
+The preview now admits existing exact native scalar types with finite-float and
+bounded-decimal checks, while selected scenario edges retain their integer/string
+contract and empty-key rejection. The three regressions and 169 focused tests
+pass, with Ruff/mypy successful. The complete local gate is rerun for this changed
+runtime; only the final exact-head provider CI may authorize merge.
