@@ -205,7 +205,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 80145958b579540b6852c6860de27f41a591c79d
+  <br>Documentation eac35eee904278db499d53355fb2f8bc918e41c2
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -390,6 +390,14 @@ suppress their displayed traceback. Raise the fixed <code>SqlQueryProfileError</
 after leaving the handler so <code>__cause__</code> and <code>__context__</code> retain no driver
 response objects. Test synthetic secret canaries at direct, CLI and audited MCP
 boundaries; preserve existing output artifacts on failure.</p>
+<p>SQL query profiling batches at most eight column summaries per trusted SELECT.
+Keep the original authorized source SQL unchanged and include it once per batch.
+Alias only generated aggregate result fields; retain per-field temporal guards,
+category preflight and count validation. Bound wrapper overhead to 64 KiB and
+retain at most 72 aggregate cells per batch. Do not combine category literals
+into these summaries. Actual statement/scan-estimate charges, cumulative
+projection/profiled-column work, result bytes/cells and deadlines remain separate
+and unchanged. Table profiling is not batched by this query-source optimization.</p>
               
 </div>
 
