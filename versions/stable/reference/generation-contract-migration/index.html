@@ -207,7 +207,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation b58eb02e46144a3d6d311ca81945dedcbad03cfb
+  <br>Documentation 7ff706da1cfcb5e0b7fa66cd2b4e58ca2615ef9a
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -281,6 +281,13 @@ upgrade; the new contract fixtures record the intentional report changes.
 Unknown source fidelity, fan-out and missing relationship coverage remain
 unknown. No source queries, new authorization, dependency, package publication
 or completed release-candidate acceptance is implied.</p>
+<h3 id="parquet-distinctness-evidence">Parquet distinctness evidence<a class="headerlink" href="#parquet-distinctness-evidence" title="Permanent link">&para;</a></h3>
+<p>Reprofile Parquet sources to obtain bounded non-null distinctness. Old profiles
+retain unknown values. Newly profiled scalar columns may have <code>exact</code> or
+<code>lower_bound</code> unique-ratio evidence using existing schema fields; changed profile
+fingerprints require fresh plan review. This adds no primary-key nomination,
+identifier pool or source key reuse. Missing null metadata still blocks automatic
+spec inference. Existing dataset/profile schema versions remain unchanged.</p>
               
 </div>
 

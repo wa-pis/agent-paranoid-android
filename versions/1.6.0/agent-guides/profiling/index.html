@@ -207,7 +207,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation b58eb02e46144a3d6d311ca81945dedcbad03cfb
+  <br>Documentation 7ff706da1cfcb5e0b7fa66cd2b4e58ca2615ef9a
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -371,6 +371,13 @@ This structural check does not establish a native CSV parser peak-memory bound.<
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
 format 7 invalidates older inferred bindings; reprofile saved artifacts.</p>
+<p>Parquet distinctness reuses the scalar sensitivity scan and retains at most
+10,000 private SHA-256 scalar digests per column. Complete supported equality
+reports exact non-null distinctness; overflow reports lower_bound. Binary,
+composite and nonfinite numeric values stay unknown. Do not serialize digests
+or nominate primary keys/pools from this evidence. Invalid or absent metadata
+null counts remain unknown independently. A row-count mismatch rejects the
+profile; existing decoded-byte/cell/deadline limits remain in force.</p>
               
 </div>
 
