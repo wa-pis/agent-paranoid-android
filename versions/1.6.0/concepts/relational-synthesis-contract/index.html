@@ -207,7 +207,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br>Documentation e51e4f1c6d82ead6ac4c0b4b56727050507eadb0
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -385,6 +385,20 @@ manifests. Older saved reports without this field remain readable.</p>
 <p>Evidence contains metadata and counts, not key values or temporal endpoints.
 Collection shares the existing generation work and deadline budget and does
 not add a second scan of generated rows or change seeded generation.</p>
+<h2 id="proposed-relational-extensions">Proposed relational extensions<a class="headerlink" href="#proposed-relational-extensions" title="Permanent link">&para;</a></h2>
+<p>Existing mixed/negative business rules can create synthetic missing-parent
+references. They do not provide an exact orphan-count selector, configurable
+fan-out allocation or measured source fan-out fidelity. The separate
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/controlled-relational-scenarios">controlled relational scenarios proposal</a>
+records those optional extensions and their acceptance criteria; no new option
+is enabled by that proposal.</p>
+<p>Formulas currently support assign/check without a conditional predicate;
+conditional-required and conditional-allowed-values rules use predicates.
+Scenario weights cannot emulate a predicate. The separate
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/reviewed-eav-expressions">conditional formula/EAV proposal</a>
+records the remaining work. EAV source rows are not automatically pivoted or
+retained; explicit target modeling and independently generated key domains
+remain necessary.</p>
               
 </div>
 
