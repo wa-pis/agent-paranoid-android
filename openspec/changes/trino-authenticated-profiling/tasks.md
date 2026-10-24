@@ -8,8 +8,12 @@
 - [x] A7: Update database-source-configuration/MCP contracts, .env example without credentials, guides and release candidate evidence.
 - [x] A8: Leave live authenticated acceptance explicitly pending unless separately authorized and available.
 
-A3 evidence: the user tentatively identified version 1.6.0; the selected auth
-method is unavailable. The historical 401 remains unconfirmed. A separately
+A3 evidence: the user tentatively identified version 1.6.0 and subsequently
+confirmed username/password authentication on 2026-10-24. This corresponds to the
+supported `basic` mode. The historical application setting `TRINO_AUTH_METHOD`
+and secret-reference configuration remain unknown; the server authentication
+requirement does not prove that the application enabled Basic authentication.
+The historical 401 remains unconfirmed. A separately
 reproduced untyped-driver exception-context gap is fixed and covered by tests.
 A7 documentation and candidate evidence passed full green CI in #640, merged as
 `b58eb02e46144a3d6d311ca81945dedcbad03cfb`. A3 remains open solely for unavailable
