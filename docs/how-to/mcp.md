@@ -27,6 +27,9 @@ For process and dependency isolation, use the separate hardened images in
 [Container Deployment](../operations/containers.md). The generator example has
 no network, while the Trino worker receives no generator workspace mount.
 
+For Trino username/password setup, use the complete
+[Basic authentication MCP example](trino.md#mcp-with-a-username-and-password).
+
 ## Generator-Only Quickstart
 
 Install the optional MCP support in a dedicated environment. Use the version

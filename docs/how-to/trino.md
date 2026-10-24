@@ -134,6 +134,127 @@ safe profile, reviewed spec, generated rows, validation report, manifest, and a
 bounded result summary. See [Configuration](../reference/configuration.md) and
 [MCP Tools](../mcp_examples.md) for the full limits and tool contracts.
 
+## MCP with a username and password
+
+Select `TRINO_AUTH_METHOD=basic` explicitly for username/password login.
+The default is `none`: setting `TRINO_USER` alone does not send a password.
+`TRINO_AUTH_SECRET_ENV` holds the **name of the password environment variable**,
+not the password. Basic requires verified HTTPS, including local deployments.
+
+### 1. Prepare the environment and access
+
+```bash
+python3 -m venv /ABSOLUTE/PATH/trino-env
+/ABSOLUTE/PATH/trino-env/bin/python -m pip install 'agent-paranoid-android[mcp,trino]'
+/ABSOLUTE/PATH/trino-env/bin/test-data-agent --version
+/ABSOLUTE/PATH/trino-env/bin/test-data-agent doctor --require-extra trino
+```
+
+Replace `/ABSOLUTE/PATH` with your absolute path. Doctor checks local installation,
+not server login. Obtain the HTTPS host/port, login, approved catalog/schema/table/
+column scope and read-only metadata/aggregate grants from your Trino administrator.
+The MCP process needs network access, any required VPN and a trusted certificate
+chain. A corporate CA must be trusted by the Python/runtime environment; keep
+certificate verification enabled.
+
+### 2. Supply the password to the process
+
+If your MCP client supports protected secret injection into child-process
+environment variables, configure `MY_TRINO_PASSWORD` there. Keep the password out
+of JSON, repositories, command arguments and chat. A graphical application may
+not inherit terminal variables, and a `.env` file is not loaded automatically.
+Restart the MCP server after changing its environment.
+
+A complete **macOS** option: use Keychain Access to create a password item named
+`agent-paranoid-android-trino`, with its account matching `TRINO_USER` and your
+password. Save this script as `/ABSOLUTE/PATH/start-trino-mcp.sh`, replacing the
+path to the installed server:
+
+```bash
+#!/bin/bash
+# Resolve the password locally; reserve stdout for the MCP protocol.
+if ! MY_TRINO_PASSWORD=$(/usr/bin/security find-generic-password \
+    -s agent-paranoid-android-trino -a "$TRINO_USER" -w 2>/dev/null); then
+  printf '%s\n' 'Trino password is unavailable in Keychain' >&2
+  exit 1
+fi
+export MY_TRINO_PASSWORD
+exec /ABSOLUTE/PATH/trino-env/bin/test-data-agent-mcp-trino
+```
+
+Run `chmod 700 /ABSOLUTE/PATH/start-trino-mcp.sh`. Allow local access to that
+item if macOS prompts. Do not enable `set -x` or print the password. This launcher
+resolves the secret at startup without relying on a GUI application's inherited
+environment. On other operating systems use the client's protected storage or a
+local secret mechanism.
+
+### 3. Register the server in your MCP client
+
+This is the common `mcpServers` shape; the settings location depends on the client.
+Replace all fictional endpoints, usernames and data names locally. This example
+uses the Keychain launcher from the previous step:
+
+```json
+{
+  "mcpServers": {
+    "trino": {
+      "command": "/ABSOLUTE/PATH/start-trino-mcp.sh",
+      "env": {
+        "TRINO_HOST": "trino.example.internal",
+        "TRINO_PORT": "443",
+        "TRINO_HTTP_SCHEME": "https",
+        "TRINO_USER": "your_login",
+        "TRINO_AUTH_METHOD": "basic",
+        "TRINO_AUTH_SECRET_ENV": "MY_TRINO_PASSWORD",
+        "TRINO_ALLOWED_CATALOGS": "warehouse",
+        "TRINO_ALLOWED_SCHEMAS": "analytics",
+        "TRINO_ALLOWED_TABLE_COLUMNS": "warehouse.analytics.orders.*",
+        "TRINO_DEPLOYMENT_PROFILE": "shared-hardened",
+        "TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES": "1073741824"
+      }
+    }
+  }
+}
+```
+
+When the client securely supplies `MY_TRINO_PASSWORD` instead of using Keychain,
+set `command` directly to
+`/ABSOLUTE/PATH/trino-env/bin/test-data-agent-mcp-trino`.
+Secret substitution is client-specific: `${MY_TRINO_PASSWORD}` in JSON is not a
+universal substitution mechanism.
+
+`TRINO_HOST` is a host name without a URL scheme or path; use the actual HTTPS
+port. Catalog/schema allowlists are mandatory comma-separated sets. Column scope
+is optional for ordinary table profiling, but required for `profile-query`.
+You may replace `warehouse.analytics.orders.*` with comma-separated exact columns.
+The wildcard permits bounded aggregate profiling only, grants no source-row
+access and does not replace Trino grants.
+
+The cumulative scan limit shown is 1 GiB per invocation. Existing defaults also
+bound request timeout to 30 seconds, execution time to 30 seconds, run time to
+45 seconds and scanning to 1 GiB per query. `TRINO_CATALOG` and `TRINO_SCHEMA`
+are optional defaults within the allowlists. See the
+[configuration reference](../reference/configuration.md#trino-connection) for all settings.
+
+### 4. Verify startup and diagnose failures
+
+Restart the server in your MCP client and check that Trino tools appear. Start
+with an allowed metadata tool such as `list_catalogs`, then `describe_table` for
+an approved table. Process startup and Doctor success do not prove authentication.
+These instructions are checked locally against configuration contracts, not
+against your remote server.
+
+For a 401, check `basic`, the variable referenced by `TRINO_AUTH_SECRET_ENV`,
+the login and process restart locally. For a 403, check server grants and access
+policy; a status alone does not establish the exact cause. For TLS failures,
+check the endpoint and certificate trust.
+
+For support share the package version, launch method, `TRINO_AUTH_METHOD`,
+`TRINO_HTTP_SCHEME`, whether a login and secret reference are set, whether the
+password variable reaches the process, and whether another client can log in.
+Do not share login/password values, complete `.env` files, connection URLs,
+source rows or raw driver responses.
+
 ## Authentication failures
 
 For a failed connection, record the installed package version and selected

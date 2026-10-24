@@ -89,6 +89,10 @@ rejected before an output folder is created.
 
 ## Trino Profile To Synthetic Output
 
+For password-protected Trino, first configure the
+[Basic authentication MCP example](how-to/trino.md#mcp-with-a-username-and-password).
+The workflow below assumes the process already receives its connection/auth environment.
+
 1. Start the Trino MCP server with allowlisted catalogs and schemas:
 
 ```bash

@@ -381,6 +381,11 @@ driver.
 The URL is limited to 4,096 UTF-8 bytes, its host to 253 characters, and each
 catalog or schema identifier to 255 characters.
 
+For a complete MCP username/password configuration, including protected password
+injection and a macOS Keychain launcher, follow
+[MCP with a username and password](../how-to/trino.md#mcp-with-a-username-and-password)
+or the [Russian guide](../ru/how-to/trino.md#trino-mcp-basic).
+
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `TRINO_JDBC_URL` | unset | Credential-free JDBC-style endpoint; conflicts with unequal explicit endpoint/default components |
