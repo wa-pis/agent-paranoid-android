@@ -17,7 +17,7 @@
 ## Follow-through
 - [x] P1: deliver reviewed numeric CSV profiling and negative privacy tests.
 - [x] P1: verify existing TLS-protected Trino authentication and independently reproduced safe-error defects (#640).
-- [ ] Reconcile unavailable historical Trino authentication configuration; tentative version 1.6.0 alone does not establish the cause of 401.
+- [ ] Reconcile historical Trino application authentication settings; username/password authentication is confirmed, but tentative version 1.6.0 and the server requirement do not establish whether Basic auth was enabled or explain the 401.
 - [x] P1: deliver relational planning and utility evidence after candidate review.
 - [x] P2: deliver bounded numeric/temporal/Parquet statistics and query cost evidence (#642–#646).
 - [x] P2: finish remaining CLI/validation contract clarifications.
@@ -36,7 +36,9 @@ numeric declarations #645; query batching #646; conditional formulas/EAV modelin
 #648; exact controlled relational scenarios #649. Documentation publication is
 independently verified through #649.
 
-The remaining historical evidence tasks (Trino configuration and external profile
+Username/password authentication was confirmed on 2026-10-24; the historical
+application auth settings remain unknown. The remaining evidence tasks
+(Trino application configuration and external profile
 provenance) require unavailable external information; they are not runtime fixes.
 The source-free `controlled-relational-scenarios` and `reviewed-eav-expressions`
 implementation/activation slices are complete in main. Source-row pivot/unpivot

@@ -77,8 +77,9 @@ and category preflight/iteration (#644). CLI contract clarifications merged in
 #632. Separate controlled-scenario and conditional-EAV proposals were recorded
 in #639 and remain unimplemented.
 
-The user tentatively identified installed version 1.6.0 but has no authentication
-configuration details. The historical 401 and profile provenance are therefore
+The user tentatively identified installed version 1.6.0 and confirmed
+username/password authentication on 2026-10-24. Historical application auth
+settings remain unknown. The historical 401 and profile provenance are therefore
 unconfirmed. Candidate test success is not a substitute for those observations.
 The versioned documentation is published, including its Russian edition; the
 main documentation workflow for #645 (39921070445) completed successfully.
@@ -109,9 +110,11 @@ identity remains published 1.6.0 (`258c035c22408becf17ab090635710a50dda8ccc`);
 new source features are Unreleased. No new package release or live database
 acceptance is claimed.
 
-The historical Trino configuration (A3) and external profile provenance (S4)
-remain unavailable. The user tentatively identified version 1.6.0 and explicitly
-reported having no authentication details. These remain evidence gaps, without
+The historical Trino application settings (A3) and external profile provenance
+(S4) remain unavailable. The user tentatively identified version 1.6.0 and later
+confirmed username/password authentication on 2026-10-24. This identifies the
+server requirement as supported by `basic`, without establishing the historical
+application setting or explaining the 401. These remain evidence gaps, without
 an independently reproduced runtime defect to fix. Source-row pivot/unpivot,
 month-start inference and a configurable category-preservation ceiling retain
 their separate proposed scopes; they were not activated by these fixes.

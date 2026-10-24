@@ -30,8 +30,13 @@ profiling, then passed after raising the same fixed error outside the handler.
 The existing MCP boundary already detached it. No auth mode, TLS policy,
 allowlist, budget, public error category or default changed.
 
-The user tentatively identified installed version 1.6.0 but cannot supply the
-authentication method. The historical external 401 remains unconfirmed; the
+The user tentatively identified installed version 1.6.0 and confirmed
+username/password authentication on 2026-10-24. The supported `basic` mode uses
+`TRINO_USER`, `TRINO_AUTH_METHOD=basic` and `TRINO_AUTH_SECRET_ENV` referencing
+a separately supplied password variable over verified HTTPS. The historical
+application settings and secret-reference presence remain unknown. A server
+requiring a password does not prove that the application enabled this mode.
+The historical external 401 remains unconfirmed; the
 independent regression does not establish its cause or resolve server access.
 Live authenticated acceptance remains pending: no live server or secret was
 used. The public guide and credential-free environment example document the
@@ -51,5 +56,16 @@ on this shared path without changing its message or category.
 PR #640 passed full green CI and merged as
 `b58eb02e46144a3d6d311ca81945dedcbad03cfb`. This supersedes the pending CI
 statement above. A7 documentation and contract checks are complete. A3 historical
-authentication evidence and live authenticated acceptance remain unavailable;
+application-configuration evidence and live authenticated acceptance remain unavailable;
 neither is inferred from fake-driver test success.
+
+
+## Username/password clarification, 2026-10-24
+
+After the user clarified the authentication requirement, the current
+`test_trino_auth.py`, `test_trino_auth_feedback.py` and `test_trino_config.py`
+suites passed all 91 cases offline against the candidate source. Coverage
+includes Basic credential forwarding, verified HTTPS, missing/invalid secret
+references and sanitized 401/403 failures. Both affected OpenSpec changes
+validate strictly. No runtime change, live connection or credential collection
+was needed; these checks do not reproduce the historical server rejection.
