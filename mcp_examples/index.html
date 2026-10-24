@@ -204,7 +204,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1dca668a3d5cbe9e205af72be61fe76cbee6c3dd
+  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -284,6 +284,9 @@ command is documented in <a href="../how-to/business-rules/">Add Business Rules<
 fields, unsupported formula syntax, and concrete PII or secret values are
 rejected before an output folder is created.</p>
 <h2 id="trino-profile-to-synthetic-output">Trino Profile To Synthetic Output<a class="headerlink" href="#trino-profile-to-synthetic-output" title="Permanent link">&para;</a></h2>
+<p>For password-protected Trino, first configure the
+<a href="../how-to/trino/#mcp-with-a-username-and-password">Basic authentication MCP example</a>.
+The workflow below assumes the process already receives its connection/auth environment.</p>
 <ol>
 <li>Start the Trino MCP server with allowlisted catalogs and schemas:</li>
 </ol>

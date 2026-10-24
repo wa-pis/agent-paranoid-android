@@ -78,6 +78,18 @@
   
   <li class="toctree-l1 current"><a class="reference internal current" href="#">Profile Through Trino</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#mcp-with-a-username-and-password">MCP with a username and password</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-prepare-the-environment-and-access">1. Prepare the environment and access</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-supply-the-password-to-the-process">2. Supply the password to the process</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-register-the-server-in-your-mcp-client">3. Register the server in your MCP client</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-verify-startup-and-diagnose-failures">4. Verify startup and diagnose failures</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#authentication-failures">Authentication failures</a>
     </li>
     </ul></li>
@@ -209,7 +221,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1dca668a3d5cbe9e205af72be61fe76cbee6c3dd
+  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -321,6 +333,104 @@ profile = profile_trino_query_source(
 safe profile, reviewed spec, generated rows, validation report, manifest, and a
 bounded result summary. See <a href="../../reference/configuration/">Configuration</a> and
 <a href="../../mcp_examples/">MCP Tools</a> for the full limits and tool contracts.</p>
+<h2 id="mcp-with-a-username-and-password">MCP with a username and password<a class="headerlink" href="#mcp-with-a-username-and-password" title="Permanent link">&para;</a></h2>
+<p>Select <code>TRINO_AUTH_METHOD=basic</code> explicitly for username/password login.
+The default is <code>none</code>: setting <code>TRINO_USER</code> alone does not send a password.
+<code>TRINO_AUTH_SECRET_ENV</code> holds the <strong>name of the password environment variable</strong>,
+not the password. Basic requires verified HTTPS, including local deployments.</p>
+<h3 id="1-prepare-the-environment-and-access">1. Prepare the environment and access<a class="headerlink" href="#1-prepare-the-environment-and-access" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash">python3 -m venv /ABSOLUTE/PATH/trino-env
+/ABSOLUTE/PATH/trino-env/bin/python -m pip install 'agent-paranoid-android[mcp,trino]'
+/ABSOLUTE/PATH/trino-env/bin/test-data-agent --version
+/ABSOLUTE/PATH/trino-env/bin/test-data-agent doctor --require-extra trino
+</code></pre>
+<p>Replace <code>/ABSOLUTE/PATH</code> with your absolute path. Doctor checks local installation,
+not server login. Obtain the HTTPS host/port, login, approved catalog/schema/table/
+column scope and read-only metadata/aggregate grants from your Trino administrator.
+The MCP process needs network access, any required VPN and a trusted certificate
+chain. A corporate CA must be trusted by the Python/runtime environment; keep
+certificate verification enabled.</p>
+<h3 id="2-supply-the-password-to-the-process">2. Supply the password to the process<a class="headerlink" href="#2-supply-the-password-to-the-process" title="Permanent link">&para;</a></h3>
+<p>If your MCP client supports protected secret injection into child-process
+environment variables, configure <code>MY_TRINO_PASSWORD</code> there. Keep the password out
+of JSON, repositories, command arguments and chat. A graphical application may
+not inherit terminal variables, and a <code>.env</code> file is not loaded automatically.
+Restart the MCP server after changing its environment.</p>
+<p>A complete <strong>macOS</strong> option: use Keychain Access to create a password item named
+<code>agent-paranoid-android-trino</code>, with its account matching <code>TRINO_USER</code> and your
+password. Save this script as <code>/ABSOLUTE/PATH/start-trino-mcp.sh</code>, replacing the
+path to the installed server:</p>
+<pre><code class="language-bash">#!/bin/bash
+# Resolve the password locally; reserve stdout for the MCP protocol.
+if ! MY_TRINO_PASSWORD=$(/usr/bin/security find-generic-password \
+    -s agent-paranoid-android-trino -a &quot;$TRINO_USER&quot; -w 2&gt;/dev/null); then
+  printf '%s\n' 'Trino password is unavailable in Keychain' &gt;&amp;2
+  exit 1
+fi
+export MY_TRINO_PASSWORD
+exec /ABSOLUTE/PATH/trino-env/bin/test-data-agent-mcp-trino
+</code></pre>
+<p>Run <code>chmod 700 /ABSOLUTE/PATH/start-trino-mcp.sh</code>. Allow local access to that
+item if macOS prompts. Do not enable <code>set -x</code> or print the password. This launcher
+resolves the secret at startup without relying on a GUI application's inherited
+environment. On other operating systems use the client's protected storage or a
+local secret mechanism.</p>
+<h3 id="3-register-the-server-in-your-mcp-client">3. Register the server in your MCP client<a class="headerlink" href="#3-register-the-server-in-your-mcp-client" title="Permanent link">&para;</a></h3>
+<p>This is the common <code>mcpServers</code> shape; the settings location depends on the client.
+Replace all fictional endpoints, usernames and data names locally. This example
+uses the Keychain launcher from the previous step:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;trino&quot;: {
+      &quot;command&quot;: &quot;/ABSOLUTE/PATH/start-trino-mcp.sh&quot;,
+      &quot;env&quot;: {
+        &quot;TRINO_HOST&quot;: &quot;trino.example.internal&quot;,
+        &quot;TRINO_PORT&quot;: &quot;443&quot;,
+        &quot;TRINO_HTTP_SCHEME&quot;: &quot;https&quot;,
+        &quot;TRINO_USER&quot;: &quot;your_login&quot;,
+        &quot;TRINO_AUTH_METHOD&quot;: &quot;basic&quot;,
+        &quot;TRINO_AUTH_SECRET_ENV&quot;: &quot;MY_TRINO_PASSWORD&quot;,
+        &quot;TRINO_ALLOWED_CATALOGS&quot;: &quot;warehouse&quot;,
+        &quot;TRINO_ALLOWED_SCHEMAS&quot;: &quot;analytics&quot;,
+        &quot;TRINO_ALLOWED_TABLE_COLUMNS&quot;: &quot;warehouse.analytics.orders.*&quot;,
+        &quot;TRINO_DEPLOYMENT_PROFILE&quot;: &quot;shared-hardened&quot;,
+        &quot;TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES&quot;: &quot;1073741824&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>When the client securely supplies <code>MY_TRINO_PASSWORD</code> instead of using Keychain,
+set <code>command</code> directly to
+<code>/ABSOLUTE/PATH/trino-env/bin/test-data-agent-mcp-trino</code>.
+Secret substitution is client-specific: <code>${MY_TRINO_PASSWORD}</code> in JSON is not a
+universal substitution mechanism.</p>
+<p><code>TRINO_HOST</code> is a host name without a URL scheme or path; use the actual HTTPS
+port. Catalog/schema allowlists are mandatory comma-separated sets. Column scope
+is optional for ordinary table profiling, but required for <code>profile-query</code>.
+You may replace <code>warehouse.analytics.orders.*</code> with comma-separated exact columns.
+The wildcard permits bounded aggregate profiling only, grants no source-row
+access and does not replace Trino grants.</p>
+<p>The cumulative scan limit shown is 1 GiB per invocation. Existing defaults also
+bound request timeout to 30 seconds, execution time to 30 seconds, run time to
+45 seconds and scanning to 1 GiB per query. <code>TRINO_CATALOG</code> and <code>TRINO_SCHEMA</code>
+are optional defaults within the allowlists. See the
+<a href="../../reference/configuration/#trino-connection">configuration reference</a> for all settings.</p>
+<h3 id="4-verify-startup-and-diagnose-failures">4. Verify startup and diagnose failures<a class="headerlink" href="#4-verify-startup-and-diagnose-failures" title="Permanent link">&para;</a></h3>
+<p>Restart the server in your MCP client and check that Trino tools appear. Start
+with an allowed metadata tool such as <code>list_catalogs</code>, then <code>describe_table</code> for
+an approved table. Process startup and Doctor success do not prove authentication.
+These instructions are checked locally against configuration contracts, not
+against your remote server.</p>
+<p>For a 401, check <code>basic</code>, the variable referenced by <code>TRINO_AUTH_SECRET_ENV</code>,
+the login and process restart locally. For a 403, check server grants and access
+policy; a status alone does not establish the exact cause. For TLS failures,
+check the endpoint and certificate trust.</p>
+<p>For support share the package version, launch method, <code>TRINO_AUTH_METHOD</code>,
+<code>TRINO_HTTP_SCHEME</code>, whether a login and secret reference are set, whether the
+password variable reaches the process, and whether another client can log in.
+Do not share login/password values, complete <code>.env</code> files, connection URLs,
+source rows or raw driver responses.</p>
 <h2 id="authentication-failures">Authentication failures<a class="headerlink" href="#authentication-failures" title="Permanent link">&para;</a></h2>
 <p>For a failed connection, record the installed package version and selected
 <code>TRINO_AUTH_METHOD</code> locally. Share only those details when investigating a failure;
