@@ -16,7 +16,10 @@ may include later reviewed corrections; it is not claimed to be unchanged
 release-era documentation. An older release without a guide remains represented
 by its [release evidence](release-evidence.md), not a fabricated snapshot.
 
-Development documentation appears under `versions/next/`, with a visible label.
+Release-candidate guides use `versions/X.Y.ZrcN/` (for example `versions/1.7.0rc1/`),
+with an explicit non-stable label. The `next` copy alias follows the current RC;
+older RC guides retain their own directory. Other development documentation
+appears under `versions/next/`, with a visible label.
 It preserves the stable default and cannot advance it merely because `main`
 changed. History and RC evidence remain in [History And Maintenance](history.md)
 and stay out of default user search.

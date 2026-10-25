@@ -15,7 +15,7 @@ resolution-markers = [
 
 [[package]]
 name = "agent-paranoid-android"
-version = "1.6.0"
+version = "1.7.0rc1"
 source = { editable = "." }
 dependencies = [
     { name = "faker" },

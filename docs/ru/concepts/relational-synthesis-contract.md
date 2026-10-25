@@ -20,7 +20,9 @@ FK coverage не доказывает бизнес-смысл связи. Round-
 
 Проверьте имена parent/child полей, статус связей, cardinality, nullable и число строк до генерации. После неё прочитайте relationships и constraints в validation_report, затем business_validation_report. Практика: [связанные таблицы](../getting-started/related-tables.md).
 
-## Явные сценарии связей (Unreleased)
+<a id="explicit-relational-scenarios-unreleased"></a>
+
+## Явные сценарии связей (1.7.0rc1)
 
 В проверенную спецификацию DatasetSpec можно добавить `relational_scenarios`.
 Декларация задаёт `parent_entity`, `parent_field`, `child_entity`, `child_field`,
@@ -73,4 +75,5 @@ FK coverage не доказывает бизнес-смысл связи. Round-
 CSV, JSON и Parquet допускают такие явно заданные невалидные наборы. Экспорт SQL
 PostgreSQL по-прежнему требует валидности и отклоняет отсутствующие ссылки до
 публикации DDL с внешними ключами. Валидное распределение допускает SQL-экспорт.
-Эти изменения Unreleased не означают выпуск новой версии пакета.
+Эти изменения входят в кандидат 1.7.0rc1; статус публикации и приёмки
+записан отдельно в [статусе кандидата](../../1.7.0rc1-release-status.md).

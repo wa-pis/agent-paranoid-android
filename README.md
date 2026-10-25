@@ -19,6 +19,10 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
+Prospective candidate `1.7.0rc1` is not yet published; stable `1.6.0` remains recommended.
+After publication, install explicitly with `python3 -m pip install "agent-paranoid-android==1.7.0rc1"`.
+See [candidate status](docs/1.7.0rc1-release-status.md) and its [guide](https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/).
+
 ## Install And Try It
 
 Python 3.11 or newer is required.
@@ -133,4 +137,4 @@ use exact arithmetic with one target-scale HALF_UP rounding. See
 
 Reviewed [relational scenarios](docs/concepts/relational-synthesis-contract.md#explicit-relational-scenarios-unreleased)
 can specify exact synthetic missing-parent counts and generated parent fan-out
-in DatasetSpec (Unreleased); expected invalid references remain explicitly invalid.
+in DatasetSpec (1.7.0rc1); expected invalid references remain explicitly invalid.

@@ -10,4 +10,8 @@ Default site содержит поддерживаемую документац�
 
 Поддерживаемая guide может получать reviewed corrections; её metadata содержит отдельный documentation commit. Это не обещание неизменной release-era prose. Для старого package без guide сохраняется release evidence, а не выдуманный snapshot.
 
-Development docs размещаются в versions/next/ с видимым статусом и не продвигают stable автоматически. Package 1.6.0 и DatasetSpec schema 1.1 — разные версии. См. [совместимость](concepts/dataset-spec-compatibility.md), [скачивание](downloads.md) и [публикацию — English](../development/documentation.md).
+Документация RC сохраняется отдельно: `versions/X.Y.ZrcN/`, например
+`versions/1.7.0rc1/`. Копия-алиас `next` ведёт на текущий RC; более ранние
+кандидаты сохраняются в собственных каталогах. Статус явно указывает, что
+это не стабильная версия. Остальные development docs размещаются в
+`versions/next/` с видимым статусом и не продвигают stable автоматически. Package 1.6.0 и DatasetSpec schema 1.1 — разные версии. См. [совместимость](concepts/dataset-spec-compatibility.md), [скачивание](downloads.md) и [публикацию — English](../development/documentation.md).

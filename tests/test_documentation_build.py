@@ -217,7 +217,13 @@ def test_failed_rollback_retains_previous_site_outside_staging(tmp_path, monkeyp
     assert (previous / "index.html").read_text() == "other writer"
 
 
-def test_standard_plugins_preserve_stable_and_old_versions_in_preview(tmp_path):
+@pytest.mark.parametrize("version,target,status", [
+    ("1.7.0.dev1", "next", "Development / not stable"),
+    ("1.7.0rc1", "1.7.0rc1", "Release candidate / not stable"),
+])
+def test_standard_plugins_preserve_stable_and_old_versions_in_preview(
+    tmp_path, version, target, status,
+):
     pytest.importorskip("mkdocs")
     pytest.importorskip("mike")
     source = tmp_path / "source"
@@ -285,7 +291,7 @@ nav:
         ["git", "fetch", str(bundle), "gh-pages:refs/remotes/origin/gh-pages"],
         cwd=source,
     )
-    (source / "pyproject.toml").write_text('[project]\nversion = "1.7.0rc1"\n')
+    (source / "pyproject.toml").write_text(f'[project]\nversion = "{version}"\n')
     (source / "docs/index.md").write_text("# NEXT VERSION ONLY\n")
     docs.build(source, output, str(browser))
     assert (output / "index.html").read_bytes() == before
@@ -293,13 +299,33 @@ nav:
     assert (output / "versions/1.6.0/index.html").read_bytes() == (
         output / "versions/stable/index.html"
     ).read_bytes()
-    assert "NEXT VERSION ONLY" in (output / "versions/next/index.html").read_text()
+    assert "NEXT VERSION ONLY" in (output / f"versions/{target}/index.html").read_text()
     assert (
-        "Development / not stable"
-        in (output / "versions/next/documentation.json").read_text()
+        status in (output / f"versions/{target}/documentation.json").read_text()
     )
     versions = json.loads((output / "versions/versions.json").read_text())
-    assert {entry["version"] for entry in versions} == {"1.6.0", "next"}
+    assert {entry["version"] for entry in versions} == {"1.6.0", target}
+    if target != "next":
+        assert (output / "versions/next/documentation.json").read_bytes() == (
+            output / f"versions/{target}/documentation.json"
+        ).read_bytes()
+        assert next(item for item in versions if item["version"] == target)["aliases"] == ["next"]
+        # A later RC moves only next, retaining the previous candidate and stable.
+        docs.build(source, output, str(browser), bundle=bundle)
+        first_candidate = (output / f"versions/{target}/index.html").read_bytes()
+        docs.command(["git", "fetch", str(bundle), "gh-pages:refs/remotes/origin/gh-pages"], cwd=source)
+        (source / "pyproject.toml").write_text('[project]\nversion = "1.7.0rc2"\n')
+        docs.command(["git", "-c", "commit.gpgsign=false", "commit", "-am", "fictional next candidate"], cwd=source)
+        docs.command(["git", "tag", "v1.7.0rc2"], cwd=source)
+        tag_commit = docs.command(["git", "rev-parse", "HEAD"], cwd=source)
+        (source / "docs/index.md").write_text("# SECOND CANDIDATE ONLY\n")
+        docs.build(source, output, str(browser))
+        assert (output / "index.html").read_bytes() == before
+        assert (output / f"versions/{target}/index.html").read_bytes() == first_candidate
+        second = json.loads((output / "versions/1.7.0rc2/documentation.json").read_text())
+        assert second["package_commit"] == tag_commit
+        assert second["package_version"] == "1.7.0rc2"
+        assert "SECOND CANDIDATE ONLY" in (output / "versions/next/index.html").read_text()
 
 
 def test_russian_search_and_navigation_keep_the_language(tmp_path, monkeypatch):

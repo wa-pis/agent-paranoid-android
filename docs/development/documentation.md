@@ -32,7 +32,8 @@ locked documentation group is separate from runtime package dependencies.
 | Site root | Maintained guide for the verified stable package; existing URLs work |
 | `versions/stable/` | mike's copy alias to the selected stable guide, with selector |
 | `versions/X.Y.Z/` | Guide for that exact package version, with its own search index |
-| `versions/next/` | Clearly labelled development documentation |
+| `versions/X.Y.ZrcN/` | Exact release-candidate guide, explicitly not stable |
+| `versions/next/` | Current development guide or copy alias of the latest RC |
 | `documentation.json` | Package version/source, documentation revision and status |
 | `downloads/` | PDF, standalone HTML, Markdown source ZIP, selected-version site ZIP |
 
@@ -53,8 +54,12 @@ remain available through the history index but are excluded from default search.
 Local builds use `refs/remotes/origin/gh-pages` when available. Fetch it first to
 retain existing versions, or pass `--state-ref REF` to a local branch containing
 previous native state. First publication bootstraps only the current verified
-stable package; it does not manufacture earlier snapshots. A `next` build
+stable package; it does not manufacture earlier snapshots. A development or RC build
 requires already-published stable state and preserves the complete stable root.
+RC builds retain their exact version directory and move only the `next` copy
+alias; later candidates preserve earlier RC directories. RC identity binds to
+its tag commit once available and otherwise to the candidate source. The label
+does not claim successful package publication or public acceptance.
 
 ## Publication And Release Gates
 

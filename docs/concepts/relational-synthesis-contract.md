@@ -148,7 +148,7 @@ Existing mixed/negative business rules can create synthetic missing-parent
 references. They do not provide an exact orphan-count selector, configurable
 fan-out allocation or measured source fan-out fidelity. Reviewed DatasetSpec
 [explicit scenarios](#explicit-relational-scenarios-unreleased) now provide
-exact synthetic orphan counts and generated-parent allocations in Unreleased
+exact synthetic orphan counts and generated-parent allocations in candidate 1.7.0rc1
 source. They do not infer source histograms or reproduce source row mappings.
 Their executable acceptance is recorded in the
 [controlled relational scenario change](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-10-23-controlled-relational-scenarios).
@@ -160,7 +160,9 @@ and the source-free EAV example. Scenario weights remain probabilistic assignmen
 not predicates. EAV source rows are not automatically pivoted or retained;
 explicit target modeling and independently generated key domains remain necessary.
 
-## Explicit relational scenarios (Unreleased)
+<a id="explicit-relational-scenarios-unreleased"></a>
+
+## Explicit relational scenarios (1.7.0rc1)
 
 A reviewed DatasetSpec may include `relational_scenarios`. Each declaration names
 `parent_entity`, `parent_field`, `child_entity`, `child_field`, an exact
@@ -218,4 +220,4 @@ CSV, JSON and Parquet can hold these explicitly controlled invalid datasets.
 PostgreSQL SQL export retains its valid-dataset requirement and rejects missing
 references before publishing DDL with foreign-key constraints. Valid fan-out
 allocations remain eligible for SQL export. No package release is implied by
-these Unreleased source changes.
+these 1.7.0rc1 source changes.

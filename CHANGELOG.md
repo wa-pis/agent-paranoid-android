@@ -4,7 +4,17 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.0rc1] - 2026-10-25
+
+First release candidate for the feedback-driven 1.7 series. Stable 1.6.0
+remains the recommended default. Historical Trino 401 and profile-provenance
+reports remain unconfirmed; no live server acceptance is claimed.
+
 ### Added
+
+- Complete English/Russian Trino MCP username/password setup, including protected
+  secret injection and a macOS Keychain launcher. RC documentation now retains
+  an exact version directory while keeping the verified stable site unchanged.
 
 - Reviewed `relational_scenarios` support exact synthetic orphan counts and generated-parent fan-out, with mandatory reconciliation and count-only requested/observed evidence. Expected invalid datasets remain invalid; omitted declarations preserve existing seeded behavior.
 
@@ -1199,7 +1209,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.7.0rc1...HEAD
+[1.7.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.6.0...v1.7.0rc1
 [1.5.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.5.0rc1...v1.5.0
 [1.5.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.4.0...v1.5.0rc1
 [1.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2...v1.4.0
