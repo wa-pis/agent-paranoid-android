@@ -20,7 +20,7 @@
 +References to the “1.6 RC” composition identify the historical implementation;
 +later feedback additions remain subject to their own reviewed contracts.
 +Release acceptance does not authorize a dataset or issue preservation consent.
- 
+
  The golden fixtures under `tests/fixtures/contracts/` remain authoritative.
 -The reviewed development activation candidate adds `transform-execute` and local
 +The original reviewed activation added `transform-execute` and local
@@ -46,26 +46,26 @@
 +preservation-receipt issuer.
  This page makes their ownership and the current architectural pressure visible
  in one place so each extraction can be reviewed against the same baseline.
- 
+
 @@ -33,7 +45,7 @@
- 
+
  ## Public Python Imports
- 
+
 -The exact 66-name `test_data_agent.__all__` baseline is protected by
 +The current 67-name `test_data_agent.__all__` inventory is protected by
  `public-python-api.json`. The exports are grouped below only to show
  ownership; grouping does not change their compatibility status.
- 
+
 @@ -85,13 +97,14 @@
- 
+
  ## CLI Surface
- 
+
 -`cli-parser-surface.json` tracks these 26 commands; the read-only
 -`transform-review` entry was added for the 1.6 candidate after the original
 -1.0 baseline:
 +`cli-parser-surface.json` tracks these 29 commands, including the transformation
 +entrances added after the original 1.0 baseline:
- 
+
  - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `discover-relationships`, `profile-csv`, `profile-parquet`,
    `transform-review`, `transform-execute`, `transform-approve`,
    `profile-postgres`, `profile-query`
@@ -75,7 +75,7 @@
  - `demo`, `doctor`, `audit-verify`, `completion`
  - `agent-plan`, `agent-approve`, `agent-recover`
 @@ -106,19 +119,30 @@
- 
+
  The parser, option defaults, structured success/errors, doctor states,
  parser-derived completion, human output, and exit-code meanings remain owned
 -by `cli_parser.py`, `cli_contract.py`, and `cli_presenter.py`. Moving handlers
@@ -85,13 +85,13 @@
 +dispatches that command to `cli_transformation_candidate.py`; the other
 +handlers are composed by `cli_application.py`. Moving handlers must not change
 +those contracts.
- 
+
  ## MCP Tool Surfaces
- 
+
 -`mcp-generator-tools.json` freezes these generator tools:
 +`mcp-generator-tools.json` freezes these 14 tools in the running generator
 +server composition:
- 
+
  - `approve_dataset_plan`, `export_dataset`, `generate_dataset`
  - `review_transformation` (read-only local snapshot review; no execution or receipt)
  - `execute_transformation` (reviewed snapshot/receipt consumer; no receipt issuer)
@@ -105,9 +105,9 @@
 +`mcp_generator_server:main` injects the workspace and session manager needed for
 +the two common/configured consumers. The module-level SDK object retains the
 +12 base tools and no SQL sessions; it is not the full running-server inventory.
- 
+
  `mcp-trino-tools.json` freezes these default aggregate-only Trino tools:
- 
+
 @@ -174,8 +198,10 @@
  | Owner | Current dependencies |
  | --- | --- |
@@ -137,7 +137,7 @@
  | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
  | `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
 @@ -218,9 +249,15 @@
- 
+
  The two server modules currently import their transport factory to assemble the
  executable server. `agent.py` and `cli.py` remain compatibility owners around
 -their extracted services; `mcp_trino_server.py` retains responsibilities named
@@ -152,13 +152,13 @@
 +recorded here rather than treated as a completed transport-independent
 +extraction. The architecture gate below covers its named agent/Trino boundary
 +modules, not every transformation/session import.
- 
+
  The target direction remains:
- 
+
 @@ -398,11 +435,20 @@
  4. add or tighten an architecture dependency rule when a new boundary exists;
  5. run the focused tests plus the relevant public contract gates.
- 
+
 -See [Public Stability](stability.md) for change classification and the active
 -[OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
 -for the staged extraction plan.
