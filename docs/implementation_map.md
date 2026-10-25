@@ -470,7 +470,7 @@ workflow.
 planning does not write generated data.
 
 
-## Explicit relational scenarios (Unreleased)
+## Explicit relational scenarios (1.7.0rc1)
 
 `core/relational_scenario.py` owns reviewed count declarations and count-only
 observation types. `rules/relational_scenarios.py` prepares bounded plans bound

@@ -19,9 +19,10 @@ updates. Nine changes were already complete, and five remaining delivery gates
 were reconciled with [1.7.0rc1 public acceptance](release-evidence-1.7.0rc1.md).
 Historical checkpoints retain their source identities.
 
-Five changes remain active: external 1.6 feedback intake, historical Trino
-configuration evidence, bounded-profile provenance, the separate source-row EAV
-extension and selective transformation follow-through. Unavailable historical
+Four changes remain active: external 1.6 feedback intake, historical Trino
+configuration evidence, bounded-profile provenance and selective transformation
+follow-through. Source-row EAV pivot/unpivot remains deferred in the roadmap,
+outside the completed synthetic EAV slice. Unavailable historical
 settings, live/private acceptance and new preservation authority are not inferred
 from release publication. See the [current work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes).
 
@@ -39,4 +40,13 @@ this is not a new activation patch applied to production.
 Continued feedback work also reconciles nine completed transformation delivery
 tasks and their public-contract subtask with actual stable/candidate evidence.
 The [remaining scope and installed replay](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/selective-source-transformation/release-1.7-reconciliation.md)
-retain the original source identities and five unchecked composite tasks.
+retain the original source identities. A subsequent [installed feedback replay](feedback-acceptance-1.7.0rc1.md)
+closes the findings 1–26/section E matrix and reviewed-script replay; three
+transformation composite tasks remain unchecked.
+
+The completed conditional-formula/source-free EAV change was also archived,
+bringing this reconciliation to fifteen archives. Its exact requirement delta
+already matched the business-rules baseline, so the normal archive operation
+needed no duplicate specification update. The deferred source-row operation is
+explicitly retained in both roadmaps; it was not implemented or accepted by
+archival.

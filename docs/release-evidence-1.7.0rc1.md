@@ -117,3 +117,12 @@ Security-workbench measured usage for the completed review at sealing was
 10,995,189 total tokens across five threads (10,960,046 input, including
 10,530,560 cached; 35,143 output). This is measured context-inclusive usage,
 not an estimate of source-only review cost.
+
+
+## Original feedback follow-up — 2026-10-25
+
+A separate [installed baseline/candidate replay](feedback-acceptance-1.7.0rc1.md)
+binds findings 1–26 and section E to verified public wheels, six original
+diagnostic scripts and 782 maintained fictional assertions. It retains initial
+harness failures and unverified private/live cases. This documentation follow-up
+does not modify the accepted package source, tag or release artifacts.

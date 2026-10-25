@@ -33,6 +33,11 @@ completed work belongs in [release history](history.md), not this list.
 
 ## Later
 
+- Source-row EAV pivot/unpivot remains deferred. Conditional formulas and
+  source-free EAV modeling shipped in the 1.7.0rc1 candidate; transforming existing
+  EAV rows requires a separate proposal for row cardinality, duplicate/null
+  semantics, typed values, provenance and explicitly authorized source I/O.
+  Neither source-free generation nor one-to-one transformation authorizes it.
 - Add integrations only after demonstrated demand.
 - Consider reporting and validation adapters for concrete workflows.
 - Evolve public contracts through the compatibility and deprecation policy.

@@ -8,8 +8,11 @@ nine completed parent delivery tasks and their public-contract subtask. The
 new candidate wheel passed 600 source-free logical cells, five documented
 examples and 260 focused feedback checks. A corrected isolated-fixture loader
 then passed a separate 48-cell subset without its temporary helper workaround.
-Historical preservation/scale results retain their actual artifacts. Five
-composite tasks remain open; this proposal is not archived or declared complete.
+The fresh [original-finding matrix and local replay](../../../docs/feedback-acceptance-1.7.0rc1.md)
+now records all 26 dispositions, original-script limitations and actual installed
+baseline/candidate outcomes. Historical preservation/scale results retain their
+actual artifacts. Three composite tasks remain open; this proposal is not
+archived or declared complete.
 Earlier dated pending checkpoints below are historical, not current release
 or registration denials.
 
@@ -279,17 +282,25 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   corrected/current installed bindings. Monthly fidelity deferred; internal
   formulas excluded by owner; statistical utility/live costs/private inputs
   unverified. Closure is reconciliation, not blanket client or RC acceptance.
-- [ ] Extend candidate matrix to findings 1–26 and section E safeguards; record
+- [x] Extend candidate matrix to findings 1–26 and section E safeguards; record
   unavailable private/live cases honestly. Full scope and final RC gates unchanged.
+  2026-10-25: 782 shared installed cases, 33 conditional cases, six unchanged
+  diagnostic scripts per package and section E guards are recorded in the new
+  [dated acceptance ledger](../../../docs/feedback-acceptance-1.7.0rc1.md).
+  Missing private inputs, unsupported monkeypatched arms and live costs are not passed.
 
 ### Existing transformation and release requirements
 
 - [x] Reconcile every client finding against [client acceptance](client-acceptance.md),
   with disposition and executable evidence; do not treat supplied fix prompts
   or monkeypatches as approved implementation instructions.
-- [ ] Locally replay reviewed client scripts against isolated baseline and
+- [x] Locally replay reviewed client scripts against isolated baseline and
   installed candidate-branch packages; record per-requirement before/after
   results, disclosed harness adaptations and genuinely unverified private cases.
+  2026-10-25: public 1.6.0/1.7.0rc1 installed payloads verified byte-for-byte;
+  original golden/publication/doctor/anchor/mode/Parquet results retained separately
+  from assertions. Broken Python 3.11 Trino harness and product-monkeypatch arms
+  have explicit exclusions/replacements, not passing statuses. See the dated ledger.
 - [x] Support inline YAML and local CSV mappings with equivalent validation;
   keep external script/API execution an unapproved future TODO.
 
@@ -421,6 +432,11 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   consumption, and historical review from final activation clearance. No
   contradictory activation claim found in these sections; whole-doc audit
   and executable-example acceptance remain open.
+  2026-10-25 audit continuation: current implementation-map scenario heading now
+  identifies published candidate 1.7.0rc1, and profiling guidance describes the
+  registered reviewed common workflow. A legacy deep-link anchor is retained
+  intentionally for compatibility. This focused correction does not close the
+  whole-repository audit.
 - [x] Execute documented examples on fictional fixtures and validate links,
   documentation tests and strict documentation build before the candidate.
   2026-10-07 reconciled existing exact268efc9a full-gate log: all five

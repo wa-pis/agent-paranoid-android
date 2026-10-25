@@ -490,7 +490,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     }
     assert active == {
         "_template", "selective-source-transformation",
-        "external-feedback-1-6", "reviewed-eav-expressions",
+        "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
     }
 
@@ -502,7 +502,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "remediate-full-security-audit", "source-output-contract-parity",
         "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
         "fix-csv-generation-pipeline", "fix-transformation-review-boundaries",
-        "versioned-task-oriented-documentation",
+        "versioned-task-oriented-documentation", "reviewed-eav-expressions",
     ):
         final_archive = changes / "archive" / f"2026-10-25-{change_id}"
         assert "- [ ]" not in (final_archive / "tasks.md").read_text()

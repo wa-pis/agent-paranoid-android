@@ -959,3 +959,16 @@ contracts passed separately in52test source set. ActualTTY approval, direct/
 fallback receipts and saved wizard-policy execution tested, no product patch.
 Final declared key/schema/constraint validation inspected in batch.py240–242
 and execute.py500; optional flags do not disable final checks.
+
+
+## Final-public installed original-finding replay — 2026-10-25
+
+The [new dated matrix and ledger](../../../docs/feedback-acceptance-1.7.0rc1.md)
+records actual public 1.6.0 versus 1.7.0rc1 payload identities, all findings 1–26,
+section E safeguards, six unchanged diagnostic scripts per package, 782 shared
+fictional assertions, separate harness corrections and 20 fresh real doctor
+invocations per package. Candidate conditional formulas also pass 33 cases.
+Earlier pending final-release/replay notes are historical checkpoints, not a
+claim that this fresh execution did not happen. Missing private inputs, original
+harness defects, product-monkeypatch exclusions and live costs remain explicit
+unverified limits; no original red is silently converted into a pass.
