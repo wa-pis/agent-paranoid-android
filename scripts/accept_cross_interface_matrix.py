@@ -194,6 +194,16 @@ def run_cli(entrypoint: Path, spec: Path, target: Path, workspace: Path,
                 "cli_envelope_status_mismatch")
 
 
+def load_fixture(path: Path) -> dict[str, Any]:
+    """Admit the reviewed fixture's local helpers only while loading it."""
+    original_path = sys.path[:]
+    sys.path.insert(0, str(path.resolve().parent.parent))
+    try:
+        return runpy.run_path(str(path))
+    finally:
+        sys.path[:] = original_path
+
+
 async def run_campaign(args: argparse.Namespace, report: dict[str, Any]) -> None:
     import test_data_agent
     from test_data_agent.core.field import FieldType
@@ -207,7 +217,7 @@ async def run_campaign(args: argparse.Namespace, report: dict[str, Any]) -> None
     installed = Path(test_data_agent.__file__).resolve(strict=True)
     require(installed.is_relative_to(package_root), "package_provenance_mismatch")
     require(not installed.is_relative_to(args.fixture_file.parent.parent), "source_tree_import")
-    fixture = runpy.run_path(str(args.fixture_file))
+    fixture = load_fixture(args.fixture_file)
     require(tuple(fixture["SOURCES"]) == SOURCES, "source_inventory_changed")
     require({item.value for item in FieldType} == {
         "integer", "float", "decimal", "boolean", "string", "date", "datetime"},

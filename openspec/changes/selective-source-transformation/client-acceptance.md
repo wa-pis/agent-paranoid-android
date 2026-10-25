@@ -1,5 +1,12 @@
 # Client Feedback And Acceptance Plan
 
+## Current release evidence — 2026-10-25
+
+Use [release reconciliation](release-1.7-reconciliation.md) for actual 1.6.0 and
+1.7.0rc1 publication, installed-artifact identities and remaining scope. It
+supersedes older pending-release/index language only for completed, explicitly
+listed gates. Earlier records retain their source and private/live limits.
+
 ## Current evidence index — 2026-10-07
 
 Use [frozen candidate acceptance](current-candidate-acceptance.md) for the
