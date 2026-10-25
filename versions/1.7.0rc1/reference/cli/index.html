@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/cli/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>CLI Command Index - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CLI Command Index";
+        var mkdocs_page_input_path = "reference/cli.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/cli/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">CLI Command Index</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/cli.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/reference/cli/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="cli-command-index">CLI Command Index<a class="headerlink" href="#cli-command-index" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/reference/cli/">Русский</a></p>
+<p>This reference describes stable <code>1.6.0</code>. For complete tasks start with
+<a href="../../">the user guide</a> or <a href="../../how-to/transformation/">Transform Local Data</a>.
+Historical anchors are retained so existing links keep working.</p>
+<p>Generation retains supported intentionally invalid output and its validation
+report, but returns exit <code>1</code> / JSON status <code>validation_failed</code> when validation
+fails, including <code>mixed</code> and <code>negative</code> modes. Spec, profile and CSV inputs use
+the same contract. Valid reports return exit <code>0</code>. Privacy failures still prevent
+publication; invalid mode never bypasses them.</p>
+<p>The executable is <code>test-data-agent</code>. Built-in help is the authoritative option
+reference for the installed version:</p>
+<pre><code class="language-bash">test-data-agent
+test-data-agent --help
+test-data-agent COMMAND --help
+test-data-agent --version
+</code></pre>
+<p>Running without a command prints the available commands and safe starting
+points, then exits successfully.</p>
+<p>Use these focused references for task detail:</p>
+<ul>
+<li><a href="../cli-workflows/">CLI Workflows</a></li>
+<li><a href="../cli-automation/">CLI Automation And JSON</a></li>
+<li><a href="../cli-errors/">CLI Errors And Exit Codes</a></li>
+<li><a href="../shell-completion/">Shell Completion</a></li>
+</ul>
+<h2 id="generate-and-validate">Generate And Validate<a class="headerlink" href="#generate-and-validate" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+<th>Primary output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>demo</code></td>
+<td>Run the offline fictional example</td>
+<td>Synthetic CSV bundle</td>
+</tr>
+<tr>
+<td><code>profile-csv</code></td>
+<td>Profile one CSV into safe metadata</td>
+<td>Profile JSON</td>
+</tr>
+<tr>
+<td><code>profile-parquet</code></td>
+<td>Profile one Parquet file into safe metadata</td>
+<td>Profile JSON</td>
+</tr>
+<tr>
+<td><code>profile-example</code></td>
+<td>Profile a folder with one CSV per entity</td>
+<td>Profile JSON</td>
+</tr>
+<tr>
+<td><code>infer-spec</code></td>
+<td>Infer a reviewable <code>DatasetSpec</code></td>
+<td>YAML or JSON spec</td>
+</tr>
+<tr>
+<td><code>generate-from-csv</code></td>
+<td>Run the complete single-table workflow</td>
+<td>Data file and review artifacts</td>
+</tr>
+<tr>
+<td><code>generate-from-example</code></td>
+<td>Run the complete related-table workflow</td>
+<td>Dataset bundle</td>
+</tr>
+<tr>
+<td><code>generate</code></td>
+<td>Generate from a spec or safe profile</td>
+<td>Data file or dataset bundle</td>
+</tr>
+<tr>
+<td><code>validate</code></td>
+<td>Validate generated data against a <code>DatasetSpec</code></td>
+<td>Validation report</td>
+</tr>
+</tbody>
+</table>
+<h2 id="selective-transformation-review-and-policy-decisions">Selective Transformation (Review And Policy Decisions)<a class="headerlink" href="#selective-transformation-review-and-policy-decisions" title="Permanent link">&para;</a></h2>
+<p><code>transform-review SOURCE POLICY.yaml</code> reads a fixed local source snapshot and
+the policy's referenced local mapping files, then prints value-free field
+decisions and a snapshot digest. It does not approve, transform, or export
+source rows. Mapping paths in the policy are relative to the policy file's
+directory. Use <code>--table NAME</code> when the entity name differs from the source
+filename stem; <code>--json</code> wraps the same review in the standard CLI response.
+The policy's <code>input_format</code> selects CSV, Parquet or an already captured
+PostgreSQL/Trino query-result envelope. Configured query capture is a separate <code>transform-batch query-execute</code>
+operation; this review command neither imports SQL scripts as data nor connects
+to a database.
+Installed fictional acceptance covers all four inputs and three outputs
+using the same saved policy and review digest, including public command execution.
+Native Parquet/captured-result input supports nullable strings, signed integers,
+float64, BOOLEAN, date32 and declared decimal128. Native Arrow timestamps,
+nested types and unsupported numeric shapes fail closed; this is not a promise
+of arbitrary Parquet input support. Textual DATETIME output conversion is separate.
+For exact-text plans, a single-file policy may declare a top-level
+<code>file_text_mapping</code> and optional CSV <code>mapping</code> on each <code>replace_text</code> field.
+The review reports configured scopes but never shows mapping literals;
+matching field rules take priority over file-wide rules, without cascading.
+Duplicate keys within either table are rejected. Review itself never produces
+replacement output; execution consumes the separately reviewed snapshot.</p>
+<p>CSV review uses literal empty cells: an empty cell is a non-null string. A
+behavior policy may set <code>csv_nulls.input_token</code> to a nonempty explicit null
+marker; the marker is matched exactly and excluded from type inference. The
+executor additionally uses <code>csv_nulls.output_token</code> for null output.
+Setting a marker is not approval or execution. Source/output markers are
+separate from a mapping file's <code>null_token</code>. All settings are bound to the
+exact policy snapshot, so changing them invalidates existing approvals.
+The schema fingerprint must match this transformation-specific profile;
+ordinary source-free profiling still treats empty cells as missing values.
+Single-source review requires an existing valid policy. The separate
+<code>transform-batch create --create-csv-policies</code> workflow can prepare common-profile
+CSV policy proposals; it does not approve their decisions. Review never silently
+repairs a stale fingerprint or approves the revised policy.</p>
+<p>Add <code>--trace</code> to the same read-only command for up to 50 row/column/rule
+ordinal events plus match counts. It reads only the fixed snapshot (at most
+10,000 replacement cells), returns no source or replacement literals or
+value hashes, and fails closed above the limit. Unmatched cells are counted,
+not copied. This is debugging metadata, not a preview of output or approval.</p>
+<p>Review alone does not authorize source preservation. The separate local
+approval and execution entrances below enforce the exact reviewed snapshot.</p>
+<p><a id="implemented-rc-execution-candidate"></a></p>
+<h3 id="transformation-execution">Transformation Execution<a class="headerlink" href="#transformation-execution" title="Permanent link">&para;</a></h3>
+<p>The registered implementation uses the same saved policy and reviewed
+<code>snapshot_sha256</code> for <code>transform-execute SOURCE POLICY DESTINATION
+--snapshot-sha256 SHA</code>. Output format comes from the policy; destination must
+be a new bundle, never an existing directory or an input file. Success reports
+digest, provenance counts and output-budget metadata, not rows. The consumer
+uses <code>transformation_completed</code> inside the existing JSON <code>result</code> envelope;
+errors retain the existing <code>error</code> envelope and exit code.</p>
+<p>Preservation additionally requires a matching restricted local receipt.
+Explicit <code>substitute</code> and <code>replace_text</code> use one contract for all fields:
+mapped values may equal other source values, including sensitive permutations.
+Review retains a value-free sensitivity note. Such values stay only in the
+selected local mixed-origin output, never CLI summaries or logs. This does not
+authorize direct preservation or a copying fallback.</p>
+<p>Only <code>transform-approve SOURCE POLICY RECEIPT --snapshot-sha256 SHA</code> in a
+controlling terminal may create one after displaying the value-free review
+and receiving fresh <code>APPROVE</code>. Piped input, flags and agent approval cannot
+replace this confirmation. <code>--json</code> keeps the review/prompt visible on the
+terminal. Execution consumes that receipt with <code>--receipt RECEIPT</code>; changing
+source, policy, classification or referenced mapping/generation-policy bytes
+requires review and approval again. Sensitive, unknown or conflicting fields
+remain ineligible for preservation.</p>
+<p>Run caps are <code>--max-total-input-bytes</code> and <code>--max-output-bytes</code>.
+They may lower, not silently raise, effective session/profile limits. A request
+above the ceiling and actual exhaustion are distinct typed failures with safe
+counters and supported recovery keys. Cleanup-incomplete errors require local
+inspection of destination/staging before retry; they do not permit overwrite.
+Database capture and private <code>derive</code> are not enabled by this entrance.</p>
+<p>These commands are available in stable <code>1.6.0</code>.
+The finite fictional transformation/session campaign completed for stable;
+see the <a href="../../release-evidence-1.6.0/">current evidence and limits</a>.
+Command discovery, fictional tests and release acceptance do not authorize a
+dataset. Changed activation still requires its safety/spec and exact-source
+review gates; ordinary generation stays source-free.</p>
+<p>The existing decision wizard feeds this same
+execution contract: edit an already reviewable policy with <code>transform-review
+SOURCE POLICY --decide --edit-actions</code>, save with <code>SAVE</code>, then review the saved
+bytes again and use that digest for execution. Inline and local CSV substitution
+mappings follow the same workflow; CSV paths remain relative to the policy.
+Saving decisions does not issue a preservation receipt. If the saved policy
+retains any eligible source field, separate local <code>transform-approve</code> remains
+mandatory before CLI or MCP execution. The wizard does not create or repair an
+invalid initial policy or turn a sensitivity answer into approval.</p>
+<p><a id="closed-common-profile-workflow-candidate"></a></p>
+<p><a id="common-profile-workflow-16-rc"></a></p>
+<h3 id="common-profile-workflow">Common profile workflow<a class="headerlink" href="#common-profile-workflow" title="Permanent link">&para;</a></h3>
+<p>Stable <code>1.6.0</code> provides <code>transform-batch</code> in the CLI and
+<code>common_transformation</code> in the running generator MCP server. Their operations are:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Required local arguments</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create</code></td>
+<td>root, draft profile, configuration destination</td>
+<td>Save policies/spec/references only; optional <code>--decide</code> invokes the local wizard.</td>
+</tr>
+<tr>
+<td><code>review</code></td>
+<td>root, saved profile</td>
+<td>Return a bounded value-free plan and exact digest.</td>
+</tr>
+<tr>
+<td><code>approve</code></td>
+<td>root, saved profile, new receipt, <code>--snapshot-sha256</code></td>
+<td>Require fresh controlling-TTY confirmation; pipe/flag approval is rejected.</td>
+</tr>
+<tr>
+<td><code>validate</code></td>
+<td>root, saved profile, <code>--snapshot-sha256</code></td>
+<td>Validate temporary output without retained publication.</td>
+</tr>
+<tr>
+<td><code>execute</code></td>
+<td>root, saved profile, <code>--snapshot-sha256</code></td>
+<td>Execute temporarily, or retain a new direct-child bundle with <code>--destination</code>.</td>
+</tr>
+<tr>
+<td><code>query-execute</code></td>
+<td>root, saved profile, configured query references, new destination</td>
+<td>Capture once, review and complete the separate <a href="#configured-sql-sessions-16-rc">configured SQL workflow</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>All operations require explicit <code>--max-total-input-bytes</code> and <code>--max-review-bytes</code>;
+review/validate/execute/query-execute also require <code>--max-output-bytes</code>.
+Saved-profile <code>validate</code>/<code>execute</code> need <code>--receipt</code> when preserving values;
+<code>query-execute</code> obtains any required receipt locally within its owning session.
+Creation from absent CSV policies requires
+<code>--create-csv-policies --seed INTEGER</code>; initial proposals are unknown/drop-only,
+not approved decisions. <code>--edit-actions</code>/<code>--edit-formats</code> require <code>--decide</code>, and
+CSV creation with interactive decisions requires explicit action editing.
+Saving configuration changes reference paths and requires a fresh reviewed digest.
+Existing files, unsafe references and output destinations are not overwritten.
+Registration is not authorization to process a dataset. The finite fictional
+stable campaign completed with <a href="../../release-evidence-1.6.0/">recorded limits</a>;
+it does not issue preservation authority or clear changed activation.</p>
+<p>Stable <code>1.6.0</code> exposes these operations under <code>transform-batch</code>. Its
+machine-readable success and error responses use CLI schema version <code>1.0</code>;
+success metadata is inside <code>result</code>, not flattened into the envelope. Runtime
+<code>--json</code>/<code>--debug</code> flags are accepted before the command, before the operation,
+or after operation arguments. Debug does not disclose rejected arguments.
+Controlling-TTY approval remains local-only; <code>create</code> and <code>SAVE</code> never issue a
+receipt. Isolated CLI/MCP checks alone do not approve changed public activation.</p>
+<p>Save the profile and field decisions, review the
+exact saved inputs, then validate against the returned digest. Obtain local
+approval only when the selected actions preserve values, and execute using that
+same digest and receipt. Editing an input, policy, mapping or output setting
+requires a fresh review; a receipt is not a reusable blanket approval. Agents
+can consume a matching receipt but cannot issue one.</p>
+<p>For these workflows install stable <code>1.6.0</code> or a compatible later release.
+Installing <code>1.5.0</code> does not expose <code>transform-batch</code>. Keep ordinary source-free
+generation workflows separate and retain their existing schemas. A transformed
+bundle may deliberately contain preserved or explicitly mapped source values;
+it is not an anonymity guarantee. Protect its destination as potentially
+sensitive and inspect the value-free action/provenance report before sharing.
+SQL output is a script artifact and is never executed by transformation.</p>
+<h3 id="edit-field-decisions-locally">Edit Field Decisions Locally<a class="headerlink" href="#edit-field-decisions-locally" title="Permanent link">&para;</a></h3>
+<p><code>transform-review SOURCE.csv POLICY.yaml --decide</code> edits an existing valid
+policy in place. For every column it displays the value-free system comment,
+observed sensitivity and current action, then requires an explicit
+<code>sensitive</code>, <code>non_sensitive</code>, or <code>unknown</code> answer. There is no accept-all or
+default answer. Actions, mapping references, unmatched behavior and operator
+comments are retained unchanged; serialization may normalize YAML formatting.</p>
+<p>The wizard displays the revised review and requires <code>SAVE</code> before atomically
+replacing the owner-only policy file. Invalid answers, conflicts, timeouts,
+or source/policy/mapping changes observed before saving leave the policy
+untouched. Each answer has a 60-second timeout, within the command's overall
+work budget. Input and prompt output must be terminals; piped answers are
+rejected. With <code>--json</code>, prompts remain on terminal stderr and the final
+<code>policy_saved</code> result is emitted on stdout. Run <code>--trace</code> separately afterward.</p>
+<p>This is policy editing, not data approval: no receipt is issued, no rows are
+transformed, and a <code>non_sensitive</code> answer cannot override conflicting evidence
+or enable preservation. A future approval must revalidate and bind all exact
+snapshots again. The wizard currently requires a reviewable policy; it does not
+repair an invalid input policy.</p>
+<p>Add <code>--edit-actions</code> with <code>--decide</code> to choose each field's action as well:
+<code>keep</code> retains its existing configuration; <code>drop</code>, <code>preserve</code>, <code>synthesize</code>,
+<code>substitute</code>, <code>replace_text</code>, and <code>derive</code> request the corresponding versioned
+policy action. There is no implicit choice. Preservation asks for a reference
+and rationale, synthesis for a local generation-policy reference, derivation
+for an expression and a JSON array of dependency names. These declarations
+are not proof of executable formula/generator validity or permission to retain
+source data.</p>
+<p>For <code>derive</code>, review parses the existing bounded arithmetic syntax (1024
+characters, 128 AST nodes) without evaluation. Referenced column names must
+exactly match the declared dependencies; missing, extra, dropped or cyclic
+dependencies reject. Aggregate calls, attribute access and unsupported syntax
+are not row-local formulas and reject. Columns literally named <code>sum</code> or
+<code>count</code> still count as ordinary dependencies when used without a function call.
+This preflight does not establish result types, null handling or DECIMAL rounding.</p>
+<p>Substitution/replacement asks for mapping JSON using the policy's existing
+schema. For example, a local exact-text CSV table uses:</p>
+<pre><code class="language-json">{&quot;kind&quot;:&quot;csv&quot;,&quot;path&quot;:&quot;status.csv&quot;,&quot;source_columns&quot;:[&quot;old&quot;],&quot;replacement_columns&quot;:[&quot;new&quot;]}
+</code></pre>
+<p><code>substitute</code> also accepts inline entries or a reference to an existing shared
+domain. For <code>replace_text</code>, JSON <code>null</code> selects only the policy's existing
+file-wide table; a CSV mapping adds column rules. Existing top-level domains
+and file-wide declarations are not silently removed or edited. The wizard
+then asks for unmatched behavior: <code>reject</code>, <code>preserve</code>, or <code>synthesize</code>.</p>
+<p>Private configuration prompts disable terminal echo on POSIX terminals and
+accept a bounded single line (less than 4096 UTF-8 bytes, also subject to the
+terminal's line-length limit). Use local CSV tables for larger dictionaries.
+No private configuration is included in the displayed review or JSON result.
+Newly referenced files are read under the same restricted policy directory
+and byte budgets, validated, and checked again before saving. Changed or
+invalid references abort without replacing the policy. <code>--edit-actions</code>
+without <code>--decide</code> is rejected.</p>
+<h3 id="temporal-field-settings-configuration-only">Temporal field settings (configuration only)<a class="headerlink" href="#temporal-field-settings-configuration-only" title="Permanent link">&para;</a></h3>
+<p>Use <code>transform-review SOURCE POLICY --decide --edit-formats</code> to edit each
+field's <code>temporal_type</code> metadata. At the hidden JSON prompt, empty input keeps
+the current setting and <code>null</code> clears it. For example:</p>
+<pre><code class="language-json">{&quot;type&quot;:&quot;datetime&quot;,&quot;format&quot;:&quot;%Y-%m-%d&quot;,&quot;output_format&quot;:&quot;%Y-%m-%dT%H:%M:%S%z&quot;,&quot;source_timezone&quot;:&quot;Europe/Samara&quot;,&quot;target_timezone&quot;:&quot;UTC&quot;}
+</code></pre>
+<p><code>date</code> fields do not accept timezone settings. Explicit SAVE writes a validated
+policy atomically; it creates neither approval nor output data. This setting
+does not itself execute temporal conversion. Literal <code>replace_text</code> always
+ignores field format/timezone metadata and supplies its replacement unchanged.
+A separately selected typed Parquet/SQL output may explicitly parse that result
+using its output field's <code>temporal_type</code>, including declared source/target
+timezones. CSV replacement output remains literal; no implicit UTC is applied.</p>
+<h2 id="database-sources-and-sql">Database Sources And SQL<a class="headerlink" href="#database-sources-and-sql" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+<th>Primary output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>profile-postgres</code></td>
+<td>Profile an allowlisted read-only PostgreSQL source</td>
+<td>Profile JSON</td>
+</tr>
+<tr>
+<td><code>profile-query</code></td>
+<td>Profile one reviewed PostgreSQL or Trino query as an aggregate-only virtual source</td>
+<td>Profile JSON</td>
+</tr>
+<tr>
+<td><code>export-postgres-sql</code></td>
+<td>Generate and export executable PostgreSQL DDL and INSERT statements</td>
+<td><code>.sql</code> file</td>
+</tr>
+</tbody>
+</table>
+<p>Database connection, allowlist, JDBC-style endpoint, qualified wildcard, and
+query-source requirements are documented in the
+<a href="../../how-to/postgresql/">PostgreSQL</a> and <a href="../../how-to/trino/">Trino</a> guides.</p>
+<h2 id="review-first-agent-flow">Review-First Agent Flow<a class="headerlink" href="#review-first-agent-flow" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-plan</code></td>
+<td>Profile and prepare a spec, then stop for review</td>
+</tr>
+<tr>
+<td><code>agent-review</code></td>
+<td>Inspect a metadata-only approval checklist</td>
+</tr>
+<tr>
+<td><code>agent-advise</code></td>
+<td>Ask an installed provider for validated spec changes</td>
+</tr>
+<tr>
+<td><code>agent-advisor-request</code></td>
+<td>Export safe metadata for an external advisor</td>
+</tr>
+<tr>
+<td><code>agent-advisor-apply</code></td>
+<td>Validate and apply an external proposal</td>
+</tr>
+<tr>
+<td><code>agent-status</code></td>
+<td>Inspect phase and next action without changing state</td>
+</tr>
+<tr>
+<td><code>agent-approve</code></td>
+<td>Generate from an exactly approved workspace</td>
+</tr>
+<tr>
+<td><code>agent-recover</code></td>
+<td>Revalidate and finish an interrupted approval</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../cli-workflows/#review-first-agent-flow">CLI Workflows</a> for the command
+sequence and <a href="../cli-automation/">CLI Automation And JSON</a> for stable response
+contracts.</p>
+<h2 id="utilities">Utilities<a class="headerlink" href="#utilities" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples</code></td>
+<td>Show complete examples for common workflows</td>
+</tr>
+<tr>
+<td><code>doctor</code></td>
+<td>Check installation and run a temporary smoke generation</td>
+</tr>
+<tr>
+<td><code>completion</code></td>
+<td>Generate completion for bash, zsh, fish, or PowerShell</td>
+</tr>
+<tr>
+<td><code>audit-verify</code></td>
+<td>Verify an HMAC-authenticated MCP audit log</td>
+</tr>
+</tbody>
+</table>
+<p>Aliases:</p>
+<ul>
+<li><code>profile-csv-folder</code> is an alias for <code>profile-example</code>;</li>
+<li><code>generate-from-csv-folder</code> is an alias for <code>generate-from-example</code>.</li>
+</ul>
+<p><a id="configured-sql-sessions-16-rc"></a></p>
+<h3 id="configured-sql-sessions">Configured SQL Sessions<a class="headerlink" href="#configured-sql-sessions" title="Permanent link">&para;</a></h3>
+<p><code>test-data-agent transform-batch query-execute</code> completes a single
+owned session. It reads a saved batch profile and a bounded reference file,
+captures each configured query once and displays metadata review. When
+preservation requires it, the command requests fresh controlling-TTY confirmation,
+then issues and consumes an owned temporary receipt for that frozen session.
+It validates before retaining output in a new directory in the parent workspace.
+Captured inputs and session receipts expire on command completion or failure.
+This is not an installed 1.5.0 command or dataset approval. For example, with
+authorization to read the configured source and an authored batch profile:</p>
+<pre><code class="language-bash">test-data-agent transform-batch query-execute /path/to/workspace batch.yaml queries.yaml selected-output \
+  --max-total-input-bytes 67108864 --max-review-bytes 4194304 \
+  --max-output-bytes 67108864 --json
+</code></pre>
+<p>The saved reference file can contain this fictional entry; its key must match
+a batch input source and its entity must match that input policy:</p>
+<pre><code class="language-yaml">schema_version: &quot;0.1&quot;
+queries:
+  captured-orders.query:
+    adapter: trino
+    source_id: trino
+    entity: fictional_orders
+    query_file: orders.sql
+    max_rows: 1000
+    max_bytes: 8388608
+    max_seconds: 60.0
+</code></pre>
+<p>Success writes one schema-1.0 JSON envelope to stdout; bounded value-free review
+goes to stderr before execution. Preservation confirmation uses the controlling
+terminal, not stdin or an approval flag. SQL output remains an artifact file;
+this command never executes generated SQL.</p>
+<p>The reference file has <code>schema_version: "0.1"</code> and a <code>queries</code> mapping keyed by
+batch input source reference. Each entry contains <code>adapter</code> (<code>postgres</code> or
+<code>trino</code>), <code>source_id</code>, <code>entity</code>, <code>query_file</code>, <code>max_rows</code>, <code>max_bytes</code> and
+<code>max_seconds</code>. Query files are bounded relative workspace references. PostgreSQL
+source IDs must match administrator configuration; the configured Trino source
+ID is <code>trino</code>. Endpoints, credentials, callbacks and driver factories are not
+accepted in this file. Connection authority comes from existing administrator
+environment settings and allowlists.</p>
+<p>Capture-specific Trino row and cumulative decoded-result byte limits use the
+explicit authorized <code>max_rows</code> and <code>max_bytes</code>; ordinary profiling defaults
+remain unchanged. Metadata retains its existing row ceiling, and statement,
+scan, time and transport limits still apply. A caller cannot raise capture
+limits above effective transformation policy/session ceilings.</p>
+<p>The registered runtime <code>configured_query_session</code> MCP tool retains one frozen capture across
+review, validation and execution requests. It returns an opaque handle, digest
+and metadata for local CLI approval; MCP cannot issue approval. Session expiry,
+active-count and lifetime byte admission are bounded. Execution consumes the
+existing exact local receipt and publishes to a new child of the owning
+workspace. Expiry, refusal and shutdown clean the owned capture; cleanup
+failures refuse further work. The server owns the sessions and closes them in
+its shutdown handler, including transport failures. The module-level SDK object
+does not create sessions; custom embedding must explicitly inject and close its
+own session owner. See <a href="../../how-to/mcp/#configured-sql-sessions-16-rc">MCP session operations</a>
+and <a href="../configuration/#configured-sql-session-bounds-16-rc">session settings</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

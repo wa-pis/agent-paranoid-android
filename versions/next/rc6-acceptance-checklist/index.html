@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/rc6-acceptance-checklist/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>RC6 Acceptance Checklist - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "RC6 Acceptance Checklist";
+        var mkdocs_page_input_path = "rc6-acceptance-checklist.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/rc6-acceptance-checklist/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">RC6 Acceptance Checklist</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/rc6-acceptance-checklist.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="rc6-acceptance-checklist">RC6 Acceptance Checklist<a class="headerlink" href="#rc6-acceptance-checklist" title="Permanent link">&para;</a></h1>
+<p>This checklist applies to the immutable <code>1.0.0rc6</code> tag. Local wheels and
+source checkouts are not substitutes for the public-artifact checks.</p>
+<p>The immutable public results are recorded in the
+<a href="../release-evidence-1.0.0rc6/">RC6 published release evidence</a>.</p>
+<h2 id="source-and-review-identity">Source and review identity<a class="headerlink" href="#source-and-review-identity" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[x] RC6 tag points to the reviewed fixed commit.</li>
+<li>[x] Independent security review records reviewer identity or stable
+  pseudonym, commit, UTC date, scope, findings/disposition, and signature or
+  approval URL in the <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc6-final-release-candidate/security-review-evidence.md">review evidence</a>.</li>
+<li>[x] RC5 is treated as historical and superseded for stable promotion.</li>
+</ul>
+<h2 id="security-review-closure">Security review closure<a class="headerlink" href="#security-review-closure" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[x] PR #331 suppresses provider text from normal formatted tracebacks.</li>
+<li>[x] PR #332 reserves placeholder-shaped baseline literals from generated
+  placeholder collisions.</li>
+<li>[x] PR #333 replaces incomplete provider status with a fixed local reason.</li>
+<li>[x] PR #334 detaches handled OpenAI failures from their cause/context chains.</li>
+<li>[x] PR #335 preserves rare-category replacement and placeholder provenance
+  across reordered baselines.</li>
+<li>[x] PR #336 replaces dynamic provider exception names with fixed text and
+  contains every ordinary SDK constructor exception.</li>
+<li>[x] RC6-S1: reordered baseline categories cannot leave an original rare value
+  in the sanitized profile, baseline, or serialized advisor request.</li>
+<li>[x] RC6-S2: handled provider/validation failures have empty <code>__cause__</code> and
+  <code>__context__</code>, and their public messages use only fixed local allowlisted
+  text rather than dynamic Python exception class names.</li>
+<li>[x] RC6-S3: every ordinary SDK constructor exception, including exceptions
+  outside <code>OpenAIError</code>, becomes the fixed local <code>ValueError</code> with no raw text,
+  <code>__cause__</code>, or <code>__context__</code>.</li>
+<li>[x] RC6-S4: incomplete responses use a fixed bounded local reason and never
+  reflect raw provider status text.</li>
+<li>[x] RC6-S7: external advisor requests contain no raw categorical values,
+  including common names or address-like values missed by heuristics.</li>
+<li>[x] RC6-S8: sensitive numeric Trino profiling suppresses exact extrema and
+  percentiles in MCP responses, profiles, specs, and planning artifacts.</li>
+<li>[x] RC6-S9: advisor-proposed constraints reject string constants, unknown
+  references, and sensitive targets; post-solve privacy/type validation runs
+  before publication.</li>
+<li>[x] RC6-S10: generator MCP enforces pre-parse raw-frame, shared invocation,
+  and final-response budgets; JSON structural limits apply before full
+  materialization.</li>
+<li>[x] RC6-S11: public artifact names are safe path components, CSV formula
+  markers are neutralized, and formula/validation diagnostics are bounded.</li>
+<li>[x] RC6-S12: CI classification uses trusted code, release publication checks
+  signed tag and accepted commit identity, and RC acceptance is machine-
+  enforced.</li>
+<li>[x] RC6-S13: active MCP requests and shared Trino work are globally bounded;
+  cancellation, disconnect, timeout, and teardown release state exactly once.</li>
+<li>[x] RC6-S14: Trino driver errors are fixed and redacted, and catalog/schema
+  enumeration has an explicit tested metadata-exposure policy.</li>
+<li>[x] RC6-S15: the explicit opt-in <code>run_safe_select</code> has a separately
+  documented and
+  enforced row-privacy contract, including names, addresses, and heuristic
+  false negatives; default aggregate-only tools remain a separate surface.</li>
+<li>[x] MT-01: bounded nested maps, arrays, and rows apply the same string and
+  sensitive-value masking before <code>run_safe_select</code> returns them.</li>
+<li>[x] RC6-S16: semantic-provider calls have bounded timeout/cancellation,
+  deterministic replay or a seed-bound fingerprint, synthetic-only identity
+  output, and post-generation privacy/type checks.</li>
+<li>[x] RC6-S17: filesystem publication and overwrite paths reject symlink and
+  TOCTOU attacks, use no-follow/inode validation, and revalidate before
+  publication and cleanup.</li>
+<li>[x] RC6-S18: single-entity publication has completion/read-validation
+  semantics and sibling-artifact replacement requires explicit approval;
+  interrupted and collision cases are covered.</li>
+<li>[x] RC6-S19: untrusted metadata, paths, and errors are escaped and bounded
+  in CLI and log output, with control-character injection regressions.</li>
+<li>[x] RC6-S20: deployed branch/tag rulesets, required checks, and PyPI Trusted
+  Publisher approvals are recorded as external acceptance evidence.</li>
+<li>[x] FS-01: CSV-folder profiles, caches, specs, and generated rows contain
+  collision-safe ranked labels instead of source-derived text categories;
+  inferred conditional rules use the matching labels.</li>
+<li>[x] AG-01/FS-02: provider-bound profile and baseline constraints replace
+  <code>equals</code>, <code>not_equals</code>, and <code>in_values</code> strings with the matching
+  field-scoped category labels; unrepresented strings fail closed.</li>
+<li>[x] AG-03: provider-bound integer, float, boolean, and null categories use
+  typed field-scoped labels while ordinary numeric bounds remain unchanged.</li>
+<li>[x] SC-08: the Dockerfile frontend is pinned to the immutable OCI index
+  digest for the reviewed <code>docker/dockerfile:1.7</code> release.</li>
+<li>[x] FS-03: single-CSV generation checks complete-row reuse against digests
+  captured during the exact profiling read, including atomic path replacement.</li>
+<li>[x] FS-06: dataset specs and writers reject entity names reserved for control
+  artifacts before any output file is created.</li>
+<li>[x] FS-08: dataset-row readers reject duplicate entity stems across supported
+  artifact formats before reading any row file.</li>
+<li>[x] FS-10: local CSV profiling checks its monotonic deadline between field
+  processing and finalization operations.</li>
+<li>[x] MT-04: audit capacity rejects new invocations before execution unless a
+  bounded terminal record can be retained.</li>
+<li>[x] AG-04, FS-11, MT-02, and MT-03: exact Low finding identities, risk owner,
+  rationale, revisit triggers, and post-1.0 target are recorded in
+  <a href="../known-issues/">Known Issues</a>.</li>
+<li>[x] Synthetic regression tests cover category reordering, placeholder-shaped
+  literals, ordinary and typed constructor/provider/validation failures,
+  dynamic exception-class markers, incomplete status, formatted traceback
+  output, direct exception-chain inspection, source-free common categories,
+  sensitive numeric profiles, provider formulas, bounded generator transport,
+  JSON structural limits, safe artifact names, CSV formula injection,
+  request-cap exhaustion, backend-error redaction, opt-in row privacy,
+  semantic-provider timeout/replay/output policy, filesystem races, interrupted
+  publication, overwrite approval, and terminal escaping.</li>
+<li>[x] A disposable synthetic PostgreSQL check proves the profiling role cannot
+  write, applies mandatory schema/table/column allowlists and budgets, preserves
+  only the approved enum, validates generated rows, executes the deterministic
+  SQL file in an empty target, and leaves zero FK violations.</li>
+<li>[x] Public documentation distinguishes default replacement, selective local
+  preservation, external/default-MCP egress boundaries, generic SQL output,
+  and executable PostgreSQL export, with runnable CSV/PostgreSQL/Trino examples.</li>
+<li>[x] Independent review is rerun against the exact fixed RC6 commit and every
+  finding has a closed or explicitly approved disposition.</li>
+</ul>
+<h2 id="public-python-artifacts">Public Python artifacts<a class="headerlink" href="#public-python-artifacts" title="Permanent link">&para;</a></h2>
+<p>For each profile, install the public wheel in a clean environment and run the
+literal README commands plus <code>test-data-agent --version</code>, <code>demo</code>, and <code>doctor</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base</td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+<tr>
+<td><code>parquet</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+<tr>
+<td><code>mcp</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+<tr>
+<td><code>trino</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+<tr>
+<td><code>postgres</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/issues/398">Public PostgreSQL profile evidence</a></td>
+</tr>
+<tr>
+<td><code>mcp,trino</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+<tr>
+<td><code>openai</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+<tr>
+<td><code>all</code></td>
+<td>[x]</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778">Verify Published Release</a></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[x] Public wheel and sdist match the release commit and version.</li>
+<li>[x] Checksums, SBOM, provenance, attestations, and signatures are published
+  and independently verified.</li>
+<li>[x] Each public profile is installed with <code>--require-hashes</code> against the
+  independently verified wheel digest.</li>
+<li>[x] Upgrade from public <code>0.12.0</code> succeeds without changing the README
+  commands and uses hash-pinned dependencies plus verified old and new wheels.</li>
+</ul>
+<h2 id="public-containers">Public containers<a class="headerlink" href="#public-containers" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[x] CLI image: version, doctor, demo, signature, SBOM, and digest verified.</li>
+<li>[x] Generator MCP image: version, health check, signature, SBOM, and digest
+  verified.</li>
+<li>[x] Trino MCP image: hardened configuration, health check, signature, SBOM,
+  and digest verified.</li>
+</ul>
+<h2 id="quality-gates">Quality gates<a class="headerlink" href="#quality-gates" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[x] Full unit/integration test suite, coverage threshold, lint, typing, and
+  compile checks pass.</li>
+<li>[x] Release script and strict documentation build pass on the exact RC6
+  commit.</li>
+<li>[x] Stable promotion uses only the accepted RC6 source tree plus reviewed
+  release metadata changes; see the
+  <a href="../release-evidence-1.0.0/">stable published release evidence</a>.</li>
+</ul>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

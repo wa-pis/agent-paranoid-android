@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/source-output-matrix/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Source and output matrix - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Source and output matrix";
+        var mkdocs_page_input_path = "reference/source-output-matrix.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/source-output-matrix/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Source and output matrix</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/source-output-matrix.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/reference/source-output-matrix/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="source-and-output-matrix">Source and output matrix<a class="headerlink" href="#source-and-output-matrix" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/reference/source-output-matrix/">Русский</a></p>
+<p>Every supported source supplies safe evidence for the same reviewed DatasetSpec.
+The source and output format do not select different field, setting or business-rule
+languages. Profile what is available, review or author the full specification,
+then generate and validate through the common engine.</p>
+<table>
+<thead>
+<tr>
+<th>Input route</th>
+<th>CSV</th>
+<th>JSON</th>
+<th>Parquet</th>
+<th>SQL INSERT bundle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSV file → safe profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>CSV folder → safe relational profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Parquet file → safe profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Saved JSON DatasetProfile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Trino aggregate table profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>PostgreSQL aggregate table profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Reviewed PostgreSQL query → aggregate profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Reviewed Trino query → aggregate profile → reviewed spec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Reviewed YAML DatasetSpec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Reviewed JSON DatasetSpec</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>These are generation transitions, not source-row conversion. A JSON profile is
+metadata, not a raw JSON row dataset. Database acquisition retains configuration,
+read-only allowlists and budgets; no output cell authorizes database writes.
+Query profiling retains its existing query policy and dependency checks.</p>
+<h2 id="one-reviewed-contract">One reviewed contract<a class="headerlink" href="#one-reviewed-contract" title="Permanent link">&para;</a></h2>
+<p>All seven field types are available: <code>integer</code>, <code>float</code>, <code>decimal</code>, <code>boolean</code>,
+<code>string</code>, <code>date</code>, <code>datetime</code>. All accepted DatasetSpec properties pass unchanged
+to the common generator: field distributions, nullable/null ratio, semantic and
+identifier settings, relationships, constraints, privacy rules/settings, business
+rules, generation settings and validation settings. A source adapter must not
+remove a reviewed option because of its source type. Output adapters preserve
+logical values rather than reassigning formulas or choosing different rules.</p>
+<p>The same contract supports <code>valid</code>, <code>edge</code>, <code>load_test</code>, <code>mixed</code>, <code>negative</code>,
+explicit seeds, locale, invalid ratio and load multiplier. Load defaults to ×10;
+an explicit count remains exact. Validation toggles control optional reporting;
+mandatory privacy, constraints and business checks retain their existing safety
+contract. Contradictory specifications, incompatible rules and resource-limit
+violations fail consistently before publication.</p>
+<p>Profiles contain different evidence. Missing exact DECIMAL bounds, unknown null
+statistics or unsupported query dependencies still require an independently
+reviewed specification. This does not reduce which field types or options that
+specification can use. No source extrema, row identities or source categories
+become permission to copy values. DECIMAL retains exact base-ten arithmetic,
+precision/scale and the existing sensitivity vetoes.</p>
+<p>The regression matrix exercises all ten routes, four outputs and five modes
+with all seven field types, native constraints and embedded business rules.
+Database fixtures supply fictional metadata and aggregates; these tests do not
+claim acceptance against a live database. Separate regressions cover exact
+arithmetic, rules, relationships, nullable values, limits and interface contracts.
+This is executable coverage of the shared contract, not an exhaustive Cartesian
+product of every possible option value or rule combination.</p>
+<h2 id="output-representations-and-revalidation">Output representations and revalidation<a class="headerlink" href="#output-representations-and-revalidation" title="Permanent link">&para;</a></h2>
+<p>Generated bundles retain their reviewed specification and manifest. Use those
+artifacts together: business-validation reports are included in manifest hashes,
+including reviewed-agent generation. Folder overwrite refuses an input rule file
+inside the replaced folder; single-file and stdout routes also refuse rule-file
+collisions with their generated artifacts, including filesystem aliases.
+Retain them together when revalidating; physical representations differ between
+formats, while schema-aware operands retain the same rule semantics. Validation
+normalizes operands without modifying the supplied rows.</p>
+<ul>
+<li><strong>CSV:</strong> the manifest declares <code>csv_encoding: backslash-null-v1</code>. <code>\N</code> represents
+  null; an empty cell remains empty text. A literal leading backslash is doubled.
+  Formula-capable strings and headers start with <code>\F</code>, keeping them inert in
+  spreadsheets and reversible on reload. Only marked bundles use this decoding;
+  old unmarked CSV artifacts retain their previous interpretation. Do not remove
+  the manifest and expect reversible decoding.</li>
+<li><strong>JSON:</strong> native scalar values and exact decimal text remain supported.</li>
+<li><strong>Parquet:</strong> ordinary fields retain native Arrow types, including exact
+  <code>decimal128</code>. Wide integers that exceed int64 use explicitly marked decimal
+  text; mixed timestamp offsets use explicitly marked scalar text. Malformed
+  cells in explicitly requested mixed/negative generation use marked JSON scalar
+  columns where a native Arrow type cannot represent them. The reader restores
+  the logical cells and validation reports the intended violations. Such columns
+  are physically strings: consumers reading Parquet directly must inspect
+  <code>apa.scalar_encoding</code> field metadata or use the bundle reader. Valid generation
+  still rejects values incompatible with its declared types.</li>
+<li><strong>SQL:</strong> the bundle contains quoted, per-entity <code>INSERT ... VALUES</code> statements.
+  Revalidation decodes only this generated data grammar under input budgets; it
+  never executes SQL or connects to a database. Arbitrary SQL, DDL, functions,
+  comments and inconsistent table/column declarations are rejected. The separate
+  PostgreSQL DDL exporter continues to require valid datasets.</li>
+</ul>
+<p>Single-entity profile generation can retain its chosen filename. Its manifest
+records <code>entity_artifacts</code>, mapping the logical entity to the filename.
+Multi-entity profile generation writes a complete folder in any of the four
+formats. Neither route discards entities or applies load scaling twice.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

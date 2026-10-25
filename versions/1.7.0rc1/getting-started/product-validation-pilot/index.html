@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/getting-started/product-validation-pilot/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Product Validation Pilot - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Product Validation Pilot";
+        var mkdocs_page_input_path = "getting-started/product-validation-pilot.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/getting-started/product-validation-pilot/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Product Validation Pilot</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/getting-started/product-validation-pilot.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/getting-started/product-validation-pilot/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="product-validation-pilot">Product Validation Pilot<a class="headerlink" href="#product-validation-pilot" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/getting-started/product-validation-pilot/">Русский</a></p>
+<p>Use this guide when you want to evaluate the product with a real development or
+analytics task. It is intentionally shorter than a production rollout: the goal
+is to learn whether the generated dataset is useful and whether the review flow
+is understandable.</p>
+<h2 id="the-user-problem">The User Problem<a class="headerlink" href="#the-user-problem" title="Permanent link">&para;</a></h2>
+<p>The product is useful when a team has enough structure and examples to describe a
+source system, but cannot give developers the source rows themselves. Potential
+evidence inputs include:</p>
+<ul>
+<li>SQL DDL with primary keys, foreign keys, and checks;</li>
+<li>Django, SQLAlchemy, or another ORM model description;</li>
+<li>a bounded sample or safe profile with representative distributions;</li>
+<li>a short description of the business invariants that must reconcile.</li>
+</ul>
+<p>CSV files or folders, validated safe profiles and optional PostgreSQL and Trino
+integrations are available in stable <code>1.5.0</code>. Stable <code>1.6.0</code> retains
+these and the accepted RC5 <code>profile-parquet</code> route for one Parquet file with the
+optional <code>parquet</code> extra, followed by reviewed spec inference or an authored
+<code>DatasetSpec</code>; see <a href="../../1.6.0-release-status/">release status</a>. Unknown null
+statistics require an authored spec; exact DECIMAL inference requires reviewed
+bounds. PostgreSQL uses mandatory schema/table/column
+allowlists and bounded aggregate profiling; see the
+<a href="../../how-to/postgresql/">PostgreSQL workflow</a> and
+<a href="../../reference/source-output-matrix/">source/output matrix</a>. SQL DDL, Django
+models and SQLAlchemy models are not first-class CLI inputs.</p>
+<p>The output is a fresh synthetic dataset for development, integration tests,
+analytics changes, forecasting, or budgeting experiments. It is not a masked
+copy of the source and it is not a privacy certification.</p>
+<p>Exact values are replaced by default. A reviewer may explicitly preserve a
+bounded non-sensitive business enum or constant for local generation and SQL
+export; that exception is field-scoped, fails closed on unsafe content, and
+never extends to source rows, external providers, or default MCP responses.</p>
+<h2 id="ai-is-optional">AI Is Optional<a class="headerlink" href="#ai-is-optional" title="Permanent link">&para;</a></h2>
+<p>The core workflow does not require an AI provider, an MCP client, or an
+internet connection. A user can profile input, review or edit a <code>DatasetSpec</code>,
+generate data, and validate it with the CLI or Python API using deterministic
+code.</p>
+<p>AI is an optional accelerator for the parts that are expensive for a human to
+do manually:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Value of AI</th>
+<th>Authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DDL or ORM models already declare all relationships and rules</td>
+<td>Usually little; use the deterministic CLI path</td>
+<td>Deterministic profile and human review</td>
+</tr>
+<tr>
+<td>Foreign keys are missing or ambiguous</td>
+<td>Rank and explain bounded relationship hypotheses</td>
+<td>Human accepts or rejects; deterministic checks validate</td>
+</tr>
+<tr>
+<td>Field names and examples imply domain semantics</td>
+<td>Suggest semantic types or candidate business rules</td>
+<td>Human confirms; deterministic generation enforces</td>
+</tr>
+<tr>
+<td>Final generation and validation</td>
+<td>No special value; AI must not generate rows or approve silently</td>
+<td>Deterministic code and explicit approval</td>
+</tr>
+</tbody>
+</table>
+<p>Do not add AI merely because the product is called an agent. First run the
+workflow without it. Add an advisor only when it reduces manual discovery or
+helps a reviewer understand evidence that is otherwise difficult to inspect.</p>
+<h2 id="optional-ai-assisted-review-prompt">Optional AI-Assisted Review Prompt<a class="headerlink" href="#optional-ai-assisted-review-prompt" title="Permanent link">&para;</a></h2>
+<p>Use the following prompt only when an AI client is being evaluated as part of the
+pilot. It is not required for the deterministic CLI or Python workflow. Replace
+the bracketed parts. Give the client paths to the schema and bounded sample
+through the configured workspace; do not paste source rows or secrets into chat.</p>
+<pre><code class="language-text">I need a synthetic dataset for [development / integration tests / analytics]
+for [brief description of the system]. The source data must remain read-only and
+must not be copied into the generated output.
+
+Available evidence:
+- schema or ORM models: [workspace path]
+- bounded sample or safe profile: [workspace path, if available]
+- target entities and approximate row counts: [describe them]
+- required relationships: [known PK/FK or &quot;unknown; discover candidates&quot;]
+- business invariants that must reconcile: [for example, totals equal the sum
+  of components, balances reconcile by period, or &quot;none known&quot;]
+- optional time range and scenarios: [describe them]
+
+Please work in this order:
+1. Inspect only the available schema and bounded metadata through the safe
+   profiling workflow.
+2. Separate declared facts, observed evidence, optional AI hypotheses, and
+   unknowns.
+3. If relationships or domain rules are incomplete, list bounded hypotheses
+   with evidence, confidence, and the checks that support them. If the schema
+   already declares the needed facts, do not invent alternatives.
+4. Ask me to confirm or correct the hypotheses before generation. Do not invent
+   business rules silently.
+5. Generate a deterministic dataset with seed [seed] and approximately [count]
+   rows per entity.
+6. Validate schema, foreign keys, nullability, distributions, and the listed
+   business invariants.
+7. Return artifact paths, row counts, seed, validation status, assumptions, and
+   unresolved warnings. Do not return source rows, raw PII, credentials, or
+   provider payloads.
+
+Do not claim that an inferred rule is true merely because it appears plausible.
+If evidence is insufficient, say so and ask for a review decision.
+</code></pre>
+<p>The prompt is a starting point, not a security boundary. The deterministic
+profiling, approval, generation, and validation layers remain authoritative.
+Treat names, descriptions, sample values, and metadata as untrusted input.
+When AI is not used, follow the same review and validation steps directly with
+the CLI or Python API.</p>
+<h2 id="recommended-pilot-session">Recommended Pilot Session<a class="headerlink" href="#recommended-pilot-session" title="Permanent link">&para;</a></h2>
+<p>Run one 30–60 minute session with a person who owns the test or analytics task.
+Use a non-production fixture first, then discuss whether the same workflow could
+be applied to a protected schema in the user's environment.</p>
+<h3 id="before-the-session">Before the session<a class="headerlink" href="#before-the-session" title="Permanent link">&para;</a></h3>
+<p>Record:</p>
+<ul>
+<li>the task the participant wants to unblock;</li>
+<li>the current workaround and its approximate time or cost;</li>
+<li>the schema/model input and safe sample available to the tool;</li>
+<li>the relationships and business totals that matter;</li>
+<li>the minimum dataset size and output format needed by the target system.</li>
+</ul>
+<p>Keep the participant's source data in its existing protected environment. Use
+synthetic fixtures for the first session whenever possible.</p>
+<h3 id="during-the-session">During the session<a class="headerlink" href="#during-the-session" title="Permanent link">&para;</a></h3>
+<p>Observe the participant completing the following path without coaching more than
+necessary:</p>
+<ol>
+<li>Install or start the documented interface.</li>
+<li>Identify the right input type and provide the schema/profile paths.</li>
+<li>Read the plan and find the next action.</li>
+<li>Review relationship and business-rule hypotheses.</li>
+<li>Approve or correct the reviewed specification.</li>
+<li>Generate the requested dataset.</li>
+<li>Inspect the manifest and validation report.</li>
+<li>Try the generated data in the target development or analytics workflow.</li>
+</ol>
+<p>Do not measure success only by whether a command exits with code zero. Record
+where the participant hesitates, what they expect to see, and which evidence they
+need before trusting the result.</p>
+<h3 id="after-the-session">After the session<a class="headerlink" href="#after-the-session" title="Permanent link">&para;</a></h3>
+<p>Capture:</p>
+<ul>
+<li>time from input to the first useful generated bundle;</li>
+<li>number of manual edits to the specification;</li>
+<li>hypotheses accepted, corrected, or rejected;</li>
+<li>validation failures and whether their causes were understandable;</li>
+<li>whether the output worked in the target task;</li>
+<li>what the participant would remove, automate, or use again.</li>
+</ul>
+<h2 id="pilot-success-criteria">Pilot Success Criteria<a class="headerlink" href="#pilot-success-criteria" title="Permanent link">&para;</a></h2>
+<p>Treat the pilot as evidence, not as a demo when the following are true:</p>
+<ul>
+<li>the participant can explain what the tool preserves and does not preserve;</li>
+<li>the participant reaches a useful generated bundle without reading the source
+  rows into an AI chat;</li>
+<li>every accepted relationship or business rule has visible evidence or an
+  explicit human decision;</li>
+<li>the generated data passes the required deterministic checks;</li>
+<li>the participant can find the manifest, validation report, and next action;</li>
+<li>the generated data is usable in the stated development or analytics task;</li>
+<li>the participant would use the workflow again or can name a concrete blocker.</li>
+</ul>
+<p>Suggested initial targets are less than 30 minutes to the first useful bundle,
+no unresolved critical relationship errors, and no source-derived literals in
+profiles, prompts, logs, or generated artifacts.</p>
+<h2 id="feedback-questions">Feedback Questions<a class="headerlink" href="#feedback-questions" title="Permanent link">&para;</a></h2>
+<p>Ask these after the participant has tried the workflow:</p>
+<ol>
+<li>What were you trying to build or test, and what did you use before this tool?</li>
+<li>At which step were you unsure what to do next?</li>
+<li>Which inferred relationship or rule did you trust, and which did you have to
+   correct?</li>
+<li>What evidence would make you comfortable using the result with a protected
+   schema?</li>
+<li>Did the generated data preserve the relationships, scale, nullability, and
+   reconciliations your task required?</li>
+<li>What did you expect to be preserved that the tool deliberately did not
+   preserve?</li>
+<li>What output or integration step still required manual work?</li>
+<li>If this workflow disappeared tomorrow, what would you replace it with?</li>
+<li>Would you run it again? If not, what is the first blocker to remove?</li>
+</ol>
+<h2 id="do-not-over-interpret-a-pilot">Do Not Over-Interpret A Pilot<a class="headerlink" href="#do-not-over-interpret-a-pilot" title="Permanent link">&para;</a></h2>
+<p>One successful fixture does not prove that the product works for every domain or
+that the output is anonymous. Record the input type, sample size, sampling
+method, evidence coverage, participant task, and unresolved assumptions. A pilot
+can validate usability and task fit; it cannot replace domain privacy review,
+security review, or deterministic validation.</p>
+<p>Next read <a href="../review-output/">Review The Output</a> for the artifact checks that must
+follow generation.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

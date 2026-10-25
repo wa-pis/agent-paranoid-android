@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/operations/resource-budgets/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Operational Resource Budgets - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Operational Resource Budgets";
+        var mkdocs_page_input_path = "operations/resource-budgets.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/operations/resource-budgets/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Operational Resource Budgets</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/operations/resource-budgets.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/operations/resource-budgets/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="operational-resource-budgets">Operational Resource Budgets<a class="headerlink" href="#operational-resource-budgets" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/operations/resource-budgets/">Русский</a></p>
+<p>The release gate exercises profiling, deterministic multi-entity generation,
+and validation against checked-in time and peak-allocation ceilings. Its input
+is created locally from synthetic identifiers and low-cardinality categories;
+it never reads production data or contacts an external service.</p>
+<p>Run the same gate locally:</p>
+<pre><code class="language-bash">PYTHONPATH=src python3 scripts/check_operational_budgets.py
+</code></pre>
+<p>The command prints one JSON record for each phase. The current representative
+workload uses 2,500 rows in each of two related entities and applies these
+per-phase ceilings:</p>
+<table>
+<thead>
+<tr>
+<th>Budget</th>
+<th style="text-align: right;">Ceiling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wall-clock time</td>
+<td style="text-align: right;">15 seconds</td>
+</tr>
+<tr>
+<td>Peak traced allocation</td>
+<td style="text-align: right;">256 MiB</td>
+</tr>
+</tbody>
+</table>
+<p>These ceilings are release-regression guards, not hardware sizing promises.
+They are deliberately high enough for ordinary CI variance while still
+detecting accidental unbounded work or large allocation growth. Tightening a
+ceiling requires repeated measurements on every supported CI runtime.</p>
+<p>Local JSON datasets, JSON profile/spec imports, and profile-cache documents are
+also scanned for structural depth before <code>json.loads</code> or Pydantic materializes
+them. <code>TEST_DATA_AGENT_MAX_JSON_DEPTH</code> defaults to <code>100</code>; brackets inside JSON
+strings do not count toward the limit. Oversized nesting fails before a partial
+dataset, profile, or spec can be returned.</p>
+<p>A failure identifies the phase and exceeded ceiling. Investigate the measured
+operation and input size before changing a budget. Do not raise a ceiling only
+to make a single run pass. Platform-level RSS, disk, cancellation, and failure
+cleanup are covered by separate operational-readiness gates.</p>
+<h2 id="database-source-budgets">Database Source Budgets<a class="headerlink" href="#database-source-budgets" title="Permanent link">&para;</a></h2>
+<p>The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
+this section apply to stable <code>1.5.0</code> and are retained in stable
+<code>1.6.0</code>; see <a href="../../1.6.0-release-status/">release status</a>.</p>
+<p>Database-source configuration and profiling have independent limits before
+generation begins:</p>
+<ul>
+<li>PostgreSQL and Trino JDBC-style URLs are capped at 4,096 UTF-8 bytes and
+  parsed hosts at 253 characters. PostgreSQL database identifiers are capped at
+  63 characters; Trino catalog and schema identifiers at 255 characters.</li>
+<li>One PostgreSQL profile defaults to 100 tables, 1,000 explicit or
+  metadata-expanded columns, 1,500 statements, 10,000 aggregate/metadata
+  result rows, 100,000 result cells, and a shared 120-second deadline.</li>
+<li>One Trino invocation defaults to 100 profiled columns, 150 statements, a
+  120-second deadline, and 4 MiB each for database results and the serialized
+  transport response. Shared-hardened deployments additionally require a
+  finite cumulative estimated-scan ceiling.</li>
+<li>One SQL query source defaults to 64 KiB of UTF-8 SQL, 500 AST nodes, depth
+  32, and 100 projected fields after wildcard expansion. It also consumes the
+  selected adapter's existing statement, result, deadline, and scan budgets.</li>
+</ul>
+<p>Qualified wildcards do not bypass these ceilings. Metadata expansion must
+finish as one validated, sorted, explicit-column snapshot before aggregate
+work starts. Exhaustion fails before the next operation and publishes no
+partial profile. Exact environment names, defaults, and absolute caps are in
+<a href="../../reference/configuration/">Configuration</a>.</p>
+<h2 id="artifact-persistence-contract">Artifact Persistence Contract<a class="headerlink" href="#artifact-persistence-contract" title="Permanent link">&para;</a></h2>
+<p>Atomic visibility is not the same as durable persistence. Generated artifacts,
+profiles, specs, and agent workspace state use these boundaries:</p>
+<ul>
+<li>completion-state and advisor-handoff writes that use atomic writers create a
+  sibling temporary file and atomically replace the destination;</li>
+<li>new folder, review, and agent-plan bundles are completed in a sibling staging
+  directory and published with one same-filesystem directory rename;</li>
+<li>a single-entity update to an existing directory uses several per-file moves,
+  so it is not one atomic multi-file transaction;</li>
+<li>approval receipt and result markers are separately atomic, and an
+  interruption between them is represented as a recoverable agent state.</li>
+</ul>
+<p>For an exception or interactive cancellation that the process can handle, the
+workflow removes staging data or rolls moved files back. Agent recovery then
+revalidates the existing checkpoint, spec fingerprint, manifest, report, and
+generated files before publishing missing completion metadata. Recovery does
+not regenerate rows.</p>
+<p>The shared single-file atomic writer flushes file contents and parent-directory
+metadata with <code>fsync</code>; owned directory publication also flushes its parent.
+This is not a complete crash-consistency protocol for every artifact or multi-file
+bundle. A hard stop, kernel or host crash, storage failure, or power loss can
+still leave abandoned staging data or lose an incomplete bundle. Atomic replacement prevents partial visibility for the
+state transitions and new bundles that use it during normal operation; it does
+not cover every standalone artifact command or promise persistence across
+those failures.</p>
+<p><strong>Historical disposition:</strong> complete artifact durability was deferred until after 1.0 and is
+not release-blocking for RC4 or stable 1.0. The repository maintainer owns the
+follow-up. Revisit this decision before promising crash/power-loss durability,
+when deployment requirements demand it, after an artifact-loss incident, or
+when a platform-specific implementation and crash-consistency test plan are
+ready. The HMAC audit log has separate flush behavior and does not broaden the
+artifact durability contract.</p>
+<h2 id="cancellation-cleanup">Cancellation Cleanup<a class="headerlink" href="#cancellation-cleanup" title="Permanent link">&para;</a></h2>
+<p>Folder and single-entity generation stage artifacts beside the destination.
+If the process receives an interactive cancellation while writing or
+validating that staging area, the incomplete staging directory is removed and
+the cancellation is re-raised. The final destination and success metadata are
+not published.</p>
+<p>Hard termination such as <code>SIGKILL</code>, power loss, or host failure cannot run
+in-process cleanup and may leave an abandoned staging directory. Follow the
+recovery guidance below; do not interpret staging data as a completed bundle.</p>
+<h2 id="disk-exhaustion">Disk Exhaustion<a class="headerlink" href="#disk-exhaustion" title="Permanent link">&para;</a></h2>
+<p>Generation checks estimated bundle size and available capacity before work
+starts. Free space can still disappear concurrently. If a write receives
+<code>ENOSPC</code> after creating a partial staged file, folder, review, and single-entity
+workflows remove the staging directory, propagate the operating-system error,
+and publish neither the destination nor success metadata.</p>
+<p>Free space on the target filesystem and retry with the same reviewed spec and
+seed. Do not treat files from an abandoned or failed staging directory as a
+successful synthetic bundle.</p>
+<h2 id="generation-timeout">Generation Timeout<a class="headerlink" href="#generation-timeout" title="Permanent link">&para;</a></h2>
+<p>The generation deadline is checked between deterministic workflow stages. If
+the deadline expires after rows or metadata have been staged, folder, review,
+and single-entity workflows remove the entire staging directory before
+returning the timeout error. They publish neither a final destination nor
+success metadata.</p>
+<p>Increase <code>TEST_DATA_AGENT_MAX_GENERATION_SECONDS</code> only after confirming that
+the requested row count and rule complexity are expected. Retrying with the
+same spec and seed remains deterministic.</p>
+<h2 id="interrupted-publication">Interrupted Publication<a class="headerlink" href="#interrupted-publication" title="Permanent link">&para;</a></h2>
+<p>Folder and review bundles use an atomic directory rename. If publication is
+interrupted after that rename but before the caller receives success, the new
+destination is removed. Single-entity publication may update several files in
+an existing directory; it keeps temporary backups and rolls every moved file
+back, restoring replaced files while leaving unrelated files untouched. It
+publishes <code>generation_manifest.json</code> last and reports completion only after
+the manifest-recorded artifact hashes pass read validation. Replacing any
+same-named sibling requires explicit overwrite approval.</p>
+<p>The caller receives the original interruption error. A failed publication does
+not leave a generation manifest or output file that can be mistaken for a
+successful run when the process can complete rollback. This process-level
+behavior is not a crash/power-loss guarantee.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

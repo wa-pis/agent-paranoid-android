@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/adr/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Architecture Decision Records - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Architecture Decision Records";
+        var mkdocs_page_input_path = "adr/index.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/adr/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Architecture Decision Records</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/adr/index.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="architecture-decision-records">Architecture Decision Records<a class="headerlink" href="#architecture-decision-records" title="Permanent link">&para;</a></h1>
+<p>Recorded <strong>2026-09-29</strong>. This is a project-wide retrospective register, not a
+proposal to rewrite the product and not a claim that 1.6.0rc1 is ready.</p>
+<p>The inventory covers the current 16 baseline OpenSpec capabilities, the
+cross-cutting architecture/operations contracts and the accepted selective
+transformation decisions. It does not attempt to turn every implementation
+choice, historical task or unapproved feature suggestion into an ADR.</p>
+<h2 id="status-and-authority">Status and authority<a class="headerlink" href="#status-and-authority" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Accepted — retrospective baseline:</strong> reconstructed from an existing
+  documented project contract. No new owner approval or historical decision
+  meeting is invented.</li>
+<li><strong>Accepted — owner decision/target:</strong> explicit owner direction, with its
+  recorded date where known. Implementation and public activation may still
+  be incomplete or gated.</li>
+<li><strong>Proposed:</strong> a future choice without sufficient acceptance evidence; not
+  implementation authority. Unresolved choices are currently listed in the
+  <a href="open-questions/">open-question register</a>, not disguised as accepted ADRs.</li>
+<li><strong>Superseded / Rejected:</strong> retain history and link the replacing decision or
+  rejection evidence. The initial numbered records are current decisions;
+  ADR-0025/0026 identify superseded <em>earlier prose</em>, not fictitious prior ADRs.</li>
+</ul>
+<p>Each ADR separates context, decision, alternatives/consequences, evidence and
+revisit conditions. Alternatives are reconstructed engineering contrasts unless
+an authority source explicitly records their consideration; they are not minutes
+of a historical vote. Original approval dates are unknown unless stated.</p>
+<p>Repository/code/spec links are pinned to baseline commit
+<a href="https://github.com/wa-pis/agent-paranoid-android/commit/637065966c12584e11c9b437c1e8b8f8d708c0df"><code>6370659</code></a> (merged PR #594).
+Relative links point to maintained documentation. The current worktree also has
+uncommitted private SQL-limit work: its presence does not establish an accepted
+implementation, new public interface or release. Test links identify coverage
+anchors, <strong>not tests run during ADR collection</strong>.</p>
+<h2 id="how-to-use-this-register">How to use this register<a class="headerlink" href="#how-to-use-this-register" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Before changing a boundary, find its ADR and read its cited contract.</li>
+<li>If implementation differs from the accepted decision, record the discrepancy;
+   do not silently reinterpret the ADR or treat code as permission.</li>
+<li>If the decision must change, write a new record using the
+   <a href="template/">template</a>, explain the trigger and affected contracts, and obtain
+   the existing product/security/release authority. Then mark the old record
+   Superseded with reciprocal links.</li>
+<li>Update executable OpenSpec/reference contracts and tests for behavior changes.
+   Plans reference the decision; progress records results and acceptance evidence.</li>
+<li>Editorial corrections or evidence additions may update the same ADR. Changes
+   to meaning must not be hidden as editorial cleanup.</li>
+</ol>
+<p>Explicit later owner decisions supersede earlier assistant planning where the
+conflict is documented. Baseline safety restrictions remain in force until the
+already-required amendment/review/activation gates are satisfied. An ADR is not
+an access grant, dataset approval, receipt, GitHub approval or release tag.
+For unresolved contradictions, use <a href="open-questions/">the discrepancy register</a>
+rather than guessing a new product/security policy.</p>
+<h2 id="decision-index">Decision index<a class="headerlink" href="#decision-index" title="Permanent link">&para;</a></h2>
+<h3 id="foundations-and-data">Foundations and data<a class="headerlink" href="#foundations-and-data" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="0001-decision-records/">ADR-0001</a></td>
+<td>Record decisions separately from specifications and progress</td>
+</tr>
+<tr>
+<td><a href="0002-source-free-generation/">ADR-0002</a></td>
+<td>Keep synthetic generation source-row-free</td>
+</tr>
+<tr>
+<td><a href="0003-layered-typed-core/">ADR-0003</a></td>
+<td>Enforce policy below CLI, MCP and provider adapters</td>
+</tr>
+<tr>
+<td><a href="0004-profile-spec-evidence/">ADR-0004</a></td>
+<td>Separate observations, hypotheses and executable DatasetSpec</td>
+</tr>
+<tr>
+<td><a href="0005-determinism-provenance/">ADR-0005</a></td>
+<td>Bind reproducibility to the full recorded environment</td>
+</tr>
+<tr>
+<td><a href="0006-bounded-profiling/">ADR-0006</a></td>
+<td>Profile bounded metadata and preserve uncertainty</td>
+</tr>
+<tr>
+<td><a href="0007-deterministic-rules/">ADR-0007</a></td>
+<td>Make relationships and business rules executable</td>
+</tr>
+<tr>
+<td><a href="0008-exact-decimal/">ADR-0008</a></td>
+<td>Keep exact financial types out of binary FLOAT</td>
+</tr>
+</tbody>
+</table>
+<h3 id="access-and-application-boundaries">Access and application boundaries<a class="headerlink" href="#access-and-application-boundaries" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="0009-database-access/">ADR-0009</a></td>
+<td>Authorize database access before I/O</td>
+</tr>
+<tr>
+<td><a href="0010-sql-query-sources/">ADR-0010</a></td>
+<td>Treat approved SQL as a bounded virtual source</td>
+</tr>
+<tr>
+<td><a href="0011-review-first-agent/">ADR-0011</a></td>
+<td>Use a review-first, recoverable agent state machine</td>
+</tr>
+<tr>
+<td><a href="0012-provider-boundary/">ADR-0012</a></td>
+<td>Keep providers optional, untrusted and advisory</td>
+</tr>
+<tr>
+<td><a href="0013-interface-parity/">ADR-0013</a></td>
+<td>Share application policy across CLI, Python and MCP</td>
+</tr>
+<tr>
+<td><a href="0030-source-output-parity/">ADR-0030</a></td>
+<td>Use one generation contract across the source/output matrix</td>
+</tr>
+<tr>
+<td><a href="0014-filesystem-publication/">ADR-0014</a></td>
+<td>Validate fixed inputs and publish completed artifacts safely</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operations-and-delivery">Operations and delivery<a class="headerlink" href="#operations-and-delivery" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="0015-resource-limits/">ADR-0015</a></td>
+<td>Make budgets explicit, separate and actionable</td>
+</tr>
+<tr>
+<td><a href="0016-compatibility-packaging/">ADR-0016</a></td>
+<td>Keep public contracts versioned and integrations optional</td>
+</tr>
+<tr>
+<td><a href="0017-audit/">ADR-0017</a></td>
+<td>Audit operations without recording their sensitive contents</td>
+</tr>
+<tr>
+<td><a href="0018-container-isolation/">ADR-0018</a></td>
+<td>Deploy separate least-privilege CLI and MCP images</td>
+</tr>
+<tr>
+<td><a href="0019-release-integrity/">ADR-0019</a></td>
+<td>Release immutable reviewed commits and verify public artifacts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="selective-transformation">Selective transformation<a class="headerlink" href="#selective-transformation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="0020-selective-transformation/">ADR-0020</a></td>
+<td>Separate mixed-origin transformation from synthetic generation</td>
+</tr>
+<tr>
+<td><a href="0021-local-preservation-approval/">ADR-0021</a></td>
+<td>Require local human approval of exact preservation inputs</td>
+</tr>
+<tr>
+<td><a href="0022-behavior-policies-mappings/">ADR-0022</a></td>
+<td>Use one strict behavior policy and deterministic mapping semantics</td>
+</tr>
+<tr>
+<td><a href="0023-field-types-null-time/">ADR-0023</a></td>
+<td>Make matching, nulls and temporal conversion explicit per field</td>
+</tr>
+<tr>
+<td><a href="0024-format-adapters/">ADR-0024</a></td>
+<td>Use typed input/output adapters around one transformation core</td>
+</tr>
+<tr>
+<td><a href="0025-action-origin-reporting/">ADR-0025</a></td>
+<td>Report executed cell origins rather than value equality</td>
+</tr>
+<tr>
+<td><a href="0026-transformation-scope/">ADR-0026</a></td>
+<td>Keep internal formula recomputation out of the 1.6 RC scope</td>
+</tr>
+</tbody>
+</table>
+<h3 id="acceptance-and-documentation">Acceptance and documentation<a class="headerlink" href="#acceptance-and-documentation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="0027-acceptance-evidence/">ADR-0027</a></td>
+<td>Accept complete workflows using fictional, reproducible evidence</td>
+</tr>
+<tr>
+<td><a href="0028-executable-documentation/">ADR-0028</a></td>
+<td>Keep documentation and release claims tied to supported behavior</td>
+</tr>
+</tbody>
+</table>
+<h2 id="coverage-of-baseline-specifications">Coverage of baseline specifications<a class="headerlink" href="#coverage-of-baseline-specifications" title="Permanent link">&para;</a></h2>
+<p>Coverage is a navigation map, not a declaration that every requirement has passed.</p>
+<table>
+<thead>
+<tr>
+<th>OpenSpec capability</th>
+<th>Governing records</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/synthetic-generation/spec.md">synthetic-generation</a></td>
+<td><a href="0002-source-free-generation/">ADR-0002</a>, <a href="0004-profile-spec-evidence/">ADR-0004</a>, <a href="0005-determinism-provenance/">ADR-0005</a>, <a href="0007-deterministic-rules/">ADR-0007</a>, <a href="0008-exact-decimal/">ADR-0008</a>, <a href="0014-filesystem-publication/">ADR-0014</a>, <a href="0016-compatibility-packaging/">ADR-0016</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/safe-csv-profiling/spec.md">safe-csv-profiling</a></td>
+<td><a href="0006-bounded-profiling/">ADR-0006</a>, <a href="0014-filesystem-publication/">ADR-0014</a>, <a href="0015-resource-limits/">ADR-0015</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/business-rules/spec.md">business-rules</a></td>
+<td><a href="0007-deterministic-rules/">ADR-0007</a>, <a href="0008-exact-decimal/">ADR-0008</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/dataset-validation/spec.md">dataset-validation</a></td>
+<td><a href="0002-source-free-generation/">ADR-0002</a>, <a href="0007-deterministic-rules/">ADR-0007</a>, <a href="0008-exact-decimal/">ADR-0008</a>, <a href="0027-acceptance-evidence/">ADR-0027</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/agent-orchestration/spec.md">agent-orchestration</a></td>
+<td><a href="0003-layered-typed-core/">ADR-0003</a>, <a href="0011-review-first-agent/">ADR-0011</a>, <a href="0012-provider-boundary/">ADR-0012</a>, <a href="0013-interface-parity/">ADR-0013</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/safe-mcp-workflow/spec.md">safe-mcp-workflow</a></td>
+<td><a href="0002-source-free-generation/">ADR-0002</a>, <a href="0009-database-access/">ADR-0009</a>, <a href="0011-review-first-agent/">ADR-0011</a>, <a href="0013-interface-parity/">ADR-0013</a>, <a href="0015-resource-limits/">ADR-0015</a>, <a href="0017-audit/">ADR-0017</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/mcp-interface/spec.md">mcp-interface</a></td>
+<td><a href="0013-interface-parity/">ADR-0013</a>, <a href="0016-compatibility-packaging/">ADR-0016</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/public-python-api/spec.md">public-python-api</a></td>
+<td><a href="0003-layered-typed-core/">ADR-0003</a>, <a href="0016-compatibility-packaging/">ADR-0016</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/public-contracts/spec.md">public-contracts</a></td>
+<td><a href="0004-profile-spec-evidence/">ADR-0004</a>, <a href="0013-interface-parity/">ADR-0013</a>, <a href="0016-compatibility-packaging/">ADR-0016</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/artifact-contract/spec.md">artifact-contract</a></td>
+<td><a href="0005-determinism-provenance/">ADR-0005</a>, <a href="0011-review-first-agent/">ADR-0011</a>, <a href="0014-filesystem-publication/">ADR-0014</a>, <a href="0016-compatibility-packaging/">ADR-0016</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/database-source-configuration/spec.md">database-source-configuration</a></td>
+<td><a href="0009-database-access/">ADR-0009</a>, <a href="0015-resource-limits/">ADR-0015</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/database-source-allowlists/spec.md">database-source-allowlists</a></td>
+<td><a href="0006-bounded-profiling/">ADR-0006</a>, <a href="0009-database-access/">ADR-0009</a>, <a href="0010-sql-query-sources/">ADR-0010</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/sql-query-source-profiling/spec.md">sql-query-source-profiling</a></td>
+<td><a href="0009-database-access/">ADR-0009</a>, <a href="0010-sql-query-sources/">ADR-0010</a>, <a href="0026-transformation-scope/">ADR-0026</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/operational-readiness/spec.md">operational-readiness</a></td>
+<td><a href="0014-filesystem-publication/">ADR-0014</a>, <a href="0015-resource-limits/">ADR-0015</a>, <a href="0016-compatibility-packaging/">ADR-0016</a>, <a href="0018-container-isolation/">ADR-0018</a>, <a href="0027-acceptance-evidence/">ADR-0027</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/container-deployment/spec.md">container-deployment</a></td>
+<td><a href="0018-container-isolation/">ADR-0018</a>, <a href="0019-release-integrity/">ADR-0019</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/release-supply-chain/spec.md">release-supply-chain</a></td>
+<td><a href="0016-compatibility-packaging/">ADR-0016</a>, <a href="0019-release-integrity/">ADR-0019</a>, <a href="0027-acceptance-evidence/">ADR-0027</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/public-documentation/spec.md">public-documentation</a></td>
+<td><a href="0001-decision-records/">ADR-0001</a>, <a href="0028-executable-documentation/">ADR-0028</a></td>
+</tr>
+</tbody>
+</table>
+<p>The active <a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/plan.md">selective-source-transformation change</a>
+is covered by ADR-0008, ADR-0010, ADR-0015 and ADR-0020–0027; its SQL delta also
+maps to ADR-0010/0026. Module extraction maps to ADR-0003 and the
+<a href="../reference/application-boundaries/">application-boundary inventory</a>.
+Provider integrations map to ADR-0012/0016, not to a new source-data permission.</p>
+<h2 id="implementation-and-acceptance-snapshot">Implementation and acceptance snapshot<a class="headerlink" href="#implementation-and-acceptance-snapshot" title="Permanent link">&para;</a></h2>
+<p>Owner successor <a href="0029-unified-replacement-contract/">ADR-0029: unified replacement contract</a>
+permits explicit mapped source-membership/permutations for every field, with
+value-free sensitivity notes. Direct preservation and source-free rules remain
+unchanged; activation requires new executable evidence and independent review.</p>
+<ul>
+<li>Existing generation/profiling/agent contracts remain separate from transformation.</li>
+<li>PR #594 merged private installed-wheel CSV replacement acceptance at
+  <strong>300,000 × 50</strong>. See <a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/csv-scale-acceptance.md">immutable evidence</a>.</li>
+<li><strong>1,000,000 × 100</strong>, SQL-result scale, complete twelve-route coverage, public
+  transformation execution and final RC acceptance are not proved by that run.</li>
+<li>The provenance decision replaces the earlier user-facing equality report;
+  safety comparisons remain. Internal formula recomputation is not required
+  for the RC. Do not recreate those old blockers.</li>
+<li>Development automation was paused at the owner's request. Creating these ADRs
+  does not resume it or authorize publication. Resume work only on explicit
+  direction, using the current progress and diff.</li>
+</ul>
+<p>See <a href="open-questions/">open questions and discrepancies</a> for the unresolved
+choices, superseded prose and implementation gaps. See
+<a href="0001-decision-records/">ADR-0001</a> for document responsibilities.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

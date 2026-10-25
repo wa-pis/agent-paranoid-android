@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/ru/agent_design/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Архитектура и точки расширения - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0410\u0440\u0445\u0438\u0442\u0435\u043a\u0442\u0443\u0440\u0430 \u0438 \u0442\u043e\u0447\u043a\u0438 \u0440\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u0438\u044f";
+        var mkdocs_page_input_path = "ru/agent_design.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/ru/agent_design/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск по документации" aria-label="Поиск по документации" title="Введите поисковый запрос" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../" class="icon icon-home" aria-label="Документация"></a></li>
+      <li class="breadcrumb-item active">Архитектура и точки расширения</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/agent_design.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../agent_design/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Архитектура и точки расширения<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../agent_design/">English</a> · Русский</p>
+<h2 id="_2">Как проходит запрос<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre><code class="language-mermaid">flowchart TD
+  CLI[CLI] --&gt; APP[Application services]
+  MCP[MCP transport] --&gt; APP
+  PY[Python API] --&gt; CORE[Типизированные модели и детерминированное ядро]
+  APP --&gt; IO[Ограниченное чтение и запись]
+  APP --&gt; PROFILE[Профилирование]
+  APP --&gt; CORE
+  PROFILE --&gt; CORE
+  CORE --&gt; GEN[Генератор и constraint solver]
+  GEN --&gt; VAL[Валидация]
+  VAL --&gt; IO
+  APP --&gt; ADVISOR[Необязательный advisor]
+  ADVISOR --&gt; REVIEW[Предложение и review]
+  REVIEW --&gt; CORE
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Зона</th>
+<th>Реальные модули</th>
+<th>Ответственность</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Контракты</td>
+<td>core/dataset.py, entity.py, field.py, settings.py</td>
+<td>Pydantic-модели DatasetProfile и DatasetSpec, ссылки и настройки</td>
+</tr>
+<tr>
+<td>CSV-профиль</td>
+<td>profiling/schema_profiler.py, relationship_profiler.py, constraint_miner.py, cache.py</td>
+<td>Потоковый анализ, ограниченная выборка, гипотезы, кеш метаданных</td>
+</tr>
+<tr>
+<td>Генерация</td>
+<td>generation/planner.py, entity_generator.py, constraint_solver.py</td>
+<td>Spec из профиля, новые значения, согласование ограничений</td>
+</tr>
+<tr>
+<td>Проверка</td>
+<td>validation/schema_validator.py, relationship_validator.py, constraint_validator.py, reconciliation.py</td>
+<td>Секции отчёта и обязательные post-solve guards</td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>cli.py, cli_parser.py, cli_presenter.py, cli_contract.py</td>
+<td>Разбор, dispatch, безопасное представление, коды завершения</td>
+</tr>
+<tr>
+<td>Базы</td>
+<td>postgres_config.py, postgres_client.py, postgres_profiler.py; trino_config.py, trino_client.py, trino_profiling.py</td>
+<td>Scope, read-only доступ, агрегаты и бюджеты</td>
+</tr>
+<tr>
+<td>Query source</td>
+<td>sql_query_source.py, sql_query_profiling.py, sql_query_adapters.py</td>
+<td>Локальный AST, allowlists, no-row/aggregate-only профиль</td>
+</tr>
+<tr>
+<td>MCP</td>
+<td>mcp_generator_transport.py, mcp_trino_transport.py и соответствующие server.py</td>
+<td>Ограниченный транспорт и регистрация инструментов</td>
+</tr>
+<tr>
+<td>Публикация</td>
+<td>io/workflows.py, io/artifacts.py, workspace_store.py</td>
+<td>Выходные артефакты, staging, workspace</td>
+</tr>
+<tr>
+<td>Advisor</td>
+<td>advisor.py и provider adapters</td>
+<td>Ограниченные предложения по метаданным без auto-approval</td>
+</tr>
+</tbody>
+</table>
+<p>Все пути в таблице — внутри <code>src/test_data_agent/</code>. I/O и provider adapters не должны подменять детерминированное ядро. Семена, бюджеты и зависимости передаются явно.</p>
+<h2 id="python-api">Минимальный Python API<a class="headerlink" href="#python-api" title="Permanent link">&para;</a></h2>
+<p>В активном окружении из корня checkout выполните этот локальный пример; он не читает источник и не печатает строки:</p>
+<pre><code class="language-python">from test_data_agent import DatasetSpec, generate_dataset, validate_dataset
+
+spec = DatasetSpec.model_validate({
+    &quot;schema_version&quot;: &quot;1.1&quot;,
+    &quot;entities&quot;: [{
+        &quot;name&quot;: &quot;checks&quot;, &quot;row_count&quot;: 3,
+        &quot;primary_key&quot;: &quot;check_id&quot;,
+        &quot;fields&quot;: [{&quot;name&quot;: &quot;check_id&quot;, &quot;data_type&quot;: &quot;integer&quot;, &quot;is_identifier&quot;: True}],
+    }],
+})
+rows = generate_dataset(spec, seed=12345)
+assert len(rows[&quot;checks&quot;]) == 3
+assert validate_dataset(rows, spec).valid
+print(&quot;python API: ok&quot;)
+</code></pre>
+<p>Предварительно нужен установленный базовый пакет. Ожидается <code>python API: ok</code>; при ошибке проверьте Python/package version и схему. Пример проверен в аудите; подробности окружения — <a href="../quality-report/">отчёт</a>. Эта операция возвращает строки вызывающему Python-коду, поэтому вывод в чат/лог по умолчанию недопустим. Безопасный признак завершения — сводка assert, а для сохранения файлов используйте документированный bundle workflow.</p>
+<p>Подробные карты: <a href="../../reference/application-boundaries/">Application boundaries</a>, <a href="./">описание проекта</a>. Карта исходных модулей также хранится в <code>docs/implementation_map.md</code> (служебный файл исключён из сайта).</p>
+<h2 id="160">Дополнения 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h2>
+<p><code>core/distribution.py</code> и <code>core/decimal_units.py</code> задают exact DECIMAL; DatasetSpec 1.1 переносит embedded business_rules. <code>io/transformation_batch_workflow.py</code>, <code>transformation_batch_profile.py</code>, <code>transformation_query_workflow.py</code> координируют отдельную mixed-origin обработку, фиксированные snapshots и local receipt consumption. CLI registration находится в cli_parser.py и cli_transformation_candidate.py; running generator MCP регистрирует соответствующие consumers. Внутреннее имя candidate не означает отсутствие публичной команды. Расширение публичного Python API из внутренних helpers не следует: проверяйте <strong>all</strong> и contract fixtures.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

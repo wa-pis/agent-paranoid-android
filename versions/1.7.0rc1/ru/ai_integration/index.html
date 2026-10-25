@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/ru/ai_integration/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>AI-клиент - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "AI-\u043a\u043b\u0438\u0435\u043d\u0442";
+        var mkdocs_page_input_path = "ru/ai_integration.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/ru/ai_integration/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск по документации" aria-label="Поиск по документации" title="Введите поисковый запрос" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">AI-клиент</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">Для чего это нужно</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Что получится в результате</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Предварительные требования</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Пошаговое выполнение</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1">Шаг 1. Подготовьте план</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-review">Шаг 2. Посмотрите review</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-exchange">Шаг 3. Сохраните exchange локально</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">Проверка результата</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">Типичные ошибки</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_7">Необязательное обращение к провайдеру</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_8">Следующий шаг</a>
+    </li>
+    </ul></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../" class="icon icon-home" aria-label="Документация"></a></li>
+          <li class="breadcrumb-item">Русский</li>
+          <li class="breadcrumb-item">Интеграции</li>
+      <li class="breadcrumb-item active">AI-клиент</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/ai_integration.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../ai_integration/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="ai-">AI-интеграция<a class="headerlink" href="#ai-" title="Permanent link">&para;</a></h1>
+<p><a href="../../ai_integration/">English</a> · Русский</p>
+<h2 id="_1">Для чего это нужно<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Advisor помогает предложить изменения DatasetSpec по безопасным метаданным. Его предложение проходит детерминированную проверку, а человек повторно проверяет итоговый контракт.</p>
+<h2 id="_2">Что получится в результате<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Локальный review-first workspace и ограниченный advisor exchange JSON. Внешняя отправка не выполняется этими шагами.</p>
+<h2 id="_3">Предварительные требования<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Установлен Python 3.11+ и пакет проекта. Терминал открыт в корне репозитория <code>agent-paranoid-android</code>; виртуальное окружение активно. Входы — только вымышленные файлы из репозитория. Папка назначения новая; есть права чтения входов и записи результата. Для команд ниже используйте macOS/Linux; в PowerShell вводите каждую команду одной строкой без <code>\</code>. Внешние provider-вызовы не проверялись. Для локального plan/request extra openai не требуется.</p>
+<h2 id="_4">Пошаговое выполнение<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="1">Шаг 1. Подготовьте план<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Создайте workspace из вымышленного CSV и остановитесь до генерации.</p>
+<p><strong>Где выполнить:</strong> Корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent agent-plan examples/csv_quickstart/customers.csv --workspace out/ru-agent --count 25 --seed 12345 --format csv
+</code></pre>
+<p><strong>Что должно произойти:</strong> Созданы profile/spec и состояние ожидания review.</p>
+<p><strong>Как проверить:</strong> agent-status сообщает awaiting_approval.</p>
+<p><strong>Если не получилось:</strong> При занятом workspace выберите новую папку; не удаляйте исходные артефакты.</p>
+<h3 id="2-review">Шаг 2. Посмотрите review<a class="headerlink" href="#2-review" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Получите безопасный checklist и отпечаток текущего spec.</p>
+<p><strong>Где выполнить:</strong> Корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent agent-review out/ru-agent
+test-data-agent agent-status out/ru-agent --json
+</code></pre>
+<p><strong>Что должно произойти:</strong> Показаны поля, предположения, privacy и fingerprint.</p>
+<p><strong>Как проверить:</strong> Статус ожидает одобрения; generation ещё не выполнена.</p>
+<p><strong>Если не получилось:</strong> Если источник или spec изменился, заново постройте план или повторите review.</p>
+<h3 id="3-exchange">Шаг 3. Сохраните exchange локально<a class="headerlink" href="#3-exchange" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Создайте файл только если out/ru-advisor-exchange.json ещё не существует: перенаправление shell само по себе перезаписывает файл.</p>
+<p><strong>Где выполнить:</strong> Корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent agent-advisor-request out/ru-agent --exchange &gt; out/ru-advisor-exchange.json
+</code></pre>
+<p><strong>Что должно произойти:</strong> Записаны trusted instructions, untrusted metadata и schema AdvisorProposal.</p>
+<p><strong>Как проверить:</strong> JSON читается, содержит fingerprint-bound request; исходных строк нет.</p>
+<p><strong>Если не получилось:</strong> При ненулевом коде не передавайте файл провайдеру: shell мог оставить пустой/ошибочный файл. Проверьте статус workspace.</p>
+<h2 id="_5">Проверка результата<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>Перед любой внешней отправкой человек проверяет метаданные, имена таблиц/полей, разрешённого провайдера и политику организации. Даже агрегаты и имена могут раскрывать контекст. Сохранение exchange — локальная операция, не разрешение на передачу.</p>
+<h2 id="_6">Типичные ошибки<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Workspace не awaiting_approval</td>
+<td>Уже завершён или находится в другой фазе</td>
+<td>Выполните agent-status; действуйте по его next action.</td>
+</tr>
+<tr>
+<td>Proposal не совпадает с fingerprint</td>
+<td>Изменился request/spec</td>
+<td>Создайте новый exchange; не подменяйте отпечаток.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">Необязательное обращение к провайдеру<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>После явного разрешения передачи и установки <code>.[openai]</code> можно выполнить <code>test-data-agent agent-advise out/ru-agent --provider openai</code>. Runtime <code>OPENAI_API_KEY</code> должен внедряться секретным механизмом, не попадать в команды или файл проекта. OpenAI и GigaChat — экспериментальные provider adapters. Для GigaChat: extra <code>gigachat</code>, <code>--provider gigachat</code>; используйте ровно один из <code>GIGACHAT_CREDENTIALS</code> и <code>GIGACHAT_ACCESS_TOKEN</code>. TLS обязателен. Эти сетевые команды <strong>не проверены выполнением</strong> в аудите; квота, модель и доступность требуют отдельной проверки.</p>
+<p>Для внешнего ручного обмена ответ сохраняется как bounded JSON и принимается через <code>test-data-agent agent-advisor-apply out/ru-agent advisor_proposal.json</code>. Схема ответа находится внутри exchange; не придумывайте proposal и не редактируйте spec в обход валидатора.</p>
+<p>После любого применения предложения снова выполните <code>agent-review</code>, прочитайте изменённый spec и получите согласие на точный fingerprint. Только затем <code>agent-approve out/ru-agent --reviewed-spec-sha256 &lt;ОДОБРЕННЫЙ_SHA256&gt;</code> (placeholder заменяется реальным значением; не вставляйте угловые скобки в shell). Нельзя автоматически одобрять всё, что предложил provider.</p>
+<p>AI не создаёт строки напрямую, не придумывает таблицы и связи вне локальных кандидатов и не получает право отключать safety. <code>--local-category</code> не разрешает передавать исходные enum провайдеру: они заменяются field-scoped synthetic labels. Подробный <a href="../../reference/advisor/">контракт advisor</a> и <a href="./">интеграция</a>.</p>
+<h2 id="_8">Следующий шаг<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p><a href="../how-to/reference-agent/">Workflow для агента</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../how-to/mcp/" class="btn btn-neutral float-left" title="MCP-клиент"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../operations/containers/" class="btn btn-neutral float-right" title="Контейнеры">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../how-to/mcp/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../operations/containers/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

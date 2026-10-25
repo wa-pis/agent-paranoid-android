@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/agent_design/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Agent Design - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Agent Design";
+        var mkdocs_page_input_path = "agent_design.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/agent_design/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Agent Design</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/agent_design.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/agent_design/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="agent-design">Agent Design<a class="headerlink" href="#agent-design" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../ru/agent_design/">Русский</a></p>
+<p>The agent layer is a safe orchestration boundary over the existing deterministic
+pipeline. It plans work, writes review artifacts, waits for approval, and then
+calls deterministic generation and validation code.</p>
+<p>The agent does not generate rows with an LLM. It does not receive unrestricted
+SQL access, shell access, or raw production rows.</p>
+<p>PlantUML diagrams for this layer are available in:</p>
+<ul>
+<li><a href="../architecture_agent_workflow.puml">Agent Workflow</a></li>
+<li><a href="../architecture_safety_boundaries.puml">Safety Boundaries</a></li>
+</ul>
+<h2 id="flow">Flow<a class="headerlink" href="#flow" title="Permanent link">&para;</a></h2>
+<pre><code class="language-text">User or AI client
+  -&gt; agent-plan
+    -&gt; safe CSV/profile profiling
+    -&gt; DatasetSpec inference
+    -&gt; profile.json / dataset_spec.yaml / agent_plan.json
+    -&gt; stop for review
+  -&gt; agent-status
+    -&gt; validate workspace state
+    -&gt; report phase, next action, artifact paths, and safe summary
+  -&gt; agent-review
+    -&gt; report detailed metadata-only spec and privacy checklist
+    -&gt; report exact current fingerprint without changing the workspace
+  -&gt; agent-advise (optional provider-backed proposal)
+    -&gt; send safe metadata through the structured advisor boundary
+    -&gt; validate and persist the proposed DatasetSpec
+    -&gt; stop for another agent-review
+  -&gt; agent-approve
+    -&gt; deterministic synthetic generation
+    -&gt; source-row reuse checks when source CSV is available
+    -&gt; validation_report.json / generation_manifest.json
+    -&gt; agent_completion.json checkpoint
+  -&gt; agent-recover (only after interrupted completion publication)
+    -&gt; revalidate the existing bundle
+    -&gt; publish missing receipt/result without regenerating rows
+</code></pre>
+<h2 id="cli-usage">CLI Usage<a class="headerlink" href="#cli-usage" title="Permanent link">&para;</a></h2>
+<p>Plan from a CSV folder and stop before generation:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent \
+  --count 25 \
+  --seed 12345 \
+  --format csv
+</code></pre>
+<p>Review <code>out/agent/dataset_spec.yaml</code>, optionally request advice, review any
+changed spec again, then approve:</p>
+<pre><code class="language-bash">test-data-agent agent-review out/agent
+test-data-agent agent-advise out/agent --provider openai
+test-data-agent agent-review out/agent
+REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot;
+</code></pre>
+<p>The provider default remains OpenAI. To select the experimental direct
+GigaChat adapter explicitly, use <code>--provider gigachat</code> and follow
+<a href="../how-to/gigachat/">Use The GigaChat Advisor</a>. Both adapters receive the same
+safe exchange and stop before approval.</p>
+<p>Inspect the same workspace as versioned JSON for automation or an AI client:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent --json
+test-data-agent agent-review out/agent --json
+test-data-agent agent-advise out/agent --provider openai --json
+test-data-agent agent-review out/agent --json
+test-data-agent agent-status out/agent --json
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot; --json
+</code></pre>
+<p>If status reports <code>recovery_required</code>, keep the reviewed fingerprint and run:</p>
+<pre><code class="language-bash">test-data-agent agent-recover out/agent \
+  --reviewed-spec-sha256 &quot;$REVIEWED_SPEC_SHA256&quot; --json
+</code></pre>
+<p>Each command writes one JSON document to stdout and leaves stderr empty. Status
+inspection is read-only. It rejects incomplete or contradictory workspace
+state, and none of the JSON contracts returns source or generated rows.</p>
+<p>Planning and pending status print a concise summary. <code>agent-review</code> adds the
+approval checklist containing:</p>
+<ul>
+<li>entities, row counts, primary keys, field types, and nullability;</li>
+<li>sensitive and identifier classifications;</li>
+<li>semantic types and distribution kinds, without distribution values;</li>
+<li>inferred relationships and confidence;</li>
+<li>privacy defaults and current/planned spec fingerprints;</li>
+<li>assumptions and safety warnings.</li>
+</ul>
+<p>Only metadata is shown. Names are treated as untrusted input, escaped for the
+terminal, and explicitly marked as non-instructional.</p>
+<p>Plan from one CSV file:</p>
+<pre><code class="language-bash">test-data-agent agent-plan tests/fixtures/customers.csv \
+  --workspace out/customer_agent \
+  --table customers \
+  --count 25 \
+  --seed 12345 \
+  --format csv
+</code></pre>
+<p>Plan from a safe profile JSON:</p>
+<pre><code class="language-bash">test-data-agent agent-plan examples/orders_profile.json \
+  --workspace out/profile_agent \
+  --count 25 \
+  --seed 12345 \
+  --format json
+</code></pre>
+<p><code>agent-plan</code> detects CSV files, folders containing CSV files, and validated
+safe-profile JSON. Use <code>--source-type</code> only as an explicit override.
+DatasetSpec JSON or YAML belongs to the existing <code>generate</code> workflow.</p>
+<h2 id="artifacts">Artifacts<a class="headerlink" href="#artifacts" title="Permanent link">&para;</a></h2>
+<p>Planning writes:</p>
+<ul>
+<li><code>agent_request.json</code></li>
+<li><code>agent_plan.json</code></li>
+<li><code>profile.json</code></li>
+<li><code>dataset_spec.yaml</code></li>
+</ul>
+<p>Approval writes:</p>
+<ul>
+<li><code>approval_receipt.json</code></li>
+<li><code>agent_result.json</code></li>
+<li><code>generated/&lt;entity&gt;.csv|json|parquet</code></li>
+<li><code>generated/profile.json</code></li>
+<li><code>generated/dataset_spec.yaml</code></li>
+<li><code>generated/validation_report.json</code></li>
+<li><code>generated/generation_manifest.json</code></li>
+<li><code>generated/agent_completion.json</code></li>
+</ul>
+<h2 id="result-contract">Result Contract<a class="headerlink" href="#result-contract" title="Permanent link">&para;</a></h2>
+<p>The Python API returns an <code>AgentResult</code>. Its <code>summary</code> is one of two typed
+models:</p>
+<ul>
+<li><code>AgentPlanSummary</code> reports entities, relationship and constraint counts,
+  seed, output format, fields, sensitive classifications, relationship
+  confidence, assumptions, and warnings while approval is pending.</li>
+<li><code>AgentGenerationSummary</code> reports row counts, seed, output format, validation
+  status, and the <code>synthetic</code> and <code>source_rows_copied</code> safety facts.</li>
+<li><code>AgentWorkspaceStatus</code> reports the current phase, next action, artifacts, and
+  the applicable typed summary. Its JSON contract has <code>schema_version: "1.0"</code>.</li>
+<li><code>AgentReviewState</code> reports the random plan identifier, safe-profile
+  fingerprint, planned/current spec fingerprints, and whether the spec changed
+  during review.</li>
+<li><code>AgentApprovalReceipt</code> binds successful approval to the plan identifier,
+  profile fingerprint, and exact reviewed effective-spec fingerprint.</li>
+<li><code>AgentCompletionCheckpoint</code> records the reviewed identity and completed
+  generation facts inside the atomically published bundle.</li>
+<li><code>AgentRecoverySummary</code> reports why completion metadata must be recovered and
+  the exact reviewed fingerprint required for that operation.</li>
+</ul>
+<p><code>AgentResult</code> and <code>AgentWorkspaceStatus</code> both have
+<code>schema_version: "1.0"</code>. The same result fields are serialized under <code>summary</code>
+in <code>agent_plan.json</code> and <code>agent_result.json</code>. Existing dict-style reads such as
+<code>result.summary["row_counts"]</code> remain supported, but new Python integrations
+should use typed attributes such as <code>result.summary.row_counts</code>.</p>
+<p>Agent CLI failures use <code>CliErrorResponse</code>. It has a stable error code, message,
+command, exit code, retryability flag, and optional help command. Consumers
+should branch on the error code rather than matching human-readable messages.</p>
+<p>New review fields have defaults, so status inspection can still read
+workspaces created before the richer summary was introduced. Legacy workspaces
+must be replanned before approval because they have no trusted review binding.</p>
+<h2 id="llm-responsibilities">LLM Responsibilities<a class="headerlink" href="#llm-responsibilities" title="Permanent link">&para;</a></h2>
+<p>An LLM-based client may:</p>
+<ul>
+<li>choose <code>csv</code>, <code>csv-folder</code>, or <code>profile</code> source type;</li>
+<li>call <code>agent-plan</code>;</li>
+<li>summarize the inferred <code>DatasetSpec</code>;</li>
+<li>ask a human to approve or edit the spec;</li>
+<li>call <code>agent-approve</code> after approval;</li>
+<li>report manifest and validation summaries.</li>
+</ul>
+<p>An LLM-based client must not:</p>
+<ul>
+<li>generate rows itself;</li>
+<li>bypass <code>DatasetSpec</code>;</li>
+<li>use arbitrary SQL;</li>
+<li>return raw rows or raw PII in chat;</li>
+<li>treat free-form reasoning as validation.</li>
+</ul>
+<h2 id="safety-boundary">Safety Boundary<a class="headerlink" href="#safety-boundary" title="Permanent link">&para;</a></h2>
+<p>The Python workflow still enforces the important invariants:</p>
+<ul>
+<li>profile safety checks reject unsafe sensitive distributions;</li>
+<li>CSV source-row reuse checks run before output is committed;</li>
+<li>generation is deterministic by seed;</li>
+<li>generation folders are assembled through temporary folders;</li>
+<li>validation reports and generation manifests are written for every approved
+  generation.</li>
+<li>interrupted publication is recoverable only after bounded revalidation of
+  the unchanged generated bundle.</li>
+</ul>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/configuration/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Configuration - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Configuration";
+        var mkdocs_page_input_path = "reference/configuration.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/configuration/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Configuration</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/configuration.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/reference/configuration/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/reference/configuration/">Русский</a></p>
+<p>Defaults are conservative. Raise limits only after reviewing expected data
+volume, available resources, and the trust level of the input.</p>
+<p>These settings describe stable <code>1.6.0</code>. Historical anchors remain available.
+Configuration and tool registration do not grant dataset permission or local
+preservation approval. Existing component settings and exact allowlists remain
+supported.</p>
+<p>All byte values are integer bytes unless stated otherwise.</p>
+<p>CLI flags override the corresponding command defaults. Environment variables
+configure resource, database, provider, and transport boundaries only where
+listed below; they do not silently activate an optional provider or overwrite
+an explicit CLI value. Use <code>COMMAND --help</code> to inspect CLI defaults and
+<code>doctor --json</code> for installed/local capability states. <code>doctor</code> deliberately
+does not read provider credentials or test remote reachability.</p>
+<p><a id="closed-common-transformation-profile"></a></p>
+<p><a id="common-transformation-profile-16-rc"></a></p>
+<h2 id="common-transformation-profile">Common Transformation Profile<a class="headerlink" href="#common-transformation-profile" title="Permanent link">&para;</a></h2>
+<p>Stable <code>1.6.0</code> provides the common CLI/MCP workflow. Its versioned reference profile combines two or more inputs
+with one independently reviewed DatasetSpec for final linked validation:</p>
+<pre><code class="language-yaml">schema_version: &quot;0.1&quot;
+validation: validation.yaml
+inputs:
+  - entity: fictional_parents
+    source: parents.csv
+    policy: parents-policy.yaml
+  - entity: fictional_children
+    source: children.csv
+    policy: children-policy.yaml
+    mappings: [keys.csv]
+</code></pre>
+<p><code>mappings</code> and <code>generation_policies</code> list exact local reference paths to bind;
+they do not embed source rows. All paths are relative to the explicit reference
+root, not to each policy's directory, and must pass restricted no-follow reads.
+Entities must match their policies and final validation spec. Unknown/duplicate
+keys, conflicting links, unsafe references and budget exhaustion fail closed.
+Source, policies, mappings, generation policies, validation and exact profile
+bytes bind the reviewed digest, including order and whitespace.</p>
+<p>Optional shared <code>resource_limits</code> supports only <code>max_total_input_bytes</code> and
+<code>max_output_bytes</code>; remaining dimensions stay in per-input behavior policies.
+Session precedence and explicit run-cap checks below still apply. Combined
+review bytes must fit <code>--max-review-bytes</code>; no truncation or implicit cap raise.
+The local create/wizard saves only policies/spec/references, not source copies
+or receipts. Saving changes paths and therefore requires fresh review. See the
+<a href="../cli/#closed-common-profile-workflow-candidate">common-profile CLI workflow</a> for draft
+CSV proposals, local confirmation and retained-publication restrictions. This
+profile is not a compatibility promise for stable <code>1.5.0</code>. Registration grants
+no dataset authority or local preservation approval and does not close the
+separately gated transformation/session acceptance campaign.</p>
+<h2 id="input-and-generation-limits">Input And Generation Limits<a class="headerlink" href="#input-and-generation-limits" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th style="text-align: right;">Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_GENERATION_COUNT</code></td>
+<td style="text-align: right;"><code>100000</code></td>
+<td>Maximum rows per entity</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES</code></td>
+<td style="text-align: right;"><code>134217728</code></td>
+<td>Maximum bytes per input file</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_TOTAL_INPUT_BYTES</code></td>
+<td style="text-align: right;"><code>536870912</code></td>
+<td>Maximum total input bytes</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_INPUT_ROWS</code></td>
+<td style="text-align: right;"><code>1000000</code></td>
+<td>Maximum input rows</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_INPUT_COLUMNS</code></td>
+<td style="text-align: right;"><code>1000</code></td>
+<td>Maximum columns</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_INPUT_CELLS</code></td>
+<td style="text-align: right;"><code>10000000</code></td>
+<td>Maximum row/column cells</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_INPUT_FILES</code></td>
+<td style="text-align: right;"><code>100</code></td>
+<td>Maximum files in a source folder</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS</code></td>
+<td style="text-align: right;"><code>1000000</code></td>
+<td>Maximum characters in one CSV cell or JSON string value</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES</code></td>
+<td style="text-align: right;"><code>536870912</code></td>
+<td>Maximum estimated expanded Parquet bytes</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_YAML_ALIASES</code></td>
+<td style="text-align: right;"><code>50</code></td>
+<td>Maximum YAML aliases</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_YAML_DEPTH</code></td>
+<td style="text-align: right;"><code>100</code></td>
+<td>Maximum YAML nesting depth</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_JSON_DEPTH</code></td>
+<td style="text-align: right;"><code>100</code></td>
+<td>Maximum structural depth for JSON datasets, profile/spec imports, and profile caches before parsing</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES</code></td>
+<td style="text-align: right;"><code>1048576</code></td>
+<td>Maximum rule payload bytes</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS</code></td>
+<td style="text-align: right;"><code>5000000</code></td>
+<td>Estimated row/rule work limit</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_OUTPUT_BYTES</code></td>
+<td style="text-align: right;"><code>536870912</code></td>
+<td>Maximum complete generated bundle size</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MIN_FREE_DISK_BYTES</code></td>
+<td style="text-align: right;"><code>134217728</code></td>
+<td>Disk space kept in reserve</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_GENERATION_SECONDS</code></td>
+<td style="text-align: right;"><code>300</code></td>
+<td>Generation wall-clock limit</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SECONDS</code></td>
+<td style="text-align: right;"><code>120</code></td>
+<td>Wall-clock limit for one local CSV-folder profile</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SAMPLE_ROWS</code></td>
+<td style="text-align: right;"><code>1000000</code></td>
+<td>Cumulative relationship/rule sample-row ceiling per folder profile</td>
+</tr>
+</tbody>
+</table>
+<p>Values must be positive integers, except the two <code>*_SECONDS</code> values, which
+accept positive finite numbers. Invalid environment values fail closed.</p>
+<h2 id="generator-mcp-invocation-deadline">Generator MCP Invocation Deadline<a class="headerlink" href="#generator-mcp-invocation-deadline" title="Permanent link">&para;</a></h2>
+<p><code>TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS</code> defaults to <code>120</code> and accepts a
+finite positive number of seconds. Set it in the generator MCP client's <code>env</code>
+configuration and restart that server. The Compose generator service forwards
+the same variable from the shell or Compose <code>.env</code> file. Startup rejects invalid values with a
+value-free configuration error (exit 78). One captured value governs both the
+transport request context and service invocation; tool arguments cannot change it.</p>
+<p>For a reviewed longer run, for example set this value to <code>1800</code>. The independent
+<code>TEST_DATA_AGENT_MAX_GENERATION_SECONDS</code>, profiling and transformation byte/row/
+cell limits still apply; set the relevant limits explicitly too. This setting
+does not enlarge SQL access, raw frame, argument or response-byte ceilings and
+does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
+<code>TRINO_MAX_INVOCATION_SECONDS</code> setting.</p>
+<p><a id="private-transformation-input-limits-16-development"></a></p>
+<p><a id="transformation-input-limits-16-rc"></a></p>
+<h2 id="transformation-input-limits">Transformation Input Limits<a class="headerlink" href="#transformation-input-limits" title="Permanent link">&para;</a></h2>
+<p>These settings apply to transformation acquisition, decoding and policy-aware
+review preflight in stable <code>1.6.0</code>, plus CSV profiling/trace shape checks.
+They do not change source-free profiling/MCP budgets or themselves establish
+end-to-end capacity. Remaining pipeline caps still apply. The fictional private replacement-only CSV scenario
+passed 300,000 rows × 50 columns; see
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/12e9e272c98ea469cbef92fe9fae49c518046461/openspec/changes/selective-source-transformation/csv-scale-acceptance.md">candidate evidence</a>.
+This does not certify public execution, SQL routes or the 1M × 100 target.</p>
+<p>Use <code>resource_limits</code> in the saved <strong>behavior profile</strong> (not DatasetProfile):</p>
+<pre><code class="language-yaml">resource_limits:
+  max_input_rows: 1000000
+  max_input_columns: 100
+  max_input_cells: 100000000
+</code></pre>
+<p>For the current shell session, override a setting explicitly:</p>
+<pre><code class="language-sh">export TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_ROWS=1000000
+export TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_COLUMNS=100
+export TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_CELLS=100000000
+</code></pre>
+<p>For one invocation, prefix that invocation with the same <code>NAME=value</code>
+assignments instead of exporting them. No new public execution command is
+introduced here. In PowerShell, use
+<code>$env:TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_ROWS = '1000000'</code> for the session.</p>
+<table>
+<thead>
+<tr>
+<th>Behavior-profile key under <code>resource_limits</code></th>
+<th style="text-align: right;">Decoder default</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_input_rows</code></td>
+<td style="text-align: right;"><code>1000000</code></td>
+<td>rows</td>
+</tr>
+<tr>
+<td><code>max_input_columns</code></td>
+<td style="text-align: right;"><code>1000</code></td>
+<td>columns</td>
+</tr>
+<tr>
+<td><code>max_input_cells</code></td>
+<td style="text-align: right;"><code>100000000</code></td>
+<td>cells</td>
+</tr>
+<tr>
+<td><code>max_input_file_bytes</code></td>
+<td style="text-align: right;"><code>134217728</code></td>
+<td>bytes</td>
+</tr>
+<tr>
+<td><code>max_total_input_bytes</code></td>
+<td style="text-align: right;"><code>536870912</code></td>
+<td>combined snapshot bytes</td>
+</tr>
+<tr>
+<td><code>max_input_cell_chars</code></td>
+<td style="text-align: right;"><code>1000000</code></td>
+<td>characters</td>
+</tr>
+<tr>
+<td><code>max_parquet_expanded_bytes</code></td>
+<td style="text-align: right;"><code>536870912</code></td>
+<td>decoded/estimated expanded bytes</td>
+</tr>
+<tr>
+<td><code>max_output_bytes</code></td>
+<td style="text-align: right;"><code>536870912</code></td>
+<td>transformation output bytes</td>
+</tr>
+</tbody>
+</table>
+<p>Each key has a session variable named <code>TEST_DATA_AGENT_TRANSFORM_</code> followed by
+the uppercase key. Values must be positive integers no greater than
+<code>9223372036854775807</code>. Precedence, per explicitly supplied field: transformation
+session variable, saved behavior profile, legacy <code>TEST_DATA_AGENT_&lt;KEY&gt;</code> variable,
+decoder default. Invalid settings fail; they are not silently ignored.</p>
+<p>Structured limit failures identify <code>requested_above_limit</code> or <code>limit_exceeded</code>,
+the amount, threshold, unit, and origin (<code>session</code>, <code>profile</code>, <code>legacy_session</code>,
+or <code>default</code>). They name the exact session variable and saved-profile key to
+change. No data values are included; no automatic increase or truncation occurs.
+Trace requests above the effective cell limit fail with <code>requested_above_limit</code>
+instead of being silently capped. If the trace exhausts its smaller per-run
+budget, <code>limit_exceeded</code> reports origin <code>trace_run</code> and explicitly names
+<code>trace_csv_review_request(max_cells=...)</code> as the parameter to increase within
+the session/profile ceiling. Changing only the ceiling does not change that
+explicit per-run argument. Registered CLI/MCP request boundaries
+retain typed value-free limit failures. Increasing a decoder limit
+does not override the explicit total-input budget, downstream work/output
+budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.</p>
+<p>Transformation total-input accounting includes source, behavior policy,
+referenced mappings/generation policies, classification evidence and displayed
+review bytes. Read-only review resolves the same session/profile ceiling as the
+registered execution workflow; it does not silently request the default ceiling.
+Set <code>TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES</code> for the session or
+<code>resource_limits.max_total_input_bytes</code> in the saved behavior profile. The
+registered <code>transform-execute</code> CLI additionally accepts <code>--max-total-input-bytes</code>
+and the workspace-scoped <code>execute_transformation</code> tool accepts
+<code>max_total_input_bytes</code>. These implemented RC interfaces do not issue approval.
+Smaller explicit run caps report
+<code>snapshot_run</code>; a run cap above the configured ceiling is rejected, not raised.</p>
+<p>Transformation CSV character limits reach parsing, sensitivity detection and profile
+finalization. Internal CSV readers coordinate the stdlib process-global field
+limit for each record and restore its previous value even on failure. Each
+reader keeps its own limit; source-free readers retain legacy/default limits.
+External code directly changing <code>csv.field_size_limit</code> is outside this
+coordination. On parser overflow, the reported amount is the first forbidden
+character (<code>limit + 1</code>), not the length of an unread remainder of the field.</p>
+<p>Transformation CSV execution uses <code>resource_limits.max_output_bytes</code> or
+<code>TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES</code> as the output ceiling, distinct
+from input-file bytes. Its explicit <code>max_output_bytes</code> run argument must fit
+that ceiling; it is no longer silently capped at 128 MiB. Actual exhaustion
+reports origin <code>output_run</code>, the encoded byte count (including CSV header and
+quoting), and <code>replace_csv_snapshot(max_output_bytes=...)</code>. Partial output is
+not returned. Transformation SQL/Parquet encoding checks its <code>max_bytes</code> run argument
+and reports <code>sql_output_run</code> / <code>parquet_output_run</code> with the corresponding
+<code>render_transformation_sql(max_bytes=...)</code> /
+<code>render_transformation_parquet(max_bytes=...)</code> recovery parameter. Publication
+also counts the manifest: <code>bundle_run</code> names
+<code>temporary_csv_publication(max_output_bytes=...)</code>. A bundle over budget is
+rejected before publication. These share the output ceiling when invoked by
+the publisher; standalone renderers only receive their explicit run budget.
+Configured query capture uses the same transformation input ceilings:
+<code>max_rows</code> / <code>max_bytes</code> must fit the effective row / input-file-byte limits
+before opening its stream. Runtime exhaustion names <code>query_rows_run</code> or
+<code>query_bytes_run</code> and the corresponding <code>_capture_authorized_result</code> argument.
+Captured bytes include the query envelope; decoded bytes have their own
+<code>max_parquet_expanded_bytes</code> ceiling. The resolved limits and their origins
+are bound into capture metadata. PostgreSQL's owned stream uses these
+authorized capture limits, not aggregate-profiling result-row/cell budgets;
+allowlists, read-only sessions and existing statement/time limits remain.
+The private process supervisor reconstructs only validated fixed-schema limit
+diagnostics after clean worker exit and cleanup, never driver exception text.
+The registered RC workflow uses these checks; synthetic isolation evidence
+does not establish live-database acceptance.</p>
+<p>The private replacement dry-run has the same checks. Its exhausted run budget
+reports origin <code>replacement_trace_run</code> and names
+<code>trace_csv_replacements(max_cells=...)</code>; a request above the effective
+session/profile ceiling reports <code>requested_above_limit</code> before tracing.</p>
+<h2 id="local-csv-folder-profile-limits">Local CSV-Folder Profile Limits<a class="headerlink" href="#local-csv-folder-profile-limits" title="Permanent link">&para;</a></h2>
+<p>Each fresh local folder profile receives one typed monotonic budget. Its
+defaults are 120 seconds, at most 1,000,000 retained sample rows, 536,870,912
+input bytes, and 10,000,000 streamed cells. The byte and cell caps reuse
+<code>TEST_DATA_AGENT_MAX_TOTAL_INPUT_BYTES</code> and
+<code>TEST_DATA_AGENT_MAX_INPUT_CELLS</code>; the normal CLI sample is smaller at 50,000
+rows via <code>--rule-sample-rows</code>.</p>
+<p>The Python API can pass narrower <code>LocalProfileLimits</code> through a fresh
+<code>LocalProfileBudget</code>. Deadline, sample, byte, or cell exhaustion raises a
+structured <code>LocalProfileLimitError</code>. A failed profile is not written to the
+metadata-only cache.</p>
+<h2 id="postgresql-profiling">PostgreSQL Profiling<a class="headerlink" href="#postgresql-profiling" title="Permanent link">&para;</a></h2>
+<p><code>profile-postgres</code> requires <code>POSTGRES_ALLOWED_SCHEMAS</code>,
+<code>POSTGRES_ALLOWED_TABLES</code>, and <code>POSTGRES_ALLOWED_COLUMNS</code>. Connection settings
+use <code>POSTGRES_HOST</code>, <code>POSTGRES_PORT</code>, <code>POSTGRES_DATABASE</code>, <code>POSTGRES_USER</code>, and
+<code>POSTGRES_SSLMODE</code>. As an alternative to the host, port, database, and TLS
+components, <code>POSTGRES_JDBC_URL</code> accepts the credential-free
+<code>jdbc:postgresql://host:port/database?sslmode=verify-full</code> shape. This is URL
+syntax parsed into the existing Psycopg configuration, not a Java/JDBC runtime.
+Set <code>POSTGRES_PASSWORD_ENV</code> to the name of the environment variable containing
+the password; never put a user or password in the URL.
+The URL is limited to 4,096 UTF-8 bytes, its host to 253 characters, and its
+database identifier to 63 characters.</p>
+<p>Each <code>POSTGRES_ALLOWED_COLUMNS</code> item is either an exact
+<code>schema.table.column</code> or a table-qualified <code>schema.table.*</code>. Wildcards are
+expanded from bounded metadata into explicit columns before aggregate queries;
+they never become SQL projection stars or local-value permissions.</p>
+<p>The <code>POSTGRES_MAX_TABLES</code>, <code>POSTGRES_MAX_COLUMNS</code>, <code>POSTGRES_MAX_STATEMENTS</code>,
+<code>POSTGRES_MAX_RESULT_ROWS</code>, <code>POSTGRES_MAX_RESULT_CELLS</code>, and
+<code>POSTGRES_MAX_SECONDS</code> limits bound one profile. Statement and lock timeouts use
+<code>POSTGRES_STATEMENT_TIMEOUT_MS</code> and <code>POSTGRES_LOCK_TIMEOUT_MS</code>. See the
+<a href="../../how-to/postgresql/">PostgreSQL workflow</a> for a complete example.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POSTGRES_SOURCE_ID</code></td>
+<td><code>postgres</code></td>
+<td>Stable non-secret source identity used in qualified entity names</td>
+</tr>
+<tr>
+<td><code>POSTGRES_JDBC_URL</code></td>
+<td>unset</td>
+<td>Credential-free JDBC-style endpoint; conflicts with unequal explicit host, port, database, or TLS components</td>
+</tr>
+<tr>
+<td><code>POSTGRES_HOST</code></td>
+<td><code>localhost</code></td>
+<td>PostgreSQL host; never serialized into profile identity</td>
+</tr>
+<tr>
+<td><code>POSTGRES_PORT</code></td>
+<td><code>5432</code></td>
+<td>PostgreSQL port</td>
+</tr>
+<tr>
+<td><code>POSTGRES_DATABASE</code></td>
+<td><code>postgres</code></td>
+<td>Database name</td>
+</tr>
+<tr>
+<td><code>POSTGRES_USER</code></td>
+<td><code>test_data_agent</code></td>
+<td>Existing read-only database role</td>
+</tr>
+<tr>
+<td><code>POSTGRES_PASSWORD_ENV</code></td>
+<td>unset</td>
+<td>Name of the environment variable containing the password</td>
+</tr>
+<tr>
+<td><code>POSTGRES_SSLMODE</code></td>
+<td><code>verify-full</code></td>
+<td>Verify the certificate and configured hostname; weaker modes require explicit local opt-in</td>
+</tr>
+<tr>
+<td><code>POSTGRES_ALLOW_INSECURE</code></td>
+<td><code>false</code></td>
+<td>Required with <code>require</code>, <code>verify-ca</code>, or <code>disable</code>; local isolated testing only</td>
+</tr>
+<tr>
+<td><code>POSTGRES_ALLOWED_SCHEMAS</code></td>
+<td>required</td>
+<td>Comma-separated schema allowlist</td>
+</tr>
+<tr>
+<td><code>POSTGRES_ALLOWED_TABLES</code></td>
+<td>required</td>
+<td>Comma-separated <code>schema.table</code> allowlist</td>
+</tr>
+<tr>
+<td><code>POSTGRES_ALLOWED_COLUMNS</code></td>
+<td>required</td>
+<td>Comma-separated exact <code>schema.table.column</code> or table-qualified <code>schema.table.*</code> profiling selectors</td>
+</tr>
+<tr>
+<td><code>POSTGRES_STATEMENT_TIMEOUT_MS</code></td>
+<td><code>30000</code></td>
+<td>Per-statement timeout requested on the read-only session</td>
+</tr>
+<tr>
+<td><code>POSTGRES_LOCK_TIMEOUT_MS</code></td>
+<td><code>5000</code></td>
+<td>Lock wait timeout requested on the read-only session</td>
+</tr>
+<tr>
+<td><code>POSTGRES_MAX_TABLES</code></td>
+<td><code>100</code></td>
+<td>Maximum profiled tables</td>
+</tr>
+<tr>
+<td><code>POSTGRES_MAX_COLUMNS</code></td>
+<td><code>1000</code></td>
+<td>Maximum profiled columns</td>
+</tr>
+<tr>
+<td><code>POSTGRES_MAX_STATEMENTS</code></td>
+<td><code>1500</code></td>
+<td>Cumulative statement limit</td>
+</tr>
+<tr>
+<td><code>POSTGRES_MAX_RESULT_ROWS</code></td>
+<td><code>10000</code></td>
+<td>Cumulative aggregate/metadata result rows</td>
+</tr>
+<tr>
+<td><code>POSTGRES_MAX_RESULT_CELLS</code></td>
+<td><code>100000</code></td>
+<td>Cumulative aggregate/metadata result cells</td>
+</tr>
+<tr>
+<td><code>POSTGRES_MAX_SECONDS</code></td>
+<td><code>120</code></td>
+<td>Shared monotonic profile deadline</td>
+</tr>
+</tbody>
+</table>
+<p>The database role must independently lack write privileges. The client also
+requests <code>default_transaction_read_only=on</code>, but that setting is defense in
+depth rather than a replacement for role permissions. No arbitrary SQL or
+source-row profiling option exists.</p>
+<h2 id="sql-query-source-limits">SQL Query Source Limits<a class="headerlink" href="#sql-query-source-limits" title="Permanent link">&para;</a></h2>
+<p><code>profile-query</code> uses the selected adapter's existing connection, physical
+table/column allowlists, statement/result/time/scan budgets, and read-only
+enforcement. Trino query sources require <code>TRINO_ALLOWED_TABLE_COLUMNS</code>; an
+unrestricted Trino configuration is rejected for this command.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th style="text-align: right;">Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SQL_QUERY_MAX_BYTES</code></td>
+<td style="text-align: right;"><code>65536</code></td>
+<td>Maximum UTF-8 bytes in the local query file</td>
+</tr>
+<tr>
+<td><code>SQL_QUERY_MAX_AST_NODES</code></td>
+<td style="text-align: right;"><code>500</code></td>
+<td>Maximum parsed SQL nodes</td>
+</tr>
+<tr>
+<td><code>SQL_QUERY_MAX_AST_DEPTH</code></td>
+<td style="text-align: right;"><code>32</code></td>
+<td>Maximum parsed SQL nesting depth</td>
+</tr>
+<tr>
+<td><code>SQL_QUERY_MAX_PROJECTED_COLUMNS</code></td>
+<td style="text-align: right;"><code>100</code></td>
+<td>Maximum explicit fields after wildcard expansion</td>
+</tr>
+</tbody>
+</table>
+<p>Values must be positive integers and remain below the built-in absolute caps.
+The file is read once with descriptor metadata revalidation. SQL text and
+literals are not accepted through environment variables or CLI options and are
+not written to profiles, manifests, errors, providers, or MCP responses.</p>
+<h2 id="gigachat-advisor">GigaChat Advisor<a class="headerlink" href="#gigachat-advisor" title="Permanent link">&para;</a></h2>
+<p>GigaChat is explicit and off unless <code>agent-advise --provider gigachat</code> is
+selected. Configure exactly one runtime authentication value:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GIGACHAT_CREDENTIALS</code></td>
+<td>unset</td>
+<td>Authorization key used by the official SDK to obtain an access token</td>
+</tr>
+<tr>
+<td><code>GIGACHAT_ACCESS_TOKEN</code></td>
+<td>unset</td>
+<td>Pre-obtained short-lived access token; mutually exclusive with <code>GIGACHAT_CREDENTIALS</code></td>
+</tr>
+<tr>
+<td><code>GIGACHAT_SCOPE</code></td>
+<td><code>GIGACHAT_API_PERS</code></td>
+<td><code>GIGACHAT_API_PERS</code>, <code>GIGACHAT_API_B2B</code>, or <code>GIGACHAT_API_CORP</code></td>
+</tr>
+<tr>
+<td><code>GIGACHAT_CA_BUNDLE_FILE</code></td>
+<td>system trust store</td>
+<td>Absolute or relative path to a reviewed readable CA bundle</td>
+</tr>
+</tbody>
+</table>
+<p>Credentials are never accepted as CLI arguments or written to settings,
+workspaces, logs, or errors. The API and authorization endpoints are fixed to
+the official HTTPS services. TLS verification cannot be disabled; endpoint,
+client-certificate, SSL-context, or token-expiry overrides fail locally.</p>
+<p>The CLI exposes only the optional <code>--model</code> override. Applications that use
+the Python adapter can provide frozen <code>GigaChatAdvisorSettings</code> to narrow the
+default 4 MiB request, 1 MiB response, 4,096 output-token, 15-second timeout,
+and zero-retry budgets. See <a href="../../how-to/gigachat/">Use The GigaChat Advisor</a>.</p>
+<h2 id="generator-mcp">Generator MCP<a class="headerlink" href="#generator-mcp" title="Permanent link">&para;</a></h2>
+<p>See <a href="../mcp-permissions/">MCP Permissions</a> for the tool-by-tool rights matrix.
+These settings constrain application behavior; they do not grant operating-system
+access, database privileges or human approval. Ordinary MCP tool paths use the
+workspace; audit/authentication files and owned runtime temporary storage have
+separate configured locations.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Required</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TEST_DATA_AGENT_WORKSPACE_ROOT</code></td>
+<td>Recommended</td>
+<td>Bounds generator workspace tool paths; does not sandbox the process or relocate audit/authentication/runtime temporary files</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES</code></td>
+<td>Optional</td>
+<td>Maximum inline safe profile size; defaults to 4 MiB</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_AUDIT_LOG</code></td>
+<td>Optional</td>
+<td>Enables a shared HMAC-authenticated JSONL audit log</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_AUDIT_HMAC_KEY</code></td>
+<td>Required with audit log</td>
+<td>Base64 key containing at least 32 random bytes</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE</code></td>
+<td>Alternative to key value</td>
+<td>Path to a bounded base64 secret file</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_AUDIT_ACTOR</code></td>
+<td>Optional</td>
+<td>Stable non-sensitive worker or deployment label</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_AUDIT_MAX_BYTES</code></td>
+<td>Optional</td>
+<td>Audit log size limit; defaults to 64 MiB</td>
+</tr>
+</tbody>
+</table>
+<p>When unset, the generator server uses the current working directory. For shared
+or production-like use, always set a dedicated narrow workspace.</p>
+<p>Configure exactly one of <code>TEST_DATA_AGENT_AUDIT_HMAC_KEY</code> and
+<code>TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE</code>. Secret files must be regular,
+non-linked, at most 4096 bytes, and not group- or world-writable.</p>
+<h2 id="trino-mcp">Trino MCP<a class="headerlink" href="#trino-mcp" title="Permanent link">&para;</a></h2>
+<p>The default aggregate-only tools are source-literal-free. The explicit opt-in
+row-returning tools are configured separately. Both servers use stdio, with no
+MCP HTTP listener or per-tool OAuth scopes. Trino database authentication and
+client tool-confirmation policy remain separate:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRINO_ENABLE_SAFE_SELECT</code></td>
+<td><code>false</code></td>
+<td>Enables <code>run_safe_select</code>; every returned string is recursively masked in bounded composite values, but other non-string source values may remain outside the source-literal-free guarantee</td>
+</tr>
+</tbody>
+</table>
+<h2 id="trino-connection">Trino Connection<a class="headerlink" href="#trino-connection" title="Permanent link">&para;</a></h2>
+<p>Use <code>TRINO_JDBC_URL</code> as an alternative to separate host and port settings. Its
+supported form is <code>jdbc:trino://host:port/catalog/schema?SSL=true</code>. Catalog and
+schema are optional request defaults and are accepted only when each is in the
+mandatory allowlist. Authentication remains in <code>TRINO_USER</code> and existing
+runtime secret mechanisms; URL credentials, tokens, roles, session properties,
+headers, proxies, unknown properties, and <code>SSL=false</code> are rejected. The URL is
+parsed into the existing Python Trino client and does not load Java or a JDBC
+driver.
+The URL is limited to 4,096 UTF-8 bytes, its host to 253 characters, and each
+catalog or schema identifier to 255 characters.</p>
+<p>For a complete MCP username/password configuration, including protected password
+injection and a macOS Keychain launcher, follow
+<a href="../../how-to/trino/#mcp-with-a-username-and-password">MCP with a username and password</a>
+or the <a href="../../ru/how-to/trino/#trino-mcp-basic">Russian guide</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRINO_JDBC_URL</code></td>
+<td>unset</td>
+<td>Credential-free JDBC-style endpoint; conflicts with unequal explicit endpoint/default components</td>
+</tr>
+<tr>
+<td><code>TRINO_HOST</code></td>
+<td><code>localhost</code></td>
+<td>Trino host name</td>
+</tr>
+<tr>
+<td><code>TRINO_PORT</code></td>
+<td><code>8080</code></td>
+<td>Trino port</td>
+</tr>
+<tr>
+<td><code>TRINO_USER</code></td>
+<td><code>test_data_agent</code></td>
+<td>Trino user</td>
+</tr>
+<tr>
+<td><code>TRINO_HTTP_SCHEME</code></td>
+<td><code>https</code></td>
+<td><code>https</code> or explicitly allowed <code>http</code></td>
+</tr>
+<tr>
+<td><code>TRINO_AUTH_METHOD</code></td>
+<td><code>none</code></td>
+<td>Optional methods in stable <code>1.6.0</code>: <code>basic</code>, <code>jwt</code>, <code>kerberos</code>, <code>gssapi</code>, <code>oauth2</code>, <code>certificate</code>; authenticated connections require HTTPS and certificate verification</td>
+</tr>
+<tr>
+<td><code>TRINO_AUTH_SECRET_ENV</code></td>
+<td>unset</td>
+<td>Name of a runtime environment variable containing the Basic password or JWT, not the secret itself</td>
+</tr>
+<tr>
+<td><code>TRINO_AUTH_CERTIFICATE_ENV</code></td>
+<td>unset</td>
+<td>Name of a runtime environment variable containing the client certificate path</td>
+</tr>
+<tr>
+<td><code>TRINO_AUTH_KEY_ENV</code></td>
+<td>unset</td>
+<td>Name of a runtime environment variable containing the private-key path</td>
+</tr>
+<tr>
+<td><code>TRINO_CATALOG</code></td>
+<td>unset</td>
+<td>Optional request default; must be in <code>TRINO_ALLOWED_CATALOGS</code></td>
+</tr>
+<tr>
+<td><code>TRINO_SCHEMA</code></td>
+<td>unset</td>
+<td>Optional request default; requires <code>TRINO_CATALOG</code> and membership in <code>TRINO_ALLOWED_SCHEMAS</code></td>
+</tr>
+<tr>
+<td><code>TRINO_ALLOWED_CATALOGS</code></td>
+<td>required</td>
+<td>Comma-separated catalog allowlist</td>
+</tr>
+<tr>
+<td><code>TRINO_ALLOWED_SCHEMAS</code></td>
+<td>required</td>
+<td>Comma-separated schema allowlist</td>
+</tr>
+<tr>
+<td><code>TRINO_ALLOWED_TABLE_COLUMNS</code></td>
+<td>unset</td>
+<td>Optional exact <code>catalog.schema.table.column</code> or restricted table-qualified <code>catalog.schema.table.*</code> profile selectors; wildcard does not authorize category literals</td>
+</tr>
+<tr>
+<td><code>TRINO_REQUEST_TIMEOUT_SECONDS</code></td>
+<td><code>30</code></td>
+<td>Client request timeout, <code>0.1</code> to <code>300</code></td>
+</tr>
+<tr>
+<td><code>TRINO_MAX_RESULT_ROWS</code></td>
+<td><code>10000</code></td>
+<td>Client result cap, maximum <code>100000</code></td>
+</tr>
+<tr>
+<td><code>TRINO_QUERY_MAX_EXECUTION_TIME</code></td>
+<td><code>30s</code></td>
+<td>Trino execution-time session budget</td>
+</tr>
+<tr>
+<td><code>TRINO_QUERY_MAX_RUN_TIME</code></td>
+<td><code>45s</code></td>
+<td>Trino total run-time session budget</td>
+</tr>
+<tr>
+<td><code>TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES</code></td>
+<td><code>1GB</code></td>
+<td>Trino physical scan budget</td>
+</tr>
+<tr>
+<td><code>TRINO_DEPLOYMENT_PROFILE</code></td>
+<td><code>trusted-local</code></td>
+<td><code>trusted-local</code> permits an unset cumulative scan ceiling; <code>shared-hardened</code> requires a finite <code>TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES</code></td>
+</tr>
+</tbody>
+</table>
+<p>The Kerberos/GSSAPI methods require their driver's optional
+<code>requests_kerberos</code> / <code>requests_gssapi</code> dependencies and existing runtime
+credentials. They use mutual authentication without delegation.
+<code>profile-query --adapter trino --trino-oauth-browser</code> explicitly opts
+into opening the configured Trino HTTPS authentication route at a local terminal
+when <code>TRINO_AUTH_METHOD=oauth2</code>. It never prints authentication URLs; pipes reject
+before connection. This is a local-only flag; MCP never installs a
+browser callback.
+Python applications can explicitly supply their own trusted redirect callback.
+The auth object is reused within one client; OAuth token caching remains the
+driver's implementation, including its optional operating-system keyring backend.
+These local checks do not prove remote reachability or authorize live access.</p>
+<p>The OAuth2 HTTP adapter also guards the driver's direct token polling:
+requests must target the configured HTTPS Trino host and port, use verified TLS,
+and fit the remaining invocation/request deadline. Environment proxies and netrc
+are not inherited. Other token-server origins fail closed; this is not evidence
+of acceptance against a remote identity provider or a hard wall-clock guarantee
+for arbitrary slow response bodies.
+Selecting OAuth2 installs idempotent value-free diagnostic filters on
+<code>trino.auth</code> and <code>urllib3.connectionpool</code>; the latter can log token request paths
+at DEBUG. These filters remain attached for the process lifetime, including
+other traffic using those loggers. They neither store secrets nor disable the
+process logger or change its level.</p>
+<p>Duration values use <code>ms</code>, <code>s</code>, <code>m</code>, or <code>h</code>. Data-size values use <code>B</code>, <code>kB</code>,
+<code>MB</code>, or <code>GB</code>.</p>
+<p><code>TRINO_QUERY_MAX_RUN_TIME</code> must be greater than or equal to
+<code>TRINO_QUERY_MAX_EXECUTION_TIME</code>.</p>
+<p>When <code>TRINO_ALLOWED_TABLE_COLUMNS</code> is set, table profiling uses only its exact
+selectors plus metadata-expanded columns from a matching table wildcard. The
+request fails before aggregate work when metadata is empty, malformed,
+duplicated, inconsistent, or over the invocation column budget.</p>
+<p>This selector is not a universal per-tool ACL: metadata discovery,
+count/cardinality tools, rule probes and optional <code>run_safe_select</code> do not apply
+it. The optional row tool checks catalog/schema scope and SQL safety, not this
+column list. Restrict the database identity's actual table/column grants
+independently. Catalog and schema
+allowlists are independent sets, not allowed catalog/schema pairs. See
+<a href="../mcp-permissions/#trino-tool-rights">Trino tool rights</a>.</p>
+<h2 id="trino-invocation-limits">Trino Invocation Limits<a class="headerlink" href="#trino-invocation-limits" title="Permanent link">&para;</a></h2>
+<p>These limits apply to one MCP tool invocation, including nested table and
+column profiling. Every invocation receives a fresh monotonic budget.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th style="text-align: right;">Default</th>
+<th>Unit</th>
+<th>Scope</th>
+<th>Failure behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRINO_MAX_INVOCATION_PROFILED_COLUMNS</code></td>
+<td style="text-align: right;"><code>100</code></td>
+<td>columns</td>
+<td>Per invocation</td>
+<td>Rejects before profiling the next column</td>
+</tr>
+<tr>
+<td><code>TRINO_MAX_INVOCATION_STATEMENTS</code></td>
+<td style="text-align: right;"><code>150</code></td>
+<td>statements</td>
+<td>Per invocation</td>
+<td>Rejects before opening the next Trino connection</td>
+</tr>
+<tr>
+<td><code>TRINO_MAX_INVOCATION_SECONDS</code></td>
+<td style="text-align: right;"><code>120</code></td>
+<td>seconds</td>
+<td>Per invocation</td>
+<td>Clamps HTTP and Trino query timeouts; closes active query resources on expiry</td>
+</tr>
+<tr>
+<td><code>TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES</code></td>
+<td style="text-align: right;">unset</td>
+<td>bytes</td>
+<td>Per invocation; required for <code>shared-hardened</code></td>
+<td>Rejects before a statement whose conservative estimate would exceed the limit</td>
+</tr>
+</tbody>
+</table>
+<p>All configured values must be finite and positive. Column, statement, and scan
+limits accept integers; invocation seconds accepts a number. Invalid values
+fail server startup. The <code>shared-hardened</code> profile fails closed when the
+cumulative scan ceiling is unset. Budget exhaustion raises a bounded query-work error and
+does not restore work already consumed by nested helpers.</p>
+<p>The typed budget also keeps <code>database_result_bytes</code> and
+<code>transport_response_bytes</code> separate; each defaults to <code>4 MiB</code> in the Trino MCP
+work limits. The transport limit is measured in UTF-8 bytes after final MCP
+JSON serialization and framing, at the production writer boundary. Its
+minimum is <code>350</code> bytes: that fixed amount is reserved for the bounded terminal
+error response, so normal responses can use at most the configured total minus
+the reserve. A related notification and its final response share the same
+per-invocation budget.</p>
+<p><code>TRINO_QUERY_MAX_EXECUTION_TIME</code>, <code>TRINO_QUERY_MAX_RUN_TIME</code>, and
+<code>TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES</code> remain per-query limits. The invocation
+deadline clamps the two per-query time limits and <code>TRINO_REQUEST_TIMEOUT_SECONDS</code>
+to the remaining invocation time. When the optional cumulative scan limit is
+set, each statement conservatively consumes the configured per-query
+<code>TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES</code> cap. Leaving the cumulative cap unset is
+allowed only for the explicitly named <code>trusted-local</code> profile; the
+<code>shared-hardened</code> profile requires a finite cap before startup.</p>
+<h2 id="explicit-safety-overrides">Explicit Safety Overrides<a class="headerlink" href="#explicit-safety-overrides" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRINO_ALLOW_UNRESTRICTED</code></td>
+<td><code>false</code></td>
+<td>Allows missing catalog/schema allowlists</td>
+</tr>
+<tr>
+<td><code>TRINO_ALLOW_INSECURE_HTTP</code></td>
+<td><code>false</code></td>
+<td>Allows plain HTTP</td>
+</tr>
+</tbody>
+</table>
+<p>These accept <code>1</code>, <code>true</code>, <code>yes</code>, or <code>on</code> and their false equivalents.</p>
+<p>Do not enable either override for production or production-adjacent Trino.
+Plain HTTP is intended only for an isolated local integration environment.</p>
+<p><a id="configured-sql-session-bounds-16-rc"></a></p>
+<h2 id="configured-sql-session-bounds">Configured SQL Session Bounds<a class="headerlink" href="#configured-sql-session-bounds" title="Permanent link">&para;</a></h2>
+<p>The generator MCP entrypoint reads these administrator settings once at startup.
+They bound the instance-owned <code>configured_query_session</code> manager, not ordinary
+source-free profiling or database credentials. Published 1.5.0 has no session
+tool. Invalid settings or workspace paths stop startup with a fixed error and
+exit code 78.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th style="text-align: right;">Default</th>
+<th>Accepted values and meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TEST_DATA_AGENT_QUERY_SESSION_MAX_ACTIVE</code></td>
+<td style="text-align: right;"><code>4</code></td>
+<td>Integer 1–32; maximum simultaneously owned sessions.</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_QUERY_SESSION_MAX_CUMULATIVE_BYTES</code></td>
+<td style="text-align: right;"><code>67108864</code></td>
+<td>Positive integer through 9223372036854775807; lifetime input-byte reservation ceiling for this server instance.</td>
+</tr>
+<tr>
+<td><code>TEST_DATA_AGENT_QUERY_SESSION_MAX_SECONDS</code></td>
+<td style="text-align: right;"><code>300</code></td>
+<td>Finite seconds 0.1–3600; session lifetime starts before capture and is never renewed by requests.</td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>open</code> reserves its explicit <code>max_total_bytes</code> before database work.
+Reservations are not refunded after failure, close or expiry. Per-input policy
+and transformation session ceilings still apply, as do SQL allowlists and
+statement, scan, invocation, transport and response budgets. Active operations
+are clamped to the session's remaining lifetime and request deadline.
+<code>max_review_bytes</code> must be positive and no greater than <code>max_total_bytes</code>; the
+output cap must fit the effective batch output ceiling. Expiry timers clean
+owned snapshots without requiring another request. The entrypoint also closes
+all sessions on normal or failed transport shutdown; cleanup failures refuse
+further work. See <a href="../../how-to/mcp/#configured-sql-sessions-16-rc">the session workflow</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

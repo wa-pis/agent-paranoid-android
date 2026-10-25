@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/generation-contract-migration/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Generation Contract Corrections - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Generation Contract Corrections";
+        var mkdocs_page_input_path = "reference/generation-contract-migration.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/generation-contract-migration/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Generation Contract Corrections</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/generation-contract-migration.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/reference/generation-contract-migration/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="generation-contract-corrections">Generation Contract Corrections<a class="headerlink" href="#generation-contract-corrections" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/reference/generation-contract-migration/">Русский</a></p>
+<p>These corrections are included in stable <code>1.6.0</code>. Regenerate affected fixtures
+and review differences when upgrading. Package version and DatasetSpec schema
+version are separate; the current specification schema is <code>1.1</code>.</p>
+<h2 id="changed-results">Changed Results<a class="headerlink" href="#changed-results" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Formula dependencies are computed before their consumers, regardless of list
+  order. Cycles and multiple assignments to the same formula target fail early.</li>
+<li>Constraints and relationships marked <code>rejected</code> are ignored by generation and
+  validation. Existing <code>inferred</code> rules in an explicitly supplied specification
+  remain executable; the agent workflow still requires fingerprint approval.
+  Remove or revise active aggregate mappings that depend on a rejected link;
+  they fail validation instead of being silently skipped.</li>
+<li>Nullable foreign keys preserve generated nulls. One-to-one capacity counts
+  only non-null child references. Required identifiers cannot be empty or null.</li>
+<li>String-pattern lengths describe the entire string, including any synthetic
+  prefix. Short non-sensitive strings use random characters where a prefix does
+  not fit. A required string cannot have a zero maximum length.</li>
+</ul>
+<p>Regenerate affected fixtures and review resulting differences. A fixed seed
+remains reproducible within the recorded generator version and environment;
+it does not promise identical bytes across this upgrade.</p>
+<h2 id="publication-and-validation">Publication And Validation<a class="headerlink" href="#publication-and-validation" title="Permanent link">&para;</a></h2>
+<p>Valid, edge, and load-test generation must pass all core schema, relationship,
+constraint, and privacy checks before returning rows or publishing output.
+Turning off report sections does not disable these generation checks. Business
+rule mutations are checked again before publication. Failures preserve existing
+output and do not publish a new successful bundle.</p>
+<p>Explicit mixed and negative generation still publish controlled-invalid data
+with validation evidence. Parquet uses explicitly marked scalar columns
+when intentionally malformed cells cannot fit native Arrow types. The bundle
+reader restores those cells for validation; consumers reading Parquet directly
+must inspect the <code>apa.scalar_encoding</code> field metadata. Ordinary valid-mode
+values incompatible with declared types still reject the whole export without
+partial publication. Row privacy remains mandatory in every mode.
+The RC5 CLI reports <code>validation_failed</code> with exit 1 for intentionally
+invalid results while retaining the representable output, manifest and report.
+Explicit mode/ratio overrides must be reflected in effective execution evidence;
+an invalid artifact is not a successful validation.
+Standalone <code>validate</code> now inspects row values when its privacy section is
+enabled, in addition to checking specification safety. CSV numeric values are
+interpreted using their declared numeric type before privacy classification.
+This decoding exception applies to revalidation only; generated formula and
+business-rule strings retain the strict pre-export privacy check.</p>
+<p>These checks detect recognizable sensitive strings using the existing synthetic
+namespace policy. They do not certify anonymity or prove that data has never
+come from a source. Keep the source-row checks and organization-specific review.</p>
+<p>The solver does not search for a solution to arbitrary interacting rules. If
+later temporal, conditional, or aggregate changes invalidate an earlier rule,
+the operation fails; revise the specification rather than consuming partial
+output. Numeric sampling remains uniform between configured bounds and foreign
+key assignment remains round-robin among non-null child rows. These are not
+claims of preserving correlations or source fan-out distributions.</p>
+<h2 id="additive-validation-utility-evidence">Additive validation utility evidence<a class="headerlink" href="#additive-validation-utility-evidence" title="Permanent link">&para;</a></h2>
+<p>New reports add <code>utility</code> with the canonical effective-spec hash, active native
+relationship/temporal declaration counts and executed/not-declared/not-run status.
+Temporal metrics add generated checked/failing row counts. Existing validity,
+settings, section errors and relationship metrics retain their semantics. Old
+saved reports without <code>utility</code> remain accepted. JSON consumers that enforce
+exact keys must admit this new optional field.</p>
+<p>Generated row values, DatasetSpec versions and existing profile/spec hashes are
+unchanged. Serialized validation reports and their manifest output digests do
+change. Compare replayed rows separately from report byte identity across this
+upgrade; the new contract fixtures record the intentional report changes.
+Unknown source fidelity, fan-out and missing relationship coverage remain
+unknown. No source queries, new authorization, dependency, package publication
+or completed release-candidate acceptance is implied.</p>
+<h3 id="parquet-distinctness-evidence">Parquet distinctness evidence<a class="headerlink" href="#parquet-distinctness-evidence" title="Permanent link">&para;</a></h3>
+<p>Reprofile Parquet sources to obtain bounded non-null distinctness. Old profiles
+retain unknown values. Newly profiled scalar columns may have <code>exact</code> or
+<code>lower_bound</code> unique-ratio evidence using existing schema fields; changed profile
+fingerprints require fresh plan review. This adds no primary-key nomination,
+identifier pool or source key reuse. Missing null metadata still blocks automatic
+spec inference. Existing dataset/profile schema versions remain unchanged.</p>
+<h3 id="long-fractional-datetime-intervals">Long fractional datetime intervals<a class="headerlink" href="#long-fractional-datetime-intervals" title="Permanent link">&para;</a></h3>
+<p>Datetime range sampling now computes its whole-second span with integer
+arithmetic. Very long fractional intervals previously could round the maximum
+admissible offset up and exceed the upper bound by a microsecond. Replaying such
+an affected specification may produce different values after upgrading; compare
+the manifest's generator version. The existing second-resolution policy,
+missing-bound fallbacks and schema version are unchanged. This does not add
+monthly/calendar inference or certify source-period fidelity.</p>
+<p>A partial date/time bound must also be compatible with the existing missing
+endpoint defaults (minimum 2020-01-01, maximum 2025-01-01). A maximum before
+2020 or minimum after 2025 now rejects instead of silently clamping an inverted
+interval. Supply both ordered bounds for earlier or later periods. Failure leaves
+previous dataset artifacts unchanged and publishes no new manifest.</p>
+<h2 id="csv-numeric-replacement-evidence">CSV numeric replacement evidence<a class="headerlink" href="#csv-numeric-replacement-evidence" title="Permanent link">&para;</a></h2>
+<p>Reprofile CSV folders to replace cache format 7 with format 8. Ambiguous numeric
+phone-like fields may now include optional <code>numeric_storage_type</code>; sensitivity
+and masked patterns are unchanged. Old ambiguous profiles cannot opt into a
+numeric replacement without fresh storage evidence. Independently authored
+<code>numeric_measure</code> decimal ranges use the existing <code>infer-spec --decimal-fields</code>
+contract. Re-review changed profile/spec fingerprints. In an awaiting-approval workspace,
+copy the reviewed field while preserving planned generation settings, run
+<code>agent-review</code> and approve the new fingerprint. Do not mutate an already approved
+plan; replan changed source/profile evidence. DatasetSpec version 1.1 and unaffected legacy hashes
+remain unchanged; see <a href="../profiling/#reviewed-csv-numeric-replacements">profiling</a>.</p>
+<h2 id="query-summary-batching">Query-summary batching<a class="headerlink" href="#query-summary-batching" title="Permanent link">&para;</a></h2>
+<p>Query-source summary batching changes trusted internal SQL and request counts,
+not profile/spec schemas. Fixed aggregate evidence keeps the same profile
+fingerprint; there is no silent reclassification or saved-plan promotion.
+Existing statement, scan, result and time limits remain enforced independently.
+Real source changes still require normal profile review.</p>
+<h2 id="optional-conditional-formulas">Optional conditional formulas<a class="headerlink" href="#optional-conditional-formulas" title="Permanent link">&para;</a></h2>
+<p>Formula rules add optional <code>when</code> with the existing typed Condition semantics.
+Absent/null predicates serialize as omitted and retain prior hashes and seeded
+behavior. Reports add eligible/evaluated/skipped counters only for conditional
+formulas; strict consumers should accept these additive counters. DatasetSpec
+stays at 1.1. Reviewed conditional branches change the rules/spec fingerprint
+and require renewed plan review. Conditional writer conflicts reject before
+publication; no existing source access or privacy permission is expanded.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

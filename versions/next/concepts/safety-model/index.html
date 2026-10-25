@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/concepts/safety-model/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Safety Model - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Safety Model";
+        var mkdocs_page_input_path = "concepts/safety-model.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/concepts/safety-model/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Safety Model</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#trust-boundaries">Trust Boundaries</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#defenses">Defenses</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#sensitive-data">Sensitive data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#source-row-reuse">Source-row reuse</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#filesystem">Filesystem</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#trino">Trino</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#postgresql">PostgreSQL</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resource-limits">Resource limits</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-the-project-guarantees">What The Project Guarantees</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-it-does-not-guarantee">What It Does Not Guarantee</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#acceptance-checklist">Acceptance Checklist</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#configured-sql-transformation-sessions">Configured SQL Transformation Sessions</a>
+    </li>
+        </ul>
+    </li>
+    </ul></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Safety Model</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/concepts/safety-model.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/concepts/safety-model/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="safety-model">Safety Model<a class="headerlink" href="#safety-model" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/concepts/safety-model/">Русский</a></p>
+<p>The central invariant is:</p>
+<blockquote>
+<p>Generated output must contain newly generated values, not copied source rows.</p>
+</blockquote>
+<p>Source data may be read to derive bounded metadata. It is not used as a pool of
+rows to shuffle, duplicate, or export.</p>
+<h2 id="trust-boundaries">Trust Boundaries<a class="headerlink" href="#trust-boundaries" title="Permanent link">&para;</a></h2>
+<p>Selective transformation is a separate mixed-origin surface in stable <code>1.6.0</code>. Its <a href="../../reference/cli/#implemented-rc-execution-candidate">execution and approval contract</a>
+requires local interactive approval of exact input/review bytes before any
+explicitly non-sensitive field can be preserved. Agent execution can only
+consume an existing matching receipt; it cannot issue or broaden approval.
+Sensitivity conflicts, unknown fields and default DECIMAL preservation remain
+blocked. Receipt integrity does not prove personhood or anonymity. Existing
+generation, profiling and default responses retain their source-free contracts.
+Private implementation review does not activate public registration.</p>
+<p>Treat all of these as untrusted:</p>
+<ul>
+<li>CSV, JSON, YAML, and Parquet files;</li>
+<li>paths supplied to CLI or MCP tools;</li>
+<li>profile payloads supplied by another process;</li>
+<li>business-rule files and inline rule payloads;</li>
+<li>Trino identifiers, metadata, query results, and environment variables;</li>
+<li>PostgreSQL and Trino JDBC-style endpoint strings;</li>
+<li>local PostgreSQL and Trino SQL query-source files;</li>
+<li>output directories that may contain symlinks or existing files.</li>
+</ul>
+<h2 id="defenses">Defenses<a class="headerlink" href="#defenses" title="Permanent link">&para;</a></h2>
+<h3 id="sensitive-data">Sensitive data<a class="headerlink" href="#sensitive-data" title="Permanent link">&para;</a></h3>
+<p>Likely PII and secrets are detected from both field names and values. Sensitive
+columns suppress raw top values and expose masked patterns or aggregate metadata
+instead. Sensitive examples use an opaque placeholder rather than intentionally
+preserving source values. Non-sensitive category profiles replace source values
+with ranked synthetic labels by default. An explicit field-scoped local
+allowlist may preserve only a reviewed bounded non-sensitive business enum or
+constant after content, cardinality, and value-length checks. Rare free text,
+PII, secrets, identifiers, and quasi-identifiers are never eligible.</p>
+<p>Approved exact values may appear only in local profiles, reviewed specs,
+deterministic generated rows, and local SQL export. External providers receive
+field-scoped labels, and default MCP responses, logs, and public errors remain
+source-literal free.</p>
+<h3 id="source-row-reuse">Source-row reuse<a class="headerlink" href="#source-row-reuse" title="Permanent link">&para;</a></h3>
+<p>Generation uses a reviewed specification and a local seeded random generator.
+Runtime checks reject exact source-row reuse in supported CSV workflows.
+The comparison covers complete rows only and runs only when the source CSV is
+available to that workflow. It does not detect every partial-value,
+quasi-identifier, or statistical similarity between source and output.</p>
+<h3 id="filesystem">Filesystem<a class="headerlink" href="#filesystem" title="Permanent link">&para;</a></h3>
+<p>Input and output paths must be distinct. New bundles are assembled in a
+temporary sibling directory and published only after size and validation
+checks. Workspace-bound MCP paths reject traversal and symlink escapes.</p>
+<h3 id="trino">Trino<a class="headerlink" href="#trino" title="Permanent link">&para;</a></h3>
+<p>Trino access is read-only, allowlisted, bounded by client row limits and
+server-side time and scan budgets. Unsafe query shapes and likely sensitive
+projections are rejected before execution. The default aggregate-only tools
+return only source-literal-free metadata and aggregates. The explicit opt-in
+row-returning tool <code>run_safe_select</code> recursively masks every returned string in
+bounded scalar or composite values and any non-string field or value recognized
+as sensitive. Other non-string source values may remain, so those rows are not
+source-free or anonymous.</p>
+<h3 id="postgresql">PostgreSQL<a class="headerlink" href="#postgresql" title="Permanent link">&para;</a></h3>
+<p>Direct PostgreSQL profiling uses the optional driver through a forced
+read-only session. Schema, table, and column allowlists are mandatory, and one
+shared statement/result/deadline budget bounds metadata and aggregate queries.
+Normal table profiling accepts no caller SQL and reads no source rows.
+<code>profile-query</code> is a separate local-file surface for one strictly parsed,
+single-table, fully allowlisted <code>SELECT</code>. Adapter-owned no-row schema and
+aggregate queries profile its virtual relation without fetching result rows.
+The profile stores a SHA-256 fingerprint and policy version, never query text,
+query literals, backend messages, endpoints, or source rows. Qualified local
+category selectors may retain only values that pass the selective local policy
+above.</p>
+<p>PostgreSQL <code>schema.table.*</code> and Trino <code>catalog.schema.table.*</code> column selectors
+are authorization syntax, not SQL. They are expanded from bounded metadata for
+one exact allowed table into a deterministic explicit-column snapshot before
+aggregates run. They do not authorize source rows, local exact values, category
+literals, caller projection stars, providers, default MCP literals, logs, or
+errors.</p>
+<p>PostgreSQL and Trino may accept credential-free JDBC-style endpoint syntax.
+Parsing happens before client construction and rejects userinfo, secrets,
+session-changing or unknown properties, malformed escapes, ambiguous paths,
+and conflicting component configuration. The complete URL is discarded after
+normalization and is never written to profiles, manifests, MCP responses,
+provider payloads, logs, or public errors.</p>
+<h3 id="resource-limits">Resource limits<a class="headerlink" href="#resource-limits" title="Permanent link">&para;</a></h3>
+<p>The project limits input bytes, rows, columns, cells, YAML complexity, Parquet
+expansion, generated rows, output bytes, available disk reserve, rule work,
+query work, and wall-clock generation time.</p>
+<h2 id="what-the-project-guarantees">What The Project Guarantees<a class="headerlink" href="#what-the-project-guarantees" title="Permanent link">&para;</a></h2>
+<p>For supported synthetic-generation workflows and accepted inputs, the project
+is designed to:</p>
+<ul>
+<li>avoid copying complete source rows;</li>
+<li>avoid writing raw detected PII into safe profiles;</li>
+<li>regenerate identifiers and sensitive semantic values;</li>
+<li>produce logically deterministic output for the same spec, rules, seed,
+  locale, runtime, dependencies, serializer, and generator version;</li>
+<li>validate schema, relationships, constraints, and business rules;</li>
+<li>record provenance and safety flags in a generation manifest.</li>
+</ul>
+<p>The manifest records those effective inputs plus SHA-256 evidence for generated
+artifacts. Byte-for-byte identity is expected only when the complete recorded
+environment is unchanged. It is not guaranteed across Python, dependency,
+serializer, operating-system, or package versions, even when logical values and
+validation results remain equivalent.</p>
+<h2 id="what-it-does-not-guarantee">What It Does Not Guarantee<a class="headerlink" href="#what-it-does-not-guarantee" title="Permanent link">&para;</a></h2>
+<p>The project cannot decide whether every ambiguous business field is sensitive.
+It also cannot prove that an inferred distribution is legally or statistically
+safe for every use case. The project does not currently implement differential
+privacy, k-anonymity, l-diversity, or a privacy budget, and makes no statistical
+privacy guarantee. Treat generated data as requiring a domain-specific privacy
+review before distribution.</p>
+<p>Human review is still required for:</p>
+<ul>
+<li>domain-specific identifiers and rare free text;</li>
+<li>inferred relationships and constraints;</li>
+<li>privacy requirements outside the built-in detectors;</li>
+<li>organization-specific retention and access controls;</li>
+<li>downstream systems that may log or redistribute generated data.</li>
+</ul>
+<p>Do not send production data, raw PII, credentials, or tokens to an LLM while
+reviewing profiles or specifications.</p>
+<h2 id="acceptance-checklist">Acceptance Checklist<a class="headerlink" href="#acceptance-checklist" title="Permanent link">&para;</a></h2>
+<p>Before publishing a generated dataset:</p>
+<p>This checklist applies to synthetic generation, not the gated mixed-origin
+transformation workflow. A transformed bundle must not be relabelled synthetic
+merely because validation passed: its action provenance and any matching local
+preservation receipt remain separate requirements.</p>
+<ul>
+<li>manifest says <code>synthetic: true</code>;</li>
+<li>manifest says <code>source_rows_copied: false</code>;</li>
+<li>deterministic validation passed;</li>
+<li>business validation passed when rules were used;</li>
+<li>seed, row counts, format, and fingerprints are correct;</li>
+<li>profile and generated samples contain no unexpected sensitive values;</li>
+<li>the output is stored outside the source path.</li>
+</ul>
+<p>See <a href="../../getting-started/review-output/">Review The Output</a> for the practical
+review sequence.</p>
+<h3 id="configured-sql-transformation-sessions">Configured SQL Transformation Sessions<a class="headerlink" href="#configured-sql-transformation-sessions" title="Permanent link">&para;</a></h3>
+<p>The separately selected configured query workflow captures one allowlisted read-only
+result using administrator configuration, then reviews and validates frozen
+local bytes without reconnecting. It does not expand ordinary profiling or
+source-free generation authority. MCP returns only metadata and consumes an
+existing exact local controlling-TTY receipt when preservation requires one;
+it cannot issue approval. Session handles expire without recapture, owned raw
+inputs/receipts are removed, and only validated selected output is retained.
+Cleanup failure refuses further work. Registration is not data access permission
+or final exact-SHA security/release clearance.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../profiles-and-specs/" class="btn btn-neutral float-left" title="Profiles And Specs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../operations/troubleshooting/" class="btn btn-neutral float-right" title="Troubleshooting">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../profiles-and-specs/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../operations/troubleshooting/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

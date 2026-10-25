@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/concepts/threat-model/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Threat Model - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Threat Model";
+        var mkdocs_page_input_path = "concepts/threat-model.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/concepts/threat-model/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Threat Model</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/concepts/threat-model.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/concepts/threat-model/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="threat-model">Threat Model<a class="headerlink" href="#threat-model" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/concepts/threat-model/">Русский</a></p>
+<p>This model covers supported CSV, Python, CLI, MCP, Trino, advisor, generation,
+validation, and export workflows. The primary security objective is to prevent
+source rows, raw detected PII, and secrets from crossing into generated output,
+provider requests, logs, or unrestricted database operations.</p>
+<h2 id="assets-and-trust-boundaries">Assets And Trust Boundaries<a class="headerlink" href="#assets-and-trust-boundaries" title="Permanent link">&para;</a></h2>
+<p>Protected assets are source datasets, credentials, connection settings,
+reviewed specifications, generated artifacts, manifests, and validation
+reports. Treat every source file, rule payload, profile, path, Trino response,
+MCP request, advisor response, and output destination as untrusted.</p>
+<p>The main boundaries are:</p>
+<ul>
+<li>local source to bounded profiler;</li>
+<li>profiler and reviewed specification to deterministic generator;</li>
+<li>application to optional AI provider;</li>
+<li>MCP client to workspace-confined tools;</li>
+<li>application to read-only Trino;</li>
+<li>staged artifacts to the published output directory.</li>
+</ul>
+<h2 id="threats-and-controls">Threats And Controls<a class="headerlink" href="#threats-and-controls" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Control</th>
+<th>Residual risk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source rows or raw PII reach generated output</td>
+<td>Profiles suppress sensitive values; specs pass <code>assert_spec_safe()</code>; supported CSV flows reject complete-row reuse.</td>
+<td>Partial values, rare combinations, and statistical similarity require human review.</td>
+</tr>
+<tr>
+<td>Secrets leak through input, configuration, logs, or provider calls</td>
+<td>Secret-like fields and values are treated as sensitive; provider requests use bounded structured evidence; rejected values are not echoed.</td>
+<td>Unknown secret formats or unsafe downstream logging can bypass heuristics.</td>
+</tr>
+<tr>
+<td>Prompt injection in source text or advisor output changes authority</td>
+<td>Source text is untrusted data, provider schemas are validated, and AI proposals require explicit human review; deterministic code alone authorizes generation and validation.</td>
+<td>A reviewer can still approve a misleading proposal. Never send raw production content to a provider.</td>
+</tr>
+<tr>
+<td>Provider receives source records or rare identifying values</td>
+<td>Advisor payloads exclude rows, replace categories with synthetic labels, and sanitize singleton values before the provider boundary.</td>
+<td>Provider retention and transport remain governed by the selected provider and operator configuration.</td>
+</tr>
+<tr>
+<td>Trino access reads sensitive rows or mutates data</td>
+<td>Public operations are allowlisted, read-only, and bounded; unsafe SQL is rejected before execution; credentials stay outside returned payloads.</td>
+<td>Database permissions must independently enforce least privilege and read-only access.</td>
+</tr>
+<tr>
+<td>MCP paths escape the configured workspace or overwrite trusted files</td>
+<td>Path traversal and symlink escapes are rejected; source and output paths must differ; publication is staged and atomic.</td>
+<td>Operators must secure the workspace and downstream artifact storage.</td>
+</tr>
+<tr>
+<td>Generated artifacts are mistaken for privacy-certified data</td>
+<td>Manifests record synthetic and validation evidence; documentation separates structural validation from privacy assurance.</td>
+<td>The project provides no differential privacy, anonymity, or universal re-identification guarantee.</td>
+</tr>
+<tr>
+<td>Oversized inputs, queries, rules, or output exhaust resources</td>
+<td>Byte, row, cell, nesting, query, rule, disk, output, and wall-clock budgets fail closed.</td>
+<td>Limits reduce impact but do not replace process, container, or infrastructure quotas.</td>
+</tr>
+<tr>
+<td>Modified packages or artifacts enter the release path</td>
+<td>Release gates produce checksums, SBOMs, attestations, and exact-commit evidence.</td>
+<td>Users must verify published evidence and protect their installation environment.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="assumptions-and-non-goals">Assumptions And Non-Goals<a class="headerlink" href="#assumptions-and-non-goals" title="Permanent link">&para;</a></h2>
+<p>Operators keep credentials outside datasets and logs, grant Trino least
+privilege, review inferred rules, and protect generated artifacts. The project
+does not defend a compromised host, malicious Python code running in the same
+process, a compromised dependency, or redistribution by an authorized user.
+It does not certify legal compliance or statistical privacy.</p>
+<p>Report suspected boundary failures through the private process in the
+<a href="https://github.com/wa-pis/agent-paranoid-android/security/policy">Security Policy</a>.
+Use synthetic reproductions only.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

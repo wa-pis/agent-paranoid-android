@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/application-boundaries/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Application Boundaries - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Application Boundaries";
+        var mkdocs_page_input_path = "reference/application-boundaries.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/application-boundaries/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Application Boundaries</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/application-boundaries.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="application-boundaries">Application Boundaries<a class="headerlink" href="#application-boundaries" title="Permanent link">&para;</a></h1>
+<p>This page records the current observable surfaces and dependency ownership,
+including the additions shipped in <code>1.6.0rc5</code>. The original 1.0 boundary
+inventory and completed extraction remain the historical baseline; current
+contract fixtures include later reviewed additions. This inventory does not
+declare internal modules public or approve a contract change.</p>
+<p>Stable <code>1.6.0</code> preparation retains this accepted RC5 runtime and ownership map.
+References to the “1.6 RC” composition remain valid for that unchanged promotion;
+they do not establish stable publication or close the separate
+transformation/session acceptance campaign. See the
+<a href="../../1.6.0-release-status/">release status</a>.</p>
+<p>The golden fixtures under <code>tests/fixtures/contracts/</code> remain authoritative.
+The original reviewed activation added <code>transform-execute</code> and local
+<code>transform-approve</code> CLI entrances and the workspace consumer
+<code>execute_transformation</code>. They share fixed-snapshot application enforcement;
+MCP has no preservation-receipt issuer. Ordinary generation remains source-free. These
+original additions have exact-SHA safety evidence in ActivationSafety-R3; the
+contract fixtures include their registration. That historical evidence does
+not clear later changes by itself. Published RC5 also registers <code>transform-batch</code>,
+<code>common_transformation</code> and <code>configured_query_session</code>; their current composition
+is described below and in <a href="../../how-to/mcp/#common-profile-workflow-16-rc">MCP usage</a>.
+The <a href="../../release-evidence-1.6.0rc5/">published RC5 evidence</a> records release
+acceptance and its limits. The broader transformation/session campaign remains
+open; registration, dataset approval and complete campaign acceptance are
+separate. MCP has no preservation-receipt issuer.
+This page makes their ownership and the current architectural pressure visible
+in one place so each extraction can be reviewed against the same baseline.</p>
+<h2 id="process-entry-points">Process Entry Points<a class="headerlink" href="#process-entry-points" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>test-data-agent</code> -&gt; <code>test_data_agent.cli:main</code></li>
+<li><code>test-data-agent-mcp-generator</code> -&gt;
+  <code>test_data_agent.mcp_generator_server:main</code></li>
+<li><code>test-data-agent-mcp-trino</code> -&gt;
+  <code>test_data_agent.mcp_trino_server:main</code></li>
+</ul>
+<p>These entry-point names and targets must continue to resolve throughout the
+refactor. A thin compatibility wrapper may retain an old target while the
+composition root moves internally.</p>
+<h2 id="public-python-imports">Public Python Imports<a class="headerlink" href="#public-python-imports" title="Permanent link">&para;</a></h2>
+<p>The current 67-name <code>test_data_agent.__all__</code> inventory is protected by
+<code>public-python-api.json</code>. The exports are grouped below only to show
+ownership; grouping does not change their compatibility status.</p>
+<p>Core data, result, error, and version contracts:</p>
+<ul>
+<li><code>DATASET_SPEC_SCHEMA_VERSION</code>, <code>DatasetProfile</code>, <code>DatasetSpec</code>,
+  <code>LocalCategoryField</code></li>
+<li><code>DatasetGenerationResult</code>, <code>DatasetValidationReport</code></li>
+<li><code>CliErrorCode</code>, <code>CliErrorDetail</code>, <code>CliErrorResponse</code>, <code>CliSuccessResponse</code></li>
+<li><code>DoctorCheck</code>, <code>DoctorResponse</code>, <code>DoctorStatus</code></li>
+<li><code>SqlQueryAdapter</code>, <code>SqlQueryProfileLimits</code>, <code>SqlQueryProfileRequest</code></li>
+<li><code>__version__</code></li>
+</ul>
+<p>Agent models and enums:</p>
+<ul>
+<li><code>AgentApprovalReceipt</code>, <code>AgentCompletionCheckpoint</code></li>
+<li><code>AgentFieldReference</code>, <code>AgentFieldSummary</code>,
+  <code>AgentGenerationSummary</code></li>
+<li><code>AgentNextAction</code>, <code>AgentPlanSummary</code>,
+  <code>AgentRecoverySummary</code></li>
+<li><code>AgentRelationshipSummary</code>, <code>AgentRequest</code>, <code>AgentResult</code></li>
+<li><code>AgentReviewEntitySummary</code>, <code>AgentReviewFieldSummary</code></li>
+<li><code>AgentReviewReport</code>, <code>AgentReviewSafetySummary</code>,
+  <code>AgentReviewState</code></li>
+<li><code>AgentSourceType</code>, <code>AgentWorkspaceStatus</code></li>
+</ul>
+<p>Advisor contracts:</p>
+<ul>
+<li><code>AdvisorContractError</code>, <code>AdvisorExchange</code>,
+  <code>AdvisorExchangeClient</code></li>
+<li><code>AdvisorProposal</code>, <code>AdvisorRequest</code>,
+  <code>AdvisorReviewArtifact</code></li>
+<li><code>DatasetAdvisor</code>, <code>ExchangeDatasetAdvisor</code></li>
+</ul>
+<p>Public operations:</p>
+<ul>
+<li><code>advise_agent_workspace</code>, <code>advise_dataset_spec</code></li>
+<li><code>advisor_proposal_json_schema</code>, <code>apply_agent_advisor_proposal</code></li>
+<li><code>approve_agent_workspace</code>, <code>build_agent_advisor_exchange</code></li>
+<li><code>build_agent_advisor_request</code>, <code>build_advisor_exchange</code></li>
+<li><code>build_advisor_request</code>, <code>build_advisor_review_artifact</code></li>
+<li><code>detect_agent_source_type</code>, <code>generate_dataset</code></li>
+<li><code>generate_dataset_bundle</code>, <code>infer_dataset_spec</code></li>
+<li><code>inspect_agent_workspace</code>, <code>plan_agent_profile</code></li>
+<li><code>plan_agent_request</code>, <code>recover_agent_workspace</code></li>
+<li><code>profile_postgres_query_source</code>, <code>profile_trino_query_source</code></li>
+<li><code>review_agent_workspace</code>, <code>solve_constraints</code></li>
+<li><code>validate_advisor_proposal</code>, <code>validate_dataset</code></li>
+</ul>
+<h2 id="cli-surface">CLI Surface<a class="headerlink" href="#cli-surface" title="Permanent link">&para;</a></h2>
+<p><code>cli-parser-surface.json</code> tracks these 29 commands, including the transformation
+entrances added after the original 1.0 baseline:</p>
+<ul>
+<li><code>generate</code>, <code>export-postgres-sql</code>, <code>profile-example</code>, <code>infer-spec</code>, <code>discover-relationships</code>, <code>profile-csv</code>, <code>profile-parquet</code>,
+  <code>transform-review</code>, <code>transform-execute</code>, <code>transform-approve</code>,
+  <code>profile-postgres</code>, <code>profile-query</code></li>
+<li><code>transform-batch</code> (create, review, approve, validate, execute and configured
+  <code>query-execute</code>; receipt issuance remains local controlling-TTY only)</li>
+<li><code>generate-from-csv</code>, <code>validate</code>, <code>generate-from-example</code></li>
+<li><code>demo</code>, <code>doctor</code>, <code>audit-verify</code>, <code>completion</code></li>
+<li><code>agent-plan</code>, <code>agent-approve</code>, <code>agent-recover</code></li>
+<li><code>agent-advise</code>, <code>agent-advisor-request</code></li>
+<li><code>agent-advisor-apply</code>, <code>agent-status</code>, <code>agent-review</code></li>
+<li><code>examples</code></li>
+</ul>
+<p>Compatibility aliases remain:</p>
+<ul>
+<li><code>generate-from-csv-folder</code> -&gt; <code>generate-from-example</code></li>
+<li><code>profile-csv-folder</code> -&gt; <code>profile-example</code></li>
+</ul>
+<p>The parser, option defaults, structured success/errors, doctor states,
+parser-derived completion, human output, and exit-code meanings remain owned
+by <code>cli_parser.py</code>, <code>cli_contract.py</code>, and <code>cli_presenter.py</code>.
+<code>cli.py:build_parser</code> separately registers <code>transform-batch</code> and its <code>main</code>
+dispatches that command to <code>cli_transformation_candidate.py</code>; the other
+handlers are composed by <code>cli_application.py</code>. Moving handlers must not change
+those contracts.</p>
+<h2 id="mcp-tool-surfaces">MCP Tool Surfaces<a class="headerlink" href="#mcp-tool-surfaces" title="Permanent link">&para;</a></h2>
+<p><code>mcp-generator-tools.json</code> freezes these 14 tools in the running generator
+server composition:</p>
+<ul>
+<li><code>approve_dataset_plan</code>, <code>export_dataset</code>, <code>generate_dataset</code></li>
+<li><code>review_transformation</code> (read-only local snapshot review; no execution or receipt)</li>
+<li><code>execute_transformation</code> (reviewed snapshot/receipt consumer; no receipt issuer)</li>
+<li><code>common_transformation</code> (bounded common-profile review/validate/execute consumer)</li>
+<li><code>configured_query_session</code> (configured capture, frozen review/validate/execute
+  and close; no receipt issuer or row-returning response)</li>
+<li><code>infer_dataset_spec</code>, <code>inspect_dataset_plan</code>, <code>plan_dataset</code></li>
+<li><code>plan_trino_dataset</code>, <code>profile_csv</code>,
+  <code>recover_dataset_plan</code>, <code>validate_dataset</code></li>
+</ul>
+<p><code>mcp_generator_server:main</code> injects the workspace and session manager needed for
+the two common/configured consumers. The module-level SDK object retains the
+12 base tools and no SQL sessions; it is not the full running-server inventory.</p>
+<p><code>mcp-trino-tools.json</code> freezes these default aggregate-only Trino tools:</p>
+<ul>
+<li><code>describe_table</code>, <code>list_catalogs</code>, <code>list_schemas</code>,
+  <code>list_tables</code></li>
+<li><code>profile_aggregate_mapping</code>, <code>profile_column</code></li>
+<li><code>profile_conditional_allowed_values</code>,
+  <code>profile_conditional_required</code></li>
+<li><code>profile_foreign_key</code>, <code>profile_formula_rule</code></li>
+<li><code>profile_table</code>, <code>profile_table_safe</code></li>
+<li><code>profile_temporal_ordering</code></li>
+</ul>
+<p>The explicit opt-in row-returning tools are outside that default fixture.
+<code>run_safe_select</code> is registered only when <code>TRINO_ENABLE_SAFE_SELECT=true</code>,
+masks every returned string, and does not inherit the default
+source-literal-free guarantee for remaining non-string values.</p>
+<p>Tool names, descriptions, input/output schemas, ordering, audit wrapping, and
+safety behavior remain compatibility-gated. Transport extraction must not move
+SQL, path, profile, or generation policy into FastMCP registration.
+Sensitive numeric Trino columns expose counts, cardinality, sign presence, and
+decimal order of magnitude only. Exact extrema and percentiles are neither
+queried nor carried into profiles, specs, or planning artifacts.</p>
+<h2 id="artifact-contracts">Artifact Contracts<a class="headerlink" href="#artifact-contracts" title="Permanent link">&para;</a></h2>
+<p>The versioned contract catalog contains:</p>
+<ul>
+<li><code>advisor-exchange.json</code>, <code>artifact-layout.json</code>, <code>boundary-compatibility.json</code></li>
+<li><code>cli-agent-plan.json</code>, <code>cli-parser-surface.json</code></li>
+<li><code>dataset-spec.json</code>, <code>generation-manifest.json</code></li>
+<li><code>mcp-generate.json</code>, <code>mcp-generator-tools.json</code></li>
+<li><code>mcp-plan.json</code>, <code>mcp-trino-tools.json</code></li>
+<li><code>public-python-api.json</code>, <code>validation-report.json</code></li>
+</ul>
+<p>The review-first agent workspace publishes these stable names:</p>
+<ul>
+<li><code>agent_request.json</code>, <code>agent_plan.json</code>, <code>profile.json</code></li>
+<li><code>dataset_spec.yaml</code>, optional <code>advisor_review.json</code></li>
+<li><code>approval_receipt.json</code>, <code>agent_result.json</code></li>
+<li><code>generated/</code>, containing <code>agent_completion.json</code></li>
+</ul>
+<p>Generated bundles retain entity data files plus
+<code>generation_manifest.json</code>, <code>validation_report.json</code>, and the
+reviewed spec/profile artifacts. Rule-driven generation may add
+<code>business_validation_report.json</code>. Additive files or fields still require
+the existing contract review; rename or removal is breaking.</p>
+<h2 id="current-dependency-direction">Current Dependency Direction<a class="headerlink" href="#current-dependency-direction" title="Permanent link">&para;</a></h2>
+<p>The current dependencies after completed extraction increments are:</p>
+<table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Current dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__init__.py</code></td>
+<td>agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version</td>
+</tr>
+<tr>
+<td><code>cli.py</code></td>
+<td>public entry point, parser composition, common-profile registration/dispatch, parser/presenter contracts, and compatibility wrappers</td>
+</tr>
+<tr>
+<td><code>cli_parser.py</code></td>
+<td>shared dataset/agent/utility command registration, argument validation, errors and completion inventory</td>
+</tr>
+<tr>
+<td><code>cli_application.py</code></td>
+<td>handler composition and first-owner dispatch for commands other than the directly dispatched common workflow</td>
+</tr>
+<tr>
+<td><code>cli_transformation_candidate.py</code></td>
+<td>registered local execution/approval and common-profile operation adapters; internal candidate helper names remain non-public</td>
+</tr>
+<tr>
+<td><code>cli_agent.py</code></td>
+<td><code>agent-*</code> request translation, handler dispatch, lifecycle services, provider adapter, and presenters</td>
+</tr>
+<tr>
+<td><code>cli_commands.py</code></td>
+<td>dataset and utility handlers, I/O workflows, audit, demo, rules, and presenters</td>
+</tr>
+<tr>
+<td><code>cli_dependencies.py</code></td>
+<td>optional-extra module catalog, injected availability inspection, and normalized installation errors</td>
+</tr>
+<tr>
+<td><code>cli_doctor.py</code></td>
+<td>installation diagnostics, synthetic quickstart smoke, and redacted optional-capability smoke orchestration</td>
+</tr>
+<tr>
+<td><code>providers/openai.py</code>, <code>providers/gigachat.py</code></td>
+<td>optional provider-specific structured transports behind the provider-neutral exchange; no application authority</td>
+</tr>
+<tr>
+<td><code>agent.py</code></td>
+<td>compatibility exports plus deterministic generation and completion validation</td>
+</tr>
+<tr>
+<td><code>agent_contracts.py</code></td>
+<td>core field, relationship, and settings models only</td>
+</tr>
+<tr>
+<td><code>agent_planning.py</code></td>
+<td>adapters, contracts, core, generation planning, profiling, safety, and workspace-store port</td>
+</tr>
+<tr>
+<td><code>agent_review.py</code></td>
+<td>contracts, planning settings validation, bounded artifact readers, profile safety, and injected workspace status</td>
+</tr>
+<tr>
+<td><code>agent_approval.py</code></td>
+<td>contracts, review context, bounded artifact readers, workspace-store publication, and injected status/generation ports</td>
+</tr>
+<tr>
+<td><code>agent_recovery.py</code></td>
+<td>contracts, review/approval context, bounded artifact readers, workspace-store publication, and injected completion validation</td>
+</tr>
+<tr>
+<td><code>agent_advising.py</code></td>
+<td>advisor contracts, review context, bounded artifact readers, atomic spec publication, and injected workspace status</td>
+</tr>
+<tr>
+<td><code>agent_status.py</code></td>
+<td>contracts, bounded artifact readers, review/recovery inspection, and read-only lifecycle reconstruction</td>
+</tr>
+<tr>
+<td><code>workspace_store.py</code></td>
+<td>typed workspace paths and transitions, core profile/spec models, bounded artifact I/O</td>
+</tr>
+<tr>
+<td><code>io/path_policy.py</code></td>
+<td>descriptor-relative no-follow file/folder publication, inode revalidation, and guarded cleanup</td>
+</tr>
+<tr>
+<td>Generator MCP server</td>
+<td>agent, adapters, audit, core, I/O, rules, safety, generator transport factory</td>
+</tr>
+<tr>
+<td><code>mcp_transformation_candidate.py</code></td>
+<td>registered transformation, common-profile and configured-session adapters, workspace confinement and budget composition; no receipt issuer</td>
+</tr>
+<tr>
+<td><code>io/transformation_batch_workflow.py</code></td>
+<td>typed common-profile review/validate/execute orchestration and metadata serialization</td>
+</tr>
+<tr>
+<td><code>io/transformation_query_workflow.py</code></td>
+<td>administrator-configured PostgreSQL/Trino capture into owned frozen snapshots, then common-profile composition without recapture</td>
+</tr>
+<tr>
+<td><code>io/transformation_query_sessions.py</code></td>
+<td>instance-owned frozen captures, bounded admission/expiry/cleanup, common execution and the existing generator workspace-path resolver</td>
+</tr>
+<tr>
+<td><code>trino_config.py</code></td>
+<td>environment parsing, credential-free JDBC-style endpoint normalization, validated catalog/schema defaults, typed exact/table-wildcard column selectors, connection settings, allowlist inputs, and resource budgets</td>
+</tr>
+<tr>
+<td><code>trino_auth.py</code></td>
+<td>runtime secret references, six authenticated driver methods, fixed authentication diagnostics, and origin/deadline-guarded OAuth HTTP adapter; no CLI/browser ownership</td>
+</tr>
+<tr>
+<td><code>io/commands.py</code></td>
+<td>source command orchestration, including the explicitly registered local-terminal Trino OAuth browser callback</td>
+</tr>
+<tr>
+<td><code>postgres_config.py</code></td>
+<td>PostgreSQL source identity, credential-free JDBC-style endpoint normalization, connection settings, typed mandatory exact/table-wildcard column selectors, secret indirection, and profiling budgets</td>
+</tr>
+<tr>
+<td><code>postgres_client.py</code></td>
+<td>injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures</td>
+</tr>
+<tr>
+<td><code>postgres_query_builders.py</code></td>
+<td>allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access</td>
+</tr>
+<tr>
+<td><code>postgres_profiler.py</code></td>
+<td>bounded wildcard metadata expansion plus complete allowlisted PostgreSQL aggregate normalization into qualified <code>DatasetProfile</code> entities and declared relationships</td>
+</tr>
+<tr>
+<td><code>sql_query_source.py</code></td>
+<td>bounded local query-file loading, strict PostgreSQL/Trino AST policy, source authorization, wildcard expansion, and source-free fingerprinting</td>
+</tr>
+<tr>
+<td><code>sql_query_profiling.py</code></td>
+<td>adapter-neutral no-row schema and aggregate-only virtual-entity normalization without query-row access</td>
+</tr>
+<tr>
+<td><code>sql_query_adapters.py</code></td>
+<td>existing PostgreSQL/Trino client/config composition for allowlisted query-source profiling</td>
+</tr>
+<tr>
+<td><code>postgres_sql_export.py</code></td>
+<td>deterministic validated PostgreSQL DDL/INSERT rendering and atomic one-file publication without source access</td>
+</tr>
+<tr>
+<td><code>trino_sql_policy.py</code></td>
+<td>identifier validation, allowlists, SQL parsing, and bounded read-only policy</td>
+</tr>
+<tr>
+<td><code>trino_query_builders.py</code></td>
+<td>typed, parameterized metadata and aggregate profiling query construction without I/O</td>
+</tr>
+<tr>
+<td><code>trino_client.py</code></td>
+<td>injected driver access, per-client runtime authentication reuse, verified authenticated connections, session resource budgets, result limits, row conversion, and cleanup</td>
+</tr>
+<tr>
+<td><code>trino_profiling.py</code></td>
+<td>allowlisted metadata, deterministic wildcard expansion/preflight, and aggregate-only profiling orchestration with injected query fetching</td>
+</tr>
+<tr>
+<td><code>trino_masking.py</code></td>
+<td>sensitive-value masking, synthetic category summaries, safe column completion, and opt-in safe-select masking</td>
+</tr>
+<tr>
+<td>Trino MCP server</td>
+<td>audit, extracted Trino config/policy/query builders/client/profiling/masking, compatibility wrappers, Trino transport factory</td>
+</tr>
+<tr>
+<td>MCP transport modules</td>
+<td>optional FastMCP and audit wrapping around supplied callables; detached typed budget-error translation, not limit enforcement</td>
+</tr>
+<tr>
+<td>generation/profiling/validation/rules</td>
+<td>core models and pure policy helpers</td>
+</tr>
+</tbody>
+</table>
+<p>Exact local category values pass the shared <code>core.privacy</code> content validator
+before retention. The validator rejects sensitive fields, identifiers,
+quasi-identifiers, unsupported scalars, sensitive-looking values, free text,
+excess cardinality, and overlong values without echoing source content.</p>
+<p>The two server modules currently import their transport factory to assemble the
+executable server. <code>agent.py</code> and <code>cli.py</code> remain compatibility owners around
+their extracted services; <code>mcp_trino_server.py</code> retains the responsibilities
+recorded in the archived boundary plan. These boundaries are not permission to
+reverse safety dependencies during extraction.</p>
+<p>Configured query sessions currently import the workspace-path resolver from
+<code>mcp_generator_server.py</code> during construction. This composition dependency is
+recorded here rather than treated as a completed transport-independent
+extraction. The architecture gate below covers its named agent/Trino boundary
+modules, not every transformation/session import.</p>
+<p>The target direction remains:</p>
+<pre><code class="language-text">CLI/MCP composition -&gt; application services -&gt; policy/core -&gt; typed ports
+                                              -&gt; filesystem/database adapters
+</code></pre>
+<p>Safety policy must be callable below transports. Core and application services
+must not import CLI presentation or FastMCP registration. Compatibility modules
+may import extracted implementations temporarily, but extracted services must
+not import those wrappers back.</p>
+<h2 id="migration-notes">Migration Notes<a class="headerlink" href="#migration-notes" title="Permanent link">&para;</a></h2>
+<p>No user migration is required for these internal ownership changes. Public
+package imports, CLI commands, MCP tools, error behavior, and artifact formats
+remain available through their existing entry points.</p>
+<table>
+<thead>
+<tr>
+<th>Previous owner</th>
+<th>Canonical internal owners</th>
+<th>Retained compatibility entry point</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent.py</code> lifecycle and workspace persistence</td>
+<td><code>agent_contracts.py</code>, <code>agent_planning.py</code>, <code>agent_review.py</code>, <code>agent_approval.py</code>, <code>agent_recovery.py</code>, <code>agent_advising.py</code>, <code>agent_status.py</code>, and <code>workspace_store.py</code></td>
+<td><code>agent.py</code> and package-root exports</td>
+</tr>
+<tr>
+<td><code>cli.py</code> composition and command handlers</td>
+<td><code>cli_application.py</code>, <code>cli_agent.py</code>, <code>cli_commands.py</code>, <code>cli_dependencies.py</code>, and <code>cli_doctor.py</code></td>
+<td><code>cli.py</code> and the installed CLI</td>
+</tr>
+<tr>
+<td><code>mcp_trino_server.py</code> configuration, SQL policy, query construction, client access, profiling, and masking</td>
+<td><code>trino_config.py</code>, <code>trino_sql_policy.py</code>, <code>trino_query_builders.py</code>, <code>trino_client.py</code>, <code>trino_profiling.py</code>, and <code>trino_masking.py</code></td>
+<td><code>mcp_trino_server.py</code> and its MCP tool surface</td>
+</tr>
+</tbody>
+</table>
+<p>External callers should continue using the documented package, CLI, and MCP
+entry points. Internal contributors may import the canonical owners directly.
+Compatibility wrappers remain in place for the normal compatibility window;
+their eventual removal would require a separately documented public migration.</p>
+<h3 id="workspace-store-migration">Workspace Store Migration<a class="headerlink" href="#workspace-store-migration" title="Permanent link">&para;</a></h3>
+<p><code>workspace_store.py</code> now owns workspace artifact paths, typed persistence ports,
+atomic plan publication, and completion-marker publication. <code>agent.py</code> remains
+the compatibility owner for its existing constants, <code>AgentArtifacts</code>, and
+<code>agent_artifacts</code> import paths while lifecycle services are extracted.</p>
+<p>Planning writes into a sibling staging directory and renames the complete
+workspace into place only after every artifact is ready. A failed plan restores
+an existing empty workspace and removes staging data. Completion publishes the
+approval receipt before the atomic <code>agent_result.json</code> state marker, preserving
+the existing checkpoint-based recovery behavior.</p>
+<h3 id="planning-service-migration">Planning Service Migration<a class="headerlink" href="#planning-service-migration" title="Permanent link">&para;</a></h3>
+<p><code>agent_contracts.py</code> now owns lifecycle models and <code>agent_planning.py</code> owns safe
+profile-to-plan orchestration. Public package and <code>agent.py</code> imports remain
+compatible, and <code>workspace_store.py</code> re-exports <code>AgentArtifacts</code>. Direct service
+calls enforce source-path and profile-safety checks before publishing artifacts.</p>
+<p><code>agent_review.py</code> now owns metadata-only review report construction and review
+fingerprint refresh. The compatibility wrapper injects <code>inspect_agent_workspace</code>;
+the extracted service has no reverse dependency on <code>agent.py</code>, CLI, or MCP
+transports and rejects a replaced spec symlink before reading it.</p>
+<p><code>agent_approval.py</code> now owns the reviewed-fingerprint gate, idempotent completed
+result handling, and atomic receipt/result publication. Its typed ports inject
+workspace inspection and deterministic generation without a reverse dependency
+on <code>agent.py</code>, CLI, or MCP transports.</p>
+<p><code>agent_recovery.py</code> now owns recovery fingerprint checks, interrupted bundle
+publication, and recovery-state inspection. Its typed validation port preserves
+tamper detection without importing <code>agent.py</code>, CLI, or MCP transports.</p>
+<p><code>agent_advising.py</code> now owns safe advisor requests/exchanges, persisted proposal
+resume, and fingerprint-bound spec application. It remains metadata-only and
+injects workspace inspection without importing <code>agent.py</code>, CLI, or MCP
+transports.</p>
+<h3 id="cli-doctor-service-migration">CLI Doctor Service Migration<a class="headerlink" href="#cli-doctor-service-migration" title="Permanent link">&para;</a></h3>
+<p><code>cli_doctor.py</code> owns installation diagnostics and local capability smoke
+orchestration. <code>cli.py</code> retains compatibility wrappers and injects its current
+module importer and smoke callables. <code>DoctorReport</code> separates human text from
+typed JSON states and never interprets an import or local smoke as proof of
+remote configuration or reachability.</p>
+<p><code>cli_dependencies.py</code> centralizes optional-extra discovery and installation
+errors for doctor capability checks and provider advice. Importers and loaders
+remain injectable so direct service calls preserve fail-closed behavior.</p>
+<p><code>cli_agent.py</code> now owns review-first <code>agent-*</code> request translation and command
+handling. <code>cli.py</code> keeps the public entry point and compatibility helpers, then
+injects those helpers into the extracted handler without changing parser or
+presenter contracts.</p>
+<p><code>cli_commands.py</code> now owns dataset and utility command handling, including the
+direct business-rule bridge. <code>cli.py</code> keeps the existing business-rule
+compatibility helper while injecting doctor and rule dependencies.</p>
+<p><code>cli_application.py</code> now composes the utility, dataset, and agent handlers and
+dispatches to the first handler that owns a command. <code>cli.py</code> retains the public
+entry point and a thin <code>run_command</code> compatibility wrapper with its existing
+test override points.</p>
+<h3 id="trino-configuration-migration">Trino Configuration Migration<a class="headerlink" href="#trino-configuration-migration" title="Permanent link">&para;</a></h3>
+<p><code>trino_config.py</code> now owns validated connection settings, allowlist inputs, and
+query resource budgets. <code>mcp_trino_server.py</code> re-exports the existing config
+types, constants, and parsing helpers for compatibility while consuming the
+extracted configuration without adding a Trino-client or MCP dependency to that
+boundary.</p>
+<h3 id="trino-sql-policy-migration">Trino SQL Policy Migration<a class="headerlink" href="#trino-sql-policy-migration" title="Permanent link">&para;</a></h3>
+<p><code>trino_sql_policy.py</code> now owns identifier validation, allowlist enforcement,
+and bounded read-only SQL validation. <code>mcp_trino_server.py</code> re-exports the
+existing policy errors, constants, and helpers while using the extracted policy
+before any client execution.</p>
+<h3 id="trino-query-builder-migration">Trino Query Builder Migration<a class="headerlink" href="#trino-query-builder-migration" title="Permanent link">&para;</a></h3>
+<p><code>trino_query_builders.py</code> now owns metadata, aggregate profiling, and rule
+profiling query construction as typed <code>TrinoQuery</code> values.
+The builders validate identifiers, keep source values in bound parameters, and
+perform no I/O. <code>mcp_trino_server.py</code> retains orchestration and compatibility
+exports while passing built queries to the existing bounded client path.</p>
+<h3 id="trino-client-migration">Trino Client Migration<a class="headerlink" href="#trino-client-migration" title="Permanent link">&para;</a></h3>
+<p><code>trino_client.py</code> now owns configured driver connections, fail-closed session
+resource budgets, a process-wide concurrency cap, client-side result limits,
+row conversion, and nested cursor/connection cleanup. <code>mcp_trino_server.py</code> retains its existing
+<code>_execute_query</code>, <code>_fetch_dicts</code>, <code>trino</code>, and error imports as compatibility
+wrappers while delegating execution to the injected <code>TrinoClient</code> boundary.</p>
+<h3 id="trino-profiling-migration">Trino Profiling Migration<a class="headerlink" href="#trino-profiling-migration" title="Permanent link">&para;</a></h3>
+<p><code>trino_profiling.py</code> now owns allowlisted metadata inspection, aggregate-only
+table and column profiling, and count-only rule profiling behind an injected
+<code>TrinoQuery</code> fetcher. Direct service calls enforce the explicit configuration
+allowlist before I/O, and condition values remain bound parameters rather than
+SQL or result metadata. <code>mcp_trino_server.py</code> keeps the existing public tool
+functions as wrappers and injects the safe column summarizer from
+<code>trino_masking.py</code>.</p>
+<h3 id="trino-masking-migration">Trino Masking Migration<a class="headerlink" href="#trino-masking-migration" title="Permanent link">&para;</a></h3>
+<p><code>trino_masking.py</code> now owns content-aware value masking, masked sensitive
+patterns, synthetic category-rank summaries, safe column-profile completion,
+and opt-in safe-select result masking. Aggregate profiles replace source
+categories with synthetic labels or masked patterns. Safe-select recursively
+masks every returned string, including binary source representations, and masks
+non-string fields or values recognized as sensitive. Allowed non-string source
+values may remain when the detector does not classify them as sensitive, so the
+returned rows are outside the source-literal-free guarantee
+for the default aggregate-only tools. <code>mcp_trino_server.py</code> retains the
+remaining tool functions and privacy helper imports as compatibility exports
+while delegating masking below the transport boundary.</p>
+<h3 id="trino-mcp-privacy-boundary">Trino MCP Privacy Boundary<a class="headerlink" href="#trino-mcp-privacy-boundary" title="Permanent link">&para;</a></h3>
+<p>The former row-sampling diagnostic is no longer registered or retained as a
+public Python compatibility wrapper, masking-service method, or query builder.
+The default aggregate-only tools provide metadata and profiling. The explicit
+opt-in row-returning tools include <code>run_safe_select</code>, which masks every string
+recursively inside bounded composite values but is not a source-literal-free
+replacement for that diagnostic.</p>
+<h3 id="architecture-gate">Architecture Gate<a class="headerlink" href="#architecture-gate" title="Permanent link">&para;</a></h3>
+<p><code>tests/test_application_architecture.py</code> parses package imports and definitions
+without importing optional transports. It rejects CLI/MCP dependencies from
+lower-layer agent and Trino services, domain ownership inside MCP registration,
+missing direct policy dependencies, duplicate safety-policy definitions, and
+cycles across the extracted boundary modules.</p>
+<h2 id="per-increment-review">Per-Increment Review<a class="headerlink" href="#per-increment-review" title="Permanent link">&para;</a></h2>
+<p>Each refactor pull request must:</p>
+<ol>
+<li>name the responsibility being moved and the old compatibility owner;</li>
+<li>preserve the golden fixtures listed above without regeneration;</li>
+<li>add direct-service tests for the moved safety boundary;</li>
+<li>add or tighten an architecture dependency rule when a new boundary exists;</li>
+<li>run the focused tests plus the relevant public contract gates.</li>
+</ol>
+<p>See <a href="../stability/">Public Stability</a> for change classification and the
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md">archived OpenSpec</a>
+for the completed 1.0 staged extraction plan. Later additions remain subject to
+their own reviewed contracts and gates.</p>
+<h3 id="16-rc-composition">1.6 RC Composition<a class="headerlink" href="#16-rc-composition" title="Permanent link">&para;</a></h3>
+<p>The 1.6 RC composition adds <code>transform-batch</code>, including <code>query-execute</code>,
+and the running generator MCP server adds <code>common_transformation</code> and
+<code>configured_query_session</code>. Their operations share application enforcement;
+only local controlling-TTY approval issues a preservation receipt.
+<code>io/transformation_query_sessions.py</code> owns bounded frozen captures across MCP
+requests, expiry and shutdown cleanup; <code>mcp_generator_server:main</code> injects and
+closes that owner. The default module-level SDK object owns no SQL sessions.
+RC5 publication is recorded separately from this ownership map. Registration
+is not dataset authorization or completion of the broader transformation/session
+acceptance campaign.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

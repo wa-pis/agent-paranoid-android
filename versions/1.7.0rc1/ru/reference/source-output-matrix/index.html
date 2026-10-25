@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/ru/reference/source-output-matrix/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Матрица источников и форматов - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u041c\u0430\u0442\u0440\u0438\u0446\u0430 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u043e\u0432 \u0438 \u0444\u043e\u0440\u043c\u0430\u0442\u043e\u0432";
+        var mkdocs_page_input_path = "ru/reference/source-output-matrix.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/ru/reference/source-output-matrix/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск по документации" aria-label="Поиск по документации" title="Введите поисковый запрос" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../" class="icon icon-home" aria-label="Документация"></a></li>
+      <li class="breadcrumb-item active">Матрица источников и форматов</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/reference/source-output-matrix.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../reference/source-output-matrix/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Матрица источников и форматов<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../../reference/source-output-matrix/">English</a> · Русский</p>
+<p>Все источники дают безопасное evidence для одного reviewed DatasetSpec. Это переходы генерации новых строк, а не конвертация source rows. JSON profile — metadata, а не произвольный JSON dataset.</p>
+<table>
+<thead>
+<tr>
+<th>Источник → reviewed spec</th>
+<th>CSV</th>
+<th>JSON</th>
+<th>Parquet</th>
+<th>SQL INSERT bundle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Один CSV</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Папка CSV</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Один Parquet</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Сохранённый DatasetProfile</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Trino aggregate table profile</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>PostgreSQL aggregate table profile</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>PostgreSQL query aggregate profile</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Trino query aggregate profile</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>YAML DatasetSpec</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>JSON DatasetSpec</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+</tbody>
+</table>
+<p>Все семь field types, settings, relationships, constraints, privacy rules и embedded business_rules проходят в общий engine. Valid/edge/load_test/mixed/negative, seed, locale и multiplier не зависят от source/output. Противоречивый spec и превышение limits отклоняются; unknown null statistics, отсутствующие exact DECIMAL bounds и unmodeled query dependencies требуют авторского контракта.</p>
+<p>CSV manifest объявляет backslash-null-v1: \N — null, empty cell — пустая строка, leading backslash удваивается, \F обезвреживает formula-capable strings/headers. Не удаляйте manifest. JSON сохраняет native scalars и decimal text. Parquet сохраняет Arrow types либо явно отмеченные apa.scalar_encoding columns для wide integers, mixed offsets и malformed negative cells. Direct reader должен учитывать metadata. SQL bundle содержит quoted INSERT VALUES; validate разбирает только эту generated grammar и никогда не исполняет SQL. DDL/functions/comments и произвольный SQL отклоняются.</p>
+<p>Сохраняйте spec, manifest и business report вместе. Single-entity filename отражается в entity_artifacts. Format adapters не назначают formulas заново и не масштабируют count дважды. См. <a href="../../getting-started/review-output/">проверку форматов</a> и <a href="../generation-modes/">режимы</a>.</p>
+<h2 id="decimal">Проверенный пример: точный DECIMAL<a class="headerlink" href="#decimal" title="Permanent link">&para;</a></h2>
+<h2 id="_2">Для чего это нужно<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Используйте DECIMAL для финансовых тестов, где важны десятичные разряды. FLOAT — приближённое двоичное число; он не заменяет точный контракт decimal_range. Границы ниже придуманы для теста, а не извлечены из источника.</p>
+<h2 id="_3">Что получится в результате<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Четыре строки <code>items</code> с точным amount от 1.00 до 9.99, JSON bundle и отчёт.</p>
+<h2 id="_4">Предварительные требования<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Базовая установка 1.6.0, активное окружение, терминал в корне checkout. Папки out/ru-decimal и out/ru-decimal-data ещё не существуют. Для Parquet понадобился бы extra parquet; для JSON он не нужен.</p>
+<h2 id="_5">Пошаговое выполнение<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="1-spec">Шаг 1. Создайте явный spec<a class="headerlink" href="#1-spec" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> создайте вымышленный контракт в отдельной папке.</p>
+<p><strong>Где выполнить:</strong> терминал, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">python - &lt;&lt;'PYCODE'
+from pathlib import Path
+p = Path('out/ru-decimal')
+p.mkdir(parents=True, exist_ok=False)
+(p / 'spec.yaml').write_text(&quot;&quot;&quot;schema_version: &quot;1.1&quot;
+entities:
+  - name: items
+    row_count: 4
+    fields:
+      - name: amount
+        data_type: decimal
+        distribution:
+          kind: decimal_range
+          precision: 6
+          scale: 2
+          min: '1.00'
+          max: '9.99'
+&quot;&quot;&quot;, encoding='utf-8')
+PYCODE
+</code></pre>
+<p><strong>Что должно произойти:</strong> создан spec.yaml с десятичными границами в строках.</p>
+<p><strong>Как проверить:</strong> schema_version=1.1; precision=6, scale=2; min≤max.</p>
+<p><strong>Если не получилось:</strong> используйте новую папку. Не заменяйте строки границ на float и не переносите source extrema.</p>
+<h3 id="2">Шаг 2. Сгенерируйте и перепроверьте<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> выполните команды по очереди.</p>
+<p><strong>Где выполнить:</strong> тот же терминал.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent generate out/ru-decimal/spec.yaml --seed 17 --format json --output out/ru-decimal-data
+test-data-agent validate out/ru-decimal/spec.yaml out/ru-decimal-data
+</code></pre>
+<p><strong>Что должно произойти:</strong> создан items.json, manifest и validation report.</p>
+<p><strong>Как проверить:</strong> обе команды завершаются кодом 0.</p>
+<p><strong>Если не получилось:</strong> проверьте тип decimal_range, precision≤38, scale, строковые границы и privacy flags; не отключайте safety.</p>
+<h2 id="_6">Проверка результата<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">python - &lt;&lt;'PYCODE'
+import json
+from decimal import Decimal
+from pathlib import Path
+p = Path('out/ru-decimal-data')
+rows = json.loads((p / 'items.json').read_text())
+assert len(rows) == 4
+assert all(isinstance(r['amount'], str) for r in rows)
+assert all(Decimal('1.00') &lt;= Decimal(r['amount']) &lt;= Decimal('9.99') for r in rows)
+assert json.loads((p / 'validation_report.json').read_text())['valid'] is True
+print('decimal: ok')
+PYCODE
+</code></pre>
+<p>Не печатайте значения; достаточно assert и сводки. Для PowerShell сохраните Python-блоки в локальные .py файлы и выполните <code>python имя.py</code>; Bash heredoc там не работает. Windows-выполнение не проверено.</p>
+<h2 id="_7">Типичные ошибки<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>decimal требует 1.1</td>
+<td>Legacy spec 1.0</td>
+<td>Укажите schema_version 1.1</td>
+</tr>
+<tr>
+<td>Нет точных bounds</td>
+<td>Профиль несёт только precision/scale</td>
+<td>Задайте reviewed decimal_range или infer-spec --decimal-fields</td>
+</tr>
+<tr>
+<td>Privacy rejection</td>
+<td>Поле/значение похоже на чувствительный идентификатор</td>
+<td>Пересмотрите смысл поля; numeric_measure допустим только для явно проверенной нечувствительной меры, не как обход</td>
+</tr>
+</tbody>
+</table>
+<p>Профили numeric(p,s) и decimal128 сохраняют типовую форму, но не точные source extrema. <code>infer-spec --decimal-fields FILE</code> принимает mapping ENTITY.FIELD → полный FieldSpec с согласованными precision/scale и синтетическими bounds. Подробный формат: <a href="../../../rc4-external-feedback/#reviewed-decimal-inference">reviewed decimal inference</a>. Nullable/unknown статистики требуют review. Сохранение DECIMAL при отдельной трансформации по умолчанию заблокировано.</p>
+<h2 id="_8">Следующий шаг<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p><a href="./">Parquet-профиль</a> или <a href="../../how-to/business-rules/">правила</a>.</p>
+<h2 id="parquet">Безопасный профиль Parquet<a class="headerlink" href="#parquet" title="Permanent link">&para;</a></h2>
+<h3 id="_9">Для чего это нужно<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p><code>profile-parquet</code> анализирует локальный Parquet и возвращает ограниченные метаданные. Используйте его для подготовки DatasetSpec, а не для конвертации исходных строк в synthetic output.</p>
+<h3 id="_10">Что получится в результате<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>Безопасный profile.json, reviewed spec и JSON-набор по вымышленному Parquet из примера форматов.</p>
+<h3 id="_11">Предварительные требования<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>Установка 1.6.0 с extra parquet. Выполнена <a href="../../getting-started/review-output/">инструкция форматов</a>: существует <code>out/ru-formats/parquet/support_tickets.parquet</code>. Команды выполняются из корня checkout; out/ru-parquet и out/ru-parquet-data — новые папки. Не используйте сторонний production Parquet для знакомства.</p>
+<h3 id="_12">Пошаговое выполнение<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<h4 id="1">Шаг 1. Получите профиль<a class="headerlink" href="#1" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> прочитайте вымышленный Parquet.</p>
+<p><strong>Где выполнить:</strong> терминал, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent profile-parquet out/ru-formats/parquet/support_tickets.parquet --output out/ru-parquet/profile.json
+</code></pre>
+<p><strong>Что должно произойти:</strong> записаны метаданные без строк источника.</p>
+<p><strong>Как проверить:</strong> команда возвращает 0; source_type указывает Parquet.</p>
+<p><strong>Если не получилось:</strong> проверьте doctor --require-extra parquet, типы Arrow и budgets; не увеличивайте пределы автоматически.</p>
+<h4 id="2-spec">Шаг 2. Выведите spec<a class="headerlink" href="#2-spec" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> создайте spec по доступным статистикам.</p>
+<p><strong>Где выполнить:</strong> тот же терминал.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent infer-spec out/ru-parquet/profile.json --count 4 --output out/ru-parquet/spec.yaml
+</code></pre>
+<p><strong>Что должно произойти:</strong> для данного вымышленного входа создан контракт генерации.</p>
+<p><strong>Как проверить:</strong> код 0; локально проверьте поля, nullable и чувствительность в spec.</p>
+<p><strong>Если не получилось:</strong> отсутствующие null/distinct статистики обозначаются null, не 0. Unknown null ratio блокирует auto-inference; задайте independently reviewed spec. DECIMAL требует явных синтетических bounds.</p>
+<h4 id="3">Шаг 3. Создайте новый набор<a class="headerlink" href="#3" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> после review создайте JSON и проверьте его.</p>
+<p><strong>Где выполнить:</strong> тот же терминал.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent generate out/ru-parquet/spec.yaml --seed 271828 --format json --output out/ru-parquet-data
+test-data-agent validate out/ru-parquet/spec.yaml out/ru-parquet-data
+</code></pre>
+<p><strong>Что должно произойти:</strong> создан новый набор, а не копия Parquet-строк.</p>
+<p><strong>Как проверить:</strong> обе команды возвращают 0; manifest synthetic=true, source_rows_copied=false, validation_valid=true.</p>
+<p><strong>Если не получилось:</strong> проверьте inferred spec и ошибки секций; не меняйте source path на output path.</p>
+<h3 id="_13">Проверка результата<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<p>Сопоставьте row_count=4 и поля support_tickets; повторный validate должен пройти. Просмотрите только метаданные profile/spec и manifest. Не используйте исходные row values как эталон совпадения: совпадение строк не является целью генератора.</p>
+<h3 id="_14">Типичные ошибки<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>missing_dependency</td>
+<td>Нет PyArrow</td>
+<td>Установите .[parquet] в том же окружении</td>
+</tr>
+<tr>
+<td>Unknown null ratio</td>
+<td>В файле нет достаточной статистики</td>
+<td>Явный проверенный spec вместо догадки</td>
+</tr>
+<tr>
+<td>Превышен expanded-byte/cell budget</td>
+<td>Decode слишком объёмен</td>
+<td>Уменьшите тестовый источник; предел payload не является hard peak-RSS гарантией</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_15">Следующий шаг<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<p><a href="./">DECIMAL</a>, <a href="./">источники и форматы</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

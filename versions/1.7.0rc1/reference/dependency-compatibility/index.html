@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/dependency-compatibility/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Dependency Compatibility - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Dependency Compatibility";
+        var mkdocs_page_input_path = "reference/dependency-compatibility.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/dependency-compatibility/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Dependency Compatibility</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/reference/dependency-compatibility.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="dependency-compatibility">Dependency Compatibility<a class="headerlink" href="#dependency-compatibility" title="Permanent link">&para;</a></h1>
+<p>Dependency versions can change parsing, generated values, serialization, SQL
+policy, or validation without changing this package. The release evidence
+therefore distinguishes a <strong>minimum candidate</strong> profile from the <strong>latest
+tested</strong> lock. A profile is supported only after its CI job passes; declaring a
+range in package metadata alone is not compatibility evidence.</p>
+<h2 id="semantic-dependency-inventory">Semantic Dependency Inventory<a class="headerlink" href="#semantic-dependency-inventory" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Surface affected</th>
+<th>Base or extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Faker</td>
+<td>Seeded semantic values and locale behavior</td>
+<td>Base</td>
+</tr>
+<tr>
+<td>Pydantic</td>
+<td><code>DatasetSpec</code>, profile, manifest, and report parsing/validation</td>
+<td>Base</td>
+</tr>
+<tr>
+<td>PyYAML</td>
+<td>YAML spec and business-rule parsing</td>
+<td>Base</td>
+</tr>
+<tr>
+<td>PyArrow</td>
+<td>Parquet reading, writing, and schema conversion</td>
+<td><code>parquet</code></td>
+</tr>
+<tr>
+<td>MCP</td>
+<td>Generator and Trino transport schemas</td>
+<td><code>mcp</code></td>
+</tr>
+<tr>
+<td>sqlglot</td>
+<td>Read-only SQL parsing and policy enforcement</td>
+<td><code>postgres</code>, <code>trino</code></td>
+</tr>
+<tr>
+<td>Trino client</td>
+<td>Connection construction and bounded query execution</td>
+<td><code>trino</code></td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>Optional advisor-provider request/response transport</td>
+<td><code>openai</code></td>
+</tr>
+<tr>
+<td>GigaChat</td>
+<td>Optional advisor-provider request/response transport</td>
+<td><code>gigachat</code></td>
+</tr>
+<tr>
+<td>Psycopg</td>
+<td>Read-only PostgreSQL connection boundary</td>
+<td><code>postgres</code></td>
+</tr>
+</tbody>
+</table>
+<p>Transitive packages are recorded by the lock and supply-chain evidence, but do
+not receive an independent support promise unless they affect one of these
+contract surfaces directly.</p>
+<h2 id="profiles">Profiles<a class="headerlink" href="#profiles" title="Permanent link">&para;</a></h2>
+<p>Minimum candidates match the lower bounds in <code>pyproject.toml</code>. Latest versions
+are the versions in the reviewed <code>uv.lock</code> used by the release gate on
+2026-08-12.</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Python</th>
+<th>Direct dependency set</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>base-minimum</code></td>
+<td>3.11</td>
+<td>Faker 25.0.0; Pydantic 2.7.0; PyYAML 6.0.0</td>
+</tr>
+<tr>
+<td><code>parquet-minimum</code></td>
+<td>3.11</td>
+<td>Base minimum; PyArrow 15.0.0</td>
+</tr>
+<tr>
+<td><code>mcp-minimum</code></td>
+<td>3.11</td>
+<td>Faker 25.0.0; Pydantic 2.11.0; PyYAML 6.0.0; MCP 1.28.1</td>
+</tr>
+<tr>
+<td><code>trino-minimum</code></td>
+<td>3.11</td>
+<td>Base minimum; sqlglot 30.0.0; Trino 0.330.0</td>
+</tr>
+<tr>
+<td><code>openai-minimum</code></td>
+<td>3.11</td>
+<td>Base minimum; OpenAI 2.46.0</td>
+</tr>
+<tr>
+<td><code>gigachat-minimum</code></td>
+<td>3.11</td>
+<td>Base minimum; GigaChat 0.2.3</td>
+</tr>
+<tr>
+<td><code>postgres-minimum</code></td>
+<td>3.11</td>
+<td>Base minimum; Psycopg 3.2.0; sqlglot 30.0.0</td>
+</tr>
+<tr>
+<td><code>latest-all</code></td>
+<td>3.11–3.14</td>
+<td>Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.3; Psycopg 3.3.4</td>
+</tr>
+</tbody>
+</table>
+<p>MCP 1.28.1 requires Pydantic 2.11.0, so its minimum profile cannot reuse the
+base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
+optional extra at a time. <code>latest-all</code> tests the locked dependency set across
+every supported Python version. The CI matrix installs these profiles without
+silently upgrading minimum candidates and runs the contract tests relevant to
+each surface.</p>
+<h2 id="contract-coverage">Contract Coverage<a class="headerlink" href="#contract-coverage" title="Permanent link">&para;</a></h2>
+<p>The minimum profiles run focused contracts instead of the full locked suite:</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Required behavior</th>
+<th>CI contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>base-minimum</code></td>
+<td>Deterministic generation and validation; Pydantic JSON and PyYAML parsing</td>
+<td><code>tests/test_io_workflows.py</code>, <code>tests/test_business_rules.py</code></td>
+</tr>
+<tr>
+<td><code>parquet-minimum</code></td>
+<td>Parquet serialization and loading</td>
+<td><code>tests/test_io_commands.py</code></td>
+</tr>
+<tr>
+<td><code>mcp-minimum</code></td>
+<td>Generator and Trino MCP transport schemas and real bounded stdio</td>
+<td><code>tests/test_mcp_generator_transport.py</code>, <code>tests/test_mcp_trino_transport.py</code>, <code>tests/test_mcp_sdk_roundtrip.py</code></td>
+</tr>
+<tr>
+<td><code>trino-minimum</code></td>
+<td>SQL policy and Trino client construction</td>
+<td><code>tests/test_mcp_trino_server.py</code></td>
+</tr>
+<tr>
+<td><code>openai-minimum</code></td>
+<td>Provider request, response, and error contracts</td>
+<td><code>tests/test_openai_provider.py</code></td>
+</tr>
+<tr>
+<td><code>gigachat-minimum</code></td>
+<td>Provider request, response, TLS, authentication, and error contracts</td>
+<td><code>tests/test_gigachat_provider.py</code></td>
+</tr>
+<tr>
+<td><code>postgres-minimum</code></td>
+<td>Read-only connection, SQL query policy, allowlists, budgets, and profile normalization</td>
+<td><code>tests/test_postgres_config.py</code>, <code>tests/test_postgres_client.py</code>, <code>tests/test_postgres_query_builders.py</code>, <code>tests/test_postgres_profiler.py</code>, <code>tests/test_sql_query_source.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>latest-all</code> quality matrix runs the complete test suite on every
+supported Python version. A minimum profile must not be replaced by a resolver
+check alone: its behavior contract must also pass in the isolated environment.</p>
+<h2 id="reproducibility-guarantees">Reproducibility Guarantees<a class="headerlink" href="#reproducibility-guarantees" title="Permanent link">&para;</a></h2>
+<p>MCP 2.2.0 was selected for compatibility testing on 2026-09-23. The shared
+adapter supports both SDK server APIs while preserving wire aliases and the
+per-request budget. SDK 2 unexpected tool exceptions produce the fixed
+<code>Tool execution failed</code> message before SDK logging; validation errors remain
+redacted. This does not add row-returning tools or relax transport limits.</p>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Guarantee</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Same environment</td>
+<td>Reusing the recorded package, Python, dependencies, locale, serializer, spec, rules, and seed provides the logical reproducibility baseline. Recorded artifact digests can verify an exact repeat.</td>
+</tr>
+<tr>
+<td>Same package version</td>
+<td>Logical behavior is supported only on dependency profiles that pass CI. Different Python, dependency, locale, or serializer versions may change generated values, ordering, and bytes.</td>
+</tr>
+<tr>
+<td>Cross-version</td>
+<td>DatasetSpec compatibility follows its schema-version policy, but generated values, ordering, and byte identity are not guaranteed. Package release notes describe intentional semantic changes.</td>
+</tr>
+</tbody>
+</table>
+<p>The manifest records the environment evidence needed to compare runs. Its
+<code>byte_identical_across_versions: false</code> field is normative: a seed is not a
+cross-version snapshot promise. <code>normalized_dependencies</code> uses canonical
+lowercase distribution names and includes installed optional integrations;
+<code>normalized_dependencies_sha256</code> fingerprints that map. The legacy
+<code>dependencies</code> fields remain for additive manifest compatibility.</p>
+<h2 id="support-rules">Support Rules<a class="headerlink" href="#support-rules" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Same package, Python, dependency, locale, serializer, spec, rules, and seed
+  provide the logical reproducibility baseline recorded in the manifest.</li>
+<li>Byte identity is checked only where an artifact digest is recorded; it is not
+  promised across Python, package, dependency, locale, or serializer changes.</li>
+<li>A dependency update that changes parsing, generation, SQL policy, or
+  validation semantics requires review, compatibility evidence, and a package
+  release.</li>
+<li>MCP accepts <code>&lt;3</code> after migration of server, JSON-RPC and context handling;
+  OpenAI accepts <code>&lt;4</code> with 2.46.0 minimum and 3.18.0 latest coverage.
+  No new upper major bound is implied for Faker, Pydantic, PyYAML,
+  PyArrow, sqlglot, or Trino until minimum/latest matrix evidence justifies it.</li>
+<li>GigaChat remains on <code>&gt;=0.2.3,&lt;0.2.4</code> because its SDK changed the chat API
+  between 0.2.1 and 0.2.3; each later release needs a compatibility review.</li>
+<li>A failing profile is unsupported until fixed or explicitly removed from the
+  documented range with release notes.</li>
+</ul>
+<p>The lockfile is evidence for the latest profile, not a promise that unrelated
+future dependency versions are compatible.</p>
+<p>The release gate treats <code>.github/dependency-compatibility.toml</code> as the reviewed
+machine-readable record. It rejects runtime dependencies missing from that
+inventory, lower-bound or lockfile drift, CI profiles that lose their minimum
+constraints, undocumented reviewed versions, and incomplete or incorrectly
+hashed dependency evidence in a generated manifest.</p>
+<h2 id="upper-bound-decisions">Upper-Bound Decisions<a class="headerlink" href="#upper-bound-decisions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Decision</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MCP</td>
+<td>Accept <code>&lt;3.0.0</code></td>
+<td>MCP 2.2.0 transport contracts cover byte budgets, redaction and request context; MCP 1.28.1 remains the minimum.</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>Accept <code>&lt;4.0.0</code></td>
+<td>OpenAI 3.18.0 evaluated with offline real-SDK HTTP transport, provider privacy contracts and doctor checks; 2.46.0 minimum retained.</td>
+</tr>
+<tr>
+<td>GigaChat</td>
+<td>Retain <code>&lt;0.2.4</code></td>
+<td>The adapter is tested against the current 0.2.3 <code>chat.create</code> contract; earlier 0.2.x releases use an incompatible call shape.</td>
+</tr>
+<tr>
+<td>Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg</td>
+<td>Add no upper bound</td>
+<td>The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible.</td>
+</tr>
+</tbody>
+</table>
+<p>A newly discovered incompatibility must first be reproduced by a focused
+contract test. Narrowing a range then requires a user-facing changelog entry
+and a package release; an unreviewed speculative bound is not accepted.</p>
+<h2 id="installation-footprint">Installation Footprint<a class="headerlink" href="#installation-footprint" title="Permanent link">&para;</a></h2>
+<p>The CI dependency ceilings are intentionally small enough to catch accidental
+growth:</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Capability</th>
+<th style="text-align: right;">Maximum installed distributions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base</td>
+<td>CSV and JSON</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td><code>parquet</code></td>
+<td>Parquet files</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr>
+<td><code>mcp</code></td>
+<td>Generator MCP server</td>
+<td style="text-align: right;">35</td>
+</tr>
+<tr>
+<td><code>openai</code></td>
+<td>Optional structured-output advisor</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr>
+<td><code>gigachat</code></td>
+<td>Experimental GigaChat advisor</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr>
+<td><code>trino</code></td>
+<td>Trino client and safe SQL parser</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td><code>postgres</code></td>
+<td>Read-only PostgreSQL profiling driver</td>
+<td style="text-align: right;">12</td>
+</tr>
+</tbody>
+</table>
+<p>These are regression budgets, not a guarantee that every platform installs the
+same count. <code>PyArrow</code> is the largest optional wheel, so keep <code>parquet</code> out of
+environments that do not produce Parquet files.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/how-to/trino/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Profile Through Trino - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Profile Through Trino";
+        var mkdocs_page_input_path = "how-to/trino.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/how-to/trino/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Profile Through Trino</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#mcp-with-a-username-and-password">MCP with a username and password</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-prepare-the-environment-and-access">1. Prepare the environment and access</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-supply-the-password-to-the-process">2. Supply the password to the process</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-register-the-server-in-your-mcp-client">3. Register the server in your MCP client</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-verify-startup-and-diagnose-failures">4. Verify startup and diagnose failures</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#authentication-failures">Authentication failures</a>
+    </li>
+    </ul></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-To Guides</li>
+      <li class="breadcrumb-item active">Profile Through Trino</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/trino.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/how-to/trino/" hreflang="ru" lang="ru">Русский</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="profile-through-trino">Profile Through Trino<a class="headerlink" href="#profile-through-trino" title="Permanent link">&para;</a></h1>
+<p>English · <a href="../../ru/how-to/trino/">Русский</a></p>
+<p>Database profiling is available in stable <code>1.6.0</code> and requires explicit
+read-only configuration, allowlists and resource budgets.</p>
+<p>Install the optional Trino client and, when using MCP, the MCP SDK:</p>
+<pre><code class="language-bash">pip install &quot;agent-paranoid-android[trino]&quot;
+pip install &quot;agent-paranoid-android[mcp,trino]&quot;
+</code></pre>
+<p>Stable <code>1.6.0</code> supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
+certificates are documented in the
+<a href="../../reference/configuration/#trino-connection">configuration reference</a>. Follow its
+runtime secret-indirection, HTTPS verification and local OAuth opt-in rules.
+Local contract tests do not establish remote authentication compatibility.</p>
+<p>Configure an explicit read-only scope:</p>
+<pre><code class="language-bash">export TRINO_HOST=trino.example.internal
+export TRINO_PORT=8443
+export TRINO_USER=test_data_agent
+export TRINO_HTTP_SCHEME=https
+export TRINO_ALLOWED_CATALOGS=warehouse
+export TRINO_ALLOWED_SCHEMAS=analytics
+export TRINO_ALLOWED_TABLE_COLUMNS='warehouse.analytics.orders.*'
+export TRINO_DEPLOYMENT_PROFILE=shared-hardened
+export TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES=1073741824
+</code></pre>
+<p><code>TRINO_ALLOWED_TABLE_COLUMNS</code> is optional for compatibility. When set, an
+entry is either one exact <code>catalog.schema.table.column</code> or the exact
+<code>catalog.schema.table.*</code> form. Wildcards require restricted mode and catalog
+and schema membership in the mandatory allowlists. Bounded
+<code>information_schema</code> metadata is validated and sorted before the first table
+aggregate; the complete column budget is charged in preflight. Executed
+profiling SQL still quotes explicit columns and never projects <code>*</code>.</p>
+<p>The same endpoint and optional request defaults can come from a credential-free
+JDBC-style URL:</p>
+<pre><code class="language-bash">export TRINO_JDBC_URL='jdbc:trino://trino.example.internal:8443/warehouse/analytics?SSL=true'
+export TRINO_USER=test_data_agent
+export TRINO_ALLOWED_CATALOGS=warehouse
+export TRINO_ALLOWED_SCHEMAS=analytics
+</code></pre>
+<p>The catalog and schema path must match the allowlists. Credentials, tokens,
+roles, session properties, proxies, headers, unknown properties, and
+<code>SSL=false</code> fail before client construction. This is parsed into the Python
+Trino client; it does not install or invoke Java or a JDBC driver. Explicit
+component settings may coexist only when their values agree.</p>
+<p>The default aggregate-only MCP tools list allowlisted metadata, describe
+tables, and compute bounded aggregate profiles. They do not return source rows
+or raw category literals. Table and column profiling share cumulative
+statement, column, deadline, response, and optional scan budgets.</p>
+<p>A wildcard authorizes aggregate profiling scope only. It does not authorize
+category literals, preserve-as-is, caller SQL stars, row-returning tools,
+provider payloads, default MCP literals, logs, or errors. Exact table-column
+entries retain their existing bounded category-summary policy.</p>
+<p>Check that the Trino capability is installed, then start the MCP server:</p>
+<pre><code class="language-bash">test-data-agent doctor --require-extra trino
+test-data-agent-mcp-trino
+</code></pre>
+<p><code>doctor</code> checks the installed driver, safe-SQL support and configured deployment
+budget profile using a local smoke check. It does not validate the selected
+endpoint, authentication or catalog/schema allowlists, or contact Trino.
+Server startup and tool calls enforce their respective configuration and access
+checks; a successful local doctor check does not prove database access.</p>
+<p>The explicit opt-in <code>run_safe_select</code> surface is disabled by default. Enabling
+it is a separate row-privacy contract: every string is recursively masked, but
+allowed non-string source values may remain, so its output is not source-free,
+anonymous, or a generated dataset.</p>
+<p>Use the checked-in disposable example for a complete profile-to-generation
+workflow over Trino's synthetic TPC-H <code>tiny</code> catalog:</p>
+<pre><code class="language-bash">examples/local_trino/run.sh /tmp/agent-paranoid-trino-example
+</code></pre>
+<p>Use <code>examples/local_trino/run-jdbc.sh OUTPUT</code> to run the identical disposable
+workflow with its endpoint and <code>tpch/tiny</code> defaults supplied in JDBC syntax.
+Use <code>examples/local_trino/run-wildcard.sh OUTPUT</code> to exercise bounded
+<code>tpch.tiny.nation.*</code> expansion and deterministic field ordering.
+Use <code>examples/local_trino/run-query.sh OUTPUT</code> to profile one reviewed local
+<code>SELECT</code> as a virtual entity. Query-source mode additionally requires exact
+<code>TRINO_ALLOWED_TABLE_COLUMNS</code> entries or a table-qualified wildcard and rejects
+unrestricted mode. It stores a fingerprint, not query text, literals, backend
+messages, endpoints, or result rows.</p>
+<p>The typed Python entry point uses the same environment configuration and
+policy boundary:</p>
+<pre><code class="language-python">from pathlib import Path
+
+import trino
+
+from test_data_agent import (
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    profile_trino_query_source,
+)
+from test_data_agent.trino_config import TrinoConfig
+
+request = SqlQueryProfileRequest(
+    adapter=SqlQueryAdapter.TRINO,
+    source_id=&quot;warehouse&quot;,
+    entity=&quot;nation_query&quot;,
+    query_file=Path(&quot;query.sql&quot;),
+)
+profile = profile_trino_query_source(
+    request,
+    config=TrinoConfig.from_env(),
+    driver=trino,
+)
+</code></pre>
+<p>The example removes its container on success or failure and leaves only the
+safe profile, reviewed spec, generated rows, validation report, manifest, and a
+bounded result summary. See <a href="../../reference/configuration/">Configuration</a> and
+<a href="../../mcp_examples/">MCP Tools</a> for the full limits and tool contracts.</p>
+<h2 id="mcp-with-a-username-and-password">MCP with a username and password<a class="headerlink" href="#mcp-with-a-username-and-password" title="Permanent link">&para;</a></h2>
+<p>Select <code>TRINO_AUTH_METHOD=basic</code> explicitly for username/password login.
+The default is <code>none</code>: setting <code>TRINO_USER</code> alone does not send a password.
+<code>TRINO_AUTH_SECRET_ENV</code> holds the <strong>name of the password environment variable</strong>,
+not the password. Basic requires verified HTTPS, including local deployments.</p>
+<h3 id="1-prepare-the-environment-and-access">1. Prepare the environment and access<a class="headerlink" href="#1-prepare-the-environment-and-access" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash">python3 -m venv /ABSOLUTE/PATH/trino-env
+/ABSOLUTE/PATH/trino-env/bin/python -m pip install 'agent-paranoid-android[mcp,trino]'
+/ABSOLUTE/PATH/trino-env/bin/test-data-agent --version
+/ABSOLUTE/PATH/trino-env/bin/test-data-agent doctor --require-extra trino
+</code></pre>
+<p>Replace <code>/ABSOLUTE/PATH</code> with your absolute path. Doctor checks local installation,
+not server login. Obtain the HTTPS host/port, login, approved catalog/schema/table/
+column scope and read-only metadata/aggregate grants from your Trino administrator.
+The MCP process needs network access, any required VPN and a trusted certificate
+chain. A corporate CA must be trusted by the Python/runtime environment; keep
+certificate verification enabled.</p>
+<h3 id="2-supply-the-password-to-the-process">2. Supply the password to the process<a class="headerlink" href="#2-supply-the-password-to-the-process" title="Permanent link">&para;</a></h3>
+<p>If your MCP client supports protected secret injection into child-process
+environment variables, configure <code>MY_TRINO_PASSWORD</code> there. Keep the password out
+of JSON, repositories, command arguments and chat. A graphical application may
+not inherit terminal variables, and a <code>.env</code> file is not loaded automatically.
+Restart the MCP server after changing its environment.</p>
+<p>A complete <strong>macOS</strong> option: use Keychain Access to create a password item named
+<code>agent-paranoid-android-trino</code>, with its account matching <code>TRINO_USER</code> and your
+password. Save this script as <code>/ABSOLUTE/PATH/start-trino-mcp.sh</code>, replacing the
+path to the installed server:</p>
+<pre><code class="language-bash">#!/bin/bash
+# Resolve the password locally; reserve stdout for the MCP protocol.
+if ! MY_TRINO_PASSWORD=$(/usr/bin/security find-generic-password \
+    -s agent-paranoid-android-trino -a &quot;$TRINO_USER&quot; -w 2&gt;/dev/null); then
+  printf '%s\n' 'Trino password is unavailable in Keychain' &gt;&amp;2
+  exit 1
+fi
+export MY_TRINO_PASSWORD
+exec /ABSOLUTE/PATH/trino-env/bin/test-data-agent-mcp-trino
+</code></pre>
+<p>Run <code>chmod 700 /ABSOLUTE/PATH/start-trino-mcp.sh</code>. Allow local access to that
+item if macOS prompts. Do not enable <code>set -x</code> or print the password. This launcher
+resolves the secret at startup without relying on a GUI application's inherited
+environment. On other operating systems use the client's protected storage or a
+local secret mechanism.</p>
+<h3 id="3-register-the-server-in-your-mcp-client">3. Register the server in your MCP client<a class="headerlink" href="#3-register-the-server-in-your-mcp-client" title="Permanent link">&para;</a></h3>
+<p>This is the common <code>mcpServers</code> shape; the settings location depends on the client.
+Replace all fictional endpoints, usernames and data names locally. This example
+uses the Keychain launcher from the previous step:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;trino&quot;: {
+      &quot;command&quot;: &quot;/ABSOLUTE/PATH/start-trino-mcp.sh&quot;,
+      &quot;env&quot;: {
+        &quot;TRINO_HOST&quot;: &quot;trino.example.internal&quot;,
+        &quot;TRINO_PORT&quot;: &quot;443&quot;,
+        &quot;TRINO_HTTP_SCHEME&quot;: &quot;https&quot;,
+        &quot;TRINO_USER&quot;: &quot;your_login&quot;,
+        &quot;TRINO_AUTH_METHOD&quot;: &quot;basic&quot;,
+        &quot;TRINO_AUTH_SECRET_ENV&quot;: &quot;MY_TRINO_PASSWORD&quot;,
+        &quot;TRINO_ALLOWED_CATALOGS&quot;: &quot;warehouse&quot;,
+        &quot;TRINO_ALLOWED_SCHEMAS&quot;: &quot;analytics&quot;,
+        &quot;TRINO_ALLOWED_TABLE_COLUMNS&quot;: &quot;warehouse.analytics.orders.*&quot;,
+        &quot;TRINO_DEPLOYMENT_PROFILE&quot;: &quot;shared-hardened&quot;,
+        &quot;TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES&quot;: &quot;1073741824&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<p>When the client securely supplies <code>MY_TRINO_PASSWORD</code> instead of using Keychain,
+set <code>command</code> directly to
+<code>/ABSOLUTE/PATH/trino-env/bin/test-data-agent-mcp-trino</code>.
+Secret substitution is client-specific: <code>${MY_TRINO_PASSWORD}</code> in JSON is not a
+universal substitution mechanism.</p>
+<p><code>TRINO_HOST</code> is a host name without a URL scheme or path; use the actual HTTPS
+port. Catalog/schema allowlists are mandatory comma-separated sets. Column scope
+is optional for ordinary table profiling, but required for <code>profile-query</code>.
+You may replace <code>warehouse.analytics.orders.*</code> with comma-separated exact columns.
+The wildcard permits bounded aggregate profiling only, grants no source-row
+access and does not replace Trino grants.</p>
+<p>The cumulative scan limit shown is 1 GiB per invocation. Existing defaults also
+bound request timeout to 30 seconds, execution time to 30 seconds, run time to
+45 seconds and scanning to 1 GiB per query. <code>TRINO_CATALOG</code> and <code>TRINO_SCHEMA</code>
+are optional defaults within the allowlists. See the
+<a href="../../reference/configuration/#trino-connection">configuration reference</a> for all settings.</p>
+<h3 id="4-verify-startup-and-diagnose-failures">4. Verify startup and diagnose failures<a class="headerlink" href="#4-verify-startup-and-diagnose-failures" title="Permanent link">&para;</a></h3>
+<p>Restart the server in your MCP client and check that Trino tools appear. Start
+with an allowed metadata tool such as <code>list_catalogs</code>, then <code>describe_table</code> for
+an approved table. Process startup and Doctor success do not prove authentication.
+These instructions are checked locally against configuration contracts, not
+against your remote server.</p>
+<p>For a 401, check <code>basic</code>, the variable referenced by <code>TRINO_AUTH_SECRET_ENV</code>,
+the login and process restart locally. For a 403, check server grants and access
+policy; a status alone does not establish the exact cause. For TLS failures,
+check the endpoint and certificate trust.</p>
+<p>For support share the package version, launch method, <code>TRINO_AUTH_METHOD</code>,
+<code>TRINO_HTTP_SCHEME</code>, whether a login and secret reference are set, whether the
+password variable reaches the process, and whether another client can log in.
+Do not share login/password values, complete <code>.env</code> files, connection URLs,
+source rows or raw driver responses.</p>
+<h2 id="authentication-failures">Authentication failures<a class="headerlink" href="#authentication-failures" title="Permanent link">&para;</a></h2>
+<p>For a failed connection, record the installed package version and selected
+<code>TRINO_AUTH_METHOD</code> locally. Share only those details when investigating a failure;
+do not share passwords, tokens, connection URLs or raw driver responses.
+A reported HTTP 401 alone does not identify a configuration or compatibility issue.</p>
+<p>SQL-query profiling converts untyped HTTP 401/403 and TLS failures into the fixed
+<code>SQL query source profiling failed</code> error, without retaining the original
+exception cause or context. The CLI keeps its <code>external_service</code> category and
+leaves an existing output artifact unchanged. MCP returns its fixed Trino error
+and records value-free audit diagnostics. These boundaries do not establish
+successful authentication against a particular server.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../postgresql/" class="btn btn-neutral float-left" title="Profile PostgreSQL"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../transformation/" class="btn btn-neutral float-right" title="Transform Local Data">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../postgresql/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../transformation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

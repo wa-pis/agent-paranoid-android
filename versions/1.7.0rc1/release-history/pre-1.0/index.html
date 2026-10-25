@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/release-history/pre-1.0/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Pre-1.0 Release Candidate History - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Pre-1.0 Release Candidate History";
+        var mkdocs_page_input_path = "release-history/pre-1.0.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/release-history/pre-1.0/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Pre-1.0 Release Candidate History</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/release-history/pre-1.0.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="pre-10-release-candidate-history">Pre-1.0 Release Candidate History<a class="headerlink" href="#pre-10-release-candidate-history" title="Permanent link">&para;</a></h1>
+<p>This archive preserves the detailed <code>1.0.0</code> release-candidate notes moved from
+the main changelog. Stable release notes remain in
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<h2 id="100rc6-2026-08-11"><a href="https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc5...v1.0.0rc6">1.0.0rc6</a> - 2026-08-11<a class="headerlink" href="#100rc6-2026-08-11" title="Permanent link">&para;</a></h2>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add an allowlist-only <code>profile-postgres</code> CLI workflow that writes safe
+  metadata and bounded aggregate profiles through the optional PostgreSQL driver.</li>
+<li>Add a typed field-scoped local category allowlist across CSV, folder, agent,
+  CLI, profile, and generation-spec boundaries without weakening default
+  category replacement.</li>
+<li>Add <code>export-postgres-sql</code> for one deterministic, atomically published
+  PostgreSQL transaction containing quoted DDL, foreign keys, and INSERT
+  statements generated from validated synthetic records.</li>
+<li>Add complete PostgreSQL and Trino guides plus runnable synthetic local
+  examples for disposable profiling, generation, validation, and SQL execution.</li>
+<li>Add field-scoped, collision-safe placeholders for rare categorical values.</li>
+<li>Add typed per-call OpenAI structured completion results and failure metadata;
+  retain <code>last_run_metadata</code> only as a legacy compatibility view.</li>
+<li>Add <code>trusted-local</code> and <code>shared-hardened</code> Trino deployment profiles, with a
+  required finite cumulative scan ceiling for shared environments.</li>
+<li>Add bounded Trino deployment profile and effective scan-limit status to
+  <code>doctor</code>.</li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Restore field-and-destination privacy policy: preserve explicitly allowlisted
+  safe business enums locally, keep sensitive and unknown fields transformed,
+  and keep every external-provider category source-literal free.</li>
+<li>Bind review-first CSV agent plans and final no-copy validation to the exact
+  source version captured before profiling, rejecting changed or legacy
+  unbound plans before publication.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Validate JSON dataset fields by membership rather than object-key order, so
+  deterministic sorted-key artifacts pass the documented standalone
+  validation command.</li>
+</ul>
+<h3 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Document four accepted Low security findings with exact identities, risk
+  ownership, revisit triggers, and a first post-1.0 hardening target.</li>
+<li>Pin the Dockerfile frontend to the immutable multi-platform digest behind
+  <code>docker/dockerfile:1.7</code>.</li>
+<li>Bind single-CSV no-copy validation to SHA-256 row digests collected during
+  the same read that produced the profile, so path replacement cannot switch
+  the checked source before publication.</li>
+<li>Reject entity names reserved for generation control artifacts during spec
+  validation and again before any dataset file is written.</li>
+<li>Reject duplicate entity stems across CSV, JSON, and Parquet dataset folders
+  before any row artifact is read.</li>
+<li>Check local CSV profiling deadlines between individual field-processing and
+  field-finalization operations.</li>
+<li>Reserve bounded terminal audit capacity before MCP tool execution so a full
+  log rejects admission instead of losing the completion event.</li>
+<li>Replace source-derived CSV-folder text categories with collision-safe rank
+  labels before caching, spec inference, or generation while preserving counts
+  and conditional-rule semantics.</li>
+<li>Replace source-derived advisor constraint literals with the same field-scoped
+  category labels, reject unrepresented strings, and preserve executable
+  conditions across persisted-review verification.</li>
+<li>Replace every provider-bound categorical JSON scalar with a deterministic
+  field-scoped label while preserving numeric distribution bounds.</li>
+<li>Recursively mask strings in bounded composite <code>run_safe_select</code> values so
+  nested Trino maps, arrays, and rows cannot bypass the opt-in row policy.</li>
+<li>Prevent equal rare values in different fields from sharing a synthetic
+  placeholder and prevent placeholders from colliding with normal categories,
+  including placeholder-shaped baseline literals, while preserving sanitizer
+  provenance across reordered baseline categories.</li>
+<li>Keep provider metadata attached to the invocation that produced it, including
+  preflight and provider-error paths, without retaining prompts or source data.</li>
+<li>Detach handled OpenAI provider and validation failures from their original
+  cause/context chains, and replace incomplete-response status text with a
+  fixed bounded local error.</li>
+<li>Reject advisor formulas with string constants, unknown or incompatible
+  references, and protected targets; enforce fixed post-solve type and privacy
+  checks before generated rows reach publication adapters.</li>
+<li>Run generator MCP over the bounded stdio transport with fresh shared request
+  budgets, bounded final responses, and pre-materialization JSON structure
+  limits.</li>
+<li>Restrict public artifact names to safe path components, neutralize
+  spreadsheet formula markers in CSV cells, and replace formula diagnostics
+  with fixed local reasons.</li>
+<li>Bound active MCP requests and shared Trino operations process-wide, return a
+  fixed capacity error, and release admission state on every terminal path.</li>
+<li>Replace backend-controlled Trino failures with a fixed detached MCP error and
+  expose catalog/schema discovery only through configured allowlists.</li>
+<li>Mask every string returned by the explicit opt-in <code>run_safe_select</code> surface,
+  including names and addresses missed by heuristic classification.</li>
+<li>Isolate semantic-provider calls behind a fixed deadline, require matching
+  same-seed replay, and restrict string output to the <code>synthetic_</code> namespace.</li>
+<li>Publish files, folders, caches, and agent workspaces through one no-follow,
+  descriptor-relative path policy that revalidates inode identity before
+  replacement and cleanup.</li>
+<li>Publish single-entity manifests last, verify recorded artifact hashes before
+  reporting completion, and require explicit overwrite approval for every
+  replaced sibling artifact.</li>
+<li>Escape and bound untrusted CLI diagnostics, paths, provider metadata, and
+  row-count labels, while preserving structured JSON errors and bounded
+  canonical audit records.</li>
+<li>RC6 acceptance additionally requires source-free external advisor payloads,
+  suppression of exact sensitive numeric profile metrics, semantically
+  validated provider constraints, bounded generator MCP framing and JSON
+  materialization, bounded active requests, explicit opt-in row privacy,
+  semantic-provider and filesystem boundaries, safe CSV/artifact boundaries,
+  escaped diagnostics, trusted release identity, and external acceptance
+  evidence.</li>
+</ul>
+<h2 id="100rc5-2026-08-08"><a href="https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc4...v1.0.0rc5">1.0.0rc5</a> - 2026-08-08<a class="headerlink" href="#100rc5-2026-08-08" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add bounded typed OpenAI advisor settings for model, reasoning effort,
+  input bytes, output tokens, timeout, retries, and optional service tier.</li>
+<li>Add bounded in-memory OpenAI advisor run metadata for settings, sizes,
+  latency, status, provider-reported retries, and token usage.</li>
+<li>Add a separate OpenAI relationship-candidate ranking adapter that accepts
+  only bounded deterministic candidates and returns review-required proposals.</li>
+<li>Add explicit bounded fast, normal, and quality OpenAI advisor candidate
+  presets without changing constructor defaults before benchmark evidence.</li>
+<li>Add a synthetic-only OpenAI advisor preset benchmark runner with explicit
+  pricing inputs and redacted aggregate quality, latency, usage, and cost data.</li>
+<li>Expand the advisor acceptance runner to five synthetic profile shapes and an
+  explicit bounded run count with p50/p95, error, retry, token, and cost metrics.</li>
+</ul>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Use GPT-5.6 reasoning effort <code>none</code> for the fast advisor candidate while
+  retaining the legacy typed <code>minimal</code> value for compatibility.</li>
+<li>Select the benchmark-backed fast advisor settings as the constructor defaults:
+  4,096 output tokens, a 15-second timeout, and no SDK retries.</li>
+<li>Complete the 60-call RC5 advisor acceptance benchmark across five synthetic
+  profile shapes with 100% validity and safety preservation, no errors or
+  timeouts, and aggregate latency, token, retry-reporting, and cost evidence.</li>
+</ul>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Send the advisor's public free-form-compatible JSON Schema in non-strict mode
+  and fail closed through local typed validation of every provider response.</li>
+</ul>
+<h3 id="security_1">Security<a class="headerlink" href="#security_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Bound JSON-RPC request IDs by their serialized UTF-8 size before they can be
+  reflected in Trino MCP success or error responses.</li>
+<li>Replace oversized Trino MCP responses with a fixed bounded JSON-RPC error and
+  reject transport-response limits too small to reserve that error.</li>
+<li>Cover wide-row database overflow and final JSON-RPC growth from nested
+  metadata and escaping with explicit response-budget regression tests.</li>
+<li>Add typed cumulative profiled-column, invocation-deadline, and optional
+  estimated-scan limits to the shared Trino invocation budget.</li>
+<li>Set benchmark-backed Trino invocation defaults of 100 profiled columns, 150
+  statements, and 120 seconds.</li>
+<li>Enforce profiled-column, statement, deadline, and conservative scan estimates
+  through one monotonic budget across nested Trino table profiling.</li>
+<li>Clamp Trino HTTP, execution, and run timeouts to the remaining invocation
+  deadline and close active query resources when it expires.</li>
+<li>Add fail-closed environment configuration and scope documentation for Trino
+  invocation column, statement, deadline, and optional scan limits.</li>
+<li>Bound each fresh local CSV-folder profile with typed deadline, sample, input
+  byte, and cell limits, leaving no partial metadata cache after exhaustion.</li>
+<li>Count trusted instructions, untrusted metadata, structured-output schema,
+  settings, and serialization in the OpenAI advisor request budget.</li>
+<li>Reject non-protocol JSON-RPC request IDs before dispatch and isolate active
+  request budgets by exact serialized ID type and value.</li>
+</ul>
+<h2 id="100rc4-2026-08-02"><a href="https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc3...v1.0.0rc4">1.0.0rc4</a> - 2026-08-02<a class="headerlink" href="#100rc4-2026-08-02" title="Permanent link">&para;</a></h2>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Remove the <code>sample_rows_masked</code> Trino MCP tool, masking-service method, and
+  query builder from the RC4 compatibility surface.</li>
+<li>Pin RC4 installation guidance and optional extras to <code>1.0.0rc4</code>, with a
+  tag-matched clean-environment README smoke gate for the public wheel.</li>
+<li>Verify installed-wheel CSV and JSON quickstarts without optional integration
+  dependencies, and isolate Trino-extra failures in a separate CI check.</li>
+<li>Document the exact aggregate-only default Trino MCP surface and classify the
+  separately enabled safe-select rows as potentially containing source values.</li>
+<li>Define atomic visibility and process-interruption recovery separately from
+  crash durability, with artifact fsync explicitly deferred until after 1.0.</li>
+<li>Define stable 1.0 promotion as the accepted RC4 production tree plus only
+  reviewed version, changelog, and release-metadata updates; any code or
+  dependency change requires another release candidate.</li>
+</ul>
+<h3 id="security_2">Security<a class="headerlink" href="#security_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Remove the row-returning diagnostic path instead of relying on heuristic
+  masking to prevent unknown source literals from reaching MCP clients.</li>
+<li>Create a concurrency-isolated work budget for every Trino MCP invocation and
+  reject canonical application arguments over 256 KiB before tool execution.</li>
+<li>Reject raw Trino MCP stdio payloads over 1 MiB before JSON-RPC argument
+  parsing, without retaining the complete oversized frame in memory.</li>
+<li>Bound cumulative SQL and formula character work before Python/sqlglot
+  parsing and before opening a Trino connection.</li>
+<li>Bound cumulative Python and sqlglot AST nodes and maximum depth before
+  formula rendering, policy traversal, or Trino query execution.</li>
+<li>Bound cumulative explicit SQL projections before opening a Trino connection
+  and fail closed when a projection wildcard has unknown width.</li>
+<li>Bound cumulative parsed SQL statements before opening a Trino connection or
+  cursor.</li>
+<li>Consume Trino response metadata and rows incrementally against the shared
+  byte budget before retaining a complete oversized result.</li>
+<li>Share one monotonic budget across nested table/column profiling and opt-in
+  safe SELECT execution, stopping before later Trino work after exhaustion.</li>
+</ul>
+<h3 id="migration">Migration<a class="headerlink" href="#migration" title="Permanent link">&para;</a></h3>
+<ul>
+<li>MCP clients that called <code>sample_rows_masked</code> must use metadata and aggregate
+  profiling tools such as <code>describe_table</code>, <code>profile_table_safe</code>, and
+  <code>profile_column</code>. The separate <code>run_safe_select</code> tool remains explicit
+  operator opt-in and is not a source-literal-free replacement.</li>
+</ul>
+<h2 id="100rc3-2026-08-02"><a href="https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc2...v1.0.0rc3">1.0.0rc3</a> - 2026-08-02<a class="headerlink" href="#100rc3-2026-08-02" title="Permanent link">&para;</a></h2>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add a manual post-publish gate that verifies immutable GitHub Release, PyPI,
+  documentation, and signed multi-platform GHCR artifacts, then exercises
+  agent approval and audit verification from the public wheel.</li>
+</ul>
+<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Preserve public Python, CLI, MCP, artifact, error, and safety contracts while
+  moving workspace, agent lifecycle, CLI, and Trino ownership behind typed
+  application boundaries. No user migration is required.</li>
+</ul>
+<h3 id="security_3">Security<a class="headerlink" href="#security_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Enforce spec safety inside the agent approval service before calling an
+  injected generation port.</li>
+<li>Reject symlinked agent workspace targets at the persistence boundary before
+  creating plan staging artifacts.</li>
+</ul>
+<h2 id="100rc2-2026-08-01"><a href="https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc1...v1.0.0rc2">1.0.0rc2</a> - 2026-08-01<a class="headerlink" href="#100rc2-2026-08-01" title="Permanent link">&para;</a></h2>
+<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Publish release-candidate container images with their PEP 440 package version
+  while reserving floating major, minor, and <code>latest</code> tags for stable releases.</li>
+</ul>
+<h2 id="100rc1-2026-08-01"><a href="https://github.com/wa-pis/agent-paranoid-android/compare/v0.12.0...v1.0.0rc1">1.0.0rc1</a> - 2026-08-01<a class="headerlink" href="#100rc1-2026-08-01" title="Permanent link">&para;</a></h2>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Added a <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/local_trino">disposable local Trino journey</a> that
+  profiles the built-in synthetic TPC-H catalog through bounded operations
+  before generating fresh rows.</li>
+<li>Added a <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/mcp_stdio">runnable stdio MCP journey</a> using both
+  installed servers, review-bound generation, and a disallowed Trino request
+  rejected before network access.</li>
+<li>Added deterministic SQL <code>INSERT</code> export with quoted identifiers, escaped
+  literals, manifest evidence, and a
+  <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/output_formats">runnable all-format example</a>.</li>
+<li>Added <a href="../../reference/dependency-compatibility/">canonical dependency identities</a>
+  and a stable dependency fingerprint to generation-manifest reproducibility
+  evidence.</li>
+<li>Added an offline <code>test-data-agent demo --output PATH</code> workflow using a
+  bundled fictional fixture, deterministic seed, and atomic artifact publish,
+  plus product-fit guidance comparing alternative test-data approaches.</li>
+<li>Added metadata-only effective generation and business-rule evidence to
+  generation manifests, bound to exact spec and rule fingerprints.</li>
+<li>Added bounded numeric distribution scaling with fail-closed non-identity
+  scaling for sensitive synthetic totals.</li>
+<li>Added domain-agnostic business-invariant coverage for component formulas,
+  partitions, temporal windows, paired values, grouped totals, relationship
+  coverage, and cross-table reconciliation across multiple domains.</li>
+<li>Added metadata-only temporal relationship candidates with normalized range
+  overlap evidence and no provider-visible source date bounds.</li>
+<li>Added relationship-discovery coverage for compatible key types, normalized
+  cardinality/null/distinctness evidence, and ambiguous low-confidence cases.</li>
+<li>Added metadata-only relationship candidate mining, provider ranking validation,
+  and explicit human review records that cannot authorize generation.</li>
+<li>A runnable single-table CSV example now exercises explicit profiling, spec
+  inference, deterministic generation, and independent validation.</li>
+<li>A runnable relational CSV example now verifies generated foreign keys,
+  deterministic business rules, and multi-table validation.</li>
+<li>A runnable public Python API example now demonstrates metadata-only spec
+  inference, seeded bundle generation, and independent validation.</li>
+<li>Provider-neutral relationship discovery candidate and proposal contracts
+  restricted to bounded safe metadata and mandatory human review.</li>
+<li>Public relational-synthesis contract defining preserved graph, distribution,
+  temporal, and business-rule semantics and explicit non-guarantees.</li>
+<li>Public conduct, support, governance, and code-ownership policies for the
+  current single-maintainer project model.</li>
+<li>Generation manifests now record bounded reproducibility inputs and output
+  SHA-256 evidence while distinguishing logical from cross-version byte-level
+  reproducibility.</li>
+<li>Cross-table average aggregate mappings across deterministic generation,
+  validation, safe profile inference, and read-only Trino profiling.</li>
+<li>Deterministic controlled negative generation across required, allowed-value,
+  numeric-bound, conditional, temporal, and formula business rules.</li>
+<li>Coordinated negative foreign-key and concrete-field aggregate-formula cases
+  that preserve unrelated rows and parent tables.</li>
+<li>Bounded expected-versus-observed violation counts in business-validation
+  reports and generation manifests for controlled invalid datasets.</li>
+<li>A checked-in controlled-invalid example with tested CLI/MCP reproducibility
+  from one spec, rule file, seed, mode, and invalid ratio.</li>
+<li>A public stability table mapping Python, CLI, MCP, <code>DatasetSpec</code>, advisor,
+  and artifact contracts to owners, compatibility rules, and test gates.</li>
+<li>A versioned catalog covering every golden JSON and MCP fixture with enforced
+  additive-only or schema-versioned change rules.</li>
+<li>A compatibility inventory for retained CLI aliases, legacy Python wrappers,
+  transitional model access, migration targets, and minimum support windows.</li>
+<li>Immutable <code>v0.11.0</code> spec and manifest fixtures proving current readers and
+  deterministic generation remain compatible with the previous feature release.</li>
+<li>A public support policy for CPython versions, optional extras, provider
+  adapter maturity, compatibility notices, and release gates.</li>
+<li>Bounded release regressions for profiling, multi-entity generation, and
+  validation wall time and peak traced allocations.</li>
+</ul>
+<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Fixed ISO date columns being misclassified as phone numbers during CSV
+  profiling.</li>
+<li>Validation reports now honor all <code>ValidationSettings</code> section toggles and
+  <code>fail_fast</code>, and record the effective settings used.</li>
+<li>Container builds no longer default to version <code>0.8.1</code>, and publication now
+  rejects image metadata that differs from the package version.</li>
+<li><code>GenerationSettings.locale</code> now controls seeded Faker values, with clear
+  rejection of unsupported locales.</li>
+<li>CSV and Trino profiles preserve low-cardinality frequency ranks with
+  synthetic labels instead of exposing source category values.</li>
+<li>Incomplete staged generation and review bundles are removed when interactive
+  cancellation interrupts writing or validation.</li>
+<li>Mid-write disk exhaustion removes partial staged folder, review, and
+  single-entity output without publishing success metadata.</li>
+<li>Interrupted folder publication removes the renamed destination, while
+  interrupted single-entity publication restores replaced files and removes
+  partial new output.</li>
+</ul>
+<h3 id="security_4">Security<a class="headerlink" href="#security_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Advisor requests replace singleton categorical values with synthetic labels
+  before a provider can receive the profile or baseline specification.</li>
+<li>Documented the public threat model, validation assurance levels, exact-row
+  reuse detection limits, and the absence of statistical privacy guarantees.</li>
+<li>Trino SQL access is limited to validated read-only operations and dedicated
+  bounded profiling; forbidden and non-allowlisted queries fail before a
+  connection while allowlisted metadata and aggregate discovery remain available.</li>
+<li>Python, CLI, and generator MCP generation reject raw-looking sensitive
+  categories, unsafe sensitive distributions, and privacy-policy opt-outs before
+  creating artifacts or echoing rejected values.</li>
+<li>Masked Trino samples use opaque placeholders for rare free text and
+  quasi-identifiers.</li>
+<li>MCP installations exclude the incompatible 2.x SDK until the transport
+  migrates to its replacement API.</li>
+<li>JSON dataset inputs are bounded by row count, nested value count, nesting
+  depth, and string value length before validation.</li>
+</ul>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

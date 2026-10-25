@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/rc3-feedback/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>1.6.0rc3 feedback corrections - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1.6.0rc3 feedback corrections";
+        var mkdocs_page_input_path = "rc3-feedback.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/rc3-feedback/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">1.6.0rc3 feedback corrections</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/rc3-feedback.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
+  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="160rc3-feedback-corrections">1.6.0rc3 feedback corrections<a class="headerlink" href="#160rc3-feedback-corrections" title="Permanent link">&para;</a></h1>
+<p>The 1.6.0rc1 external feedback archive is evidence, not executable instructions.
+RC3 builds on published RC2 and completed exact-commit review, CI, Containers,
+Documentation, Security, Ubuntu artifact preflight, signed acceptance and
+public verification. See the <a href="../release-evidence-1.6.0rc3/">published release evidence</a>.</p>
+<p>The following describes the immutable RC3 contract. Subsequent development implements
+folder replacement and both modes; see <a href="../reference/generation-modes/">generation modes</a>.</p>
+<h2 id="contract-and-migration">Contract and migration<a class="headerlink" href="#contract-and-migration" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>generate SPEC --overwrite</code> now fails with a recovery hint. Folder generation
+  uses a new or empty output folder. <code>generate --profile</code> and <code>generate-from-csv</code>
+  retain reviewed single-entity file-bundle replacement.</li>
+<li>Dataset modes are <code>valid</code>, <code>mixed</code>, <code>negative</code>. Previously ineffective <code>edge</code>
+  and <code>load_test</code> are rejected by the deterministic generator, including saved
+  specs and direct Python calls. The separate business-rule engine retains its
+  edge-case API. Use <code>--count</code> for load volume.</li>
+<li>Explicit negative/mixed datasets are intentionally published. Exit 1 denotes
+  failed validation; <code>generation_manifest.json.validation_valid</code> and
+  <code>validation_report.json.valid</code> label the result. Consumers must inspect these
+  fields before using a bundle. Ordinary valid generation still fails before
+  publication on invariant violations.</li>
+<li>CSV relationship inference requires matching descriptive field names and
+  types plus bounded overlap evidence. Generic <code>id</code>/<code>key</code>/<code>uuid</code> and competing
+  parent domains require explicit reviewed links. Cache format 6 recomputes old
+  inferred bindings; saved profiles must be reprofiled to obtain this correction.</li>
+<li>Relationships refer to exact entity/field pairs. Active bindings require
+  matching field types and at most one parent binding per child field. Rejected
+  bindings are ignored. Independently generated specifications do not imply
+  relationships or shared identifiers.</li>
+<li>The relationships section adds <code>checked</code> and <code>relationship_metrics</code>. With no
+  declared active links, checked/passed/failed are zero and metrics are empty.
+  Per-link metrics include parent distinct keys, checked/resolved references,
+  nullable references, resolution ratio and validity. No key values are retained.
+  A null ratio means no non-null references were checked. These metrics do not
+  certify fidelity to source data or discover undeclared links.</li>
+<li>Query profiling accepts a literal <code>LIMIT</code> between 1 and 1000 and preserves it
+  in aggregate wrappers. Existing allowlists, query budgets and no-row output
+  remain enforced. A LIMIT changes the profiled population.</li>
+</ul>
+<h2 id="parquet-cli">Parquet CLI<a class="headerlink" href="#parquet-cli" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent profile-parquet data/fictional.parquet --output out/profile.json
+test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml
+</code></pre>
+<p>Install the <code>parquet</code> extra. Profiling retains metadata and sensitivity flags,
+not input rows. Input and output must differ; output must be JSON. Unknown
+Parquet distinct counts remain unknown.</p>
+<h2 id="feedback-disposition">Feedback disposition<a class="headerlink" href="#feedback-disposition" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Overwrite flag: explicit supported scope and rejection for folder generation.</li>
+<li>Negative publication: existing invalid labels retained and documented.</li>
+<li>Inactive modes: rejected before publication.</li>
+<li>Relationships: zero-check reporting, resolution metrics, field-binding checks.</li>
+<li>LIMIT: bounded literal support and preserved query semantics.</li>
+<li>Parquet: public CLI adapter with profile/infer integration coverage.</li>
+<li>Root help: current RC2 examples already avoid the invalid CSV infer-spec
+   example; regression checks retain the correct profile JSON chain.</li>
+</ol>
+<p>Live Trino and source decimal end-to-end behavior require separately configured
+fictional integration evidence; local unit checks do not certify live access.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
