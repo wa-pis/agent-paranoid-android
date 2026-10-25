@@ -96,6 +96,8 @@ reports remain unconfirmed; no live server acceptance is claimed.
 
 ### Security
 
+- Update the locked development audit dependency filelock to 4.2.4 to resolve
+  CVE-2026-112940, CVE-2026-112913 and CVE-2026-112907.
 - Update the locked OpenTelemetry API to 1.45.1 to resolve CVE-2026-114603
   in bounded tracestate parsing; retain the existing optional dependency ranges.
 - Update the locked certifi CA bundle to 2026.10.19 to resolve
