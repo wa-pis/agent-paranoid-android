@@ -35,3 +35,8 @@ The historical activation-composition fixture retains its executable/contract
 tail byte-for-byte. Its maintained documentation projection was refreshed for
 the corrected architecture page so forward/reverse composition remains tested;
 this is not a new activation patch applied to production.
+
+Continued feedback work also reconciles nine completed transformation delivery
+tasks and their public-contract subtask with actual stable/candidate evidence.
+The [remaining scope and installed replay](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/selective-source-transformation/release-1.7-reconciliation.md)
+retain the original source identities and five unchecked composite tasks.
