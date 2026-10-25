@@ -205,7 +205,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
-  <br>Documentation 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br>Documentation 6801997b763fa4b4ba9a27303b96ab507ab1f610
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -520,6 +520,48 @@ is covered by ADR-0008, ADR-0010, ADR-0015 and ADR-0020–0027; its SQL delta al
 maps to ADR-0010/0026. Module extraction maps to ADR-0003 and the
 <a href="../reference/application-boundaries/">application-boundary inventory</a>.
 Provider integrations map to ADR-0012/0016, not to a new source-data permission.</p>
+<h2 id="capability-navigation-added-after-archival-2026-10-25">Capability navigation added after archival — 2026-10-25<a class="headerlink" href="#capability-navigation-added-after-archival-2026-10-25" title="Permanent link">&para;</a></h2>
+<p>The original inventory and implementation snapshot retain their recorded dates.
+Archiving accepted changes added these baseline files; this navigation maps them
+to existing decisions without inventing a new decision or activation authority.</p>
+<table>
+<thead>
+<tr>
+<th>OpenSpec capability</th>
+<th>Governing records</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/feedback-corrections/spec.md">feedback-corrections</a></td>
+<td>ADR-0004, ADR-0007, ADR-0008, ADR-0027</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/generation/spec.md">generation</a></td>
+<td>ADR-0005, ADR-0007, ADR-0014, ADR-0015</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/mcp-transport/spec.md">mcp-transport</a></td>
+<td>ADR-0003, ADR-0013, ADR-0015, ADR-0016</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/portable-generation/spec.md">portable-generation</a></td>
+<td>ADR-0013, ADR-0030</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/security-boundary-enforcement/spec.md">security-boundary-enforcement</a></td>
+<td>ADR-0002, ADR-0003, ADR-0006, ADR-0015, ADR-0019</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/selective-source-transformation/spec.md">selective-source-transformation</a></td>
+<td>ADR-0020, ADR-0021, ADR-0023, ADR-0029</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/synthetic-data-generation/spec.md">synthetic-data-generation</a></td>
+<td>ADR-0002, ADR-0005, ADR-0006, ADR-0008</td>
+</tr>
+</tbody>
+</table>
 <h2 id="implementation-and-acceptance-snapshot">Implementation and acceptance snapshot<a class="headerlink" href="#implementation-and-acceptance-snapshot" title="Permanent link">&para;</a></h2>
 <p>Owner successor <a href="0029-unified-replacement-contract/">ADR-0029: unified replacement contract</a>
 permits explicit mapped source-membership/permutations for every field, with
