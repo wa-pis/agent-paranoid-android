@@ -191,11 +191,23 @@ def build(
     ):
         revision += "+dirty"
     preview = version != stable
+    candidate = re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+rc[0-9]+", version) is not None
+    package_commit = revision.split("+")[0] if preview else selected.commit
+    if candidate:
+        try:
+            package_commit = command(
+                ["git", "rev-parse", f"refs/tags/v{version}^{{commit}}"], cwd=root
+            )
+        except subprocess.CalledProcessError:
+            # Before publication the candidate is bound to its current source.
+            pass
     identity = Identity(
         version,
-        revision.split("+")[0] if preview else selected.commit,
+        package_commit,
         revision,
-        "Development / not stable" if preview else "Maintained stable guidance",
+        "Release candidate / not stable" if candidate else (
+            "Development / not stable" if preview else "Maintained stable guidance"
+        ),
     )
     environment = {
         **os.environ,
@@ -248,17 +260,21 @@ def build(
                 "publish stable documentation before building a next-version preview"
             )
         # mike updates one version and preserves all other already-rendered versions.
-        target = "next" if preview else stable
+        target = version if candidate else ("next" if preview else stable)
         arguments = [
             str(Path(sys.executable).parent / "mike"),
             "deploy",
             "--ignore-remote-status",
             "--update-aliases",
             "--title",
-            f"{version} (development)" if preview else version,
+            f"{version} (release candidate)" if candidate else (
+                f"{version} (development)" if preview else version
+            ),
             target,
         ]
-        if not preview:
+        if candidate:
+            arguments.append("next")
+        elif not preview:
             arguments.append("stable")
         subprocess.run(
             arguments, cwd=repository, env=environment, check=True, timeout=300

@@ -1086,7 +1086,7 @@ def test_installation_documents_dependency_budgets() -> None:
     assert f'"agent-paranoid-android=={PROJECT_VERSION}"' in installation
     for extra in ("parquet", "mcp", "mcp,trino", "openai"):
         assert (
-            f'"agent-paranoid-android[{extra}]=={STABLE_VERSION}"'
+            f'"agent-paranoid-android[{extra}]=={PROJECT_VERSION}"'
             in installation
         )
     assert f"The stable release is `{STABLE_VERSION}`" in installation
@@ -1373,7 +1373,7 @@ def test_gigachat_documentation_matches_provider_boundary() -> None:
     assert "--provider gigachat" in cli
     assert "OpenAI remains the default provider" in cli
     assert f'agent-paranoid-android[gigachat]=={STABLE_VERSION}' in guide
-    assert f'agent-paranoid-android[gigachat]=={STABLE_VERSION}' in installation
+    assert f'agent-paranoid-android[gigachat]=={PROJECT_VERSION}' in installation
     assert "TLS verification cannot be disabled" in configuration
 
 

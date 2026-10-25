@@ -11,6 +11,23 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.7.0rc1 Feedback Candidate
+
+The owner requested `1.7.0rc1` on 2026-10-25. It packages the post-1.6.0
+feedback changes recorded in the changelog: reviewed CSV numeric declarations,
+metadata-only relationship discovery, unequal entity sizes, bounded statistics,
+conditional formulas/EAV modeling and controlled synthetic relational scenarios.
+Existing transformation activation and local approval boundaries remain unchanged.
+Historical Trino application settings and external profile provenance remain
+unconfirmed; they are not claimed fixed by this release.
+
+Use fresh exact-main checks, independent technical AI review, Ubuntu artifact
+preflight hashes, signed acceptance and public package/container verification.
+Release authorization does not issue dataset approval or activate source-row EAV
+transformation. Publish candidate guidance at `versions/1.7.0rc1/` and retain
+stable 1.6.0 at the root and `versions/stable/`. Public RC verification uses the
+candidate documentation URL. See [candidate status](1.7.0rc1-release-status.md).
+
 ## Preflight
 
 1. Review `openspec/project.md` and the affected capability specs.

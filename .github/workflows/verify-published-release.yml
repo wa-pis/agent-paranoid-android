@@ -366,6 +366,10 @@ jobs:
           PYPI_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
+          docs_url=https://wa-pis.github.io/agent-paranoid-android/
+          if [[ "${PYPI_VERSION}" == *rc* ]]; then
+            docs_url="${docs_url}versions/${PYPI_VERSION}/"
+          fi
           curl \
             --fail \
             --location \
@@ -374,7 +378,7 @@ jobs:
             --show-error \
             --tlsv1.2 \
             --max-time 30 \
-            https://wa-pis.github.io/agent-paranoid-android/ \
+            "${docs_url}" \
             --output /tmp/published-docs.html
           grep -F "quickstart smoke: ok" /tmp/published-docs.html
           grep -F "${PYPI_VERSION}" /tmp/published-docs.html

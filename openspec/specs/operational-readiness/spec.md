@@ -311,3 +311,20 @@ locally built distribution.
 - **THEN** the documented version matches the package
 - **AND** each multi-platform image passes digest, SBOM, attestation, signature,
   and hardened runtime checks
+
+
+### Requirement: Candidate Documentation Isolation
+
+Release-candidate documentation SHALL use its exact package-version directory,
+retain earlier candidate directories, and leave the verified stable root and
+stable alias unchanged. Candidate labels SHALL NOT imply stable or public-package
+acceptance. Published RC checks SHALL inspect the candidate guide.
+
+#### Scenario: A second candidate is published
+
+- **GIVEN** verified stable guidance and a first RC guide exist
+- **WHEN** a second RC guide is built
+- **THEN** its exact version directory and the next alias contain the new guide
+- **AND** the first RC, stable directory and unversioned stable root are retained
+- **AND** candidate metadata binds its tag commit when available and records the
+  documentation revision independently
