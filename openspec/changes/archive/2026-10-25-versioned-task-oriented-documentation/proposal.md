@@ -8,10 +8,11 @@ RC, review and publication material out of the everyday user journey. Add
 explicit documentation versions so readers can distinguish installed behavior,
 historical guidance and unreleased work.
 
-Status: implemented with standard MkDocs plugins and locally verified; public
-deployment pending. The owner requested
-execution of the plan and added PDF/other offline exports on 2026-10-22.
-Public deployment and its exact-revision verification remain separate steps.
+Status: completed and publicly verified. The owner requested implementation and
+PDF/other offline exports on 2026-10-22, then requested Trino MCP configuration
+and release-version isolation. PR #631 delivered stable documentation; PR #655
+added exact candidate publication while preserving stable. Final source and
+public download checks are recorded in verification.md and tasks.md.
 
 ## Motivation
 

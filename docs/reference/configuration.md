@@ -57,9 +57,10 @@ The local create/wizard saves only policies/spec/references, not source copies
 or receipts. Saving changes paths and therefore requires fresh review. See the
 [common-profile CLI workflow](cli.md#closed-common-profile-workflow-candidate) for draft
 CSV proposals, local confirmation and retained-publication restrictions. This
-profile is not a compatibility promise for stable `1.5.0`. Registration grants
-no dataset authority or local preservation approval and does not close the
-separately gated transformation/session acceptance campaign.
+profile is not a compatibility promise for stable `1.5.0`. The finite stable
+`1.6.0` campaign completed with [recorded coverage limits](../release-evidence-1.6.0.md).
+Registration and release acceptance grant no dataset authority or local
+preservation approval.
 
 ## Input And Generation Limits
 

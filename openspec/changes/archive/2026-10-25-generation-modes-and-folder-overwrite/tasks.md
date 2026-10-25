@@ -9,7 +9,7 @@
 Final exact-main release gate: 3365 passed, 23 skipped. Strict typing, lint,
 schema/contract freshness, strict MkDocs and installed-wheel regressions passed.
 Independent AI-only exact-main approval, all four hosted gates and fresh Ubuntu
-artifact hashes are recorded in [RC4 evidence](../../../docs/release-evidence-1.6.0rc4.md).
+artifact hashes are recorded in [RC4 evidence](../../../../docs/release-evidence-1.6.0rc4.md).
 
 - [x] Accept final exact RC4 commit with independent review and remote gates.
 - [x] Run Ubuntu preflight, sign acceptance manifest/tag and publish RC4.

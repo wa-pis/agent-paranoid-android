@@ -28,6 +28,9 @@ transformation. Publish candidate guidance at `versions/1.7.0rc1/` and retain
 stable 1.6.0 at the root and `versions/stable/`. Public RC verification uses the
 candidate documentation URL. See [candidate status](1.7.0rc1-release-status.md).
 
+The candidate is published and passed all 12 public acceptance jobs.
+See [1.7.0rc1 published evidence](release-evidence-1.7.0rc1.md).
+
 ## Preflight
 
 1. Review `openspec/project.md` and the affected capability specs.
@@ -404,7 +407,9 @@ passed on its first attempt with all 12 jobs: Python-package/documentation, all
 seven installation profiles and all three container targets. RC5 publication and
 release-specific public acceptance are complete.
 Permission to publish a release does not approve a dataset or issue local
-preservation authority; the separate transformation/session campaign remains open.
+preservation authority. At that RC5 checkpoint the separate transformation/session
+campaign remained open; its later stable completion is recorded in
+[1.6.0 evidence](release-evidence-1.6.0.md) with the original source and coverage limits.
 
 ## 1.6.0rc4 Generation Modes Candidate
 

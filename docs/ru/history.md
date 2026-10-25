@@ -5,6 +5,7 @@
 Исторические release records и решения сопровождаются в оригинале. Ссылки ниже открывают English, а не переведённые документы. Кандидатное evidence относится к своему SHA и не заменяет stable verification.
 
 - [История и индекс сопровождающих — English](../history.md).
+- [Результаты публикации 1.7.0rc1 — English](../release-evidence-1.7.0rc1.md).
 - [Stable 1.6.0 status — English](../1.6.0-release-status.md).
 - [Stable publication evidence — English](../release-evidence-1.6.0.md).
 - [ADR — English](../adr/index.md).

@@ -211,7 +211,11 @@ unrelated parent or row values.
 ### Requirement: Reviewable Negative Validation Artifacts
 
 Controlled invalid generation SHALL record bounded expected and observed
-business-rule violation counts without including generated row values.
+business-rule violation counts without including generated row values. Expected
+counts SHALL include collateral rule failures caused by selected mutations.
+Injection SHALL refuse an invalid business-rule baseline before mutation,
+without treating pre-existing failures as authorized invalid cases.
+Accounting SHALL retain shared operation and deadline budgets.
 
 #### Scenario: Selected violations are observed
 
@@ -221,12 +225,34 @@ business-rule violation counts without including generated row values.
 - **AND** `expectations_met` is true when no expected violation is missing and
   no unexpected violation is observed
 
+#### Scenario: Selected mutation breaks overlapping rules
+
+- **GIVEN** a selected mutation breaks a required rule and a conditional-required
+  rule, or a row formula and an aggregate formula
+- **WHEN** before/after audits establish newly caused failures
+- **THEN** every caused failure is included in the expected counts
+- **AND** the selected rule is not counted twice for the same mutation
+
 #### Scenario: An unplanned failure is observed
 
-- **GIVEN** validation observes more failures than generation selected
+- **GIVEN** validation observes more failures than generation selected or caused
 - **WHEN** the business-validation report is produced
 - **THEN** the excess is counted as unexpected
 - **AND** no generated row values are added to the manifest summary
+
+#### Scenario: A baseline is already invalid
+
+- **GIVEN** one or more business rules fail before controlled invalid injection
+- **WHEN** negative or mixed injection starts
+- **THEN** it refuses the invalid baseline before mutation with a value-free error
+- **AND** a selected mutation cannot authorize or silently repair that failure
+
+#### Scenario: A selected mutation does not produce its violation
+
+- **GIVEN** a selected invalid mutation leaves its selected rule satisfied
+- **WHEN** final validation compares planned and observed counts
+- **THEN** the missing expected violation remains visible
+- **AND** collateral accounting cannot silently mark the run accepted
 
 ### Requirement: CLI And MCP Negative Reproducibility
 
@@ -357,7 +383,6 @@ SQL export SHALL serialize freshly generated synthetic rows as deterministic
 - **AND** the artifact contains generated rows only, never source rows
 - **AND** caller-provided SQL expressions are not accepted as values
 
-
 ### Requirement: Executable Rule Selection And Ordering
 Rejected constraints and relationships SHALL neither mutate nor validate rows.
 Formula assignments SHALL execute in dependency order; cycles and duplicate
@@ -469,3 +494,19 @@ SHALL ignore rejected relationships with the same endpoints.
 - **GIVEN** a rejected one-to-one relationship and an active many-to-one relationship with identical endpoints
 - **WHEN** a valid declared fan-out assigns multiple children to one parent
 - **THEN** generation uses the active cardinality and reconciles the declared counts
+
+### Requirement: Supported Modes And Folder Publication
+Dataset generation SHALL execute the reviewed edge and load_test modes with
+shared relationship, business-rule, privacy and resource enforcement. Unknown
+modes SHALL reject before publication. Explicit folder overwrite SHALL stage
+and reconcile a complete replacement and restore prior output on failure;
+without overwrite existing nonempty output SHALL remain unchanged.
+Negative/mixed publication SHALL remain labelled by validation status.
+
+The archived RC3 refusal requirement was superseded by the accepted
+`generation-modes-and-folder-overwrite` change; its historical delta remains in
+the archive. The `generation` capability records the replacement scenarios.
+
+#### Scenario: Deterministic enforcement
+- **WHEN** the corresponding CLI or direct service is invoked
+- **THEN** the contract is enforced before publication and tested with fictional inputs
