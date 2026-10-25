@@ -163,3 +163,15 @@ def test_key_preview_obeys_cell_limit_without_partial_mutation(monkeypatch):
     with pytest.raises(ValueError, match="relational key preview"):
         execute(data, source, [scenario(fanout_counts=(1, 2, 3))])
     assert data == before
+
+
+def test_rejected_duplicate_relationship_does_not_select_scenario_cardinality():
+    payload = spec().model_dump(mode="json")
+    payload["relationships"].insert(0, {**payload["relationships"][0],
+        "status": "rejected", "relationship_type": "one_to_one"})
+    source = type(spec()).model_validate(payload)
+    data = rows()
+    evidence = execute(data, source, [scenario(fanout_counts=(1, 2, 3))])
+    assert evidence[0].expectations_met
+    assert [sum(child["parent_key"] == parent["key"] for child in data["children"])
+            for parent in data["parents"]] == [1, 2, 3]

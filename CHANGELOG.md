@@ -69,6 +69,8 @@ reports remain unconfirmed; no live server acceptance is claimed.
 
 ### Fixed
 
+- Relational scenario allocation ignores rejected relationships when selecting
+  cardinality, matching the reviewed active relationship.
 - Date/time ranges whose supplied partial bound conflicts with a default endpoint
   now reject with an explicit-bounds recovery hint instead of silently clamping.
 

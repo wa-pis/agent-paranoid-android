@@ -459,3 +459,13 @@ valid foreign-key generation.
 #### Scenario: No relational scenario is supplied
 - **WHEN** callers omit the new declaration
 - **THEN** existing seeded assignment, count and mode contracts remain unchanged
+
+### Requirement: Rejected relationship isolation in scenarios
+
+Relational scenario allocation SHALL use the reviewed active relationship and
+SHALL ignore rejected relationships with the same endpoints.
+
+#### Scenario: Rejected cardinality precedes active relationship
+- **GIVEN** a rejected one-to-one relationship and an active many-to-one relationship with identical endpoints
+- **WHEN** a valid declared fan-out assigns multiple children to one parent
+- **THEN** generation uses the active cardinality and reconciles the declared counts

@@ -221,3 +221,6 @@ PostgreSQL SQL export retains its valid-dataset requirement and rejects missing
 references before publishing DDL with foreign-key constraints. Valid fan-out
 allocations remain eligible for SQL export. No package release is implied by
 these 1.7.0rc1 source changes.
+
+Rejected relationship hypotheses do not select scenario cardinality; allocation
+uses the reviewed active relationship even when endpoint names match.

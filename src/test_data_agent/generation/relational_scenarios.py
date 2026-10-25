@@ -46,6 +46,7 @@ def _allocate_scenario(
         other = rng.randrange(index + 1)
         children[index], children[other] = children[other], children[index]
     relationship = next(edge for edge in budget.iter_rule_work(spec.relationships) if
+                        edge.status != "rejected" and
                         (edge.parent_entity, edge.parent_field, edge.child_entity, edge.child_field) == scenario.edge)
     unique = relationship.relationship_type == RelationshipType.ONE_TO_ONE or spec.entity(scenario.child_entity).primary_key == scenario.child_field
     valid_count = eligible - scenario.orphan_count
