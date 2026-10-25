@@ -9,6 +9,7 @@ activate extensions or authorize a dataset.
 
 ## Releases And Migration
 
+- [1.7.0rc1 feedback candidate evidence](release-evidence-1.7.0rc1.md)
 - [Current stable release status](1.6.0-release-status.md)
 - [Stable 1.6.0 publication evidence](release-evidence-1.6.0.md)
 - [Release evidence index](release-evidence.md)

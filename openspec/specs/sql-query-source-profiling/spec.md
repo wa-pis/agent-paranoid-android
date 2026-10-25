@@ -131,7 +131,6 @@ their existing upper/result-row budget checks.
 - **THEN** profiling rejects before fetching a row-count or column aggregate
 - **AND** no trusted partial profile is published
 
-
 ### Requirement: Bounded Batched Query Summaries
 
 Query-source profiling SHALL combine at most eight column summaries per trusted
@@ -159,3 +158,10 @@ evidence SHALL preserve profile serialization and fingerprints.
 #### Scenario: Batch result shape is incomplete
 - **WHEN** an expected column lacks valid aggregate counts
 - **THEN** profile construction rejects without substituting another column's evidence
+
+### Requirement: RC3 feedback contract
+Single-table profiling SHALL accept and preserve literal LIMIT values between 1 and 1000 while retaining existing authorization, privacy and resource budgets.
+
+#### Scenario: Deterministic enforcement
+- **WHEN** the corresponding CLI or direct service is invoked
+- **THEN** the contract is enforced before publication and tested with fictional inputs

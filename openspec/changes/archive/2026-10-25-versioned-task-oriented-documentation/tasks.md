@@ -20,7 +20,13 @@
       build; record exact commands/results and any unavailable checks.
 - [x] Review content reduction through local task walkthroughs and record evidence.
 - [x] Publish from a reviewed merge and verify the exact deployed identity/downloads.
-- [ ] Collect user feedback and archive only after publication checks complete.
+- [x] Collect user feedback and archive only after publication checks complete.
 
 See `inventory.md` and `verification.md`. The full-suite timing failures are
 recorded, not relabelled as successful release acceptance.
+
+## Final evidence reconciliation — 2026-10-25
+
+Owner feedback requested practical login/password MCP guidance and documentation versioning, then authorized implementation and release. The guidance and version isolation were delivered in #631 and #655. Exact RC documentation and next alias, stable root/alias preservation and all four download hashes were independently verified at documentation run 40171680909; combined public package/documentation acceptance passed in 40173739663. Stable 1.6.0 remains the default.
+
+[1.7.0rc1 release evidence](../../../../docs/release-evidence-1.7.0rc1.md) records exact source, hashes and actual workflow identities. Earlier pending checkpoints retain their original historical meaning.

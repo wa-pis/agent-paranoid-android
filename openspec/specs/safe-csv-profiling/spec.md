@@ -121,7 +121,6 @@ Existing sensitivity, uniqueness, scalar, length and free-text rules SHALL apply
 - **WHEN** field eligibility or the positive-integer limit contract fails
 - **THEN** validation rejects before category-value iteration
 
-
 ### Requirement: Reviewed CSV Numeric Replacement
 
 CSV profiling SHALL retain phone sensitivity, masking and source-free metadata
@@ -153,3 +152,10 @@ Declared SQL/Parquet DECIMAL precision/scale checks SHALL remain unchanged.
 - **THEN** replacement requires new profiling and folder cache formats before 8 are recomputed
 - **AND** changed evidence or synthetic bounds changes the relevant fingerprint and requires new review
 - **AND** absent evidence remains omitted so unaffected old profile fingerprints are stable
+
+### Requirement: RC3 feedback contract
+The CLI SHALL expose profile-parquet for bounded safe metadata profiling and subsequent infer-spec. Source rows SHALL not be retained.
+
+#### Scenario: Deterministic enforcement
+- **WHEN** the corresponding CLI or direct service is invoked
+- **THEN** the contract is enforced before publication and tested with fictional inputs

@@ -1,5 +1,18 @@
 # Tasks: selective-source-transformation
 
+## Current release reconciliation — 2026-10-25
+
+Stable 1.6.0 and candidate 1.7.0rc1 are published and publicly accepted.
+[Executed evidence and remaining scope](release-1.7-reconciliation.md) reconcile
+nine completed parent delivery tasks and their public-contract subtask. The
+new candidate wheel passed 600 source-free logical cells, five documented
+examples and 260 focused feedback checks. A corrected isolated-fixture loader
+then passed a separate 48-cell subset without its temporary helper workaround.
+Historical preservation/scale results retain their actual artifacts. Five
+composite tasks remain open; this proposal is not archived or declared complete.
+Earlier dated pending checkpoints below are historical, not current release
+or registration denials.
+
 ## Published candidate checkpoint — 2026-10-08
 
 `v1.6.0rc1` published from exact main
@@ -132,7 +145,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   Executable evidence: `tests/test_sql_query_source.py` aggregate accepted/rejected
   shapes, column authorization and AST budgets for both adapters; implementation
   and docs are on accepted main. No live backend claim.
-- [ ] Amend SQL baseline/docs; prove accepted and rejected shapes for PostgreSQL
+- [x] Amend SQL baseline/docs; prove accepted and rejected shapes for PostgreSQL
   and Trino with fictional tests; independently safety-review the exact SHA
   before public activation. No internal formula engine or live DB access.
   - [x] Reconcile baseline/docs and fictional accepted/rejected adapter coverage:
@@ -213,7 +226,7 @@ amendments still require scoped review and executable checks before activation.
   - [x] Independently review this development/activation clarification.
     Historical clarification reviewed at0e7dee5 in mergedPR576; see progress.md
     and issuecomment5837209533. This does not certify current activation SHA.
-- [ ] Finalize versioned field policy, CLI/API and mixed-origin artifact schema.
+- [x] Finalize versioned field policy, CLI/API and mixed-origin artifact schema.
 - [x] Specify exact decimals, precision/scale/rounding/overflow, approximate
   DOUBLE conversion and CSV round trips; preserve existing schema compatibility.
 - [x] Define fixed-snapshot/replay semantics, mapping domains and state cleanup.
@@ -233,7 +246,7 @@ Parquet, auth, query/category budget, publication and linked-route evidence must
 not be rerun solely because these historical intake boxes are still unchecked.
 Final compatibility/clearance and unavailable private/live claims remain open.
 
-- [ ] Inspect new/changed harnesses; record package/version/SHA or wheel hash,
+- [x] Inspect new/changed harnesses; record package/version/SHA or wheel hash,
   extras, probe hashes and safe isolated baseline/candidate execution plans.
 - [x] Reproduce/fix 22: allowed AND/OR/nested predicates on both SQL adapters;
   retain forbidden-function, authorization and budget negative controls.
@@ -241,7 +254,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   mode and ratio precedence; effective spec/manifest/report/exit reflect execution.
 - [x] Reproduce/fix 20: doctor retains failed checks, distinguishes missing extras
   from capability failures and gives safe recovery hints without backend text.
-- [ ] Consolidate 21's October 2 approved six-method auth/secret-indirection
+- [x] Consolidate 21's October 2 approved six-method auth/secret-indirection
   implementation, local CLI opt-in and installed evidence into the final candidate;
   complete exact-SHA safety review before public activation. No live access.
   - [x] Renew local installed auth/OAuth constituents on exact268efc9a:
@@ -254,7 +267,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   intermediates; internal formulas are excluded by the owner scope correction.
 - [x] Consolidate 24's declared Parquet physical/readback evidence with 25's
   October 2 invalid-result/exit decision; retain fail-closed incompatible typed output.
-- [ ] Consolidate 26's October 2 approved unknown-metadata and bounded-sensitivity
+- [x] Consolidate 26's October 2 approved unknown-metadata and bounded-sensitivity
   implementation/evidence; finish final-candidate CLI/API compatibility gates.
   - [x] Renew installed unknown-metadata and bounded-sensitivity constituent:
     exact268efc9a/wheel430e0405, source-adapter Parquet selection11passed0.27s;
@@ -292,7 +305,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   - [x] Record column-over-global precedence; no cascade (owner decision).
   - [x] Replace current overlap rejection consistently in matcher, preflight and
     trace; add focused tests before claiming the new behavior is available.
-- [ ] Implement review/validate/execute parity for supported agent interfaces
+- [x] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the
   interactive local CLI may mint preservation approval receipts.
   - [x] Materialize prospective actual common CLI/MCP composition only in an
@@ -304,7 +317,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
     Python3.14/MCP2 focused18passed; same wheel Python3.11/MCP1 wire3passed.
     Subsequent OAuth-composed wheel9da73de5 explicitly revalidated actual common
     CLI/MCP21passed and unchanged ordinary contract inventory1passed; see progress.
-  - [ ] Complete public contract/golden inventories and full candidate gates;
+  - [x] Complete public contract/golden inventories and full candidate gates;
     obtain finished exact-SHA independent review before actual registration.
 - [x] Add RC acceptance for skill-guided agents: discover both packaged
   `SKILL.md` files through a documented, runtime-neutral path; choose only
@@ -316,7 +329,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   baseline unavailable-command acceptance; see [evidence](skill-workflow-acceptance.md).
   This closes the added local harness/workflow, not final reviewed RC artifacts
   or an external model/integration benchmark.
-- [ ] Implement separately authorized read-only SQL-result access; preserve
+- [x] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
 - [x] Implement consistent key mapping; internal derived-value computation is
   excluded by the latest owner clarification (existing checks below historical).
@@ -408,7 +421,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   consumption, and historical review from final activation clearance. No
   contradictory activation claim found in these sections; whole-doc audit
   and executable-example acceptance remain open.
-- [ ] Execute documented examples on fictional fixtures and validate links,
+- [x] Execute documented examples on fictional fixtures and validate links,
   documentation tests and strict documentation build before the candidate.
   2026-10-07 reconciled existing exact268efc9a full-gate log: all five
   tests/test_live_examples.py cases and44 documentation tests passed. Reviewed
@@ -416,7 +429,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   their README workflows against those assertions; SQL is generated, not
   executed. Reused completed evidence without rerunning unchanged tests.
   Installed final-version examples and remaining documentation audit stay open.
-- [ ] Obtain independent security review and complete the required RC/release
+- [x] Obtain independent security review and complete the required RC/release
   gates before shipping. Do not mark this proposal implemented beforehand.
 
 2026-10-05 current common activation preparation: isolated source copy at

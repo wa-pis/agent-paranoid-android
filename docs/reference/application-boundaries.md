@@ -6,11 +6,12 @@ inventory and completed extraction remain the historical baseline; current
 contract fixtures include later reviewed additions. This inventory does not
 declare internal modules public or approve a contract change.
 
-Stable `1.6.0` preparation retains this accepted RC5 runtime and ownership map.
-References to the “1.6 RC” composition remain valid for that unchanged promotion;
-they do not establish stable publication or close the separate
-transformation/session acceptance campaign. See the
-[release status](../1.6.0-release-status.md).
+Stable `1.6.0` retained the accepted RC5 runtime and completed its finite
+fictional transformation/session campaign and public verification. See
+[stable evidence and coverage limits](../release-evidence-1.6.0.md).
+References to the “1.6 RC” composition identify the historical implementation;
+later feedback additions remain subject to their own reviewed contracts.
+Release acceptance does not authorize a dataset or issue preservation consent.
 
 The golden fixtures under `tests/fixtures/contracts/` remain authoritative.
 The original reviewed activation added `transform-execute` and local
@@ -23,9 +24,10 @@ not clear later changes by itself. Published RC5 also registers `transform-batch
 `common_transformation` and `configured_query_session`; their current composition
 is described below and in [MCP usage](../how-to/mcp.md#common-profile-workflow-16-rc).
 The [published RC5 evidence](../release-evidence-1.6.0rc5.md) records release
-acceptance and its limits. The broader transformation/session campaign remains
-open; registration, dataset approval and complete campaign acceptance are
-separate. MCP has no preservation-receipt issuer.
+acceptance and its limits. The later stable campaign completed with the
+[recorded finite coverage](../release-evidence-1.6.0.md). Registration and
+release acceptance remain separate from dataset approval; MCP has no
+preservation-receipt issuer.
 This page makes their ownership and the current architectural pressure visible
 in one place so each extraction can be reviewed against the same baseline.
 

@@ -489,25 +489,24 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
-        "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
-        "refresh-agent-guidance",
-        "fix-csv-generation-pipeline",
-        "selective-source-transformation",
-        "fix-transformation-review-boundaries",
-        "remediate-full-security-audit",
-        "mcp-client-workflow-1-6-rc2",
-        "rc3-external-feedback",
-        "generation-modes-and-folder-overwrite",
-        "rc4-external-feedback",
-        "source-output-contract-parity",
-        "cross-interface-acceptance",
-        "rc5-release",
-        "external-feedback-1-6",
-        "reviewed-eav-expressions",
-        "trino-authenticated-profiling",
-        "bounded-profile-statistics",
-        "versioned-task-oriented-documentation",
+        "_template", "selective-source-transformation",
+        "external-feedback-1-6", "reviewed-eav-expressions",
+        "trino-authenticated-profiling", "bounded-profile-statistics",
     }
+
+
+    for change_id in (
+        "cross-interface-acceptance", "generation-modes-and-folder-overwrite",
+        "mcp-client-workflow-1-6-rc2", "rc3-external-feedback",
+        "rc4-external-feedback", "rc5-release", "refresh-agent-guidance",
+        "remediate-full-security-audit", "source-output-contract-parity",
+        "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
+        "fix-csv-generation-pipeline", "fix-transformation-review-boundaries",
+        "versioned-task-oriented-documentation",
+    ):
+        final_archive = changes / "archive" / f"2026-10-25-{change_id}"
+        assert "- [ ]" not in (final_archive / "tasks.md").read_text()
+        assert (final_archive / "proposal.md").is_file()
 
     transformation = changes / "selective-source-transformation"
     assert "- [ ]" in (transformation / "tasks.md").read_text()
@@ -517,9 +516,9 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         transformation / "specs" / "selective-source-transformation" / "spec.md"
     ).is_file()
 
-    openai_change = changes / "openai-3-sdk-compatibility"
+    openai_change = changes / "archive" / "2026-10-25-openai-3-sdk-compatibility"
     openai_tasks = (openai_change / "tasks.md").read_text()
-    assert "- [ ]" in openai_tasks
+    assert "- [ ]" not in openai_tasks
     assert (openai_change / "proposal.md").is_file()
     assert (openai_change / "design.md").is_file()
     assert (

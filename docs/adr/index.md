@@ -142,6 +142,22 @@ maps to ADR-0010/0026. Module extraction maps to ADR-0003 and the
 [application-boundary inventory](../reference/application-boundaries.md).
 Provider integrations map to ADR-0012/0016, not to a new source-data permission.
 
+## Capability navigation added after archival — 2026-10-25
+
+The original inventory and implementation snapshot retain their recorded dates.
+Archiving accepted changes added these baseline files; this navigation maps them
+to existing decisions without inventing a new decision or activation authority.
+
+| OpenSpec capability | Governing records |
+| --- | --- |
+| [feedback-corrections](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/feedback-corrections/spec.md) | ADR-0004, ADR-0007, ADR-0008, ADR-0027 |
+| [generation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/generation/spec.md) | ADR-0005, ADR-0007, ADR-0014, ADR-0015 |
+| [mcp-transport](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/mcp-transport/spec.md) | ADR-0003, ADR-0013, ADR-0015, ADR-0016 |
+| [portable-generation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/portable-generation/spec.md) | ADR-0013, ADR-0030 |
+| [security-boundary-enforcement](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/security-boundary-enforcement/spec.md) | ADR-0002, ADR-0003, ADR-0006, ADR-0015, ADR-0019 |
+| [selective-source-transformation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/selective-source-transformation/spec.md) | ADR-0020, ADR-0021, ADR-0023, ADR-0029 |
+| [synthetic-data-generation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/synthetic-data-generation/spec.md) | ADR-0002, ADR-0005, ADR-0006, ADR-0008 |
+
 ## Implementation and acceptance snapshot
 
 Owner successor [ADR-0029: unified replacement contract](0029-unified-replacement-contract.md)

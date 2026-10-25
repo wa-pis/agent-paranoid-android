@@ -1,3 +1,13 @@
+# Current continuation — 2026-10-25
+
+Release 1.7.0rc1 is published and all 12 public acceptance jobs passed.
+Use [executed reconciliation](release-1.7-reconciliation.md) and current tasks.md.
+Do not reapply historical registration patches or repeat completed unchanged
+scale/audit runs. Next work is the remaining original-client matrix/replay and
+whole-document consistency inventory; capacity/trust-boundary expansion and
+unavailable external evidence retain their explicit limits. Earlier pause,
+publication-denial and closed-registration language below is historical.
+
 > Historical planning checkpoint: the implementation-status table and publisher
 > denial below describe September27 evidence. Current owner authorization,
 > implementation dispositions and post-seed installed evidence are recorded in

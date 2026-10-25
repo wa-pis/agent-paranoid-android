@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from decimal import Decimal
 import sys
+import subprocess
 from typing import Any
 import pytest
 
@@ -108,3 +109,32 @@ def test_evidence_counts_preserve_unexecuted_cells(tmp_path: Path) -> None:
     persisted = json.loads(output.read_text())
     assert persisted["counts"] == {"failed": 1, "blocked": 2}
     assert not output.with_suffix(".json.tmp").exists()
+
+
+def test_isolated_fixture_loads_local_helpers_and_restores_import_path(tmp_path: Path) -> None:
+    fixtures = tmp_path / "fixtures"
+    fixtures.mkdir()
+    support = tmp_path / "fictional_fixture_support"
+    support.mkdir()
+    (support / "__init__.py").write_text("answer = 42\n")
+    fixture = fixtures / "matrix.py"
+    fixture.write_text("from fictional_fixture_support import answer\n")
+    result = subprocess.run(
+        [sys.executable, "-I", "-c",
+         "import runpy,sys; from pathlib import Path; "
+         "module=runpy.run_path(sys.argv[1]); before=sys.path[:]; "
+         "fixture=module['load_fixture'](Path(sys.argv[2])); "
+         "assert fixture['answer']==42; assert sys.path==before",
+         str(Path(campaign.__file__).resolve()), str(fixture)],
+        check=False, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_fixture_failure_also_restores_import_path(tmp_path: Path) -> None:
+    fixture = tmp_path / "failing.py"
+    fixture.write_text("raise ValueError('fictional failure')\n")
+    original_path = sys.path[:]
+    with pytest.raises(ValueError, match="fictional failure"):
+        campaign.load_fixture(fixture)
+    assert sys.path == original_path
