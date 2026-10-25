@@ -30,3 +30,8 @@ uses the later accepted edge/load/overwrite contract in current capabilities.
 New capability purposes and ADR navigation are filled explicitly; current
 release requirements use the authorized candidate rather than a historical
 1.6-only version. No executable behavior or authority changes with this cleanup.
+
+The historical activation-composition fixture retains its executable/contract
+tail byte-for-byte. Its maintained documentation projection was refreshed for
+the corrected architecture page so forward/reverse composition remains tested;
+this is not a new activation patch applied to production.
