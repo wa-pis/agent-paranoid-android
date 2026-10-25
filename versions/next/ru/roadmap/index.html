@@ -203,7 +203,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation 6801997b763fa4b4ba9a27303b96ab507ab1f610
+  <br>Documentation b8524e8dc61902df702b926cf714adb4c4b6d217
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -228,6 +228,12 @@
 <li>Улучшать повторно затрудняющую пользователей диагностику.</li>
 </ul>
 <h2 id="_4">Позднее<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Преобразование исходных EAV-строк (pivot/unpivot) отложено. Условные формулы
+и синтетическая EAV-модель вошли в 1.7.0rc1; для преобразования существующих
+строк нужен отдельный проект с правилами изменения количества строк,
+дубликатов, null, типов и происхождения данных, а также явное разрешение
+на доступ к источнику. Синтетическая генерация и преобразование один-к-одному
+такого разрешения не дают.</p>
 <p>Новые интеграции — только после подтверждённого спроса. Reporting/validation adapters — для конкретных задач; публичные контракты развиваются по compatibility/deprecation policy.</p>
 <p>Конечная fictional transformation/session campaign для stable завершена с <a href="../../release-evidence-1.6.0/">ограниченным покрытием</a>. Это не dataset consent и не завершение более широкой acceptance campaign. Изменённая public activation по-прежнему требует specifications, executable evidence и независимого exact-source safety review.</p>
               

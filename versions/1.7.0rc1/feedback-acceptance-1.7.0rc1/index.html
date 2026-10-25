@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/feedback-acceptance-1.7.0rc1/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Installed feedback acceptance — 1.7.0rc1 - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Installed feedback acceptance \u2014 1.7.0rc1";
+        var mkdocs_page_input_path = "feedback-acceptance-1.7.0rc1.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/feedback-acceptance-1.7.0rc1/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Installed feedback acceptance — 1.7.0rc1</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/feedback-acceptance-1.7.0rc1.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Documentation b8524e8dc61902df702b926cf714adb4c4b6d217
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="installed-feedback-acceptance-170rc1">Installed feedback acceptance — 1.7.0rc1<a class="headerlink" href="#installed-feedback-acceptance-170rc1" title="Permanent link">&para;</a></h1>
+<p>This dated follow-up binds the original findings 1–26 and section E to actual
+public installed packages. It supplements the historical client register; no
+private measurements or prior runs are relabelled. The
+<a href="../feedback-acceptance-1.7.0rc1.json">machine-readable ledger</a> records every
+selected test case/outcome, fixture hashes, original script hashes and all 61
+historical source-anchor locations for each installed package.</p>
+<h2 id="package-identity-and-results">Package identity and results<a class="headerlink" href="#package-identity-and-results" title="Permanent link">&para;</a></h2>
+<p>Baseline is published 1.6.0, source <code>258c035c22408becf17ab090635710a50dda8ccc</code>;
+candidate is published 1.7.0rc1, source
+<code>64b7c8c3bbb0174fd7e159c4dfb42312045a1716</code>. Independently downloaded PyPI
+wheels match the release hashes, and all 157/173 installed package payloads
+match those wheels byte-for-byte. Both separate Python 3.11.2 environments use
+MCP 2.3.0, OpenAI 3.37.0, SQLGlot 30.24.0, PyArrow 26.0.0, Pydantic 2.14.1
+and Faker 40.43.0 for this comparison. These current dependencies do not
+reconstruct the historical client environment.</p>
+<p>The shared cohort has <strong>782 cases</strong> across 32 maintained fictional test modules:
+1.6.0 has 757 passes and 25 differing assertions; 1.7.0rc1 passes all 782 after
+the environment correction below. The 25 differences include new-feature and
+changed mock-query expectations, so they are not 25 newly discovered baseline
+bugs. Candidate conditional formulas additionally pass all 33 cases; dependency
+guards pass on both packages. Twenty real <code>doctor --require-extra parquet
+--json</code> invocations in fresh processes per package all exit zero.</p>
+<p>The initial cohort recorded 756/26 and 781/1 pass/fail respectively: a clean
+PATH hid <code>pg_config</code>, preventing installed psycopg from loading native libpq.
+Doctor correctly stopped at dependency import before the expected Trino check.
+Adding the installed native dependency discovery directory made the unchanged
+doctor/dependency tests pass (17 per package). The first conditional follow-up
+also omitted its example file (48 passes, two fixture failures); copying the
+exact reviewed fictional example produced 33/33. Original outcomes and separate
+rechecks are retained rather than silently overwritten. Product code was not
+patched.</p>
+<h2 id="per-finding-disposition">Per-finding disposition<a class="headerlink" href="#per-finding-disposition" title="Permanent link">&para;</a></h2>
+<p>The module links identify the actual selected tests, not private-client input.
+The newer <a href="../release-evidence-1.7.0rc1/">260 installed feedback regressions</a>
+and the published 600-cell cross-interface matrix supplement this cohort.</p>
+<table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Executed fictional coverage</th>
+<th>Disposition / limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1: Synthetic identifier validation</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_csv_pipeline_regressions.py">csv_pipeline_regressions</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_privacy_corpus.py">privacy_corpus</a></td>
+<td>Supported synthetic identifiers pass privacy validation; this does not waive sensitive-name/content checks or validate the absent private snapshot.</td>
+</tr>
+<tr>
+<td>2: Distinctness and primary-key evidence</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_schema_distinct_overflow.py">schema_distinct_overflow</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_identifier_pool.py">identifier_pool</a></td>
+<td>Overflow remains lower-bound evidence and cannot nominate a primary key; reprofile older artifacts.</td>
+</tr>
+<tr>
+<td>3: Numeric storage versus sensitivity</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_csv_pipeline_regressions.py">csv_pipeline_regressions</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_privacy_corpus.py">privacy_corpus</a></td>
+<td>Conservative positive sensitivity remains. Reviewed numeric-measure declarations and their separate installed feedback regressions are recorded in the release evidence; no majority-based declassification.</td>
+</tr>
+<tr>
+<td>4: Categorical metadata and repeated keys</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_identifier_pool.py">identifier_pool</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_local_category_policy.py">local_category_policy</a></td>
+<td>Bounded synthetic categories and generated repeated-key domains are supported; no source identifier pool is copied.</td>
+</tr>
+<tr>
+<td>5: Source enum retention</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_golden_csv_acceptance.py">client_golden_csv_acceptance</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_local_category_policy.py">local_category_policy</a></td>
+<td>Intentional source-free default. The original golden source-enum assertion stays red on both packages; explicit reviewed local categories are separately tested.</td>
+</tr>
+<tr>
+<td>6: Sensitivity-name override</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_transformation_policy.py">transformation_policy</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_transformation_approval.py">transformation_approval</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_privacy_corpus.py">privacy_corpus</a></td>
+<td>Intentional safety boundary; notes and declarations cannot override positive evidence.</td>
+</tr>
+<tr>
+<td>7: Timestamp and temporal routing</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_csv_pipeline_regressions.py">csv_pipeline_regressions</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_date_fallback_disclosure.py">date_fallback_disclosure</a></td>
+<td>Supported offsets/bounds and disclosed missing-bound fallback are tested. Monthly-category inference remains deferred.</td>
+</tr>
+<tr>
+<td>8: Repeated-key cardinality</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_identifier_pool.py">identifier_pool</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_golden_csv_acceptance.py">client_golden_csv_acceptance</a></td>
+<td>Generated repeated-key pools retain bounded distinct domains; observed output membership can be smaller in short/null-heavy samples.</td>
+</tr>
+<tr>
+<td>9: Distinct key roles and declared FK</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_identifier_domains.py">identifier_domains</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_golden_csv_acceptance.py">client_golden_csv_acceptance</a></td>
+<td>Independent key domains and declared parent membership are asserted; no source mapping or arbitrary relationship inference is implied.</td>
+</tr>
+<tr>
+<td>10: Supported temporal extrema</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_postgres_temporal_bounds.py">postgres_temporal_bounds</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_temporal_bounds.py">sql_query_temporal_bounds</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_date_fallback_disclosure.py">date_fallback_disclosure</a></td>
+<td>Fictional typed bounds and explicit unknown/fallback behavior pass. The missing private pair and its source period remain unverified.</td>
+</tr>
+<tr>
+<td>11: Safe backend diagnostics</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_postgres_client.py">postgres_client</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_adapters.py">sql_query_adapters</a></td>
+<td>Typed diagnostics and value-free failures are tested with fictional drivers; no live reachability or raw exception-text parsing.</td>
+</tr>
+<tr>
+<td>12: Source names and sensitive fields</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_transformation_policy.py">transformation_policy</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_transformation_approval.py">transformation_approval</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_privacy_corpus.py">privacy_corpus</a></td>
+<td>Intentional conservative policy; source-name preservation requires the separate reviewed transformation contract and local receipt.</td>
+</tr>
+<tr>
+<td>13: Relationships and orphan utility</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_identifier_domains.py">identifier_domains</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_relationship_discovery.py">relationship_discovery</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_domain_agnostic_pipeline.py">domain_agnostic_pipeline</a></td>
+<td>Declared links and offline bounded hypotheses are tested. Source orphan-rate fidelity and absent private pair remain unverified.</td>
+</tr>
+<tr>
+<td>14: Conformance versus utility</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_domain_business_invariants.py">domain_business_invariants</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_golden_csv_acceptance.py">client_golden_csv_acceptance</a></td>
+<td>Conformance assertions do not establish statistical utility. Current utility/hypothesis delivery and its installed regressions are linked from release evidence; no invented client score.</td>
+</tr>
+<tr>
+<td>15: Local-category preflight and limits</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_local_category_policy.py">local_category_policy</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_postgres_query_builders.py">postgres_query_builders</a></td>
+<td>Scopes and existing bounded preservation contract are tested; no global cap increase or source-value logging.</td>
+</tr>
+<tr>
+<td>16: SQL shape and rejection</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_source.py">sql_query_source</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_adapters.py">sql_query_adapters</a></td>
+<td>Supported shapes and fixed recovery diagnostics pass; JOIN/CTE expansion remains unsupported.</td>
+</tr>
+<tr>
+<td>17: Bounded aggregate work</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_profiling.py">sql_query_profiling</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_postgres_query_builders.py">postgres_query_builders</a></td>
+<td>Fictional query-count/schema-drift/batch regressions distinguish 1.6.0 and candidate. No temporary writes or live latency/scan-byte claim.</td>
+</tr>
+<tr>
+<td>18: SELECT expression dependencies</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_adapters.py">sql_query_adapters</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_profiling.py">sql_query_profiling</a></td>
+<td>Unsupported automatic expression inference rejects. Owner-excluded internal SQL formula transfer is not silently implemented.</td>
+</tr>
+<tr>
+<td>19: Publication, overwrite and path identity</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_io_path_policy.py">io_path_policy</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_publication_acceptance.py">client_publication_acceptance</a></td>
+<td>Five content/exit/preservation cases plus deterministic atime/path-swap guards pass. Original 40-process probe is separately diagnostic, not universal crash/race proof.</td>
+</tr>
+<tr>
+<td>20: Doctor retention and repeatability</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_cli_doctor.py">cli_doctor</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_cli_dependencies.py">cli_dependencies</a></td>
+<td>Structured failures and missing extras pass after native-library discovery is configured. Twenty real fresh CLI doctor runs per package all exit zero; no remote service tested.</td>
+</tr>
+<tr>
+<td>21: Trino authentication</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_trino_auth.py">trino_auth</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_trino_client.py">trino_client</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_trino_oauth_cli.py">trino_oauth_cli</a></td>
+<td>Fictional six-method propagation/redaction is tested. Tentative external 1.6.0 plus server username/password does not establish historical application configuration or explain 401.</td>
+</tr>
+<tr>
+<td>22: Boolean SQL predicates</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_source.py">sql_query_source</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_sql_query_adapters.py">sql_query_adapters</a></td>
+<td>AND/OR and forbidden-function controls pass without widening allowlists or resource budgets.</td>
+</tr>
+<tr>
+<td>23: Exact decimals</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_exact_decimal_dataset.py">exact_decimal_dataset</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_exact_decimal_units.py">exact_decimal_units</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_parquet_decimal_profile.py">parquet_decimal_profile</a></td>
+<td>Declared exact DECIMAL paths and typed outputs are tested; no float-to-exact recovery or preservation exemption.</td>
+</tr>
+<tr>
+<td>24: Physical Parquet types</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_parquet_acceptance.py">client_parquet_acceptance</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_exact_decimal_dataset.py">exact_decimal_dataset</a></td>
+<td>Declared valid-mode schema/readback passes. Original diagnostic overwrites its file pointer with negative output, so its final round-trip is not a valid-mode regression.</td>
+</tr>
+<tr>
+<td>25: Mode/ratio and artifact parity</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_client_mode_installed_acceptance.py">client_mode_installed_acceptance</a></td>
+<td>Spec/profile/CSV routing, effective settings, deterministic replay and intentional invalid exit 1 pass. Old probe rejects nonzero ratios with edge/load by contract and mislabels exit 1 as failure.</td>
+</tr>
+<tr>
+<td>26: Parquet metadata honesty</td>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_source_adapters.py">source_adapters</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_parquet_decimal_profile.py">parquet_decimal_profile</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/blob/6801997b763fa4b4ba9a27303b96ab507ab1f610/tests/test_identifier_pool.py">identifier_pool</a></td>
+<td>Unknown statistics remain unknown and bounded supported distinctness is measured. No absent private Parquet or unknown null ratio is certified safe.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="original-scripts-and-disclosed-adaptations">Original scripts and disclosed adaptations<a class="headerlink" href="#original-scripts-and-disclosed-adaptations" title="Permanent link">&para;</a></h2>
+<p>Six original scripts were run unchanged on each package in new temporary roots:
+<code>golden_run.py</code>, <code>probe_output_contract.py</code>, <code>probe_doctor_parquet.py</code> (base arm,
+20 repeats), <code>rc_anchor_check.py</code>, <code>probe_mode_flags_ab.py</code> and
+<code>probe_parquet_types_ab.py</code>. The controller bounds each run, selects its CLI
+explicitly by PATH and clears external configuration. Only their fictional
+self-contained fixtures are available; no private profiles/specs are supplied.</p>
+<p>Both golden runs report six green and three red checks: source-enum copying is
+intentionally unsupported by default, and the private snapshot/pair are absent.
+The original script exits zero even with these reds. Each publication run
+executes 40 fresh processes: 32 successes and eight intended filled-directory
+rejections; its banner still incorrectly says 1.5.0. The maintained five-case
+adaptation checks exit, file contents, layout and preservation, not mere file
+existence. It passes on both actual packages. The original doctor base arm
+reports 20/20 on each; separate real CLI doctor results are above.</p>
+<p>The mode probe treats deliberate invalid publication exit 1 as a failure, passes
+a nonzero invalid ratio to edge/load modes that forbid it, and compares hashes
+as if they established semantics. Preserve its diagnostic output; the eight
+maintained CLI mode cases assert actual settings/artifacts and pass. The Parquet
+probe inspects both valid and negative arms, then uses the last (negative) file
+for its round-trip: the resulting string types do not demonstrate valid-mode
+type loss. Declared valid-mode physical schema/readback tests pass separately.</p>
+<p>The Trino ladder script has a Python 3.11 SyntaxError at line 206 and its private
+query is absent. Its product-monkeypatched arm is not an acceptance route. The
+publication fix wrapper/runner also monkeypatch production code, so their fixed
+arms are retained as diagnostic history and excluded from acceptance. Unpatched
+installed SQL/publication controls above provide the reviewed replacement
+scenarios. None of these exclusions is counted as a passing original probe.</p>
+<p>Tests and their exact fictional example are copied outside the checkout. A
+legacy <code>src</code> fixture path explicitly points to that arm's installed site-packages;
+initial imports and subprocess checks verify installed-package provenance.
+No application source checkout is imported. Reproduction uses the selected
+interpreter with <code>-I -m pytest</code>, disabled automatic pytest plugins, the listed
+32 test modules and <code>TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT</code> set to installed
+site-packages. Add the reviewed example for <code>test_conditional_formulas.py</code>.
+The ledger retains controller, fixture and report hashes and every test case.
+Parameter payloads are replaced by deterministic per-function case ordinals;
+fixture hashes bind reconstruction without publishing sensitive-shaped test literals.</p>
+<h2 id="section-e-safeguards-and-remaining-evidence">Section E safeguards and remaining evidence<a class="headerlink" href="#section-e-safeguards-and-remaining-evidence" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Guard</th>
+<th>Evidence / limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E.0 identity/extras</td>
+<td>Real public wheel hashes, byte-identical installed payloads, versions/dependencies above, doctor extra/capability checks in the ledger. No in-place product fix.</td>
+</tr>
+<tr>
+<td>E.1 anchors</td>
+<td>All 61 old anchors rebound independently on both installations in the ledger. Moved/absent strings are historical diagnostics, never proof of a runtime defect. Current test links bind the accepted source.</td>
+</tr>
+<tr>
+<td>E.2 claims and before/after</td>
+<td>All findings 1–26 above have an explicit supported, intentional, deferred or unverified disposition. Original script results remain separate from maintained assertions. No missing private snapshot, pair or query is passed.</td>
+</tr>
+<tr>
+<td>E.3 seed/layout/routing/overwrite</td>
+<td>Installed golden/mode/publication tests assert deterministic replay, flat artifacts, profile/spec routing, retained invalid output, exit semantics and overwrite. Path-identity/atime negatives remain executable.</td>
+</tr>
+<tr>
+<td>E.3 dependencies/doctor</td>
+<td>Missing-extra guards and retained structured failure tests pass; 20 fresh real CLI doctor runs per version exit zero. Native library discovery correction is disclosed. No actual remote connection attempted.</td>
+</tr>
+<tr>
+<td>E.3 speed/resource limits</td>
+<td>Fictional bounded query-count and preflight regressions pass on candidate. Live PostgreSQL latency/scan costs and the client's original table remain unverified; no temporary writes or higher default budgets.</td>
+</tr>
+<tr>
+<td>E.4 record/harness review</td>
+<td>This new source-bound ledger supplements earlier release records, retains initial harness failures and separates diagnostic probes, assertions and unavailable cases.</td>
+</tr>
+</tbody>
+</table>
+<p>This completes the accessible fictional matrix and reviewed local replay with
+explicitly unavailable cases. It does <strong>not</strong> certify full private-client utility,
+historical Trino 401 configuration, external profile provenance, final-public
+1M × 100 configured transformation capacity or new preservation authority.
+The broad documentation audit and remaining transformation gates stay open.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

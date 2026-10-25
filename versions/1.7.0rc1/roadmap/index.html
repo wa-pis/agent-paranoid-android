@@ -214,7 +214,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation 6801997b763fa4b4ba9a27303b96ab507ab1f610
+  <br>Documentation b8524e8dc61902df702b926cf714adb4c4b6d217
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -255,6 +255,11 @@ completed work belongs in <a href="../history/">release history</a>, not this li
 </ul>
 <h2 id="later">Later<a class="headerlink" href="#later" title="Permanent link">&para;</a></h2>
 <ul>
+<li>Source-row EAV pivot/unpivot remains deferred. Conditional formulas and
+  source-free EAV modeling shipped in the 1.7.0rc1 candidate; transforming existing
+  EAV rows requires a separate proposal for row cardinality, duplicate/null
+  semantics, typed values, provenance and explicitly authorized source I/O.
+  Neither source-free generation nor one-to-one transformation authorizes it.</li>
 <li>Add integrations only after demonstrated demand.</li>
 <li>Consider reporting and validation adapters for concrete workflows.</li>
 <li>Evolve public contracts through the compatibility and deprecation policy.</li>
