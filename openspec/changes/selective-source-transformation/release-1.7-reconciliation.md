@@ -75,9 +75,10 @@ failure. This is a labelled subset, not another full 600-cell execution.
 - Trust-boundary amendment: retain the existing owner decisions, local receipt
   requirements and source-free guarantees. This reconciliation does not invent
   a new scoped AGENTS/SECURITY approval or amend them by release authority.
-- Original client findings 1–26/section E matrix and isolated baseline/candidate
-  script replay: the new core matrix and focused feedback checks supplement,
-  but do not replace, every original private/client-script requirement.
+- The original findings matrix and reviewed local baseline/candidate replay
+  are now reconciled in the [dated installed acceptance](../../../docs/feedback-acceptance-1.7.0rc1.md).
+  That closes the accessible fictional/replay tasks with explicit private/live
+  exclusions; it does not claim private client inputs or monkeypatched arms passed.
 - Whole-repository prose audit: stale campaign claims in current architecture,
   implementation-map, configuration and release guidance were corrected. Strict
   links/build tests do not establish a line-by-line audit of every historical

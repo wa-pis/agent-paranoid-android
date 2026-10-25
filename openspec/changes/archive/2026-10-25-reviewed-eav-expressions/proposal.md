@@ -7,7 +7,9 @@ exact-head CI checks passed. Merge commit:
 `25a221b70f95a0e9d11e8191a2301dedac9aa690`; acceptance details are recorded in
 [tasks.md](tasks.md) and [verification.md](verification.md).
 Source-row pivot/unpivot and broader expressions remain separate unimplemented
-extensions. No package release or additional source authorization is implied.
+extensions. The delivered slice is included in the published 1.7.0rc1 candidate. Source-row
+pivot/unpivot remains explicitly deferred in the roadmap; archival does not
+authorize that extension.
 
 ## Current support and gap
 Conditional-required/allowed-values rules already accept typed predicates.

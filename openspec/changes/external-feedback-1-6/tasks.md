@@ -54,3 +54,14 @@ were moved to archive/2026-10-23-<change-id>. Main specifications already contai
 their reviewed deltas, so archival deliberately skips duplicate baseline updates.
 Historical A3/S4 evidence gaps and the separate EAV transformation proposal remain
 active. Package publication is outside this work.
+
+
+## Published candidate continuation — 2026-10-25
+
+1.7.0rc1 publication is recorded in the release evidence. The completed
+conditional-formula/source-free EAV slice is now archived as
+`2026-10-25-reviewed-eav-expressions`; source-row pivot/unpivot remains deferred
+in the roadmap, not active or implemented. The original findings 1–26/section E
+and installed baseline/candidate replay have a new dated acceptance ledger.
+Historical A3/S4 evidence gaps remain open; no new runtime defect or source
+authority is inferred from those gaps. Earlier no-release wording is historical.
