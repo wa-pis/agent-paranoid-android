@@ -192,7 +192,7 @@ def test_container_workflow_uses_node24_docker_actions() -> None:
         in workflow
     )
     assert (
-        "docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0"
+        "docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0"
         in workflow
     )
 
