@@ -205,7 +205,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation b8524e8dc61902df702b926cf714adb4c4b6d217
+  <br>Documentation 4d31d13d329ab8b27b9c9071bea7ad813bbcf943
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -284,8 +284,12 @@ not receive an independent support promise unless they affect one of these
 contract surfaces directly.</p>
 <h2 id="profiles">Profiles<a class="headerlink" href="#profiles" title="Permanent link">&para;</a></h2>
 <p>Minimum candidates match the lower bounds in <code>pyproject.toml</code>. Latest versions
-are the versions in the reviewed <code>uv.lock</code> used by the release gate on
-2026-08-12.</p>
+are the versions in the reviewed <code>uv.lock</code> and
+<code>.github/dependency-compatibility.toml</code>, exercised by the
+<a href="../../release-evidence-1.7.0rc1/">1.7.0rc1 exact-source gate</a>.
+“Latest tested” names that locked profile, not the newest packages on PyPI.
+The later installed feedback replay records its separately resolved environment;
+it does not replace the reviewed lock or minimum profiles.</p>
 <table>
 <thead>
 <tr>

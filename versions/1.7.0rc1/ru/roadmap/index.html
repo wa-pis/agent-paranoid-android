@@ -203,7 +203,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation b8524e8dc61902df702b926cf714adb4c4b6d217
+  <br>Documentation 4d31d13d329ab8b27b9c9071bea7ad813bbcf943
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -214,8 +214,9 @@
 <p>Это направления, а не обещанные даты. Приоритет определяется отзывами и подтверждёнными дефектами. Stable 1.6.0 уже опубликована и публично проверена; завершённая работа относится к <a href="../history/">истории</a>.</p>
 <h2 id="_2">Сейчас<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Обработать внешний feedback 1.6.0: reviewed numeric CSV profiling, authenticated Trino access, relational planning и проверку полезности, bounded statistics и понятные CLI diagnostics. Сохранять conservative privacy defaults и read-only DB budgets; начинать с воспроизведённых отказов, а не повторно открывать исправленные ошибки прежнего harness.</li>
-<li>Улучшать onboarding, инструкции по задачам, версионную и скачиваемую документацию.</li>
+<li>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в опубликованный <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</li>
+<li>Завершить оставшиеся проверки преобразования: целевой объём на публичных/configured маршрутах и отдельно учитываемый review поправки к границе доверия. Прежние разрешения и частные нагрузочные прогоны сохраняют исходные ограничения.</li>
+<li>Улучшать инструкции по отзывам пилотов. Версионная документация и четыре формата скачивания уже <a href="../versions/">опубликованы</a>.</li>
 <li>Проводить пилоты разработки и аналитики.</li>
 <li>Исправлять подтверждённые client defects, migration feedback и зависимости.</li>
 <li>Следить за source/output consistency, portable business rules и MCP permissions.</li>
@@ -234,8 +235,11 @@
 дубликатов, null, типов и происхождения данных, а также явное разрешение
 на доступ к источнику. Синтетическая генерация и преобразование один-к-одному
 такого разрешения не дают.</p>
+<p>Распознавание месячных категорий дат и настраиваемый предел локальных категорий
+отложены и не реализованы. Действующий предел сохранения — 20 нечувствительных
+значений длиной до 64 символов с обязательной проверкой содержимого.</p>
 <p>Новые интеграции — только после подтверждённого спроса. Reporting/validation adapters — для конкретных задач; публичные контракты развиваются по compatibility/deprecation policy.</p>
-<p>Конечная fictional transformation/session campaign для stable завершена с <a href="../../release-evidence-1.6.0/">ограниченным покрытием</a>. Это не dataset consent и не завершение более широкой acceptance campaign. Изменённая public activation по-прежнему требует specifications, executable evidence и независимого exact-source safety review.</p>
+<p>Конечная fictional transformation/session campaign для stable завершена с <a href="../../release-evidence-1.6.0/">ограниченным покрытием</a>. Это не разрешение на набор данных и не подтверждение оставшихся нагрузочных или иных непроверенных сценариев. Изменённая public activation по-прежнему требует specifications, executable evidence и независимого exact-source safety review.</p>
               
 </div>
 

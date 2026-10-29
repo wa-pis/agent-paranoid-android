@@ -205,7 +205,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation b8524e8dc61902df702b926cf714adb4c4b6d217
+  <br>Documentation 4d31d13d329ab8b27b9c9071bea7ad813bbcf943
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -223,11 +223,15 @@
 not a complete description of the domain and must not imply that unobserved
 rules are known.</p>
 <h2 id="evidence-envelope">Evidence Envelope<a class="headerlink" href="#evidence-envelope" title="Permanent link">&para;</a></h2>
-<p>The evidence-bounded contract records how each important observation was
-obtained. Relationships and constraints already expose confidence and status;
-the release contract extends that record with provenance and coverage rather
-than treating inference as fact.</p>
-<p>Target shape for an observed rule or relationship:</p>
+<h3 id="planned-evidence-envelope-not-a-serialized-contract">Planned evidence envelope (not a serialized contract)<a class="headerlink" href="#planned-evidence-envelope-not-a-serialized-contract" title="Permanent link">&para;</a></h3>
+<p>Relationships and constraints currently expose numeric <code>confidence</code> in [0, 1]
+and <code>status</code>. The following richer provenance envelope is a design target;
+it is not emitted by the current profile models and must not be supplied as
+supported relationship/constraint fields. In particular, <code>confidence: medium</code>
+below is illustrative, not a valid current numeric confidence value.
+The separate relationship-discovery and validation-utility reports have their
+own shipped schemas; they do not add this envelope to DatasetProfile.</p>
+<p>Proposed shape for a future observed rule or relationship:</p>
 <pre><code class="language-yaml">origin: observed
 status: candidate
 confidence: medium
