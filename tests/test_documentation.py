@@ -492,7 +492,6 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "_template", "selective-source-transformation",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
-        "fix-ci-dependency-vulnerabilities",
     }
 
 
@@ -508,6 +507,14 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         final_archive = changes / "archive" / f"2026-10-25-{change_id}"
         assert "- [ ]" not in (final_archive / "tasks.md").read_text()
         assert (final_archive / "proposal.md").is_file()
+
+    dependency_archive = changes / "archive" / "2026-10-29-fix-ci-dependency-vulnerabilities"
+    assert "- [ ]" not in (dependency_archive / "tasks.md").read_text()
+    for spec, requirement in (
+        ("container-deployment", "Shared Runtime OpenSSL Security Floor"),
+        ("release-supply-chain", "Audit Tool Dependency Security Maintenance"),
+    ):
+        assert requirement in (ROOT / "openspec" / "specs" / spec / "spec.md").read_text()
 
     transformation = changes / "selective-source-transformation"
     assert "- [ ]" in (transformation / "tasks.md").read_text()
