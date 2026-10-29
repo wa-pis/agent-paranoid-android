@@ -1,12 +1,12 @@
 # Change Proposal: fix-ci-dependency-vulnerabilities
 
-## Summary
+## What Changes
 
 Update only locked audit-tool MessagePack to 1.2.3 and require fixed Bookworm
 OpenSSL packages in the shared runtime image. Restore vulnerability gates for
 main and the five pending action-update PRs without suppressing findings.
 
-## Motivation
+## Why
 
 CI on PR658 (40704469304) flags msgpack1.2.1 / CVE-2026-114613; container
 validation (40704469386) flags openssl/libssl3 3.0.20-1~deb12u2 /
