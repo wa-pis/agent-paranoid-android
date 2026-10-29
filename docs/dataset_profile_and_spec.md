@@ -15,12 +15,17 @@ rules are known.
 
 ## Evidence Envelope
 
-The evidence-bounded contract records how each important observation was
-obtained. Relationships and constraints already expose confidence and status;
-the release contract extends that record with provenance and coverage rather
-than treating inference as fact.
+### Planned evidence envelope (not a serialized contract)
 
-Target shape for an observed rule or relationship:
+Relationships and constraints currently expose numeric `confidence` in [0, 1]
+and `status`. The following richer provenance envelope is a design target;
+it is not emitted by the current profile models and must not be supplied as
+supported relationship/constraint fields. In particular, `confidence: medium`
+below is illustrative, not a valid current numeric confidence value.
+The separate relationship-discovery and validation-utility reports have their
+own shipped schemas; they do not add this envelope to DatasetProfile.
+
+Proposed shape for a future observed rule or relationship:
 
 ```yaml
 origin: observed

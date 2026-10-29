@@ -8,6 +8,7 @@
 - [Результаты публикации 1.7.0rc1 — English](../release-evidence-1.7.0rc1.md).
 - [Stable 1.6.0 status — English](../1.6.0-release-status.md).
 - [Stable publication evidence — English](../release-evidence-1.6.0.md).
+- [Аудит согласованности документации — English](../documentation-consistency-2026-10-29.md).
 - [ADR — English](../adr/index.md).
 - [Development — English](../development.md).
 - [Release process — English](../release.md).

@@ -26,21 +26,25 @@ behavior change, a matching OpenSpec/roadmap update.
 
 ## Selective transformation: registered local surface and gated extensions
 
-The separate opt-in transformation in the 1.6 RC line is not synthetic
-generation. Published 1.6.0rc5 registers the reviewed single-source local
+The separate opt-in transformation is not synthetic generation. Stable 1.6.0
+and candidate 1.7.0rc1 retain the reviewed runtime first published in 1.6.0rc5,
+including the single-source local
 `transform-approve`/`transform-execute` CLI and `execute_transformation` MCP
 consumer, plus common saved-profile and configured SQL session consumers.
 These produce labelled mixed-origin, one-to-one artifacts. They are not shipped
-1.5.0 capabilities or authorization of any dataset; the broader
-transformation/session acceptance campaign remains open, as recorded in
-`docs/acceptance-evidence-1.6.0rc5.md`. Existing generation, profiling and
-advisors remain source-free; MCP transformation returns no rows.
+1.5.0 capabilities or authorization of any dataset. The finite fictional
+transformation/session campaign completed for stable 1.6.0; its evidence and
+limits are recorded in `docs/release-evidence-1.6.0.md`. The earlier open-campaign
+statements in `docs/acceptance-evidence-1.6.0rc5.md` are historical. Existing
+generation, profiling and advisors remain source-free; MCP transformation
+returns no rows.
 
-Stable `1.6.0` preparation promotes this publicly accepted RC5 runtime through
-version and documentation changes only; see `docs/1.6.0-release-status.md`.
-The new stable commit still requires independent exact-SHA review and every
-release gate before publication. This promotion does not approve a dataset,
-activate an extension or close the separate transformation/session campaign.
+Stable 1.6.0 and candidate 1.7.0rc1 are published and publicly verified; see
+`docs/1.6.0-release-status.md` and `docs/1.7.0rc1-release-status.md`. Candidate
+acceptance does not repeat historical personal approvals or capacity tests on
+the newer artifact. Changed activation still requires independent exact-SHA
+review and every applicable release gate. Publication does not approve a dataset,
+activate a new extension or close the remaining transformation tasks.
 
 Before any source value may be retained by `preserve` or a preserve fallback, require an
 explicit per-field non-sensitive decision, no positive/conflicting sensitivity
@@ -74,7 +78,7 @@ destinations. This permits no real data access or dataset approval. Passing
 end-to-end tests and independent review of the implementation are prerequisites
 for activation, not prerequisites for writing the implementation and its tests.
 
-The activation amendment under review is defined in
+The scoped activation contract and historical development stages are defined in
 `openspec/changes/selective-source-transformation/safety-boundary.md`.
 Its separate local-file execution contract permits only local controlling-TTY
 receipt issuance and matching-receipt consumption by noninteractive/workspace
@@ -153,7 +157,8 @@ and focused tests.
 
 ### Configured SQL Session Extension
 
-The published 1.6.0rc5 composition separately registers common saved-profile
+The reviewed composition retained in stable 1.6.0 and candidate 1.7.0rc1
+separately registers common saved-profile
 CLI/MCP consumers and configured SQL sessions. Read authority still comes from
 administrator configuration, allowlists and bounded read-only policy; it is
 not inferred from a transformation request. Capture once into owned snapshots;

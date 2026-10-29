@@ -79,10 +79,10 @@ failure. This is a labelled subset, not another full 600-cell execution.
   are now reconciled in the [dated installed acceptance](../../../docs/feedback-acceptance-1.7.0rc1.md).
   That closes the accessible fictional/replay tasks with explicit private/live
   exclusions; it does not claim private client inputs or monkeypatched arms passed.
-- Whole-repository prose audit: stale campaign claims in current architecture,
-  implementation-map, configuration and release guidance were corrected. Strict
-  links/build tests do not establish a line-by-line audit of every historical
-  page, so the composite audit remains open.
+- Whole-documentation consistency audit completed on 2026-10-29 with
+  [inventory, semantic reconciliation and executable checks](../../../docs/documentation-consistency-2026-10-29.md).
+  Historical pages retain their source identities; this does not claim a new
+  line-by-line review of every historical paragraph or settle capacity/authority.
 
 Historical Trino application configuration and external profile provenance
 remain unavailable in their focused changes. Source-row EAV pivot/unpivot
