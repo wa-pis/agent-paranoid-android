@@ -1,7 +1,7 @@
 {
   "package_version": "1.7.0rc1",
   "package_commit": "64b7c8c3bbb0174fd7e159c4dfb42312045a1716",
-  "documentation_revision": "d4beb4416115f42412d2774bd878e3bcc6076eca",
+  "documentation_revision": "a27efd926fe6508afb274461eb7e60f85922e0b0",
   "status": "Release candidate / not stable",
   "chapters": [
     "index.md",
@@ -41,11 +41,11 @@
     "ru/operations/troubleshooting.md",
     "ru/known-issues.md"
   ],
-  "index_sha256": "92d34fe9b043abc7c712a73afd23b83f709e1a2526648086fbbc977b8311ce3b",
+  "index_sha256": "cf00e2a25621f37d9bdd5a794fd17012fc0062d64de93888cf63e8be50e27a07",
   "sha256": {
-    "handbook.pdf": "4d0400eb312d7dd56af100b089eb275759b5ff1b06e968d75483ff53eadee0ad",
-    "handbook.html": "c88afc533c46edc8027db996325dc27ffaf910f1cc9f976dcfe55382a20f288a",
-    "handbook.md.zip": "7c3c53a7ec3d0d56d30a67ddb0896b48743bb18daba681799bc2510dfd2b3894",
-    "site.zip": "7a22a8fc0acb386fc37a1f45ee25ae572e17b5112438904e48cdb5eebf0ffb9c"
+    "handbook.pdf": "e52caff15bd639118aa5e1e4e6290ed0b3a0f7a6bd9aac8ecad9d2ff5fe5ab1a",
+    "handbook.html": "44fd1fb4512e6f147196ceee441ca4a87852af77fddf924c84986ec199969da9",
+    "handbook.md.zip": "000dfeb5f09c3b0caa4bea083321ab14f916191d4c32f4f882e8a81c63d8b1da",
+    "site.zip": "c6372d1c4824921af3da7acb6b9f8b6dadb21d517f8f7537de08c26f53dec1fc"
   }
 }
