@@ -16,6 +16,7 @@ activate extensions or authorize a dataset.
 - [Release evidence index](release-evidence.md)
 - [Generation contract migration](reference/generation-contract-migration.md)
 - [Documentation versions](versions.md)
+- [Documentation consistency audit — 2026-10-29](documentation-consistency-2026-10-29.md)
 - [RC5 status](rc5-release-status.md), [acceptance](acceptance-evidence-1.6.0rc5.md)
   and [publication evidence](release-evidence-1.6.0rc5.md)
 - [Pre-1.0 history](release-history/pre-1.0.md)

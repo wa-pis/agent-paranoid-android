@@ -11,7 +11,7 @@ then passed a separate 48-cell subset without its temporary helper workaround.
 The fresh [original-finding matrix and local replay](../../../docs/feedback-acceptance-1.7.0rc1.md)
 now records all 26 dispositions, original-script limitations and actual installed
 baseline/candidate outcomes. Historical preservation/scale results retain their
-actual artifacts. Three composite tasks remain open; this proposal is not
+actual artifacts. Two composite tasks remain open after the 2026-10-29 documentation audit; this proposal is not
 archived or declared complete.
 Earlier dated pending checkpoints below are historical, not current release
 or registration denials.
@@ -419,12 +419,20 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   registration, mixed-origin privacy limits and migration from shipped1.5.0.
   Strict documentation build already passed after these documentation changes.
   Whole-repository consistency and final release acceptance remain separate.
-- [ ] Audit all repository documentation for consistency: README, quickstarts,
+- [x] Audit all repository documentation for consistency: README, quickstarts,
   CLI help/reference, Python/MCP contracts, source adapters, configuration,
   privacy/security, architecture, manifests/reports, troubleshooting, examples,
   roadmap, OpenSpec baselines, changelog and release guidance. Update every
   affected page, preserve historical evidence as historical, and explicitly
   distinguish shipped from planned behavior.
+  2026-10-29 completed consistency audit: inventoried all 684 tracked Markdown
+  files at b8524e8d, reconciled current English/Russian workflow/contract/status
+  surfaces, corrected stale release/ADR/MCP claims and the planned evidence
+  envelope. Historical records and unresolved authority/capacity remain scoped.
+  [Audit coverage, corrections and checks](../../../docs/documentation-consistency-2026-10-29.md):
+  151 focused tests plus24 publication-build tests passed, strict MkDocs and
+  all29 strict OpenSpec items passed. No new runtime or dataset permission.
+  Earlier partial checkpoints below retain their original scope.
   2026-10-07 consistency constituent: reviewed roadmap and compatibility
   inventory, plus transformation-boundary sections in output review, application
   boundaries, MCP design and MCP how-to. They distinguish ordinary synthetic
