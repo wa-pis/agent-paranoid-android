@@ -34,12 +34,15 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM ${PYTHON_IMAGE} AS runtime-base
 
 # The pinned base predates these Bookworm security updates. Fail the build
-# if either fixed package cannot be installed; keep the scanner enabled.
+# if a fixed package cannot be installed; keep the scanner enabled.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends --only-upgrade \
         libpcre2-8-0=10.42-1+deb12u2 perl-base=5.36.0-7+deb12u4 \
+        libssl3=3.0.22-1~deb12u2 openssl=3.0.22-1~deb12u2 \
     && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libpcre2-8-0)" ge 10.42-1+deb12u2 \
     && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' perl-base)" ge 5.36.0-7+deb12u4 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libssl3)" ge 3.0.22-1~deb12u2 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' openssl)" ge 3.0.22-1~deb12u2 \
     && rm -rf /var/lib/apt/lists/*
 
 ARG APP_VERSION
