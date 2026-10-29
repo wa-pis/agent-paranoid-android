@@ -60,6 +60,8 @@ def test_runtime_base_requires_fixed_bookworm_security_packages() -> None:
     for package, fixed in (
         ("libpcre2-8-0", "10.42-1+deb12u2"),
         ("perl-base", "5.36.0-7+deb12u4"),
+        ("libssl3", "3.0.22-1~deb12u2"),
+        ("openssl", "3.0.22-1~deb12u2"),
     ):
         assert f"{package}={fixed}" in runtime
         assert f"dpkg-query -W -f='${{Version}}' {package})\" ge {fixed}" in runtime

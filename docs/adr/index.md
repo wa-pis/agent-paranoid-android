@@ -1,7 +1,13 @@
 # Architecture Decision Records
 
-Recorded **2026-09-29**. This is a project-wide retrospective register, not a
-proposal to rewrite the product and not a claim that 1.6.0rc1 is ready.
+Recorded **2026-09-29**; release-status reconciliation **2026-10-29**.
+The inventory and pinned links below describe that retrospective baseline,
+not the current number of specifications or current release readiness.
+Stable 1.6.0 and candidate 1.7.0rc1 are now published; see
+[stable evidence](../release-evidence-1.6.0.md),
+[candidate evidence](../release-evidence-1.7.0rc1.md) and the
+[current documentary reconciliation](../documentation-consistency-2026-10-29.md).
+No accepted architectural decision is changed by this status update.
 
 The inventory covers the current 16 baseline OpenSpec capabilities, the
 cross-cutting architecture/operations contracts and the accepted selective
@@ -30,8 +36,8 @@ of a historical vote. Original approval dates are unknown unless stated.
 
 Repository/code/spec links are pinned to baseline commit
 [`6370659`](https://github.com/wa-pis/agent-paranoid-android/commit/637065966c12584e11c9b437c1e8b8f8d708c0df) (merged PR #594).
-Relative links point to maintained documentation. The current worktree also has
-uncommitted private SQL-limit work: its presence does not establish an accepted
+Relative links point to maintained documentation. At the original recording
+checkpoint, the worktree also had uncommitted private SQL-limit work: its presence does not establish an accepted
 implementation, new public interface or release. Test links identify coverage
 anchors, **not tests run during ADR collection**.
 

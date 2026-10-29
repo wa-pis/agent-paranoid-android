@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Future container builds install Bookworm's fixed OpenSSL3.0.22 security
+  packages for CVE-2026-84782 across all three targets. Existing signed release
+  images remain immutable. Locked audit tooling updates MessagePack to1.2.3
+  for CVE-2026-114613; this dependency is not added to application runtime.
+
 ## [1.7.0rc1] - 2026-10-25
 
 First release candidate for the feedback-driven 1.7 series. Stable 1.6.0

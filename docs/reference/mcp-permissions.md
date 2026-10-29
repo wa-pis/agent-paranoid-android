@@ -228,6 +228,9 @@ workflows above and expose no advisor tool. Provider integration, shell/CLI
 access and arbitrary file-reading tools are separate capabilities with their
 own permissions; enabling MCP does not grant or constrain them.
 
-The planned [final acceptance campaign](../acceptance-matrix.md) will exercise
-this inventory through installed stdio clients, permissions, failures and
-deployment workloads. The plan does not claim those runs have completed.
+The finite stable 1.6.0 campaign completed with
+[recorded coverage and limits](../release-evidence-1.6.0.md). Candidate 1.7.0rc1
+has separate [installed-interface evidence](../release-evidence-1.7.0rc1.md).
+The [acceptance matrix](../acceptance-matrix.md) also contains historical and
+remaining targets; it does not establish new live database, client UI,
+preservation approval or all-route capacity acceptance.

@@ -8,15 +8,18 @@ completed work belongs in [release history](history.md), not this list.
 
 ## Now
 
-- Process external stable `1.6.0` feedback through the
+- Follow up on the remaining external `1.6.0` evidence gaps through the
   [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):
-  reviewed numeric CSV profiling, authenticated Trino access, relational planning
-  and utility evidence, bounded statistics and actionable CLI diagnostics.
-  Preserve conservative privacy defaults and read-only database budgets. Start
-  with reproduced failures; do not reopen corrected historical harness findings.
-
-- Improve onboarding and task-oriented documentation, including versioned and
-  downloadable guides.
+  historical Trino application authentication settings and external profile
+  provenance. The numeric profiling, relational planning/utility, bounded
+  statistics and CLI fixes shipped in the published
+  [1.7.0rc1 candidate](feedback-acceptance-1.7.0rc1.md); its finite installed
+  checks do not reproduce missing private inputs or the historical 401.
+- Complete remaining transformation evidence: target-size coverage of the final
+  public/configured routes and the separately tracked trust-boundary amendment
+  review. Prior approvals and private scale runs retain their original scope.
+- Improve onboarding from pilot feedback. Versioned guides and four downloadable
+  formats are already published; see [documentation versions](versions.md).
 - Run product-validation pilots on development and analytics workflows.
 - Address confirmed client defects, migration feedback and dependency maintenance.
 - Monitor source/output consistency, portable business rules and MCP permissions.
@@ -38,6 +41,9 @@ completed work belongs in [release history](history.md), not this list.
   EAV rows requires a separate proposal for row cardinality, duplicate/null
   semantics, typed values, provenance and explicitly authorized source I/O.
   Neither source-free generation nor one-to-one transformation authorizes it.
+- Consider monthly-date category inference and a separately reviewed configurable
+  local-category ceiling. Neither is implemented; source-preservation defaults
+  remain 20 non-sensitive values of at most 64 characters, with content checks.
 - Add integrations only after demonstrated demand.
 - Consider reporting and validation adapters for concrete workflows.
 - Evolve public contracts through the compatibility and deprecation policy.

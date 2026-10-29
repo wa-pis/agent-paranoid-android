@@ -6,6 +6,15 @@ below do not reinstate it. See [ADR-0026](../../../docs/adr/0026-transformation-
 All preservation, classification, exact-input approval, privacy and activation
 gates remain in force; see [ADR-0021](../../../docs/adr/0021-local-preservation-approval.md).
 
+Current status — 2026-10-29: the single-source, common saved-profile and
+configured SQL consumers below were registered in the reviewed 1.6 runtime,
+retained in stable 1.6.0 and candidate 1.7.0rc1. See
+[stable evidence](../../../docs/release-evidence-1.6.0.md) and
+[candidate evidence](../../../docs/release-evidence-1.7.0rc1.md).
+Pre-activation descriptions below retain their historical stage; they do not
+withdraw shipped consumers or approve changed activation, datasets, new trust
+amendments or outstanding all-route capacity targets.
+
 Historical stage note: the development/activation clarification was independently
 reviewed in PR576 at0e7dee5. PR601 subsequently registered the reviewed
 single-source CLI/MCP consumers. The common saved-profile CLI/MCP composition
