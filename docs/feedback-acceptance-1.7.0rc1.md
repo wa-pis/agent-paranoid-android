@@ -131,4 +131,6 @@ This completes the accessible fictional matrix and reviewed local replay with
 explicitly unavailable cases. It does **not** certify full private-client utility,
 historical Trino 401 configuration, external profile provenance, final-public
 1M × 100 configured transformation capacity or new preservation authority.
-The broad documentation audit and remaining transformation gates stay open.
+At this 2026-10-25 checkpoint the broad documentation audit remained open.
+It subsequently [completed on 2026-10-29](documentation-consistency-2026-10-29.md);
+remaining transformation capacity and amendment-review tasks stay open.
