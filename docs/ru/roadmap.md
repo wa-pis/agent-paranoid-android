@@ -6,8 +6,9 @@
 
 ## Сейчас
 
-- Обработать внешний feedback 1.6.0: reviewed numeric CSV profiling, authenticated Trino access, relational planning и проверку полезности, bounded statistics и понятные CLI diagnostics. Сохранять conservative privacy defaults и read-only DB budgets; начинать с воспроизведённых отказов, а не повторно открывать исправленные ошибки прежнего harness.
-- Улучшать onboarding, инструкции по задачам, версионную и скачиваемую документацию.
+- Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в опубликованный [1.7.0rc1](../feedback-acceptance-1.7.0rc1.md). Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.
+- Завершить оставшиеся проверки преобразования: целевой объём на публичных/configured маршрутах и отдельно учитываемый review поправки к границе доверия. Прежние разрешения и частные нагрузочные прогоны сохраняют исходные ограничения.
+- Улучшать инструкции по отзывам пилотов. Версионная документация и четыре формата скачивания уже [опубликованы](versions.md).
 - Проводить пилоты разработки и аналитики.
 - Исправлять подтверждённые client defects, migration feedback и зависимости.
 - Следить за source/output consistency, portable business rules и MCP permissions.
@@ -28,6 +29,10 @@
 на доступ к источнику. Синтетическая генерация и преобразование один-к-одному
 такого разрешения не дают.
 
+Распознавание месячных категорий дат и настраиваемый предел локальных категорий
+отложены и не реализованы. Действующий предел сохранения — 20 нечувствительных
+значений длиной до 64 символов с обязательной проверкой содержимого.
+
 Новые интеграции — только после подтверждённого спроса. Reporting/validation adapters — для конкретных задач; публичные контракты развиваются по compatibility/deprecation policy.
 
-Конечная fictional transformation/session campaign для stable завершена с [ограниченным покрытием](../release-evidence-1.6.0.md). Это не dataset consent и не завершение более широкой acceptance campaign. Изменённая public activation по-прежнему требует specifications, executable evidence и независимого exact-source safety review.
+Конечная fictional transformation/session campaign для stable завершена с [ограниченным покрытием](../release-evidence-1.6.0.md). Это не разрешение на набор данных и не подтверждение оставшихся нагрузочных или иных непроверенных сценариев. Изменённая public activation по-прежнему требует specifications, executable evidence и независимого exact-source safety review.
