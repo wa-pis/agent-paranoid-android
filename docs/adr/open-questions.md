@@ -18,7 +18,23 @@ No approval is requested as part of this documentation task. In particular,
 Q-02/Q-04 must not be used to stall already-agreed work. If Q-01 or Q-03 is needed
 for a concrete route, identify that route and ask the narrow question then.
 
-## Accepted decisions with remaining engineering evidence
+## Current implementation reconciliation — 2026-10-29
+
+The I-01–I-05 table below preserves the 2026-09-29 checklist. It is not the
+current implementation status. Common/configured public consumers and finite
+key/domain/native-type acceptance shipped in stable 1.6.0 (I-01/I-03), with
+[recorded limits](../release-evidence-1.6.0.md). Original findings and accessible
+fictional script replay are now [reconciled](../feedback-acceptance-1.7.0rc1.md)
+(I-04). Final exact-source gates and public verification passed for stable and
+[candidate 1.7.0rc1](../release-evidence-1.7.0rc1.md) (I-05).
+I-02's target-size final-public/configured-route evidence remains incomplete.
+Q-01–Q-04 remain separate decisions; these release results settle none of them.
+The remaining trust-boundary amendment task also stays open. Documentary D-05
+is reconciled by the current bilingual roadmap; historical chronology under
+D-06 retains its dated source identity. See the
+[documentation audit](../documentation-consistency-2026-10-29.md).
+
+## Historical accepted decisions with remaining engineering evidence
 
 | ID | Remaining work | What must not be claimed |
 | --- | --- | --- |
@@ -28,7 +44,7 @@ for a concrete route, identify that route and ask the narrow question then.
 | I-04 | Reconcile original client findings and inspect/run only available scripts on fictional baseline/candidate inputs. | Private/unavailable client data and future integration feedback are not passed evidence. |
 | I-05 | Complete safety activation evidence, exact-candidate independent review, required GitHub gates and public RC verification. | Accepted architecture and AI evidence do not replace human/platform approval or authorize stable 1.6.0. |
 
-The uncommitted query-limit implementation on `codex/1-6-query-limits` is a WIP
+At the 2026-09-29 checkpoint, the uncommitted query-limit implementation on `codex/1-6-query-limits` is a WIP
 checkpoint with focused evidence in progress.md, not a new approved public
 adapter contract. No new hard-RSS/wire guarantee or platform restriction is added
 by I-02. Public API details not yet accepted remain design work behind the gate,

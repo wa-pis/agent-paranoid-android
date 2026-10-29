@@ -28,8 +28,12 @@ contract surfaces directly.
 ## Profiles
 
 Minimum candidates match the lower bounds in `pyproject.toml`. Latest versions
-are the versions in the reviewed `uv.lock` used by the release gate on
-2026-08-12.
+are the versions in the reviewed `uv.lock` and
+`.github/dependency-compatibility.toml`, exercised by the
+[1.7.0rc1 exact-source gate](../release-evidence-1.7.0rc1.md).
+“Latest tested” names that locked profile, not the newest packages on PyPI.
+The later installed feedback replay records its separately resolved environment;
+it does not replace the reviewed lock or minimum profiles.
 
 | Profile | Python | Direct dependency set |
 | --- | --- | --- |
