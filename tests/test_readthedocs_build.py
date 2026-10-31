@@ -290,3 +290,28 @@ def test_normal_cli_retains_the_exact_manifest_in_build_log(
     assert json.loads(record) == json.loads(
         (output / "downloads/documentation.json").read_text()
     )
+
+
+@pytest.mark.parametrize("kind", ["branch", "tag"])
+def test_development_package_version_cannot_be_a_stable_edition(source, kind):
+    (source / "pyproject.toml").write_text('[project]\nversion = "1.7.0.dev1"\n')
+    pages.command(
+        [
+            "git",
+            "-c",
+            "commit.gpgsign=false",
+            "commit",
+            "-am",
+            "fictional development source",
+        ],
+        cwd=source,
+    )
+    pages.command(["git", "tag", "v1.7.0.dev1"], cwd=source)
+    selected = host.edition(
+        source, environment(kind, "v1.7.0.dev1" if kind == "tag" else "main")
+    )
+    assert selected.identity.package_version == "1.7.0.dev1"
+    assert selected.identity.status == "Development / not stable"
+    assert selected.identity.package_commit == pages.command(
+        ["git", "rev-parse", "HEAD"], cwd=source
+    )

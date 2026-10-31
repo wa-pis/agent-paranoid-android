@@ -155,6 +155,9 @@ build must match a clean checkout and its package tag. A stable tag is labelled 
 not prove a public release or agreement with the accepted catalog. This
 builder does not establish an accepted stable/default mapping.
 
+Development package versions such as `1.7.0.dev1` remain labelled development,
+including when built from a tag; they cannot acquire stable status.
+
 PR builds (`READTHEDOCS_VERSION_TYPE=external`) have a visible preview label,
 `noindex`, and bilingual download pages explaining that downloads are omitted.
 They do not install the export browser. Normal builds require all four exports;
@@ -265,3 +268,27 @@ host's default/version mapping. Preview builds omit downloads and cannot pass
 this normal-edition gate. Host add-on injection still fails the entry-page check;
 actual service configuration must resolve it before promotion. Public URLs,
 managed mappings and a rollback rehearsal remain required before switching.
+
+### Retained Pages Recovery Rehearsal
+
+On 2026-11-01, the `documentation-site` artifact from successful
+[publication run 40960334365](https://github.com/wa-pis/agent-paranoid-android/actions/runs/40960334365)
+was downloaded independently of the site. Its workflow source is
+`d14d3dc06af541bd89f8b047e5d54207c925e9a8`; its maintained root describes package
+1.6.0/source `258c035c22408becf17ab090635710a50dda8ccc`, documentation revision
+`5344b390920a55aebbba6946740bb755c199ad6a`. The new edition gate verified the
+actual public Pages root, exact entry HTML, chapter inventory and four downloaded
+hashes against that retained artifact. The retained export manifest SHA-256 was
+`815879a5da06078b57868f33dea5b2f84b76f64d266e3139e3d5231d82dc3d93`.
+
+In an isolated temporary copy, a deliberately changed entry page was rejected
+and the known-good local default remained byte-identical. The real atomic
+publication helper then restored a deliberately damaged local deployment from
+the retained artifact. All 1,211 retained files matched the original hashes;
+both the legacy Pages alias gate and the retained-edition gate passed after
+restoration. Temporary rollback backups were cleaned up only after success.
+
+This was a local recovery rehearsal plus a read-only public Pages check. It did
+not deploy a rollback, verify RTD output, restore an RTD default or demonstrate
+RTD's failure behaviour. Keep the Pages workflows, retained state and normal
+release gates until the actual hosted rollback/default procedures are exercised.
