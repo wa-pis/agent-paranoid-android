@@ -203,7 +203,8 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation d14d3dc06af541bd89f8b047e5d54207c925e9a8
+  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br>Documentation 1eb22683ec6a2b379f1efcd47873a0452071e761
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -223,10 +224,11 @@
 </ul>
 <h2 id="_3">Далее<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Подготовить переход на Read the Docs с сохранением проверенных версий,
+<li>Выполнить переход на Read the Docs с сохранением проверенных версий,
   двух языков, четырёх форматов скачивания, прежних ссылок и отката; см.
   <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-readthedocs">OpenSpec</a>.
-  До проверки параллельной публикации и переключения хостинг остаётся на GitHub Pages.</li>
+  Подготовлен сборщик отдельной редакции; проверка на хостинге, сопоставление версий,
+  интеграция превью и откат ещё не завершены. До приёмки хостинг остаётся на GitHub Pages.</li>
 <li>Спроектировать batch validation CSV/JSON/Parquet без удержания всего набора в памяти. Ограничить cross-table key/uniqueness checks, сохранить deterministic results и измерить память на вымышленных fixtures. До реализации нужен отдельный OpenSpec change.</li>
 <li>Упростить CSV/DB workflow по итогам пилотов.</li>
 <li>Публиковать runnable examples и короткие кейсы с синтетическими входами.</li>

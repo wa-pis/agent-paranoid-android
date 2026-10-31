@@ -205,7 +205,8 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Documentation d14d3dc06af541bd89f8b047e5d54207c925e9a8
+  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br>Documentation 1eb22683ec6a2b379f1efcd47873a0452071e761
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -216,7 +217,9 @@
 <p>Hosting remains <strong>GitHub Pages</strong>. MkDocs renders pages, <strong>mike</strong> owns version
 storage, aliases and the version selector, and <strong>mkdocs-print-site-plugin</strong>
 assembles the printable handbook. HTMLArk embeds its assets; Chrome prints PDF.
-There is no Read the Docs service or separate account to configure.</p>
+Read the Docs integration is being prepared in parallel; no host switch or
+verified Read the Docs project URL has been recorded. The theme name alone does
+not connect a service. See <a href="#parallel-read-the-docs-preparation">parallel hosting preparation</a>.</p>
 <pre><code class="language-bash">uv sync --frozen --only-group docs --no-install-project
 uv run --no-sync mkdocs build --strict
 uv run --no-sync python -m scripts.build_documentation --output site --verify-release --state-bundle site.bundle
@@ -344,6 +347,113 @@ manifest exclude history, roadmap, downloads and versions for both languages.
 Markdown and offline-site ZIPs include both editions. Do not make language
 switches point to the unversioned production root: that would silently change
 the package version when reading an older guide.</p>
+<h2 id="parallel-read-the-docs-preparation">Parallel Read the Docs Preparation<a class="headerlink" href="#parallel-read-the-docs-preparation" title="Permanent link">&para;</a></h2>
+<p>The active OpenSpec is <code>migrate-documentation-to-readthedocs</code>. GitHub Pages
+remains the accepted publication while service access and public acceptance
+are incomplete. The reported connected-service failure has no confirmed cause;
+no successful account connection or imported project is recorded here.</p>
+<h3 id="reuse-and-host-responsibilities">Reuse And Host Responsibilities<a class="headerlink" href="#reuse-and-host-responsibilities" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Existing component</th>
+<th>Parallel build decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mkdocs.yml</code>, <code>docs/</code>, bilingual theme/search</td>
+<td>Keep; use the host-provided edition canonical URL</td>
+</tr>
+<tr>
+<td><code>scripts/documentation_hooks.py</code></td>
+<td>Reuse identity, scoped search, chapter inventory and all four exporters</td>
+</tr>
+<tr>
+<td><code>docs/releases.json</code></td>
+<td>Keep accepted stable package identities; a host alias cannot replace release evidence</td>
+</tr>
+<tr>
+<td><code>scripts/build_documentation.py</code></td>
+<td>Retain Pages/mike publication, compatibility root, snapshots and atomic local output</td>
+</tr>
+<tr>
+<td><code>scripts/build_readthedocs.py</code></td>
+<td>Render one isolated edition; no mike tree, deployment credentials, default changes or Pages writes</td>
+</tr>
+<tr>
+<td><code>.github/workflows/docs.yml</code></td>
+<td>Retain licenses, strict builds, focused contracts, release verification, Pages deployment and public checks</td>
+</tr>
+<tr>
+<td><code>scripts/verify_documentation.py</code></td>
+<td>Retain all existing public Pages checks; its mike-specific mapping is not an RTD acceptance check</td>
+</tr>
+<tr>
+<td>Pages build artifacts and <code>gh-pages</code></td>
+<td>Retain recovery bundle, rendered output and existing 90-day retention; no cleanup during parallel testing</td>
+</tr>
+</tbody>
+</table>
+<p>Normal RTD builds use the same PDF, standalone HTML, Markdown ZIP and offline
+site ZIP exporters. <code>documentation.json</code> preserves package version, package
+source and documentation revision separately. A development build can describe
+a released candidate while having a newer documentation revision. A tagged
+build must match a clean checkout and its package tag. A stable tag is labelled as awaiting public acceptance; its build alone does
+not prove a public release or agreement with the accepted catalog. This
+builder does not establish an accepted stable/default mapping.</p>
+<p>PR builds (<code>READTHEDOCS_VERSION_TYPE=external</code>) have a visible preview label,
+<code>noindex</code>, and bilingual download pages explaining that downloads are omitted.
+They do not install the export browser. Normal builds require all four exports;
+a failed strict build/export leaves the previous local output intact.</p>
+<h3 id="tooling-and-local-reproduction">Tooling And Local Reproduction<a class="headerlink" href="#tooling-and-local-reproduction" title="Permanent link">&para;</a></h3>
+<p><code>.readthedocs.yaml</code> selects Ubuntu 24.04, Python 3.12 and uv 0.11.23.
+Installation uses the frozen docs-only dependency group without installing the
+application. Playwright is a docs-only browser distributor; its locked version
+selects Chromium for the existing PDF exporter. It does not automate accounts
+or use a user's browser profile. License checking runs before rendering.</p>
+<pre><code class="language-bash">uv sync --frozen --only-group docs --no-install-project --python 3.12
+uv run --no-sync python scripts/check_dependency_licenses.py
+uv run --no-sync playwright install --no-shell chromium
+READTHEDOCS_VERSION_TYPE=branch \
+READTHEDOCS_GIT_IDENTIFIER=main \
+READTHEDOCS_CANONICAL_URL=https://example.invalid/en/latest/ \
+uv run --no-sync python -m scripts.build_readthedocs --output /tmp/apa-rtd/html
+</code></pre>
+<p>Package tags are fetched explicitly after checkout so shallow service clones
+do not silently lose released package provenance. The example URL is fictional,
+not a deployed project. On the host, the builder
+uses <code>READTHEDOCS_CANONICAL_URL</code>, verifies <code>READTHEDOCS_GIT_COMMIT_HASH</code> against
+the checkout, and writes HTML plus downloads under <code>READTHEDOCS_OUTPUT/html</code>.
+Ubuntu browser libraries and fonts are declared through RTD's supported
+<code>build.apt_packages</code>, based on the locked Playwright Chromium dependency list;
+installation does not require an ad hoc privileged shell command. Actual service execution and build time must
+still be verified; a local build does not prove the hosted environment works.</p>
+<h3 id="account-setup-and-acceptance-still-required">Account Setup And Acceptance Still Required<a class="headerlink" href="#account-setup-and-acceptance-still-required" title="Permanent link">&para;</a></h3>
+<p>The Community service documents a 15-minute build limit, 7 GB memory and two
+concurrent builds. Confirm the actual account plan before import. Owner actions
+remain: connect the GitHub integration with only the intended repository,
+inspect the exact requested permissions, import the public repository, record
+the real project URL, configure version activation/defaults, and enable PR
+checks. Do not store private environment variables or publishing credentials
+in preview builds. A paid plan, custom domain or broader repository access is
+not assumed.</p>
+<p>Do not let automatic <code>stable</code> tag selection act as release acceptance. Before
+switching any canonical/default URL, the remaining work must prove accepted
+stable/candidate/development mappings, faithful historical documentation refs
+or retained snapshots, public release evidence, bilingual navigation/search,
+old links and anchors, all four downloaded hashes and rollback. Immutable old
+tags lacking host configuration stay intact.</p>
+<p>Read the Docs can inject add-ons into served HTML. The current Pages verifier
+checks the exact entry-page bytes as well as download bytes: host injection
+must be resolved and verified against actual served output, not accommodated
+by silently dropping the entry-page integrity check. No host acceptance or
+retirement of Pages is implied by a successful local build.</p>
+<p>References: <a href="https://docs.readthedocs.com/platform/stable/config-file/v2.html">configuration</a>,
+<a href="https://docs.readthedocs.com/platform/stable/reference/environment-variables.html">environment</a>,
+<a href="https://docs.readthedocs.com/platform/stable/builds.html">build limits</a>,
+<a href="https://docs.readthedocs.com/platform/stable/pull-requests.html">PR previews</a>,
+<a href="https://playwright.dev/python/docs/browsers">browser versions</a>.</p>
               
 </div>
 
