@@ -55,3 +55,13 @@ strict MkDocs, strict change validation and 28 docs dependency licenses passed.
 A Python 3.12 build with the locked Playwright Chromium produced the four real
 exports; all four file hashes and entry-page hash matched, with 36 chapters.
 These are local results, not proof of RTD publication or default promotion.
+
+Public-edition gate preparation (2026-11-01): normal builds retain their exact
+manifest in trusted logs; documentation CI retains normal/preview identities
+and normal manifest for 90 days. The new verifier compares public identity,
+complete manifest/chapter inventory, exact entry bytes and all four downloads
+against the same retained build. 119 focused tests, strict MkDocs/OpenSpec and
+Ruff passed locally. Same-site file+digest replacement and injected HTML are
+rejected; the existing Pages alias/destination checks remain enforced. These
+checks do not authorize stable/default promotion and have not run against an
+actual RTD project. No hosted acceptance task is closed by this evidence.

@@ -177,6 +177,12 @@ def main() -> None:
         with sync_playwright() as playwright:
             browser = playwright.chromium.executable_path
     build(ROOT, args.output, browser, os.environ)
+    if os.environ.get("READTHEDOCS_VERSION_TYPE") != "external":
+        # Retain evidence in the trusted build log before accepting public bytes.
+        manifest = json.loads(
+            (args.output / "downloads/documentation.json").read_text()
+        )
+        print("DOCS_EXPORT_MANIFEST=" + json.dumps(manifest, sort_keys=True))
 
 
 if __name__ == "__main__":
