@@ -79,3 +79,15 @@ byte-for-byte and passed both Pages alias and edition checks. See the operator
 guide for identities and manifest hash. No public rollback was deployed and RTD
 rollback/default behaviour remains unverified, so the hosted recovery task
 stays open. Development `.devN` versions also have focused non-stable tests.
+
+PR #669 merged as `f5aca0b9f938ea50c06adbec68a0ded708b8b934` after 38 successful
+checks (five intentional skips). The same-build edition gate, retained log/CI
+manifests, development-version tests and recovery evidence are now in main.
+
+Plan preflight: upstream RTD commit
+`f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a` disables the global Addons switch in
+the non-Business project form; middleware requests injection based on the global
+flag. The operator guide links the exact sources. Entry-page and standalone-HTML
+bytes must be tested on the actual service; individual addon toggles, a paid
+plan or an untested exception to integrity checks are not acceptance evidence.
+Account connection and the actual project URL/settings remain unverified.

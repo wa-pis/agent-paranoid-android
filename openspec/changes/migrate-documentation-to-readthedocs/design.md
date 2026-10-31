@@ -21,6 +21,16 @@ frozen dependencies. Reuse existing content and export helpers; check service
 plan support, quotas and system dependencies before choosing settings. Keep
 GitHub CI's strict documentation and release acceptance checks.
 
+Plan preflight must include served-byte preservation, not only build success.
+At upstream RTD commit `f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a`, the project
+form disables the global Addons switch outside Business, and the serving
+middleware requests injection from that global flag. Individual addon settings
+are not evidence of unmodified HTML. Verify both entry HTML and the standalone
+HTML download on the actual selected plan, retaining their integrity checks
+and offline contract. A paid plan is not assumed; a workaround or contract
+change must be explicit, tested and documented before acceptance. Upstream
+source evidence alone does not prove our project's actual served response.
+
 Read the Docs manages online versions, with an explicit mapping to the verified
 release catalog. `latest` denotes development, not a published package; an RC
 is labelled separately. Disable or constrain automatic stable promotion so a

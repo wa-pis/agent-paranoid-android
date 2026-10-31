@@ -216,11 +216,25 @@ or retained snapshots, public release evidence, bilingual navigation/search,
 old links and anchors, all four downloaded hashes and rollback. Immutable old
 tags lacking host configuration stay intact.
 
+Upstream source preflight at
+[RTD commit f343b74](https://github.com/readthedocs/readthedocs.org/commit/f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a)
+shows a plan-dependent constraint:
+[the settings form disables the global Addons switch outside Business](https://github.com/readthedocs/readthedocs.org/blob/f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a/readthedocs/projects/forms.py#L931),
+and [the serving middleware requests injection when the global flag is enabled](https://github.com/readthedocs/readthedocs.org/blob/f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a/readthedocs/proxito/middleware.py#L338).
+Turning off an individual flyout/search option must not be assumed to remove
+HTML injection. This is source-based preflight evidence, not an observation of
+our project's deployed settings. Business has not been selected or purchased.
+
 Read the Docs can inject add-ons into served HTML. The current Pages verifier
 checks the exact entry-page bytes as well as download bytes: host injection
 must be resolved and verified against actual served output, not accommodated
 by silently dropping the entry-page integrity check. No host acceptance or
-retirement of Pages is implied by a successful local build.
+retirement of Pages is implied by a successful local build. Verify the standalone
+`handbook.html` download as well as the entry page on the actual service: its
+original bytes, manifest digest and ability to work offline must survive
+hosting. Do not silently exempt either file from verification, assume a paid
+setting exists in Community, or label an untested workaround as accepted.
+
 
 References: [configuration](https://docs.readthedocs.com/platform/stable/config-file/v2.html),
 [environment](https://docs.readthedocs.com/platform/stable/reference/environment-variables.html),
