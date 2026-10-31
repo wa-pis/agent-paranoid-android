@@ -50,10 +50,21 @@ jobs:
         run: uv run --no-sync python scripts/check_dependency_licenses.py
 
       - name: Check documentation contracts
-        run: uv run --no-sync pytest tests/test_documentation.py tests/test_documentation_build.py -q
+        run: uv run --no-sync pytest tests/test_documentation.py tests/test_documentation_build.py tests/test_readthedocs_build.py -q
 
       - name: Build documentation with strict validation
         run: uv run --no-sync mkdocs build --strict
+
+      - name: Exercise parallel host editions without deployment
+        env:
+          READTHEDOCS_VERSION_TYPE: branch
+          READTHEDOCS_GIT_IDENTIFIER: main
+          READTHEDOCS_GIT_COMMIT_HASH: ${{ github.sha }}
+          READTHEDOCS_CANONICAL_URL: https://example.invalid/en/latest/
+        run: |
+          uv run --no-sync playwright install --no-shell chromium
+          uv run --no-sync python -m scripts.build_readthedocs --output rtd-normal
+          READTHEDOCS_VERSION_TYPE=external uv run --no-sync python -m scripts.build_readthedocs --output rtd-preview
 
       - name: Build versioned documentation and offline formats
         env:

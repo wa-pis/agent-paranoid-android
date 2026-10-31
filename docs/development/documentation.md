@@ -5,7 +5,9 @@
 Hosting remains **GitHub Pages**. MkDocs renders pages, **mike** owns version
 storage, aliases and the version selector, and **mkdocs-print-site-plugin**
 assembles the printable handbook. HTMLArk embeds its assets; Chrome prints PDF.
-There is no Read the Docs service or separate account to configure.
+Read the Docs integration is being prepared in parallel; no host switch or
+verified Read the Docs project URL has been recorded. The theme name alone does
+not connect a service. See [parallel hosting preparation](#parallel-read-the-docs-preparation).
 
 ```bash
 uv sync --frozen --only-group docs --no-install-project
@@ -124,3 +126,94 @@ manifest exclude history, roadmap, downloads and versions for both languages.
 Markdown and offline-site ZIPs include both editions. Do not make language
 switches point to the unversioned production root: that would silently change
 the package version when reading an older guide.
+
+## Parallel Read the Docs Preparation
+
+The active OpenSpec is `migrate-documentation-to-readthedocs`. GitHub Pages
+remains the accepted publication while service access and public acceptance
+are incomplete. The reported connected-service failure has no confirmed cause;
+no successful account connection or imported project is recorded here.
+
+### Reuse And Host Responsibilities
+
+| Existing component | Parallel build decision |
+| --- | --- |
+| `mkdocs.yml`, `docs/`, bilingual theme/search | Keep; use the host-provided edition canonical URL |
+| `scripts/documentation_hooks.py` | Reuse identity, scoped search, chapter inventory and all four exporters |
+| `docs/releases.json` | Keep accepted stable package identities; a host alias cannot replace release evidence |
+| `scripts/build_documentation.py` | Retain Pages/mike publication, compatibility root, snapshots and atomic local output |
+| `scripts/build_readthedocs.py` | Render one isolated edition; no mike tree, deployment credentials, default changes or Pages writes |
+| `.github/workflows/docs.yml` | Retain licenses, strict builds, focused contracts, release verification, Pages deployment and public checks |
+| `scripts/verify_documentation.py` | Retain all existing public Pages checks; its mike-specific mapping is not an RTD acceptance check |
+| Pages build artifacts and `gh-pages` | Retain recovery bundle, rendered output and existing 90-day retention; no cleanup during parallel testing |
+
+Normal RTD builds use the same PDF, standalone HTML, Markdown ZIP and offline
+site ZIP exporters. `documentation.json` preserves package version, package
+source and documentation revision separately. A development build can describe
+a released candidate while having a newer documentation revision. A tagged
+build must match a clean checkout and its package tag. A stable tag is labelled as awaiting public acceptance; its build alone does
+not prove a public release or agreement with the accepted catalog. This
+builder does not establish an accepted stable/default mapping.
+
+PR builds (`READTHEDOCS_VERSION_TYPE=external`) have a visible preview label,
+`noindex`, and bilingual download pages explaining that downloads are omitted.
+They do not install the export browser. Normal builds require all four exports;
+a failed strict build/export leaves the previous local output intact.
+
+### Tooling And Local Reproduction
+
+`.readthedocs.yaml` selects Ubuntu 24.04, Python 3.12 and uv 0.11.23.
+Installation uses the frozen docs-only dependency group without installing the
+application. Playwright is a docs-only browser distributor; its locked version
+selects Chromium for the existing PDF exporter. It does not automate accounts
+or use a user's browser profile. License checking runs before rendering.
+
+```bash
+uv sync --frozen --only-group docs --no-install-project --python 3.12
+uv run --no-sync python scripts/check_dependency_licenses.py
+uv run --no-sync playwright install --no-shell chromium
+READTHEDOCS_VERSION_TYPE=branch \
+READTHEDOCS_GIT_IDENTIFIER=main \
+READTHEDOCS_CANONICAL_URL=https://example.invalid/en/latest/ \
+uv run --no-sync python -m scripts.build_readthedocs --output /tmp/apa-rtd/html
+```
+
+Package tags are fetched explicitly after checkout so shallow service clones
+do not silently lose released package provenance. The example URL is fictional,
+not a deployed project. On the host, the builder
+uses `READTHEDOCS_CANONICAL_URL`, verifies `READTHEDOCS_GIT_COMMIT_HASH` against
+the checkout, and writes HTML plus downloads under `READTHEDOCS_OUTPUT/html`.
+Ubuntu browser libraries and fonts are declared through RTD's supported
+`build.apt_packages`, based on the locked Playwright Chromium dependency list;
+installation does not require an ad hoc privileged shell command. Actual service execution and build time must
+still be verified; a local build does not prove the hosted environment works.
+
+### Account Setup And Acceptance Still Required
+
+The Community service documents a 15-minute build limit, 7 GB memory and two
+concurrent builds. Confirm the actual account plan before import. Owner actions
+remain: connect the GitHub integration with only the intended repository,
+inspect the exact requested permissions, import the public repository, record
+the real project URL, configure version activation/defaults, and enable PR
+checks. Do not store private environment variables or publishing credentials
+in preview builds. A paid plan, custom domain or broader repository access is
+not assumed.
+
+Do not let automatic `stable` tag selection act as release acceptance. Before
+switching any canonical/default URL, the remaining work must prove accepted
+stable/candidate/development mappings, faithful historical documentation refs
+or retained snapshots, public release evidence, bilingual navigation/search,
+old links and anchors, all four downloaded hashes and rollback. Immutable old
+tags lacking host configuration stay intact.
+
+Read the Docs can inject add-ons into served HTML. The current Pages verifier
+checks the exact entry-page bytes as well as download bytes: host injection
+must be resolved and verified against actual served output, not accommodated
+by silently dropping the entry-page integrity check. No host acceptance or
+retirement of Pages is implied by a successful local build.
+
+References: [configuration](https://docs.readthedocs.com/platform/stable/config-file/v2.html),
+[environment](https://docs.readthedocs.com/platform/stable/reference/environment-variables.html),
+[build limits](https://docs.readthedocs.com/platform/stable/builds.html),
+[PR previews](https://docs.readthedocs.com/platform/stable/pull-requests.html),
+[browser versions](https://playwright.dev/python/docs/browsers).
