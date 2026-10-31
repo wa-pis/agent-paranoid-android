@@ -2,7 +2,7 @@
 {% set russian = page_language == "ru" or (page and page.file.src_uri.startswith("ru/")) %}
 {% block extrahead %}
 {{ super() }}
-{% if (page and page.meta.historical) or (config.extra.documentation and config.extra.documentation.status == 'Development / not stable') %}<meta name="robots" content="noindex">{% endif %}
+{% if (page and page.meta.historical) or (config.extra.documentation and config.extra.documentation.status in ['Development / not stable', 'PR preview / not stable', 'Parallel edition / awaiting public acceptance']) %}<meta name="robots" content="noindex">{% endif %}
 {% endblock %}
 {% block site_name %}
 {% if russian %}
@@ -45,6 +45,7 @@
 {% if config.extra.documentation %}
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>{% if (page and page.meta.historical) %}Historical / maintainer material{% else %}{{ config.extra.documentation.status }}{% endif %}</strong> · Package {{ config.extra.documentation.package_version }}
+  <br>Package source {{ config.extra.documentation.package_commit }}
   <br>Documentation {{ config.extra.documentation.documentation_revision }}
   <br><a href="{{ config.extra.stable_selector | url }}">Stable version selector</a> · <a href="{{ ('ru/downloads/' if russian else 'downloads/') | url }}">{{ 'Скачать' if russian else 'Downloads' }}</a>
 </aside>
