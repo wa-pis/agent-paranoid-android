@@ -11,7 +11,7 @@ Parallel-build implementation is in progress. Hosted acceptance and switching re
 
 ## Parallel build
 
-- [ ] Add `.readthedocs.yaml` with explicit supported Python/tool versions and
+- [x] Add `.readthedocs.yaml` with explicit supported Python/tool versions and
   frozen docs dependencies; retain license and strict-build checks.
 - [ ] Adapt MkDocs/theme/hooks and version links, keeping package version,
   package source and documentation revision distinct.
@@ -55,3 +55,27 @@ strict MkDocs, strict change validation and 28 docs dependency licenses passed.
 A Python 3.12 build with the locked Playwright Chromium produced the four real
 exports; all four file hashes and entry-page hash matched, with 36 chapters.
 These are local results, not proof of RTD publication or default promotion.
+
+Public-edition gate preparation (2026-11-01): normal builds retain their exact
+manifest in trusted logs; documentation CI retains normal/preview identities
+and normal manifest for 90 days. The new verifier compares public identity,
+complete manifest/chapter inventory, exact entry bytes and all four downloads
+against the same retained build. 119 focused tests, strict MkDocs/OpenSpec and
+Ruff passed locally. Same-site file+digest replacement and injected HTML are
+rejected; the existing Pages alias/destination checks remain enforced. These
+checks do not authorize stable/default promotion and have not run against an
+actual RTD project. No hosted acceptance task is closed by this evidence.
+
+PR #668 merged as `1eb22683ec6a2b379f1efcd47873a0452071e761` after 38 successful
+checks (five intentional skips). Linux CI exercised normal and preview builds;
+the explicit frozen config/license/strict-build preparation task is complete.
+This does not prove native service configuration or a host switch.
+
+Retained Pages evidence (2026-11-01): trusted successful run 40960334365,
+workflow source `d14d3dc06af541bd89f8b047e5d54207c925e9a8`. Actual public Pages
+passed the new same-build manifest/entry/four-download check. Local rejection
+left the known-good output intact; atomic restoration recovered all 1,211 files
+byte-for-byte and passed both Pages alias and edition checks. See the operator
+guide for identities and manifest hash. No public rollback was deployed and RTD
+rollback/default behaviour remains unverified, so the hosted recovery task
+stays open. Development `.devN` versions also have focused non-stable tests.

@@ -23,7 +23,13 @@ def source(tmp_path):
     (root / "docs/ru").mkdir(parents=True)
     (root / "scripts").mkdir()
     (root / "pyproject.toml").write_text('[project]\nversion = "1.7.0rc1"\n')
-    for name in ("index.md", "downloads.md", "ru/index.md", "ru/downloads.md", "versions.md"):
+    for name in (
+        "index.md",
+        "downloads.md",
+        "ru/index.md",
+        "ru/downloads.md",
+        "versions.md",
+    ):
         (root / "docs" / name).write_text(
             "# Fictional chapter\n\nFictional content only.\n"
         )
@@ -255,3 +261,57 @@ def test_failed_strict_build_retains_previous_site(source, tmp_path):
     with pytest.raises(subprocess.CalledProcessError):
         host.build(source, output, None, environment("external"))
     assert (output / "known-good").read_text() == "retained"
+
+
+def test_normal_cli_retains_the_exact_manifest_in_build_log(
+    source, tmp_path, monkeypatch, capsys
+):
+    browser = tmp_path / "fictional-browser"
+    browser.write_text(
+        f'#!{sys.executable}\nfrom pathlib import Path\nimport sys\nfor arg in sys.argv:\n if arg.startswith("--print-to-pdf="): Path(arg.split("=",1)[1]).write_bytes(b"%PDF-fictional")\n'
+    )
+    browser.chmod(0o755)
+    output = tmp_path / "site"
+    for name, value in environment().items():
+        if name.startswith("READTHEDOCS_"):
+            monkeypatch.setenv(name, value)
+    monkeypatch.setattr(host, "ROOT", source)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["build_readthedocs", "--output", str(output), "--browser", str(browser)],
+    )
+    host.main()
+    record = next(
+        line.removeprefix("DOCS_EXPORT_MANIFEST=")
+        for line in capsys.readouterr().out.splitlines()
+        if line.startswith("DOCS_EXPORT_MANIFEST=")
+    )
+    assert json.loads(record) == json.loads(
+        (output / "downloads/documentation.json").read_text()
+    )
+
+
+@pytest.mark.parametrize("kind", ["branch", "tag"])
+def test_development_package_version_cannot_be_a_stable_edition(source, kind):
+    (source / "pyproject.toml").write_text('[project]\nversion = "1.7.0.dev1"\n')
+    pages.command(
+        [
+            "git",
+            "-c",
+            "commit.gpgsign=false",
+            "commit",
+            "-am",
+            "fictional development source",
+        ],
+        cwd=source,
+    )
+    pages.command(["git", "tag", "v1.7.0.dev1"], cwd=source)
+    selected = host.edition(
+        source, environment(kind, "v1.7.0.dev1" if kind == "tag" else "main")
+    )
+    assert selected.identity.package_version == "1.7.0.dev1"
+    assert selected.identity.status == "Development / not stable"
+    assert selected.identity.package_commit == pages.command(
+        ["git", "rev-parse", "HEAD"], cwd=source
+    )

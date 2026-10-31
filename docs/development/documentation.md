@@ -155,6 +155,9 @@ build must match a clean checkout and its package tag. A stable tag is labelled 
 not prove a public release or agreement with the accepted catalog. This
 builder does not establish an accepted stable/default mapping.
 
+Development package versions such as `1.7.0.dev1` remain labelled development,
+including when built from a tag; they cannot acquire stable status.
+
 PR builds (`READTHEDOCS_VERSION_TYPE=external`) have a visible preview label,
 `noindex`, and bilingual download pages explaining that downloads are omitted.
 They do not install the export browser. Normal builds require all four exports;
@@ -197,7 +200,14 @@ inspect the exact requested permissions, import the public repository, record
 the real project URL, configure version activation/defaults, and enable PR
 checks. Do not store private environment variables or publishing credentials
 in preview builds. A paid plan, custom domain or broader repository access is
-not assumed.
+not assumed. The documented GitHub App permissions are: read account email,
+repository contents and metadata; write commit statuses, pull requests and
+checks; read organization membership where applicable. Select only
+`wa-pis/agent-paranoid-android` when granting repository access. The actual
+permission screen must be reviewed before installation; these documented
+permissions are not evidence of an installed or authorized app. See the
+[service integration reference](https://docs.readthedocs.com/platform/stable/reference/git-integration.html).
+
 
 Do not let automatic `stable` tag selection act as release acceptance. Before
 switching any canonical/default URL, the remaining work must prove accepted
@@ -217,3 +227,68 @@ References: [configuration](https://docs.readthedocs.com/platform/stable/config-
 [build limits](https://docs.readthedocs.com/platform/stable/builds.html),
 [PR previews](https://docs.readthedocs.com/platform/stable/pull-requests.html),
 [browser versions](https://playwright.dev/python/docs/browsers).
+
+### Verify A Published Normal Edition Against Its Build
+
+The RTD builder emits `DOCS_EXPORT_MANIFEST=<JSON>` in its successful normal
+build log. Retain that JSON from the trusted build record together with the
+checkout revision and actual edition URL. Documentation CI also retains the
+normal/preview identities and normal export manifest for 90 days in
+`parallel-documentation-identities`. Each baseline belongs to its own build;
+PDF and archive metadata can differ between separate rebuilds even at the same
+source revision. A GitHub CI build is not the baseline for a different RTD build.
+
+To verify an actual hosted normal edition, save the exact manifest JSON from
+that build's trusted log/artifact as `retained-manifest.json`, then run:
+
+```python
+import json
+from pathlib import Path
+from scripts.verify_documentation import verify_edition
+
+manifest = json.loads(Path("retained-manifest.json").read_text())
+identity = {key: manifest[key] for key in (
+    "package_version", "package_commit", "documentation_revision", "status"
+)}
+# Replace this fictional URL with the actual URL recorded for that same build.
+verify_edition("https://example.invalid/en/latest/", identity, manifest)
+```
+
+The CLI equivalent adds `--edition-manifest retained-manifest.json` to
+`python -m scripts.verify_documentation --url URL --expected-json IDENTITY_JSON`.
+Without that option, the existing Pages verification still requires the native
+mike stable alias and destination identity. The normal-edition check requires
+an exact public manifest match, including chapter inventory, exact entry-page
+bytes, and all four downloaded file hashes. Missing evidence or any mismatch
+fails verification. Do not construct the baseline from the live website itself:
+changing both a file and its hosted digest must not redefine the retained build.
+
+This verifies an edition's bytes and provenance, not release acceptance or the
+host's default/version mapping. Preview builds omit downloads and cannot pass
+this normal-edition gate. Host add-on injection still fails the entry-page check;
+actual service configuration must resolve it before promotion. Public URLs,
+managed mappings and a rollback rehearsal remain required before switching.
+
+### Retained Pages Recovery Rehearsal
+
+On 2026-11-01, the `documentation-site` artifact from successful
+[publication run 40960334365](https://github.com/wa-pis/agent-paranoid-android/actions/runs/40960334365)
+was downloaded independently of the site. Its workflow source is
+`d14d3dc06af541bd89f8b047e5d54207c925e9a8`; its maintained root describes package
+1.6.0/source `258c035c22408becf17ab090635710a50dda8ccc`, documentation revision
+`5344b390920a55aebbba6946740bb755c199ad6a`. The new edition gate verified the
+actual public Pages root, exact entry HTML, chapter inventory and four downloaded
+hashes against that retained artifact. The retained export manifest SHA-256 was
+`815879a5da06078b57868f33dea5b2f84b76f64d266e3139e3d5231d82dc3d93`.
+
+In an isolated temporary copy, a deliberately changed entry page was rejected
+and the known-good local default remained byte-identical. The real atomic
+publication helper then restored a deliberately damaged local deployment from
+the retained artifact. All 1,211 retained files matched the original hashes;
+both the legacy Pages alias gate and the retained-edition gate passed after
+restoration. Temporary rollback backups were cleaned up only after success.
+
+This was a local recovery rehearsal plus a read-only public Pages check. It did
+not deploy a rollback, verify RTD output, restore an RTD default or demonstrate
+RTD's failure behaviour. Keep the Pages workflows, retained state and normal
+release gates until the actual hosted rollback/default procedures are exercised.

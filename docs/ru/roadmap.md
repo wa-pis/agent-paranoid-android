@@ -18,7 +18,8 @@
 - Выполнить переход на Read the Docs с сохранением проверенных версий,
   двух языков, четырёх форматов скачивания, прежних ссылок и отката; см.
   [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-readthedocs).
-  Подготовлен сборщик отдельной редакции; проверка на хостинге, сопоставление версий,
+  Подготовлены сборщик отдельной редакции и сверка с сохранённым манифестом;
+  проверка на хостинге, сопоставление версий,
   интеграция превью и откат ещё не завершены. До приёмки хостинг остаётся на GitHub Pages.
 - Спроектировать batch validation CSV/JSON/Parquet без удержания всего набора в памяти. Ограничить cross-table key/uniqueness checks, сохранить deterministic results и измерить память на вымышленных fixtures. До реализации нужен отдельный OpenSpec change.
 - Упростить CSV/DB workflow по итогам пилотов.

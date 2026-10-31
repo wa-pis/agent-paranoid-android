@@ -64,7 +64,7 @@ def edition(root: Path, environment: Mapping[str, str]) -> Edition:
         cwd=root,
     )
     version = tomllib.loads((root / "pyproject.toml").read_text())["project"]["version"]
-    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(?:rc[0-9]+)?", version):
+    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(?:rc[0-9]+|\.dev[0-9]+)?", version):
         raise ValueError("unsupported documentation package version")
     preview = kind == "external"
     package_commit = revision
@@ -87,7 +87,7 @@ def edition(root: Path, environment: Mapping[str, str]) -> Edition:
             )
         if "rc" in version:
             status = "Release candidate / not stable"
-        else:
+        elif ".dev" not in version:
             # The release catalog and public evidence gate promotion separately.
             # A faithful tagged build is not proof of a published stable release.
             status = "Parallel edition / awaiting public acceptance"
@@ -177,6 +177,12 @@ def main() -> None:
         with sync_playwright() as playwright:
             browser = playwright.chromium.executable_path
     build(ROOT, args.output, browser, os.environ)
+    if os.environ.get("READTHEDOCS_VERSION_TYPE") != "external":
+        # Retain evidence in the trusted build log before accepting public bytes.
+        manifest = json.loads(
+            (args.output / "downloads/documentation.json").read_text()
+        )
+        print("DOCS_EXPORT_MANIFEST=" + json.dumps(manifest, sort_keys=True))
 
 
 if __name__ == "__main__":

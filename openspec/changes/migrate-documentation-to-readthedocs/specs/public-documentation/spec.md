@@ -25,6 +25,8 @@ NOT alone advance the verified stable/default edition.
 - **WHEN** a normal version build is published
 - **THEN** PDF, standalone HTML, Markdown ZIP and offline site ZIP remain
   available with identity, chapter inventory and verified hashes
+- **AND** public manifest, chapter inventory and file hashes match retained
+  evidence from the same trusted build, not only a manifest served by the site
 - **AND** a missing or mismatched required export prevents verified promotion
 
 ### Requirement: Documentation Pull Request Previews Are Isolated
