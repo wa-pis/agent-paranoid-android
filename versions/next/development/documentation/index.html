@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation f5aca0b9f938ea50c06adbec68a0ded708b8b934
+  <br>Documentation d621cc5e1f3658d646755f62b008aa4d38cde0f4
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -452,11 +452,23 @@ stable/candidate/development mappings, faithful historical documentation refs
 or retained snapshots, public release evidence, bilingual navigation/search,
 old links and anchors, all four downloaded hashes and rollback. Immutable old
 tags lacking host configuration stay intact.</p>
+<p>Upstream source preflight at
+<a href="https://github.com/readthedocs/readthedocs.org/commit/f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a">RTD commit f343b74</a>
+shows a plan-dependent constraint:
+<a href="https://github.com/readthedocs/readthedocs.org/blob/f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a/readthedocs/projects/forms.py#L931">the settings form disables the global Addons switch outside Business</a>,
+and <a href="https://github.com/readthedocs/readthedocs.org/blob/f343b74e8cbe292a2d3b8f0ed415fd9cbe1aa57a/readthedocs/proxito/middleware.py#L338">the serving middleware requests injection when the global flag is enabled</a>.
+Turning off an individual flyout/search option must not be assumed to remove
+HTML injection. This is source-based preflight evidence, not an observation of
+our project's deployed settings. Business has not been selected or purchased.</p>
 <p>Read the Docs can inject add-ons into served HTML. The current Pages verifier
 checks the exact entry-page bytes as well as download bytes: host injection
 must be resolved and verified against actual served output, not accommodated
 by silently dropping the entry-page integrity check. No host acceptance or
-retirement of Pages is implied by a successful local build.</p>
+retirement of Pages is implied by a successful local build. Verify the standalone
+<code>handbook.html</code> download as well as the entry page on the actual service: its
+original bytes, manifest digest and ability to work offline must survive
+hosting. Do not silently exempt either file from verification, assume a paid
+setting exists in Community, or label an untested workaround as accepted.</p>
 <p>References: <a href="https://docs.readthedocs.com/platform/stable/config-file/v2.html">configuration</a>,
 <a href="https://docs.readthedocs.com/platform/stable/reference/environment-variables.html">environment</a>,
 <a href="https://docs.readthedocs.com/platform/stable/builds.html">build limits</a>,
