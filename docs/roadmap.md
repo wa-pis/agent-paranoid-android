@@ -32,8 +32,9 @@ completed work belongs in [release history](history.md), not this list.
   rather than adding managed documentation features. Cloudflare publication and
   preview workflows are disabled; successful experiment evidence remains in the
   [operator record](development/cloudflare-pages.md). RTD is superseded and its
-  project-build retirement is owner-managed. The repository return and public
-  verification remain tracked until accepted.
+  project-build retirement is owner-managed. The GitHub Pages return passed main
+  Documentation 41336088977, including public verification and retained versions.
+  Cancelled/superseded hosting proposals are archived without accepting their deltas.
 - Design batch-based validation of CSV, JSON and Parquet so complete datasets
   need not remain in memory. Bound cross-table key and uniqueness checks,
   preserve deterministic results and measure memory on synthetic fixtures.

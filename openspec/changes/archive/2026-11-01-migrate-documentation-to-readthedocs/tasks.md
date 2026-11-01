@@ -2,7 +2,10 @@
 
 Hosting choice superseded on 2026-11-01 by the maintainer-selected
 `migrate-documentation-to-cloudflare-pages`. Keep the partial evidence below;
-this migration is not complete and is not archived as completed.
+this migration is not complete and is not archived as completed. The later
+Cloudflare migration was cancelled in favor of GitHub Pages. Archive this record
+as superseded without applying its unaccepted specification delta. Remote RTD
+build cleanup remains manual owner follow-up; retain configuration until confirmed.
 
 ## Compatibility and setup
 

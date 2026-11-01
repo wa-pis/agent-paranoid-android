@@ -144,7 +144,7 @@ configuration until remote build triggers are confirmed disabled.
 
 ## Parallel Read the Docs Preparation
 
-The superseded experiment is `migrate-documentation-to-readthedocs`. GitHub Pages
+The superseded experiment is in the [RTD archive](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-11-01-migrate-documentation-to-readthedocs). GitHub Pages
 remains the accepted publication while service access and public acceptance
 are incomplete. The original connected-service failure has no confirmed cause. The maintainer
 subsequently imported the public project; native normal and PR builds now

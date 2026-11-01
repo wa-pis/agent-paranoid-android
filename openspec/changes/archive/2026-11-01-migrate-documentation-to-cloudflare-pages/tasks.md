@@ -116,11 +116,26 @@ longer the intended destination and their delta must not be applied on archival.
 - [x] Disable both Cloudflare publisher workflows in GitHub; API confirmed
   `disabled_manually` for normal production and PR previews. Preserve projects,
   deployments and secret values without reading or deleting them.
-- [ ] Restore README and new-edition canonical URLs to GitHub Pages through a
+- [x] Restore README and new-edition canonical URLs to GitHub Pages through a
   checked exact-SHA protected merge; retain native mike and frozen edition bytes.
-- [ ] Verify the actual successful main Documentation publication, public
+- [x] Verify the actual successful main Documentation publication, public
   identities/exports, new GitHub Pages canonical and old stable preservation.
-- [ ] Reconcile baseline/operator/roadmaps with the final owner decision and
+- [x] Reconcile baseline/operator/roadmaps with the final owner decision and
   archive cancelled Cloudflare/superseded RTD proposals without their unaccepted
   host-specific deltas. RTD project-build cleanup is manual owner work; do not
   claim it occurred or remove RTD config before confirmation.
+
+
+Return acceptance: PR #683 merged checked head
+`5c9dca79e693dffd4695bee41cee8850bf085f26` as main
+`508b39be4a2526ac1674ccb8da41780837a4cfe9`. Documentation
+[41336088977](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41336088977)
+succeeded through build, deployment, same-build public verification and mike
+retention. Independent public reads of all five editions confirmed GitHub Pages
+canonicals, Russian entry points and bilingual search. Root/stable/1.6.0 retained
+`5344b390`; candidate/next identify the new `508b39be` documentation revision.
+Both Cloudflare workflows remained `disabled_manually` after the merge.
+Archival disposition is cancelled/superseded with `--skip-specs`: historical
+incomplete tasks above stay unchecked, and their hosting delta is not applied.
+RTD project-build cleanup remains an explicit manual owner follow-up; its
+configuration is retained and no cleanup acceptance is claimed.

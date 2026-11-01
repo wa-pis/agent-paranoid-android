@@ -5,6 +5,11 @@
 Keep user guidance concise, version-bound, executable and aligned with shipped
 safety contracts, with separate historical evidence and portable exports.
 
+The selected primary host is GitHub Pages. The cancelled Cloudflare and
+superseded RTD experiments do not establish additional accepted hosting
+requirements; their evidence is retained separately. Native mike editions and
+same-build public/export verification remain the publication contract.
+
 ## Requirements
 
 ### Requirement: Database Source Documentation Matches Shipped Behavior
