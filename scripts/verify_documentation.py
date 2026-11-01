@@ -9,8 +9,12 @@ import re
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
+DOCUMENTATION_USER_AGENT = (
+    "AgentParanoidAndroid-DocumentationVerifier/1.0 "
+    "(+https://github.com/wa-pis/agent-paranoid-android)"
+)
 MAX_DOWNLOAD_BYTES = 20 * 1024 * 1024
 EXPORT_NAMES = ("handbook.pdf", "handbook.html", "handbook.md.zip", "site.zip")
 
@@ -19,7 +23,8 @@ def download(url: str) -> bytes:
     parsed = urlsplit(url)
     if parsed.scheme != "https" or parsed.username or parsed.password:
         raise ValueError("documentation verification requires HTTPS")
-    with urlopen(url, timeout=20) as response:
+    request = Request(url, headers={"User-Agent": DOCUMENTATION_USER_AGENT})
+    with urlopen(request, timeout=20) as response:
         if urlsplit(response.url).scheme != "https":
             raise ValueError("documentation verification redirected away from HTTPS")
         payload = response.read(MAX_DOWNLOAD_BYTES + 1)

@@ -3,7 +3,7 @@
 The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
 experiment. The active change is
 [`migrate-documentation-to-cloudflare-pages`](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
-This is preparation for a parallel deployment, not a completed hosting switch.
+A first parallel deployment is available; this is not a completed hosting switch.
 GitHub Pages remains accepted. No paid plan, custom domain, DNS change, package
 release or tag rewrite is required by this implementation.
 
@@ -87,3 +87,36 @@ equivalent Cloudflare functionality and recovery are verified.
 - [Static response headers](https://developers.cloudflare.com/pages/configuration/headers/)
 - [Preview deployments](https://developers.cloudflare.com/pages/configuration/preview-deployments/)
 - [Rollback](https://developers.cloudflare.com/pages/configuration/rollbacks/)
+
+## First Live Evidence (2026-11-01)
+
+The owner created `agent-paranoid-android` as a Direct Upload project. Its
+production branch is `main`; Git integration, project variables and bindings
+are absent. The GitHub environment restricts deployment to main and contains
+the account/project variables and an owner-installed `CLOUDFLARE_API_TOKEN`.
+The prepared token summary grants Pages Edit to the selected account and expires
+on 2027-01-30; its value was not read by the agent.
+
+[Workflow 41317904495](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41317904495)
+uploaded trusted Documentation run 41286373400 at
+`3c03ccca95f430e928cd0e6af254e62d31043966` to
+[immutable deployment 42e53263](https://42e53263.agent-paranoid-android.pages.dev/).
+The upload succeeded, but the workflow's verification failed with HTTP 403/error
+1010 from the default Python urllib User-Agent. This is not a green workflow.
+Cloudflare's [documented resolution](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1010/)
+is a descriptive application User-Agent. Both byte verification and attachment
+checks identify the documentation verifier explicitly; browser impersonation or
+security-setting changes are not required.
+
+Using that correction, the local verifier passed all five same-build editions:
+root, `versions/1.6.0`, `versions/stable`, `versions/1.7.0rc1` and `versions/next`.
+It checked identities, the stable alias, exact full manifests/chapter inventory,
+entry bytes, all four export hashes and standalone HTML attachment headers.
+Root/stable remain maintained 1.6.0 guidance at documentation `5344b390`; candidate
+and next remain 1.7.0rc1 at documentation `3c03ccca`, not stable. The fresh upload
+payload contains 1,214 files and 91,808,365 bytes. A real browser HTML download
+was 710,301 bytes and matched the root retained manifest exactly.
+
+These results cover the named immutable deployment, not production promotion,
+automatic PR previews, hosted rollback or a completed migration. The corrected
+workflow must still pass on main before recording its CI acceptance.

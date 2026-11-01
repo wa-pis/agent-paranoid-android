@@ -234,3 +234,22 @@ def test_parallel_workflow_never_uses_pr_code_or_production_branch():
         == "false"
     )
     assert all(step["uses"] == deploy["uses"] for step in secret_receivers)
+
+
+def test_attachment_check_identifies_the_same_documentation_verifier(monkeypatch):
+    from contextlib import nullcontext
+    from email.message import Message
+    from types import SimpleNamespace
+
+    url = "https://fictional.pages.dev/downloads/handbook.html"
+    headers = Message()
+    headers["Content-Disposition"] = 'attachment; filename="handbook.html"'
+
+    def open_request(request, *, timeout):
+        assert request.full_url == url
+        assert request.get_header("User-agent") == cf.DOCUMENTATION_USER_AGENT
+        assert timeout == 20
+        return nullcontext(SimpleNamespace(url=url, headers=headers))
+
+    monkeypatch.setattr(cf, "urlopen", open_request)
+    cf.verify_attachment(url)

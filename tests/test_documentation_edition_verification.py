@@ -170,3 +170,17 @@ def test_cli_edition_mode_requires_local_manifest_without_claiming_promotion(
     )
     assert published.main() == 0
     assert "promotion is not verified" in capsys.readouterr().out
+
+
+def test_download_identifies_verifier_without_changing_timeout_or_payload(monkeypatch):
+    from contextlib import nullcontext
+    from types import SimpleNamespace
+
+    def open_request(request, *, timeout):
+        assert request.full_url == BASE
+        assert request.get_header("User-agent") == published.DOCUMENTATION_USER_AGENT
+        assert timeout == 20
+        return nullcontext(SimpleNamespace(url=BASE, read=lambda limit: b"fictional"))
+
+    monkeypatch.setattr(published, "urlopen", open_request)
+    assert published.download(BASE) == b"fictional"
