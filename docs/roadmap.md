@@ -29,6 +29,8 @@ completed work belongs in [release history](history.md), not this list.
 - Implement the maintainer-selected Cloudflare Pages migration while preserving verified editions, bilingual
   guides, four download formats, old links and rollback; see the
   [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
+  The first Cloudflare parallel upload passed exact-byte checks for all five retained editions and four downloads.
+  Isolated PR previews are being implemented; hosted rollback and the canonical switch remain open.
   RTD evaluation is retained as partial evidence. Native normal and PR builds succeeded; PDF and both ZIP downloads matched
   their native build. Served HTML gains service scripts, so public integrity,
   managed version mapping, preview isolation and hosted rollback remain open.
