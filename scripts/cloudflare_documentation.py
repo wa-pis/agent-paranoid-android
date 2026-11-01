@@ -118,8 +118,8 @@ def local_edition(root: Path) -> None:
             )
 
 
-def prepare(root: Path) -> Payload:
-    """Check all assets before adding transport headers; never execute site data."""
+def static_payload(root: Path) -> tuple[int, int]:
+    """Reject executable/configuration inputs before any payload mutation."""
     if root.is_symlink() or not root.is_dir():
         raise ValueError("documentation payload must be a real directory")
     if not (root / "index.html").is_file():
@@ -144,6 +144,12 @@ def prepare(root: Path) -> Payload:
             raise ValueError(
                 "documentation payload contains a non-static filesystem entry"
             )
+    return files, total
+
+
+def prepare(root: Path) -> Payload:
+    """Check all assets before adding transport headers; never execute site data."""
+    files, total = static_payload(root)
     manifests = list(root.glob("**/downloads/documentation.json"))
     if root / "downloads/documentation.json" not in manifests:
         raise ValueError("normal documentation payload is missing its export manifest")

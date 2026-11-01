@@ -10,7 +10,7 @@ acceptance remains incomplete.
   document the owner's host decision without weakening acceptance.
 - [x] Add a static-only asset preflight, Cloudflare size/count checks and HTML
   attachment headers; test rejection and unchanged artifact bytes.
-- [ ] Prepare a trusted manual parallel deployment from an exact successful main
+- [x] Prepare a trusted manual parallel deployment from an exact successful main
   Documentation run; retain its manifests and verify public bytes before promotion.
 - [x] Confirm actual account/project, minimal permissions and owner-only secret
   setup without exposing credentials; record real URLs and service limits.
@@ -35,8 +35,19 @@ credential boundaries. The first workflow
 with Cloudflare 1010/default urllib User-Agent. The documented descriptive
 application User-Agent correction passed local verification of all five exact
 same-build editions, all four exports and attachment headers. A browser HTML
-download matched its retained hash. The corrected CI workflow has not yet passed;
-manual acceptance remains open. Project production branch is main; GitHub's
+download matched its retained hash. Corrected main publisher run 41319733062 at `b99b7c8c` passed all five
+same-build editions at `https://1641144a.agent-paranoid-android.pages.dev/`.
+Manual parallel acceptance is complete for that source artifact; it does not
+prove the remaining development/history/link/preview/recovery/switch gates. Project production branch is main; GitHub's
 publication environment permits main only. The owner installed the secret
 directly; no token value was read. See the operator guide for permission scope,
 expiry and precise evidence limits. No production/canonical switch is claimed.
+
+Preview preparation: the separate `agent-paranoid-android-previews` Direct Upload
+project is created and configured in the main-only publisher environment. The
+new source job builds exact PR heads without that environment; the trusted
+workflow_run publisher accepts only current API-bound PR artifacts, treats them
+as static data, verifies bilingual/search bytes and noindex, and posts exact-head
+statuses. Fictional tests cover fork metadata, stale/closed/ambiguous sources,
+backend rejection, false labels and modified assets. Live positive/negative and
+private-variable rehearsals are still required; the preview checkbox stays open.

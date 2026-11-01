@@ -118,5 +118,46 @@ payload contains 1,214 files and 91,808,365 bytes. A real browser HTML download
 was 710,301 bytes and matched the root retained manifest exactly.
 
 These results cover the named immutable deployment, not production promotion,
-automatic PR previews, hosted rollback or a completed migration. The corrected
-workflow must still pass on main before recording its CI acceptance.
+automatic PR previews, hosted rollback or a completed migration. The corrected main workflow
+[41319733062](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41319733062)
+passed on publisher commit `b99b7c8cc2a52a8eea7c78ef15b57b25e6fd3941`,
+using the same source artifact 41286373400 and verifying all five editions at
+[deployment 1641144a](https://1641144a.agent-paranoid-android.pages.dev/).
+Production remains empty; both observed deployments are Preview/migration builds.
+
+## Isolated PR Preview Pipeline
+
+The separate Direct Upload project `agent-paranoid-android-previews` has been
+created. Configure `CLOUDFLARE_PAGES_PREVIEW_PROJECT` with that exact value in the
+existing main-only publication environment. This does not add private variables
+or bindings to the Cloudflare preview project.
+
+The Documentation workflow builds the exact PR source head in an unprivileged
+job, with no publication environment, Cloudflare credential or shared uploader
+cache. Strict normal documentation/release checks must pass first. The labelled
+preview artifact omits normal exports and retains bilingual pages/search.
+
+`Cloudflare documentation PR preview` handles the completed run using only
+trusted default-branch code. GitHub API metadata must bind that repository's
+Documentation PR run to exactly one currently open PR with the same source head
+and head/base repositories. Fork metadata is supported; missing, changed, closed
+or ambiguous associations are rejected. The publisher checks the current head
+again immediately before upload. Source failure posts an exact-head failed
+`docs/cloudflare-preview` status without opening a publication environment.
+
+Successful source artifacts are treated only as data: the existing static asset
+checks reject Functions, Workers, deployment configuration, symlinks and oversized
+inputs. The PR identity must match the authenticated source SHA and be visibly
+labelled `PR preview / not stable`. The uploader runs in an empty directory and
+uses only the separate preview project with branch `pr-N`. It never checks out
+or executes PR code with publication rights. Byte verification covers identity,
+English/Russian entry/search pages and their shared search index, plus the real
+HTTPS/noindex response. The exact source head receives a success/failure status
+and immutable deployment link. Failed publication does not change normal editions.
+
+Pipeline implementation and fictional tests are preparation. Actual successful
+and deliberately failed PR rehearsals, private-variable isolation observations,
+preview UI checks and normal-default preservation must still be recorded before
+closing the preview task. See GitHub's
+[workflow event reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
+and [secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use).

@@ -69,9 +69,9 @@ Cloudflare publication SHALL use static artifacts from a verified source run.
 Deployment credentials SHALL be unavailable to source/PR execution. The initial
 parallel upload SHALL NOT select the production branch or grant release acceptance.
 
-#### Scenario: An untrusted or unrelated run is offered for deployment
+#### Scenario: An untrusted or unrelated run is offered for normal deployment
 
-- **WHEN** a run is not a completed successful main-push Documentation workflow
+- **WHEN** a normal-edition run is not a completed successful main-push Documentation workflow
   from this repository, or the payload contains backend code or exceeds asset limits
 - **THEN** publication rejects it before using Cloudflare credentials
 - **AND** the current accepted publication and canonical URLs stay unchanged
@@ -81,3 +81,14 @@ parallel upload SHALL NOT select the production branch or grant release acceptan
 - **WHEN** a reader follows a normal edition's standalone HTML download link
 - **THEN** Cloudflare serves the exact retained artifact bytes as an attachment
 - **AND** no service scripts are injected and its offline contract remains valid
+
+#### Scenario: A PR artifact is offered to the isolated preview publisher
+
+- **WHEN** a completed Documentation PR run is associated through GitHub API
+  metadata with exactly one open PR at its current source head
+- **THEN** trusted default-branch code may upload its validated static preview
+  to a separate preview project/origin and report a status for that exact head
+- **AND** source execution never receives the publication environment or secret
+- **AND** a stale, closed, ambiguous, unrelated or failed source cannot replace
+  a successful preview or verified normal edition
+- **AND** no PR code is checked out or executed by the credentialed publisher
