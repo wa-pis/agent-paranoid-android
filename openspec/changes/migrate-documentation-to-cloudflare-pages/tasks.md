@@ -90,3 +90,16 @@ immediately before upload, choose normal production explicitly, and verify its
 base URL as well as the immutable deployment. Manual/recovery/preview isolation
 and GitHub Pages recovery remain intact. Actual production evidence and the
 subsequent canonical/README/cleanup work are still required; switch remains open.
+
+
+First normal production acceptance: Documentation 41331122749 at main
+`c8c7c97b7422c15e5068484919ca57536844c29c` and automatic publisher 41331311059
+both succeeded. Deployment `bad72846` and the normal production base passed all
+five editions and four same-build exports (1,214 static files, 91,943,587 bytes).
+The production root was also opened in a browser. The subsequent reviewed
+canonical/link change configures Cloudflare for newly rendered editions and
+README links, while retaining frozen historical/root/stable HTML and its original
+GitHub Pages canonical URLs. Native mike tests exercise the host change and exact
+stable-byte preservation. Public verification of that new canonical build and
+project-specific RTD trigger cleanup remain required; the combined switch task
+and final baseline/archive task stay open.

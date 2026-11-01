@@ -6,9 +6,9 @@ The default site contains maintained guidance for the latest publicly verified
 stable package. Its banner identifies the package version and documentation
 revision. Documentation corrections do not inherit the package's exact-SHA review.
 
-Open the [stable version selector](https://wa-pis.github.io/agent-paranoid-android/versions/stable/) to choose an available
+Open the [stable version selector](https://agent-paranoid-android.pages.dev/versions/stable/) to choose an available
 guide. **mike** maintains the selector, version directories and stable alias on
-GitHub Pages. Older package guides retain their own rendered content and search
+Cloudflare Pages. Older package guides retain their own rendered content and search
 index; they are not rebuilt automatically with today's prose.
 
 A version guide records both its package source and documentation revision. It

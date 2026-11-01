@@ -2,12 +2,18 @@
 
 ## Tools And Local Preview
 
-Hosting remains **GitHub Pages**. MkDocs renders pages, **mike** owns version
-storage, aliases and the version selector, and **mkdocs-print-site-plugin**
+Primary hosting is **Cloudflare Pages**. The original GitHub Pages publication
+continues to preserve old URLs and recovery. MkDocs renders pages, **mike** owns
+version storage, aliases and the version selector, and **mkdocs-print-site-plugin**
 assembles the printable handbook. HTMLArk embeds its assets; Chrome prints PDF.
-Read the Docs integration is being prepared in parallel; no host switch or
-verified Read the Docs project URL has been recorded. The theme name alone does
-not connect a service. See [parallel hosting preparation](#parallel-read-the-docs-preparation).
+See the [Cloudflare operator guide](cloudflare-pages.md) for live production,
+preview and rollback evidence. The RTD sections below retain the earlier partial
+evaluation; they do not describe the selected primary host.
+
+Newly generated editions use the configured Cloudflare canonical URL. Retained
+historical/root/stable snapshots preserve their original HTML, identity, exports
+and GitHub Pages canonical URLs. Moving their unchanged bytes to Cloudflare does
+not relabel their documentation revision or claim a new package acceptance.
 
 ```bash
 uv sync --frozen --only-group docs --no-install-project
