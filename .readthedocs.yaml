@@ -43,7 +43,8 @@ build:
       - if [ "$READTHEDOCS_VERSION_TYPE" != "external" ]; then python -m uv run --no-sync playwright install --no-shell chromium; fi
     build:
       html:
-        - if [ "$READTHEDOCS_VERSION_TYPE" = "external" ]; then python -c 'raise SystemExit("Fictional preview rejection: isolated failure rehearsal")'; fi
+        - |
+            if [ "$READTHEDOCS_VERSION_TYPE" = "external" ]; then python -c 'raise SystemExit("Fictional preview rejection: isolated failure rehearsal")'; fi
         - python -m uv run --no-sync python -m scripts.build_readthedocs --output "$READTHEDOCS_OUTPUT/html"
 
 mkdocs:
