@@ -293,9 +293,21 @@ that are absent from the archived original. Ordinary HTTP verification received
 remain unverified; do not claim a measured raw-byte mismatch. A browser rendering
 or a successful normal build cannot close this integrity/offline requirement.
 Community remains a parallel experiment. No paid plan, host switch, relaxed
-integrity gate, failed-preview isolation test or hosted rollback is accepted by
-this evidence. A maintainer decision on a compatible hosting/plan path is needed
+integrity gate, secret/fork isolation or hosted rollback is accepted by this
+evidence. A maintainer decision on a compatible hosting/plan path is needed
 before committing to managed release refs and a canonical switch.
+
+Isolated rejection rehearsal: [test PR #673](https://github.com/wa-pis/agent-paranoid-android/pull/673)
+was closed without merging. Its final source `8056bd791e7a2adaf2e0e7b6bd81986e54fb7398`
+ran [native build 35555440](https://app.readthedocs.org/projects/agent-paranoid-android/builds/35555440/),
+which reached the explicit fictional rejection and exited with code 17 before
+rendering; GitHub's RTD status was `FAILURE`. Earlier rehearsal revisions failed
+configuration/command parsing and are not evidence of that executable path.
+After the final failure, the project API still selected default `latest`, normal
+build 35554945 remained successful, and a fresh browser reload showed the same
+package/source/documentation identity. This verifies external-build refusal and
+status/default preservation for this same-repository test, not fork/private-variable
+isolation, failure after rendering, rollback or release promotion.
 
 ### Verify A Published Normal Edition Against Its Build
 

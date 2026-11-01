@@ -111,3 +111,12 @@ rollback or switch tasks from these partial checks. Project import and PR status
 integration are observed, but installed scopes, account limits and private-variable
 isolation still require owner-side inspection. The earlier account-unverified
 notes above describe preparation before this native evidence.
+
+Deliberate external-preview rejection: test PR #673 was closed without merge.
+Native build 35555440 at source `8056bd791e7a2adaf2e0e7b6bd81986e54fb7398`
+reached the fictional rejection and exited 17 before rendering; GitHub reported
+RTD FAILURE. Earlier test revisions failed parsing, not this runtime path.
+After failure, the API default remained latest, normal build 35554945 stayed
+successful, and browser reload retained documentation revision `0991058d08067284b8346a05c62944bd71131a57`.
+This proves the same-repository external-build rejection/status path only;
+private-variable/fork isolation and hosted recovery remain open.
