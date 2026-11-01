@@ -1,4 +1,4 @@
-"""Validate trusted static documentation artifacts before parallel Pages upload."""
+"""Validate trusted static documentation artifacts before Pages publication."""
 
 from __future__ import annotations
 
@@ -40,8 +40,7 @@ RESERVED = {
     ".env",
     ".dev.vars",
 }
-# Parallel uploads are never the indexed/canonical publication.
-HEADERS = "/*\n  X-Robots-Tag: noindex, nofollow\n\n" + "\n".join(
+ATTACHMENT_HEADERS = "\n".join(
     f'{path}\n  Content-Disposition: attachment; filename="handbook.html"\n'
     for path in (
         "/downloads/handbook.html",
@@ -50,6 +49,9 @@ HEADERS = "/*\n  X-Robots-Tag: noindex, nofollow\n\n" + "\n".join(
         "/versions/*/downloads/handbook",
     )
 )
+
+# Parallel and recovery deployments remain unindexed.
+HEADERS = "/*\n  X-Robots-Tag: noindex, nofollow\n\n" + ATTACHMENT_HEADERS
 
 
 @dataclass(frozen=True)
@@ -71,18 +73,24 @@ class Destination:
     branch: str
 
 
-def destination(project: str, run_id: int, recovery: bool = False) -> Destination:
-    """Production rehearsal is confined to a distinct, derived recovery project."""
+def destination(
+    project: str, run_id: int, recovery: bool = False, *, production: bool = False
+) -> Destination:
+    """Keep manual rehearsals separate from verified automatic production."""
     selected = project + "-recovery" if recovery else project
     if (
         type(run_id) is not int
         or run_id <= 0
         or type(recovery) is not bool
+        or type(production) is not bool
+        or (recovery and production)
         or re.fullmatch(r"[a-z0-9]([a-z0-9-]{0,56}[a-z0-9])?", project) is None
         or re.fullmatch(r"[a-z0-9]([a-z0-9-]{0,56}[a-z0-9])?", selected) is None
     ):
         raise ValueError("invalid isolated publication destination")
-    return Destination(selected, "main" if recovery else f"migration-{run_id}")
+    return Destination(
+        selected, "main" if recovery or production else f"migration-{run_id}"
+    )
 
 
 def source_run(metadata: dict[str, Any], run_id: int) -> SourceRun:
@@ -167,7 +175,7 @@ def static_payload(root: Path) -> tuple[int, int]:
     return files, total
 
 
-def prepare(root: Path) -> Payload:
+def prepare(root: Path, *, production: bool = False) -> Payload:
     """Check all assets before adding transport headers; never execute site data."""
     files, total = static_payload(root)
     manifests = list(root.glob("**/downloads/documentation.json"))
@@ -175,7 +183,9 @@ def prepare(root: Path) -> Payload:
         raise ValueError("normal documentation payload is missing its export manifest")
     for manifest in manifests:
         local_edition(manifest.parent.parent)
-    headers = HEADERS.encode()
+    if type(production) is not bool:
+        raise ValueError("production mode must be explicit")
+    headers = (ATTACHMENT_HEADERS if production else HEADERS).encode()
     (root / "_headers").write_bytes(headers)
     return Payload(files + 1, total + len(headers), len(manifests))
 
@@ -221,7 +231,7 @@ def verify_public(root: Path, url: str) -> int:
         or parsed.query
         or parsed.fragment
     ):
-        raise ValueError("parallel verification requires an HTTPS Cloudflare Pages URL")
+        raise ValueError("verification requires an HTTPS Cloudflare Pages URL")
     base = url.rstrip("/") + "/"
     identity = json.loads((root / "documentation.json").read_text())
     # Keep the existing stable alias/destination gate in addition to byte equality.
@@ -248,17 +258,21 @@ def main() -> None:
     target.add_argument("--project", required=True)
     target.add_argument("--run-id", type=int, required=True)
     target.add_argument("--recovery", action="store_true")
+    target.add_argument("--production", action="store_true")
     exercise = sub.add_parser("exercise")
     exercise.add_argument("site", type=Path)
     exercise.add_argument("--kind", choices=("identity", "hash"), required=True)
     payload = sub.add_parser("prepare")
     payload.add_argument("site", type=Path)
+    payload.add_argument("--production", action="store_true")
     public = sub.add_parser("verify")
     public.add_argument("site", type=Path)
     public.add_argument("--url", required=True)
     args = parser.parse_args()
     if args.command == "target":
-        selected_target = destination(args.project, args.run_id, args.recovery)
+        selected_target = destination(
+            args.project, args.run_id, args.recovery, production=args.production
+        )
         print(
             f"target_project={selected_target.project}\ntarget_branch={selected_target.branch}"
         )
@@ -270,7 +284,7 @@ def main() -> None:
     elif args.command == "verify":
         print(f"Verified {verify_public(args.site, args.url)} public editions")
     else:
-        selected_payload = prepare(args.site)
+        selected_payload = prepare(args.site, production=args.production)
         print(
             f"Static payload: {selected_payload.files} files, "
             f"{selected_payload.total_bytes} bytes, {selected_payload.editions} editions"

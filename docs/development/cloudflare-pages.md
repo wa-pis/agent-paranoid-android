@@ -282,3 +282,29 @@ The native mike selector was exercised on Cloudflare: selecting `1.7.0rc1` from
 `versions/stable/` opened that candidate on the same Cloudflare deployment,
 showing its explicit candidate label and `3c03ccca` identity. No normal-project
 production or canonical switch is implied by these recovery results.
+
+
+## Automatic Production Publisher (Prepared)
+
+After preview and hosted recovery acceptance, the reviewed publisher can consume
+successful main-push Documentation completions automatically. It still checks
+source API provenance and every retained artifact hash; immediately before the
+credentialed upload it requires the source SHA to equal the current main SHA.
+Stale reruns, failed runs and PR sources cannot become normal production through
+this path. Only this trusted workflow event selects the configured normal
+project's `main` branch; manual dispatch remains a migration preview or an
+explicitly separate recovery rehearsal. The two modes cannot be mixed.
+
+Automatic production adds attachment headers without the parallel noindex rule.
+It verifies both the immutable deployment and the normal project's production
+base against every same-build retained edition and all four exports. PR previews
+and recovery remain separate and unindexed. The existing GitHub Pages publisher,
+public verification and native mike retention remain active for old links and
+recovery.
+
+This is publisher preparation until its PR is merged and an actual successful
+production-base verification is recorded. README links and newly generated
+canonical URLs switch in the subsequent reviewed change after that evidence.
+Existing rendered historical bytes, identities and their original canonical
+URLs are retained; they are not rewritten to pretend they were built on the new
+host. No package release or stable catalog promotion occurs in this step.

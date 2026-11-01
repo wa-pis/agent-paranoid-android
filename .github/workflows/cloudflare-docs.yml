@@ -1,6 +1,9 @@
-name: Cloudflare documentation parallel acceptance
+name: Cloudflare documentation
 
 on:
+  workflow_run:
+    workflows: [Documentation]
+    types: [completed]
   workflow_dispatch:
     inputs:
       source_run_id:
@@ -30,18 +33,24 @@ permissions:
   actions: read
 
 concurrency:
-  group: cloudflare-docs-parallel
+  group: cloudflare-docs-publication
   cancel-in-progress: false
 
 jobs:
   parallel:
-    name: Publish and verify parallel static documentation
-    if: github.ref == 'refs/heads/main'
+    name: Publish and verify trusted static documentation
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.conclusion == 'success'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: cloudflare-pages-preview
     env:
-      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      SOURCE_RUN_ID: ${{ inputs.source_run_id || github.event.workflow_run.id }}
+      PRODUCTION: ${{ github.event_name == 'workflow_run' }}
       CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       CF_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
     steps:
@@ -69,14 +78,17 @@ jobs:
       - name: Select isolated destination and validate rehearsal controls
         id: target
         env:
-          RECOVERY: ${{ inputs.recovery }}
-          REJECTION: ${{ inputs.rejection }}
+          RECOVERY: ${{ inputs.recovery || false }}
+          REJECTION: ${{ inputs.rejection || 'none' }}
         run: |
           set -euo pipefail
           [[ "$RECOVERY" = true || "$RECOVERY" = false ]]
           [[ "$REJECTION" = none || "$REJECTION" = identity || "$REJECTION" = hash ]]
           [[ "$REJECTION" = none || "$RECOVERY" = true ]]
+          [[ "$PRODUCTION" = true || "$PRODUCTION" = false ]]
+          [[ "$PRODUCTION" = false || ( "$RECOVERY" = false && "$REJECTION" = none ) ]]
           TARGET_ARGS=()
+          if [[ "$PRODUCTION" = true ]]; then TARGET_ARGS+=(--production); fi
           if [[ "$RECOVERY" = true ]]; then TARGET_ARGS+=(--recovery); fi
           python3 -m scripts.cloudflare_documentation target --project "$CF_PROJECT" \
             --run-id "$SOURCE_RUN_ID" "${TARGET_ARGS[@]}" >> "$GITHUB_OUTPUT"
@@ -86,19 +98,21 @@ jobs:
         with:
           name: documentation-site
           path: cloudflare-site
-          run-id: ${{ inputs.source_run_id }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
           github-token: ${{ github.token }}
 
       - name: Exercise rejection only on a disposable recovery copy
         if: inputs.recovery && inputs.rejection != 'none'
         env:
-          REJECTION: ${{ inputs.rejection }}
+          REJECTION: ${{ inputs.rejection || 'none' }}
         run: python3 -m scripts.cloudflare_documentation exercise cloudflare-site --kind "$REJECTION"
 
       - name: Check static-only payload, all retained hashes and upload limits
         run: |
           set -euo pipefail
-          python3 -m scripts.cloudflare_documentation prepare cloudflare-site
+          PREPARE_ARGS=()
+          if [[ "$PRODUCTION" = true ]]; then PREPARE_ARGS+=(--production); fi
+          python3 -m scripts.cloudflare_documentation prepare cloudflare-site "${PREPARE_ARGS[@]}"
           mkdir cloudflare-upload
 
       - name: Set up pinned uploader runtime
@@ -120,7 +134,17 @@ jobs:
             pages project create ${{ steps.target.outputs.target_project }}
             --production-branch=main
 
-      - name: Upload only the validated parallel or isolated recovery destination
+      - name: Reject stale automatic production immediately before upload
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          CURRENT_MAIN_SHA=$(gh api repos/wa-pis/agent-paranoid-android/commits/main --jq .sha)
+          [[ "$CURRENT_MAIN_SHA" = "$SOURCE_SHA" ]]
+
+      - name: Upload only the validated destination
         id: deploy
         uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4
         with:
@@ -141,4 +165,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m scripts.cloudflare_documentation verify cloudflare-site --url "$DEPLOYMENT_URL"
-          echo "Destination bytes verified; no canonical or normal-project production promotion was performed."
+          if [[ "$PRODUCTION" = true ]]; then
+            python3 -m scripts.cloudflare_documentation verify cloudflare-site --url "https://${CF_PROJECT}.pages.dev/"
+            echo "Production base and immutable deployment match the retained source build."
+          else
+            echo "Rehearsal verified; no normal-project production promotion was performed."
+          fi
