@@ -62,9 +62,10 @@ jobs:
           READTHEDOCS_GIT_COMMIT_HASH: ${{ github.sha }}
           READTHEDOCS_CANONICAL_URL: https://example.invalid/en/latest/
         run: |
-          uv run --no-sync playwright install --no-shell chromium
-          uv run --no-sync python -m scripts.build_readthedocs --output rtd-normal
-          READTHEDOCS_VERSION_TYPE=external uv run --no-sync python -m scripts.build_readthedocs --output rtd-preview
+          python -m pip install uv==0.11.23
+          python -m uv run --no-sync playwright install --no-shell chromium
+          python -m uv run --no-sync python -m scripts.build_readthedocs --output rtd-normal
+          READTHEDOCS_VERSION_TYPE=external python -m uv run --no-sync python -m scripts.build_readthedocs --output rtd-preview
 
       - name: Preserve parallel edition build evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

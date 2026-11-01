@@ -166,6 +166,8 @@ a failed strict build/export leaves the previous local output intact.
 ### Tooling And Local Reproduction
 
 `.readthedocs.yaml` selects Ubuntu 24.04, Python 3.12 and uv 0.11.23.
+Host jobs invoke `python -m uv` through the interpreter used to install it,
+so they do not depend on the installed console script being on `PATH`.
 Installation uses the frozen docs-only dependency group without installing the
 application. Playwright is a docs-only browser distributor; its locked version
 selects Chromium for the existing PDF exporter. It does not automate accounts
