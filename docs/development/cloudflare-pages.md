@@ -246,3 +246,39 @@ retained `e885a63d` preview exactly. Reverification passed all five normal
 Cloudflare editions against retained build 41286373400 and the accepted GitHub
 Pages stable default. PR #678 was closed without merging. These are actual
 success/failure/default-preservation observations, not just workflow simulations.
+
+
+## Live Hosted Recovery Evidence (2026-11-01)
+
+The recovery project has production branch `main`, no Git connection, and a
+separate production base `https://agent-paranoid-android-recovery.pages.dev/`.
+Normal project production remained empty throughout this rehearsal.
+
+- A: [publisher 41324897408](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324897408)
+  accepted source 41286373400 and deployed `bc8969bc`. Its candidate/next
+  documentation revision is `3c03ccca`. Both the immutable URL and the recovery
+  production base passed all five same-build edition/download checks.
+- B: [publisher 41325086334](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325086334)
+  accepted source 41319731486 and deployed `eec2c87d`. Its candidate/next
+  documentation revision is `b99b7c8c`. The production base was demonstrably B,
+  not A, and passed all five checks against B's retained artifact. Root stable
+  retained documentation `5344b390` in both builds; checking root alone would
+  have missed the change.
+- Cloudflare's real rollback control restored production to A/`bc8969bc`.
+  The production base's candidate identity changed back to A and differed from
+  B. All five editions, exact manifests/entries, all four exports and standalone
+  HTML attachment headers passed again against retained A.
+- [Identity rejection 41325547847](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325547847)
+  and [hash rejection 41325550670](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325550670)
+  deliberately changed disposable B artifact copies. Each failed at the existing
+  static/provenance/hash preflight with the expected reason; project creation
+  and credentialed upload steps were skipped. After both refusals, the recovery
+  production base still passed all five A edition/download checks.
+
+A dashboard check then confirmed the normal project still said **No production
+deployment yet**, with only its two migration previews. The accepted GitHub Pages
+stable default had already passed unchanged after the failed PR rehearsal.
+The native mike selector was exercised on Cloudflare: selecting `1.7.0rc1` from
+`versions/stable/` opened that candidate on the same Cloudflare deployment,
+showing its explicit candidate label and `3c03ccca` identity. No normal-project
+production or canonical switch is implied by these recovery results.

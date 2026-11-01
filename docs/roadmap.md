@@ -30,7 +30,8 @@ completed work belongs in [release history](history.md), not this list.
   guides, four download formats, old links and rollback; see the
   [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
   The first Cloudflare parallel upload passed exact-byte checks for all five retained editions and four downloads.
-  Isolated PR previews are being implemented; hosted rollback and the canonical switch remain open.
+  Isolated PR success/failure and private-variable absence are verified. A separate recovery project passed
+  real A/B rollback and identity/hash rejection with unchanged defaults. The canonical switch and final cleanup remain open.
   RTD evaluation is retained as partial evidence. Native normal and PR builds succeeded; PDF and both ZIP downloads matched
   their native build. Served HTML gains service scripts, so public integrity,
   managed version mapping, preview isolation and hosted rollback remain open.
