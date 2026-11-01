@@ -92,3 +92,13 @@ parallel upload SHALL NOT select the production branch or grant release acceptan
 - **AND** a stale, closed, ambiguous, unrelated or failed source cannot replace
   a successful preview or verified normal edition
 - **AND** no PR code is checked out or executed by the credentialed publisher
+
+
+#### Scenario: A trusted main build updates normal production after acceptance
+
+- **GIVEN** parallel preview, edition/download and hosted recovery acceptance have passed
+- **WHEN** the trusted publisher receives a successful main-push Documentation completion
+- **THEN** it validates source API provenance, retained hashes and the current main SHA before upload
+- **AND** only this automatic path selects normal production; manual rehearsals stay isolated
+- **AND** both immutable and production-base URLs must match every retained edition and required download
+- **AND** old GitHub Pages publication and immutable historical bytes remain available for recovery

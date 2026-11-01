@@ -83,3 +83,10 @@ RC-as-next alias, retained stable/history, bilingual links/search and actual
 native mike selection; the development-version path is standard-plugin-tested,
 not represented as a separate live package release. Canonical/default promotion
 and final baseline/cleanup/archive tasks remain open.
+
+Automatic production preparation: trusted main workflow_run events accept only
+successful main Documentation push artifacts, recheck the current main SHA
+immediately before upload, choose normal production explicitly, and verify its
+base URL as well as the immutable deployment. Manual/recovery/preview isolation
+and GitHub Pages recovery remain intact. Actual production evidence and the
+subsequent canonical/README/cleanup work are still required; switch remains open.

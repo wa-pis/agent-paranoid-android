@@ -79,11 +79,14 @@ def site(tmp_path):
     return root
 
 
-def test_preparation_preserves_every_asset_byte_and_adds_only_transport_headers(site):
+@pytest.mark.parametrize("production", [False, True])
+def test_preparation_preserves_every_asset_byte_and_adds_only_transport_headers(
+    site, production
+):
     original = {
         p.relative_to(site): p.read_bytes() for p in site.rglob("*") if p.is_file()
     }
-    result = cf.prepare(site)
+    result = cf.prepare(site, production=production)
     assert result.editions == 1
     assert result.files == len(original) + 1
     assert all((site / name).read_bytes() == data for name, data in original.items())
@@ -91,7 +94,7 @@ def test_preparation_preserves_every_asset_byte_and_adds_only_transport_headers(
     assert 'Content-Disposition: attachment; filename="handbook.html"' in headers
     assert "/downloads/handbook\n" in headers  # Pages strips .html on serving.
     assert "/versions/*/downloads/handbook\n" in headers
-    assert "X-Robots-Tag: noindex, nofollow" in headers
+    assert ("X-Robots-Tag: noindex, nofollow" in headers) == (not production)
 
 
 @pytest.mark.parametrize(
@@ -203,7 +206,7 @@ def test_html_response_requires_real_attachment_header(monkeypatch, disposition)
         cf.verify_attachment(response.url)
 
 
-def test_parallel_workflow_never_uses_pr_code_or_production_branch():
+def test_publisher_uses_only_trusted_main_and_separates_manual_from_automatic():
     from pathlib import Path
     import yaml
 
@@ -211,9 +214,21 @@ def test_parallel_workflow_never_uses_pr_code_or_production_branch():
         Path(".github/workflows/cloudflare-docs.yml").read_text(),
         Loader=yaml.BaseLoader,
     )
-    assert set(data["on"]) == {"workflow_dispatch"}
+    assert set(data["on"]) == {"workflow_dispatch", "workflow_run"}
+    assert data["on"]["workflow_run"] == {
+        "workflows": ["Documentation"],
+        "types": ["completed"],
+    }
     job = data["jobs"]["parallel"]
-    assert job["if"] == "github.ref == 'refs/heads/main'"
+    assert "github.ref == 'refs/heads/main'" in job["if"]
+    assert "github.event.workflow_run.event == 'push'" in job["if"]
+    assert "github.event.workflow_run.head_branch == 'main'" in job["if"]
+    assert "github.event.workflow_run.conclusion == 'success'" in job["if"]
+    assert job["env"]["PRODUCTION"] == "${{ github.event_name == 'workflow_run' }}"
+    assert (
+        job["env"]["SOURCE_RUN_ID"]
+        == "${{ inputs.source_run_id || github.event.workflow_run.id }}"
+    )
     steps = job["steps"]
     checkout = next(
         step for step in steps if step.get("uses", "").startswith("actions/checkout@")
@@ -233,6 +248,21 @@ def test_parallel_workflow_never_uses_pr_code_or_production_branch():
     target = next(step for step in steps if step.get("id") == "target")
     assert '[[ "$REJECTION" = none || "$RECOVERY" = true ]]' in target["run"]
     assert "--branch=main" not in deploy["with"]["command"]
+    assert (
+        '[[ "$PRODUCTION" = false || ( "$RECOVERY" = false && "$REJECTION" = none ) ]]'
+        in target["run"]
+    )
+    stale = next(
+        s
+        for s in steps
+        if s.get("name")
+        == "Reject stale automatic production immediately before upload"
+    )
+    assert steps.index(stale) + 1 == steps.index(deploy)
+    assert stale["if"] == "github.event_name == 'workflow_run'"
+    assert '[[ "$CURRENT_MAIN_SHA" = "$SOURCE_SHA" ]]' in stale["run"]
+    assert "commits/main" in stale["run"]
+    assert any("https://${CF_PROJECT}.pages.dev/" in s.get("run", "") for s in steps)
     assert deploy["with"]["workingDirectory"] == "cloudflare-upload"
     secret_receivers = [
         step for step in steps if "CLOUDFLARE_API_TOKEN" in json.dumps(step)
@@ -299,3 +329,19 @@ def test_rejection_exercise_cannot_mutate_a_symlink_payload(site, tmp_path):
     with pytest.raises(ValueError, match="real directory"):
         cf.exercise_rejection(linked, "hash")
     assert (site / "index.html").read_bytes() == original
+
+
+def test_automatic_production_is_explicit_and_cannot_mix_with_recovery():
+    assert cf.destination("fictional-docs", 123, production=True) == cf.Destination(
+        "fictional-docs", "main"
+    )
+    with pytest.raises(ValueError, match="isolated publication destination"):
+        cf.destination("fictional-docs", 123, True, production=True)
+    with pytest.raises(ValueError, match="isolated publication destination"):
+        cf.destination("fictional-docs", 123, production="false")
+
+
+def test_unknown_production_mode_does_not_change_payload(site):
+    with pytest.raises(ValueError, match="production mode"):
+        cf.prepare(site, production="false")
+    assert not (site / "_headers").exists()
