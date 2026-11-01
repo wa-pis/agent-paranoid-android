@@ -26,7 +26,7 @@ host/tool configuration are rejected. All local edition/entry/export hashes are
 checked before upload. Credential access belongs only to the pinned Cloudflare
 action steps; no PR source is checked out or run with that credential.
 
-Initial uploads always use `migration-RUN_ID`, never the production branch.
+Normal parallel uploads always use `migration-RUN_ID`, never the production branch.
 The payload adds only `_headers`: noindex for parallel publication and attachment
 headers for standalone HTML, covering both `.html` and Cloudflare's extensionless
 paths at root and in version directories. Page/export bytes and recorded hashes
@@ -39,8 +39,8 @@ this is a local payload result, not evidence of a Cloudflare upload.
 Use an existing Cloudflare account. Create a Pages Direct Upload project with
 production branch `main`, or choose `create_project=true` on the first workflow
 run to create it through the reviewed uploader. Do not select Git integration
-for this project. A project name and actual `pages.dev` addresses are not yet
-assumed available.
+for this project. The observed normal project is `agent-paranoid-android`; its parallel deployment
+addresses are recorded below.
 
 Create the GitHub environment `cloudflare-pages-preview`, restricted to main.
 Configure these values in that environment:
@@ -75,9 +75,9 @@ not need to read its value.
 4. A failed check leaves the accepted GitHub Pages site and canonical links
    unchanged. Uploading a parallel branch is not production promotion.
 
-The first workflow does not implement automatic PR publishing, managed production
-promotion, canonical replacement or hosted rollback. Those remain required tasks
-in the active OpenSpec. Existing RTD/GitHub Pages resources are retained until
+The first workflow does not implement managed normal-project production
+promotion or canonical replacement. Separate PR publication and isolated recovery
+controls are described below; their live acceptance remains required. Existing RTD/GitHub Pages resources are retained until
 equivalent Cloudflare functionality and recovery are verified.
 
 ## References
@@ -161,3 +161,41 @@ preview UI checks and normal-default preservation must still be recorded before
 closing the preview task. See GitHub's
 [workflow event reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
 and [secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use).
+
+
+## Isolated Hosted Recovery Rehearsal
+
+The separate Direct Upload project `agent-paranoid-android-recovery` is reserved
+for recovery tests. In the manual workflow, `recovery=true` derives this name
+from the configured normal project and selects branch `main` only in that
+separate project. The default remains `recovery=false`: a normal-project
+`migration-RUN_ID` preview. No free-form project or production-branch input is
+accepted. The account-scoped Pages token already covers this project; no new
+permissions or private variables are required.
+
+Choose two successful main Documentation runs with retained artifacts and
+different candidate documentation revisions. Publish A and then B with
+`recovery=true`, leaving `rejection=none`. Both uploads must pass every edition's
+same-build verification. Confirm the recovery project's production base URL
+serves B, including its candidate identity; root stable alone may be identical
+between the two builds and cannot establish which deployment is active.
+
+Use Cloudflare's Deployments rollback control to restore the successful A
+production deployment. Verify the recovery **production base URL**, not A's
+immutable deployment URL, against A's retained artifact across all editions and
+all four exports. Cloudflare permits rollback only to successful production
+deployments; preview deployments are not rollback targets.
+
+For controlled failures, repeat the manual workflow with `recovery=true` and
+`rejection=identity`, then `rejection=hash`. These choices alter only the freshly
+downloaded disposable artifact copy: an identity mismatch or a fictional entry
+comment must fail the existing provenance/hash gate before uploader execution.
+They cannot be selected for normal publication. After each failure, verify the
+same known-good recovery production base against A again, and check the normal
+project/default and accepted GitHub Pages publication remain unchanged.
+
+These controls and their fictional tests prepare a rehearsal; they do not prove
+that a hosted rollback or rejected deployment has occurred. Record the actual
+run IDs, A/B identities, rollback result and unchanged-default checks before
+closing the recovery task. This does not authorize a normal-project production
+or canonical switch.

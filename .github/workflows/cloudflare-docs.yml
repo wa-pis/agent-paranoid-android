@@ -13,6 +13,18 @@ on:
         type: boolean
         default: false
 
+      recovery:
+        description: Rehearse production only in the separate derived recovery project
+        required: true
+        type: boolean
+        default: false
+      rejection:
+        description: Deliberately reject a disposable copy in recovery mode only
+        required: true
+        type: choice
+        options: [none, identity, hash]
+        default: none
+
 permissions:
   contents: read
   actions: read
@@ -54,6 +66,21 @@ jobs:
           python3 -m scripts.cloudflare_documentation source \
             --metadata source-run.json --run-id "$SOURCE_RUN_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Select isolated destination and validate rehearsal controls
+        id: target
+        env:
+          RECOVERY: ${{ inputs.recovery }}
+          REJECTION: ${{ inputs.rejection }}
+        run: |
+          set -euo pipefail
+          [[ "$RECOVERY" = true || "$RECOVERY" = false ]]
+          [[ "$REJECTION" = none || "$REJECTION" = identity || "$REJECTION" = hash ]]
+          [[ "$REJECTION" = none || "$RECOVERY" = true ]]
+          TARGET_ARGS=()
+          if [[ "$RECOVERY" = true ]]; then TARGET_ARGS+=(--recovery); fi
+          python3 -m scripts.cloudflare_documentation target --project "$CF_PROJECT" \
+            --run-id "$SOURCE_RUN_ID" "${TARGET_ARGS[@]}" >> "$GITHUB_OUTPUT"
+
       - name: Download only the validated rendered artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -61,6 +88,12 @@ jobs:
           path: cloudflare-site
           run-id: ${{ inputs.source_run_id }}
           github-token: ${{ github.token }}
+
+      - name: Exercise rejection only on a disposable recovery copy
+        if: inputs.recovery && inputs.rejection != 'none'
+        env:
+          REJECTION: ${{ inputs.rejection }}
+        run: python3 -m scripts.cloudflare_documentation exercise cloudflare-site --kind "$REJECTION"
 
       - name: Check static-only payload, all retained hashes and upload limits
         run: |
@@ -84,10 +117,10 @@ jobs:
           packageManager: npm
           workingDirectory: cloudflare-upload
           command: >-
-            pages project create ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+            pages project create ${{ steps.target.outputs.target_project }}
             --production-branch=main
 
-      - name: Upload only a non-production migration branch
+      - name: Upload only the validated parallel or isolated recovery destination
         id: deploy
         uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4
         with:
@@ -98,8 +131,8 @@ jobs:
           workingDirectory: cloudflare-upload
           command: >-
             pages deploy ../cloudflare-site
-            --project-name=${{ vars.CLOUDFLARE_PAGES_PROJECT }}
-            --branch=migration-${{ inputs.source_run_id }}
+            --project-name=${{ steps.target.outputs.target_project }}
+            --branch=${{ steps.target.outputs.target_branch }}
             --commit-hash=${{ steps.source.outputs.source_sha }}
 
       - name: Compare every public edition against the retained same-build evidence
@@ -108,4 +141,4 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m scripts.cloudflare_documentation verify cloudflare-site --url "$DEPLOYMENT_URL"
-          echo "Parallel bytes verified; no canonical/default promotion was performed."
+          echo "Destination bytes verified; no canonical or normal-project production promotion was performed."

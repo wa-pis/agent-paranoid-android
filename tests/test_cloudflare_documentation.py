@@ -220,7 +220,18 @@ def test_parallel_workflow_never_uses_pr_code_or_production_branch():
     )
     assert checkout["with"]["ref"] == "${{ github.sha }}"
     deploy = next(step for step in steps if step.get("id") == "deploy")
-    assert "--branch=migration-${{ inputs.source_run_id }}" in deploy["with"]["command"]
+    assert (
+        "--branch=${{ steps.target.outputs.target_branch }}"
+        in deploy["with"]["command"]
+    )
+    assert (
+        "--project-name=${{ steps.target.outputs.target_project }}"
+        in deploy["with"]["command"]
+    )
+    assert data["on"]["workflow_dispatch"]["inputs"]["recovery"]["default"] == "false"
+    assert data["on"]["workflow_dispatch"]["inputs"]["rejection"]["default"] == "none"
+    target = next(step for step in steps if step.get("id") == "target")
+    assert '[[ "$REJECTION" = none || "$RECOVERY" = true ]]' in target["run"]
     assert "--branch=main" not in deploy["with"]["command"]
     assert deploy["with"]["workingDirectory"] == "cloudflare-upload"
     secret_receivers = [
@@ -253,3 +264,38 @@ def test_attachment_check_identifies_the_same_documentation_verifier(monkeypatch
 
     monkeypatch.setattr(cf, "urlopen", open_request)
     cf.verify_attachment(url)
+
+
+def test_parallel_destination_never_selects_normal_production():
+    assert cf.destination("fictional-docs", 123) == cf.Destination(
+        "fictional-docs", "migration-123"
+    )
+    assert cf.destination("fictional-docs", 123, True) == cf.Destination(
+        "fictional-docs-recovery", "main"
+    )
+
+
+@pytest.mark.parametrize("project", ["-invalid", "unsafe;command", "A", "a" * 58])
+def test_recovery_destination_rejects_invalid_or_oversized_names(project):
+    with pytest.raises(ValueError, match="isolated publication destination"):
+        cf.destination(project, 123, True)
+
+
+@pytest.mark.parametrize(
+    "kind,match",
+    [("identity", "incomplete or inconsistent"), ("hash", "retained manifest")],
+)
+def test_rehearsal_corruption_is_rejected_before_headers_or_upload(site, kind, match):
+    cf.exercise_rejection(site, kind)
+    with pytest.raises(ValueError, match=match):
+        cf.prepare(site)
+    assert not (site / "_headers").exists()
+
+
+def test_rejection_exercise_cannot_mutate_a_symlink_payload(site, tmp_path):
+    original = (site / "index.html").read_bytes()
+    linked = tmp_path / "linked-root"
+    linked.symlink_to(site, target_is_directory=True)
+    with pytest.raises(ValueError, match="real directory"):
+        cf.exercise_rejection(linked, "hash")
+    assert (site / "index.html").read_bytes() == original
