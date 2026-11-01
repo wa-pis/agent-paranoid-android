@@ -492,10 +492,21 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "_template", "selective-source-transformation",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
-        "migrate-documentation-to-readthedocs",
-        "migrate-documentation-to-cloudflare-pages",
     }
 
+
+    for change_id, status in (
+        ("migrate-documentation-to-cloudflare-pages", "Cancelled"),
+        ("migrate-documentation-to-readthedocs", "Superseded"),
+    ):
+        retired = changes / "archive" / f"2026-11-01-{change_id}"
+        disposition = (retired / "disposition.md").read_text()
+        assert f"# Disposition: {status}" in disposition
+        assert "--skip-specs" in disposition
+        assert "- [ ]" in (retired / "tasks.md").read_text()
+    baseline = (ROOT / "openspec/specs/public-documentation/spec.md").read_text()
+    assert "The selected primary host is GitHub Pages." in baseline
+    assert "### Requirement: Cloudflare Publication Consumes Trusted Static Artifacts" not in baseline
 
     for change_id in (
         "cross-interface-acceptance", "generation-modes-and-folder-overwrite",

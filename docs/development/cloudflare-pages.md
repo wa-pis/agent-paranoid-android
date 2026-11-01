@@ -11,7 +11,7 @@ are retained snapshots and are no longer the primary publication.
 The material below records the completed experiment, including verified
 production, isolated previews and recovery. It does not authorize re-enabling
 publication. The repository return and its public verification are tracked in
-`migrate-documentation-to-cloudflare-pages`; the migration itself is cancelled,
+[cancelled change archive](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-11-01-migrate-documentation-to-cloudflare-pages); the migration itself is cancelled,
 not completed. No paid plan, custom domain, DNS change or package release is
 required to return to GitHub Pages.
 
@@ -352,3 +352,14 @@ hosting systems. README and newly rendered canonicals return to GitHub Pages;
 public acceptance of that return is recorded separately once the main build
 and its public verifier succeed. Prior successful checks are retained as
 experiment evidence, not claimed as acceptance of the return.
+
+
+The return was accepted after [PR #683](https://github.com/wa-pis/agent-paranoid-android/pull/683)
+merged as main `508b39be` and [Documentation 41336088977](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41336088977)
+passed build, GitHub Pages deployment, same-build public verification and mike
+retention. All five public edition canonicals point to GitHub Pages. Independent
+public reads also confirmed Russian entry pages and bilingual search (786 search
+records for stable, 823 for candidate/next). Stable root/aliases keep `5344b390`;
+candidate/next carry `508b39be`. Both Cloudflare workflows were rechecked as
+`disabled_manually` after merge. The proposed Cloudflare requirements were not
+added to the baseline. RTD build retirement remains manual owner follow-up.

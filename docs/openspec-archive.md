@@ -50,3 +50,21 @@ already matched the business-rules baseline, so the normal archive operation
 needed no duplicate specification update. The deferred source-row operation is
 explicitly retained in both roadmaps; it was not implemented or accepted by
 archival.
+
+
+## 2026-11-01 hosting decisions
+
+The Cloudflare proposal is archived as **cancelled**, and the earlier RTD
+proposal as **superseded**. These are disposition archives, not completed
+capabilities. Historical incomplete checkboxes remain open. Both were archived
+with `--skip-specs`; neither unaccepted hosting delta was applied to the baseline.
+The baseline records the maintainer's final choice of GitHub Pages, while its
+existing edition/export/public-verification requirements remain intact.
+
+[PR #683](https://github.com/wa-pis/agent-paranoid-android/pull/683) restored links
+and new canonicals; [Documentation 41336088977](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41336088977)
+passed main build, publication, public verification and retained mike versions.
+Both Cloudflare publishers are disabled; their projects and historical snapshots
+are retained. RTD project-build retirement remains manual owner follow-up and
+its configuration is retained until confirmed. No migration acceptance or
+package promotion is inferred from these archives.
