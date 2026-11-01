@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 3c03ccca95f430e928cd0e6af254e62d31043966
+  <br>Documentation b99b7c8cc2a52a8eea7c78ef15b57b25e6fd3941
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -216,7 +216,7 @@
 <p>The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
 experiment. The active change is
 <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages"><code>migrate-documentation-to-cloudflare-pages</code></a>.
-This is preparation for a parallel deployment, not a completed hosting switch.
+A first parallel deployment is available; this is not a completed hosting switch.
 GitHub Pages remains accepted. No paid plan, custom domain, DNS change, package
 release or tag rewrite is required by this implementation.</p>
 <h2 id="build-and-trust-boundary">Build And Trust Boundary<a class="headerlink" href="#build-and-trust-boundary" title="Permanent link">&para;</a></h2>
@@ -310,6 +310,34 @@ equivalent Cloudflare functionality and recovery are verified.</p>
 <li><a href="https://developers.cloudflare.com/pages/configuration/preview-deployments/">Preview deployments</a></li>
 <li><a href="https://developers.cloudflare.com/pages/configuration/rollbacks/">Rollback</a></li>
 </ul>
+<h2 id="first-live-evidence-2026-11-01">First Live Evidence (2026-11-01)<a class="headerlink" href="#first-live-evidence-2026-11-01" title="Permanent link">&para;</a></h2>
+<p>The owner created <code>agent-paranoid-android</code> as a Direct Upload project. Its
+production branch is <code>main</code>; Git integration, project variables and bindings
+are absent. The GitHub environment restricts deployment to main and contains
+the account/project variables and an owner-installed <code>CLOUDFLARE_API_TOKEN</code>.
+The prepared token summary grants Pages Edit to the selected account and expires
+on 2027-01-30; its value was not read by the agent.</p>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41317904495">Workflow 41317904495</a>
+uploaded trusted Documentation run 41286373400 at
+<code>3c03ccca95f430e928cd0e6af254e62d31043966</code> to
+<a href="https://42e53263.agent-paranoid-android.pages.dev/">immutable deployment 42e53263</a>.
+The upload succeeded, but the workflow's verification failed with HTTP 403/error
+1010 from the default Python urllib User-Agent. This is not a green workflow.
+Cloudflare's <a href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1010/">documented resolution</a>
+is a descriptive application User-Agent. Both byte verification and attachment
+checks identify the documentation verifier explicitly; browser impersonation or
+security-setting changes are not required.</p>
+<p>Using that correction, the local verifier passed all five same-build editions:
+root, <code>versions/1.6.0</code>, <code>versions/stable</code>, <code>versions/1.7.0rc1</code> and <code>versions/next</code>.
+It checked identities, the stable alias, exact full manifests/chapter inventory,
+entry bytes, all four export hashes and standalone HTML attachment headers.
+Root/stable remain maintained 1.6.0 guidance at documentation <code>5344b390</code>; candidate
+and next remain 1.7.0rc1 at documentation <code>3c03ccca</code>, not stable. The fresh upload
+payload contains 1,214 files and 91,808,365 bytes. A real browser HTML download
+was 710,301 bytes and matched the root retained manifest exactly.</p>
+<p>These results cover the named immutable deployment, not production promotion,
+automatic PR previews, hosted rollback or a completed migration. The corrected
+workflow must still pass on main before recording its CI acceptance.</p>
               
 </div>
 
