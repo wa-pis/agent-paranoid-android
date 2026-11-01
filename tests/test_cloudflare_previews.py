@@ -203,6 +203,13 @@ def test_source_and_publisher_have_separate_credentials_and_code():
     assert source["permissions"] == {"contents": "read"}
     assert "environment" not in source
     assert "secrets." not in json.dumps(source)
+    setup_uv = next(
+        step
+        for step in source["steps"]
+        if step.get("uses", "").startswith("astral-sh/setup-uv@")
+    )
+    assert setup_uv["with"]["enable-cache"] == "false"
+    assert setup_uv["with"]["prune-cache"] == "true"
     checkout = next(
         s for s in source["steps"] if s.get("uses", "").startswith("actions/checkout@")
     )

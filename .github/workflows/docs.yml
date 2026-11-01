@@ -143,6 +143,7 @@ jobs:
         with:
           version: '0.11.23'
           enable-cache: false
+          prune-cache: true
       - name: Install frozen preview dependencies
         run: uv sync --frozen --only-group docs --python python --no-install-project
       - name: Build labelled preview without publication credentials
