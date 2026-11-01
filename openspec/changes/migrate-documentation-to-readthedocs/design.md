@@ -30,6 +30,11 @@ HTML download on the actual selected plan, retaining their integrity checks
 and offline contract. A paid plan is not assumed; a workaround or contract
 change must be explicit, tested and documented before acceptance. Upstream
 source evidence alone does not prove our project's actual served response.
+Native build 35554945 subsequently succeeded, but the directly served standalone
+HTML DOM includes RTD Addons/advertising scripts absent from its original in the
+verified site ZIP. Raw served entry/HTML byte verification is still blocked by
+HTTP 403. Keep the acceptance gates intact and resolve the hosting/plan path
+explicitly; no paid service or alternative host is selected by this observation.
 
 Read the Docs manages online versions, with an explicit mapping to the verified
 release catalog. `latest` denotes development, not a published package; an RC

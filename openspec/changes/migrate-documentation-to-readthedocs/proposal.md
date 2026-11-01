@@ -5,7 +5,9 @@
 GitHub Pages currently hosts our MkDocs/mike/Actions documentation pipeline.
 Read the Docs can provide managed versions, builds and PR previews. Move
 hosting there while preserving existing documentation contracts. The user
-requested this work plan on 2026-10-30; migration has not started.
+requested this work plan on 2026-10-30. Native parallel normal and PR builds
+now succeed; public integrity, managed editions and the hosting switch remain
+open as recorded in the task evidence.
 
 ## What Changes
 
