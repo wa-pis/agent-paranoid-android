@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/ru/roadmap/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://agent-paranoid-android.pages.dev/versions/1.7.0rc1/ru/roadmap/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Дорожная карта - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "\u0414\u043e\u0440\u043e\u0436\u043d\u0430\u044f \u043a\u0430\u0440\u0442\u0430";
         var mkdocs_page_input_path = "ru/roadmap.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/ru/roadmap/";
+        var mkdocs_page_url = "/versions/1.7.0rc1/ru/roadmap/";
       </script>
     
     <!--[if lt IE 9]>
@@ -204,7 +204,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation c8c7c97b7422c15e5068484919ca57536844c29c
+  <br>Documentation 84edf346467a5b90ef7d395f54519ffa1b60afa7
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -229,11 +229,13 @@
   <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages">OpenSpec</a>.
   Первая параллельная публикация Cloudflare прошла проверку точного совпадения пяти редакций и четырёх форматов.
   Успешные и неуспешные PR-превью и отсутствие приватных переменных проверены. Отдельный проект восстановления
-  прошёл реальный откат A/B и отказ по идентичности/хешу с сохранением рабочей версии. Переключение основного адреса и итоговая очистка ещё впереди.
+  прошёл реальный откат A/B и отказ по идентичности/хешу с сохранением рабочей версии. Основная автоматическая
+  публикация прошла проверку отдельного deployment и постоянного адреса: сборка 41331122749, издатель 41331311059.
+  Новые canonical/README-ссылки и отключение RTD ещё проверяются; canonical сохранённых исторических страниц не меняются.
   Результаты проверки RTD сохранены. Сборки normal и PR на RTD успешны; PDF и оба ZIP совпали со своей
   сборкой. В открываемый HTML сервис добавляет скрипты, поэтому проверка
   целостности публичного HTML, управляемые версии, изоляция превью и откат
-  ещё не завершены. До приёмки основной хостинг остаётся на GitHub Pages.</li>
+  на RTD не завершены. GitHub Pages продолжает публиковаться для прежних ссылок и восстановления.</li>
 <li>Спроектировать batch validation CSV/JSON/Parquet без удержания всего набора в памяти. Ограничить cross-table key/uniqueness checks, сохранить deterministic results и измерить память на вымышленных fixtures. До реализации нужен отдельный OpenSpec change.</li>
 <li>Упростить CSV/DB workflow по итогам пилотов.</li>
 <li>Публиковать runnable examples и короткие кейсы с синтетическими входами.</li>

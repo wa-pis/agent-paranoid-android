@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/development/cloudflare-pages/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://agent-paranoid-android.pages.dev/versions/1.7.0rc1/development/cloudflare-pages/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Parallel Cloudflare Pages Publication - Agent Paranoid Android</title>
+    <title>Cloudflare Pages Publication - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link href="../../css/print-site.css" rel="stylesheet" />
@@ -15,9 +15,9 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Parallel Cloudflare Pages Publication";
+        var mkdocs_page_name = "Cloudflare Pages Publication";
         var mkdocs_page_input_path = "development/cloudflare-pages.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/development/cloudflare-pages/";
+        var mkdocs_page_url = "/versions/1.7.0rc1/development/cloudflare-pages/";
       </script>
     
     <!--[if lt IE 9]>
@@ -180,7 +180,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Parallel Cloudflare Pages Publication</li>
+      <li class="breadcrumb-item active">Cloudflare Pages Publication</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/development/cloudflare-pages.md">Edit on wa-pis/agent-paranoid-android</a>
     </li>
@@ -206,25 +206,29 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation c8c7c97b7422c15e5068484919ca57536844c29c
+  <br>Documentation 84edf346467a5b90ef7d395f54519ffa1b60afa7
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
 
 
-                <h1 id="parallel-cloudflare-pages-publication">Parallel Cloudflare Pages Publication<a class="headerlink" href="#parallel-cloudflare-pages-publication" title="Permanent link">&para;</a></h1>
+                <h1 id="cloudflare-pages-publication">Cloudflare Pages Publication<a class="headerlink" href="#cloudflare-pages-publication" title="Permanent link">&para;</a></h1>
 <p>The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
 experiment. The active change is
 <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages"><code>migrate-documentation-to-cloudflare-pages</code></a>.
-A first parallel deployment is available; this is not a completed hosting switch.
-GitHub Pages remains accepted. No paid plan, custom domain, DNS change, package
+The normal production base is verified at
+<a href="https://agent-paranoid-android.pages.dev/">https://agent-paranoid-android.pages.dev/</a>. GitHub Pages continues publishing
+for existing links and recovery. The canonical/link switch and retirement of
+project-specific RTD automation are tracked separately below; migration archival
+waits for their completion. No paid plan, custom domain, DNS change, package
 release or tag rewrite is required by this implementation.</p>
 <h2 id="build-and-trust-boundary">Build And Trust Boundary<a class="headerlink" href="#build-and-trust-boundary" title="Permanent link">&para;</a></h2>
 <p>Keep the existing strict GitHub <code>Documentation</code> workflow, frozen Python/docs
 packages, Chromium PDF exporter, release verification, mike editions and retained
 rendered artifacts. Cloudflare receives prebuilt assets through Direct Upload;
 it does not need to run the Python build or receive private source data.</p>
-<p><code>Cloudflare documentation parallel acceptance</code> runs manually from main only.
+<p><code>Cloudflare documentation</code> supports trusted automatic production and manual
+parallel/recovery publication from main only.
 Its source-run gate requires a completed successful main-push run of
 <code>.github/workflows/docs.yml</code> in this repository, binds the exact source SHA and
 then downloads only that run's <code>documentation-site</code> artifact. PR, fork, failed,
@@ -477,7 +481,7 @@ The native mike selector was exercised on Cloudflare: selecting <code>1.7.0rc1</
 <code>versions/stable/</code> opened that candidate on the same Cloudflare deployment,
 showing its explicit candidate label and <code>3c03ccca</code> identity. No normal-project
 production or canonical switch is implied by these recovery results.</p>
-<h2 id="automatic-production-publisher-prepared">Automatic Production Publisher (Prepared)<a class="headerlink" href="#automatic-production-publisher-prepared" title="Permanent link">&para;</a></h2>
+<h2 id="automatic-production-publisher">Automatic Production Publisher<a class="headerlink" href="#automatic-production-publisher" title="Permanent link">&para;</a></h2>
 <p>After preview and hosted recovery acceptance, the reviewed publisher can consume
 successful main-push Documentation completions automatically. It still checks
 source API provenance and every retained artifact hash; immediately before the
@@ -492,12 +496,32 @@ base against every same-build retained edition and all four exports. PR previews
 and recovery remain separate and unindexed. The existing GitHub Pages publisher,
 public verification and native mike retention remain active for old links and
 recovery.</p>
-<p>This is publisher preparation until its PR is merged and an actual successful
-production-base verification is recorded. README links and newly generated
-canonical URLs switch in the subsequent reviewed change after that evidence.
-Existing rendered historical bytes, identities and their original canonical
-URLs are retained; they are not rewritten to pretend they were built on the new
-host. No package release or stable catalog promotion occurs in this step.</p>
+<p>PR #681 enabled this publisher. The first normal production publication passed:</p>
+<ul>
+<li>Source <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41331122749">Documentation 41331122749</a>
+  built main <code>c8c7c97b7422c15e5068484919ca57536844c29c</code> successfully.</li>
+<li>Automatic <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41331311059">publisher 41331311059</a>
+  deployed <a href="https://bad72846.agent-paranoid-android.pages.dev/">immutable <code>bad72846</code></a>.
+  The static payload contained 1,214 files, 91,943,587 bytes and five editions.
+  Both immutable and production-base verification passed every edition and all
+  four same-build exports. A browser visit confirmed the production root.</li>
+<li>Root and maintained stable retain documentation identity <code>5344b390</code>; the RC
+  and <code>next</code> aliases carry this source build's documentation revision. Publication
+  does not promote the RC package or change the verified stable catalog.</li>
+</ul>
+<p>The subsequent canonical/link change makes Cloudflare the README entry point
+and the configured host for newly rendered editions. The native mike hook uses
+that configured host with its existing <code>versions/</code> deploy prefix; it does not
+introduce a second edition catalog. Actual standard-plugin tests build a new
+candidate/development edition on a changed host and verify its canonical URL
+while checking retained stable HTML and identities byte for byte.</p>
+<p>Existing rendered historical/root/stable bytes, identities, exports and their
+original GitHub Pages canonical URLs are retained. They are not rewritten to
+pretend they were built on the new host. New canonical URLs take effect only
+when a new edition is rendered. GitHub Pages keeps the same retained tree for
+old links and recovery. Project-specific RTD automation must be disabled before
+its configuration is removed; this owner-session cleanup remains outstanding.
+No package release or stable catalog promotion occurs in this step.</p>
               
 </div>
 
