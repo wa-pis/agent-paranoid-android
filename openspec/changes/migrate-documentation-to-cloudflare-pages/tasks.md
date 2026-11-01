@@ -14,11 +14,11 @@ acceptance remains incomplete.
   Documentation run; retain its manifests and verify public bytes before promotion.
 - [x] Confirm actual account/project, minimal permissions and owner-only secret
   setup without exposing credentials; record real URLs and service limits.
-- [ ] Verify stable/candidate/development/historical mapping and faithful retained
+- [x] Verify stable/candidate/development/historical mapping and faithful retained
   editions, bilingual navigation/search, old links/anchors and all four downloads.
 - [x] Add isolated PR preview publication/statuses; verify success, deliberate
   failure, noindex/labels and absence of private variables/publication rights in PR code.
-- [ ] Rehearse hosted rollback and failed build/identity/hash/default preservation.
+- [x] Rehearse hosted rollback and failed build/identity/hash/default preservation.
 - [ ] Switch canonical/default publication only after full acceptance; preserve
   Pages URLs and remove only replaced hosting steps and RTD-specific integration.
 - [ ] Update baseline specifications, README/operator guide/both roadmaps, close
@@ -70,3 +70,16 @@ and the accepted GitHub Pages stable default reverified unchanged. The test PR
 was closed without merging. Fork behavior is covered by fictional metadata tests,
 not a live fork rehearsal. PR #677 passed every applicable CI check and merged;
 its recovery controls are ready for hosted A/B acceptance, which remains open.
+
+Live recovery acceptance: successful publishers 41324897408 (A/`bc8969bc`, source
+41286373400) and 41325086334 (B/`eec2c87d`, source 41319731486) passed immutable and
+production-base checks. Candidate identities proved the base served B and then A
+after a real Cloudflare rollback. Every edition and all four exports passed
+against A after rollback. Identity/hash rejection runs 41325547847 and
+41325550670 failed at preflight with uploader skipped; A reverified after both.
+Normal project production remained empty. See the operator guide for full
+provenance and exact evidence limits. Mapping acceptance covers the current
+RC-as-next alias, retained stable/history, bilingual links/search and actual
+native mike selection; the development-version path is standard-plugin-tested,
+not represented as a separate live package release. Canonical/default promotion
+and final baseline/cleanup/archive tasks remain open.
