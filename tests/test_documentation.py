@@ -145,8 +145,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "statistical anonymity" in readme
     assert "cross-environment byte identity" in readme
     assert "relationship or business-rule evidence" in readme
-    assert "https://wa-pis.github.io/agent-paranoid-android/" in readme
-    assert "https://agent-paranoid-android.pages.dev/" in readme
+    assert "[original GitHub Pages site](https://wa-pis.github.io/agent-paranoid-android/)" in readme
+    assert "[documentation](https://agent-paranoid-android.pages.dev/)" in readme
     assert "## Choose A Guide" in readme
     guide_section = readme.split("## Choose A Guide", 1)[1].split(
         "## Development", 1
