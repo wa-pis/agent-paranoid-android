@@ -1,10 +1,13 @@
-# Parallel Cloudflare Pages Publication
+# Cloudflare Pages Publication
 
 The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
 experiment. The active change is
 [`migrate-documentation-to-cloudflare-pages`](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
-A first parallel deployment is available; this is not a completed hosting switch.
-GitHub Pages remains accepted. No paid plan, custom domain, DNS change, package
+The normal production base is verified at
+<https://agent-paranoid-android.pages.dev/>. GitHub Pages continues publishing
+for existing links and recovery. The canonical/link switch and retirement of
+project-specific RTD automation are tracked separately below; migration archival
+waits for their completion. No paid plan, custom domain, DNS change, package
 release or tag rewrite is required by this implementation.
 
 ## Build And Trust Boundary
@@ -14,7 +17,8 @@ packages, Chromium PDF exporter, release verification, mike editions and retaine
 rendered artifacts. Cloudflare receives prebuilt assets through Direct Upload;
 it does not need to run the Python build or receive private source data.
 
-`Cloudflare documentation parallel acceptance` runs manually from main only.
+`Cloudflare documentation` supports trusted automatic production and manual
+parallel/recovery publication from main only.
 Its source-run gate requires a completed successful main-push run of
 `.github/workflows/docs.yml` in this repository, binds the exact source SHA and
 then downloads only that run's `documentation-site` artifact. PR, fork, failed,
@@ -284,7 +288,7 @@ showing its explicit candidate label and `3c03ccca` identity. No normal-project
 production or canonical switch is implied by these recovery results.
 
 
-## Automatic Production Publisher (Prepared)
+## Automatic Production Publisher
 
 After preview and hosted recovery acceptance, the reviewed publisher can consume
 successful main-push Documentation completions automatically. It still checks
@@ -302,9 +306,30 @@ and recovery remain separate and unindexed. The existing GitHub Pages publisher,
 public verification and native mike retention remain active for old links and
 recovery.
 
-This is publisher preparation until its PR is merged and an actual successful
-production-base verification is recorded. README links and newly generated
-canonical URLs switch in the subsequent reviewed change after that evidence.
-Existing rendered historical bytes, identities and their original canonical
-URLs are retained; they are not rewritten to pretend they were built on the new
-host. No package release or stable catalog promotion occurs in this step.
+PR #681 enabled this publisher. The first normal production publication passed:
+
+- Source [Documentation 41331122749](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41331122749)
+  built main `c8c7c97b7422c15e5068484919ca57536844c29c` successfully.
+- Automatic [publisher 41331311059](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41331311059)
+  deployed [immutable `bad72846`](https://bad72846.agent-paranoid-android.pages.dev/).
+  The static payload contained 1,214 files, 91,943,587 bytes and five editions.
+  Both immutable and production-base verification passed every edition and all
+  four same-build exports. A browser visit confirmed the production root.
+- Root and maintained stable retain documentation identity `5344b390`; the RC
+  and `next` aliases carry this source build's documentation revision. Publication
+  does not promote the RC package or change the verified stable catalog.
+
+The subsequent canonical/link change makes Cloudflare the README entry point
+and the configured host for newly rendered editions. The native mike hook uses
+that configured host with its existing `versions/` deploy prefix; it does not
+introduce a second edition catalog. Actual standard-plugin tests build a new
+candidate/development edition on a changed host and verify its canonical URL
+while checking retained stable HTML and identities byte for byte.
+
+Existing rendered historical/root/stable bytes, identities, exports and their
+original GitHub Pages canonical URLs are retained. They are not rewritten to
+pretend they were built on the new host. New canonical URLs take effect only
+when a new edition is rendered. GitHub Pages keeps the same retained tree for
+old links and recovery. Project-specific RTD automation must be disabled before
+its configuration is removed; this owner-session cleanup remains outstanding.
+No package release or stable catalog promotion occurs in this step.

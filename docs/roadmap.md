@@ -31,11 +31,13 @@ completed work belongs in [release history](history.md), not this list.
   [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
   The first Cloudflare parallel upload passed exact-byte checks for all five retained editions and four downloads.
   Isolated PR success/failure and private-variable absence are verified. A separate recovery project passed
-  real A/B rollback and identity/hash rejection with unchanged defaults. The canonical switch and final cleanup remain open.
+  real A/B rollback and identity/hash rejection with unchanged defaults. Automatic normal production
+  passed source 41331122749 / publisher 41331311059, including both immutable and production-base checks.
+  New canonical/README links and final RTD cleanup remain under review; frozen historical canonical URLs stay unchanged.
   RTD evaluation is retained as partial evidence. Native normal and PR builds succeeded; PDF and both ZIP downloads matched
   their native build. Served HTML gains service scripts, so public integrity,
   managed version mapping, preview isolation and hosted rollback remain open.
-  GitHub Pages remains the accepted host until parallel acceptance and switch.
+  GitHub Pages keeps publishing for existing links and recovery.
 - Design batch-based validation of CSV, JSON and Parquet so complete datasets
   need not remain in memory. Bound cross-table key and uniqueness checks,
   preserve deterministic results and measure memory on synthetic fixtures.

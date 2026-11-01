@@ -293,7 +293,18 @@ nav:
     )
     (source / "pyproject.toml").write_text(f'[project]\nversion = "{version}"\n')
     (source / "docs/index.md").write_text("# NEXT VERSION ONLY\n")
+    # A host change affects new editions, never the retained stable bytes.
+    config = source / "mkdocs.yml"
+    config.write_text(config.read_text().replace(
+        "https://wa-pis.github.io/agent-paranoid-android/",
+        "https://fictional-docs.pages.dev/",
+    ))
     docs.build(source, output, str(browser))
+    from bs4 import BeautifulSoup
+    candidate_page = BeautifulSoup((output / f"versions/{target}/index.html").read_text(), "html.parser")
+    assert candidate_page.select_one('link[rel="canonical"]')["href"] == f"https://fictional-docs.pages.dev/versions/{target}/"
+    stable_page = BeautifulSoup((output / "index.html").read_text(), "html.parser")
+    assert stable_page.select_one('link[rel="canonical"]')["href"] == "https://wa-pis.github.io/agent-paranoid-android/"
     assert (output / "index.html").read_bytes() == before
     assert (output / "documentation.json").read_bytes() == stable_identity
     assert (output / "versions/1.6.0/index.html").read_bytes() == (

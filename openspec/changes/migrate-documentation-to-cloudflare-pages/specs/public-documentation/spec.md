@@ -60,6 +60,9 @@ retained deployment and documented rollback SHALL remain available.
 - **GIVEN** parallel verification and rollback rehearsal have passed
 - **WHEN** the canonical entry point changes
 - **THEN** old deep links, historical evidence and downloads remain usable
+- **AND** newly rendered editions use the configured Cloudflare canonical host
+- **AND** frozen historical/root/stable snapshots retain their original canonical
+  URLs, rendered bytes, identities and hashes rather than being relabelled
 - **AND** only replaced hosting steps are removed, retaining CI/export/release
   verification and recovery functionality
 

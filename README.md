@@ -1,6 +1,6 @@
 # Agent Paranoid Android
 
-[![PyPI](https://img.shields.io/pypi/v/agent-paranoid-android.svg)](https://pypi.org/project/agent-paranoid-android/) [![CI](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml/badge.svg)](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml) [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://wa-pis.github.io/agent-paranoid-android/) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/wa-pis/agent-paranoid-android/badge)](https://scorecard.dev/viewer/?uri=github.com/wa-pis/agent-paranoid-android) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/agent-paranoid-android.svg)](https://pypi.org/project/agent-paranoid-android/) [![CI](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml/badge.svg)](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml) [![Documentation](https://img.shields.io/badge/docs-Cloudflare%20Pages-blue.svg)](https://agent-paranoid-android.pages.dev/) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/wa-pis/agent-paranoid-android/badge)](https://scorecard.dev/viewer/?uri=github.com/wa-pis/agent-paranoid-android) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Deterministic synthetic test data from CSV and database metadata, without
 copying source rows. Use the CLI or Python library to profile structure, review
@@ -9,10 +9,10 @@ a `DatasetSpec`, generate reproducible datasets, and validate the result.
 Stable `1.6.0` is the recommended release. Its signed source, packages and
 containers passed [public verification](docs/release-evidence-1.6.0.md).
 
-Read the [documentation](https://wa-pis.github.io/agent-paranoid-android/)
+Read the [documentation](https://agent-paranoid-android.pages.dev/)
 for task guides, [offline downloads](docs/downloads.md), and
 [versioned documentation](docs/versions.md). Historical evidence lives in
-[History And Maintenance](docs/history.md).
+[History And Maintenance](docs/history.md). The [original GitHub Pages site](https://wa-pis.github.io/agent-paranoid-android/) remains available for existing links and recovery.
 
 See the [source/output matrix](docs/reference/source-output-matrix.md) for the
 common reviewed DatasetSpec, field types, settings and business-rule contract.
@@ -21,7 +21,7 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 Candidate `1.7.0rc1` is published; stable `1.6.0` remains recommended.
 Install explicitly with `python3 -m pip install "agent-paranoid-android==1.7.0rc1"`.
-See [candidate status](docs/1.7.0rc1-release-status.md) and its [guide](https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/).
+See [candidate status](docs/1.7.0rc1-release-status.md) and its [guide](https://agent-paranoid-android.pages.dev/versions/1.7.0rc1/).
 
 ## Install And Try It
 
@@ -50,14 +50,14 @@ those properties.
 
 | Source | Start here |
 | --- | --- |
-| One CSV file | [First CSV Dataset](https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/) |
-| PostgreSQL | [PostgreSQL Workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/postgresql/) |
-| Trino | [Trino Workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/trino/) |
-| Existing `DatasetSpec` | [Profiles And Specs](https://wa-pis.github.io/agent-paranoid-android/concepts/profiles-and-specs/) |
+| One CSV file | [First CSV Dataset](https://agent-paranoid-android.pages.dev/getting-started/first-csv/) |
+| PostgreSQL | [PostgreSQL Workflow](https://agent-paranoid-android.pages.dev/how-to/postgresql/) |
+| Trino | [Trino Workflow](https://agent-paranoid-android.pages.dev/how-to/trino/) |
+| Existing `DatasetSpec` | [Profiles And Specs](https://agent-paranoid-android.pages.dev/concepts/profiles-and-specs/) |
 
 CSV and JSON workflows are included in the base package. Install optional
 database, Parquet, MCP, or AI support only when you need it; see
-[Installation](https://wa-pis.github.io/agent-paranoid-android/getting-started/installation/).
+[Installation](https://agent-paranoid-android.pages.dev/getting-started/installation/).
 
 ## Guarantees And Limits
 
@@ -83,11 +83,11 @@ before regenerating existing fixtures.
 
 ## Choose A Guide
 
-- [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/)
-- [Related Tables](https://wa-pis.github.io/agent-paranoid-android/getting-started/related-tables/)
-- [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/)
-- [CLI Command Index](https://wa-pis.github.io/agent-paranoid-android/reference/cli/)
-- [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/)
+- [Review The Output](https://agent-paranoid-android.pages.dev/getting-started/review-output/)
+- [Related Tables](https://agent-paranoid-android.pages.dev/getting-started/related-tables/)
+- [Safety Model](https://agent-paranoid-android.pages.dev/concepts/safety-model/)
+- [CLI Command Index](https://agent-paranoid-android.pages.dev/reference/cli/)
+- [Troubleshooting](https://agent-paranoid-android.pages.dev/operations/troubleshooting/)
 
 ## Development
 

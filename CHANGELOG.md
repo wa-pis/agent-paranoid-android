@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Versioned documentation is published on Cloudflare Pages with isolated PR
+  previews and the existing four offline formats. Original GitHub Pages links
+  remain available; retained historical guides keep their original identities.
+
 ### Fixed
 
 - Future container builds install Bookworm's fixed OpenSSL3.0.22 security
