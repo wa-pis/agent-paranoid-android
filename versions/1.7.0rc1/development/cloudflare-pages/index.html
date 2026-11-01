@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://agent-paranoid-android.pages.dev/versions/1.7.0rc1/development/cloudflare-pages/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/development/cloudflare-pages/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Cloudflare Pages Publication - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Cloudflare Pages Publication";
         var mkdocs_page_input_path = "development/cloudflare-pages.md";
-        var mkdocs_page_url = "/versions/1.7.0rc1/development/cloudflare-pages/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/development/cloudflare-pages/";
       </script>
     
     <!--[if lt IE 9]>
@@ -206,22 +206,26 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 84edf346467a5b90ef7d395f54519ffa1b60afa7
+  <br>Documentation 508b39be4a2526ac1674ccb8da41780837a4cfe9
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
 
 
                 <h1 id="cloudflare-pages-publication">Cloudflare Pages Publication<a class="headerlink" href="#cloudflare-pages-publication" title="Permanent link">&para;</a></h1>
-<p>The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
-experiment. The active change is
-<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages"><code>migrate-documentation-to-cloudflare-pages</code></a>.
-The normal production base is verified at
-<a href="https://agent-paranoid-android.pages.dev/">https://agent-paranoid-android.pages.dev/</a>. GitHub Pages continues publishing
-for existing links and recovery. The canonical/link switch and retirement of
-project-specific RTD automation are tracked separately below; migration archival
-waits for their completion. No paid plan, custom domain, DNS change, package
-release or tag rewrite is required by this implementation.</p>
+<p><strong>Status: cancelled by the maintainer on 2026-11-01; GitHub Pages is the selected
+primary host.</strong> Cloudflare served the same MkDocs site and did not add managed
+Read the Docs functionality. Both <code>Cloudflare documentation</code> and <code>Cloudflare
+documentation PR preview</code> workflows were set to <code>disabled_manually</code> in GitHub.
+They do not automatically publish normal editions or PR previews. Projects,
+deployments and credentials were not deleted or read. Existing Cloudflare URLs
+are retained snapshots and are no longer the primary publication.</p>
+<p>The material below records the completed experiment, including verified
+production, isolated previews and recovery. It does not authorize re-enabling
+publication. The repository return and its public verification are tracked in
+<code>migrate-documentation-to-cloudflare-pages</code>; the migration itself is cancelled,
+not completed. No paid plan, custom domain, DNS change or package release is
+required to return to GitHub Pages.</p>
 <h2 id="build-and-trust-boundary">Build And Trust Boundary<a class="headerlink" href="#build-and-trust-boundary" title="Permanent link">&para;</a></h2>
 <p>Keep the existing strict GitHub <code>Documentation</code> workflow, frozen Python/docs
 packages, Chromium PDF exporter, release verification, mike editions and retained
@@ -522,6 +526,17 @@ when a new edition is rendered. GitHub Pages keeps the same retained tree for
 old links and recovery. Project-specific RTD automation must be disabled before
 its configuration is removed; this owner-session cleanup remains outstanding.
 No package release or stable catalog promotion occurs in this step.</p>
+<h2 id="return-to-github-pages">Return To GitHub Pages<a class="headerlink" href="#return-to-github-pages" title="Permanent link">&para;</a></h2>
+<p>The last Cloudflare canonical build was Documentation 41334153435 at
+<code>84edf346467a5b90ef7d395f54519ffa1b60afa7</code>, published successfully by 41334341512
+to <code>1a52d73d</code>. Immutable and production-base checks passed all five editions and
+four exports. Public candidate/next canonicals pointed to Cloudflare; frozen
+root/stable retained their original GitHub Pages canonicals and <code>5344b390</code>
+identity. The maintainer then chose GitHub Pages instead of maintaining two
+hosting systems. README and newly rendered canonicals return to GitHub Pages;
+public acceptance of that return is recorded separately once the main build
+and its public verifier succeed. Prior successful checks are retained as
+experiment evidence, not claimed as acceptance of the return.</p>
               
 </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://agent-paranoid-android.pages.dev/versions/1.7.0rc1/development/documentation/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/development/documentation/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Publishing Documentation - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Publishing Documentation";
         var mkdocs_page_input_path = "development/documentation.md";
-        var mkdocs_page_url = "/versions/1.7.0rc1/development/documentation/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/development/documentation/";
       </script>
     
     <!--[if lt IE 9]>
@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 84edf346467a5b90ef7d395f54519ffa1b60afa7
+  <br>Documentation 508b39be4a2526ac1674ccb8da41780837a4cfe9
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -214,17 +214,17 @@
 
                 <h1 id="publishing-documentation">Publishing Documentation<a class="headerlink" href="#publishing-documentation" title="Permanent link">&para;</a></h1>
 <h2 id="tools-and-local-preview">Tools And Local Preview<a class="headerlink" href="#tools-and-local-preview" title="Permanent link">&para;</a></h2>
-<p>Primary hosting is <strong>Cloudflare Pages</strong>. The original GitHub Pages publication
-continues to preserve old URLs and recovery. MkDocs renders pages, <strong>mike</strong> owns
+<p>Primary hosting is <strong>GitHub Pages</strong>. MkDocs renders pages, <strong>mike</strong> owns
 version storage, aliases and the version selector, and <strong>mkdocs-print-site-plugin</strong>
 assembles the printable handbook. HTMLArk embeds its assets; Chrome prints PDF.
-See the <a href="../cloudflare-pages/">Cloudflare operator guide</a> for live production,
-preview and rollback evidence. The RTD sections below retain the earlier partial
-evaluation; they do not describe the selected primary host.</p>
-<p>Newly generated editions use the configured Cloudflare canonical URL. Retained
-historical/root/stable snapshots preserve their original HTML, identity, exports
-and GitHub Pages canonical URLs. Moving their unchanged bytes to Cloudflare does
-not relabel their documentation revision or claim a new package acceptance.</p>
+The maintainer cancelled the Cloudflare migration on 2026-11-01 because it did
+not add the managed documentation functionality sought from Read the Docs.
+The <a href="../cloudflare-pages/">Cloudflare experiment record</a> retains actual evidence;
+both Cloudflare publisher workflows are disabled in GitHub.</p>
+<p>Newly rendered editions use the configured GitHub Pages canonical URL. Retained
+historical/root/stable snapshots keep their original HTML, identity, exports and
+canonical URLs. Changing the primary host does not rewrite frozen snapshots or
+claim a new package acceptance.</p>
 <pre><code class="language-bash">uv sync --frozen --only-group docs --no-install-project
 uv run --no-sync mkdocs build --strict
 uv run --no-sync python -m scripts.build_documentation --output site --verify-release --state-bundle site.bundle
@@ -353,12 +353,14 @@ Markdown and offline-site ZIPs include both editions. Do not make language
 switches point to the unversioned production root: that would silently change
 the package version when reading an older guide.</p>
 <h2 id="hosting-decision-and-retained-rtd-evaluation">Hosting Decision And Retained RTD Evaluation<a class="headerlink" href="#hosting-decision-and-retained-rtd-evaluation" title="Permanent link">&para;</a></h2>
-<p>On 2026-11-01 the maintainer selected Cloudflare Pages for the migration.
-Continue with <a href="../cloudflare-pages/">parallel Cloudflare publication</a> and
-<code>migrate-documentation-to-cloudflare-pages</code>. The RTD material below retains
-actual experiment evidence; it is not the selected future hosting plan.</p>
+<p>GitHub Pages remains the selected primary host. The Cloudflare experiment was
+cancelled on 2026-11-01; its successful publication and recovery observations
+remain historical evidence, not a reason to maintain a second active publisher.
+RTD remains a partial evaluation, superseded without accepting its uncompleted
+hosting delta. The owner is disabling its project builds manually; retain RTD
+configuration until remote build triggers are confirmed disabled.</p>
 <h2 id="parallel-read-the-docs-preparation">Parallel Read the Docs Preparation<a class="headerlink" href="#parallel-read-the-docs-preparation" title="Permanent link">&para;</a></h2>
-<p>The active OpenSpec is <code>migrate-documentation-to-readthedocs</code>. GitHub Pages
+<p>The superseded experiment is <code>migrate-documentation-to-readthedocs</code>. GitHub Pages
 remains the accepted publication while service access and public acceptance
 are incomplete. The original connected-service failure has no confirmed cause. The maintainer
 subsequently imported the public project; native normal and PR builds now
