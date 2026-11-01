@@ -13,7 +13,7 @@ Parallel-build implementation is in progress. Hosted acceptance and switching re
 
 - [x] Add `.readthedocs.yaml` with explicit supported Python/tool versions and
   frozen docs dependencies; retain license and strict-build checks.
-- [ ] Adapt MkDocs/theme/hooks and version links, keeping package version,
+- [x] Adapt MkDocs/theme/hooks and version links, keeping package version,
   package source and documentation revision distinct.
 - [ ] Verify parallel normal-version builds and all four downloads, their
   chapter inventories, offline links and manifest hashes.
@@ -91,3 +91,32 @@ flag. The operator guide links the exact sources. Entry-page and standalone-HTML
 bytes must be tested on the actual service; individual addon toggles, a paid
 plan or an untested exception to integrity checks are not acceptance evidence.
 Account connection and the actual project URL/settings remain unverified.
+
+Native service evidence (2026-11-01): project `agent-paranoid-android` now has
+successful PR build 35554849 (PR #671, source `5e2115b0386e9d039d248a112003bd48722d1b91`)
+and normal build 35554945 (documentation source `0991058d08067284b8346a05c62944bd71131a57`).
+The rendered latest edition distinguishes package 1.7.0rc1/source `64b7c8c3bbb0174fd7e159c4dfb42312045a1716`
+from its newer documentation revision and development status. English/Russian
+navigation, both search interfaces and the retained Pages stable link work.
+This closes the rendering/identity adaptation task, not managed version mapping.
+
+PDF and both downloaded ZIP hashes matched the normal build's retained log;
+archive CRCs and all 36 chapter sources passed. Original standalone HTML inside
+the site ZIP also matched its digest and contained no service scripts. Directly
+served standalone HTML has RTD Addons and EthicalAds scripts in the browser DOM;
+HTTP verification returned 403, leaving raw served HTML/entry hashes unverified.
+The operator guide records exact URLs, identities, hashes and evidence limits.
+Do not close the four-download/public-integrity, managed-preview isolation,
+rollback or switch tasks from these partial checks. Project import and PR status
+integration are observed, but installed scopes, account limits and private-variable
+isolation still require owner-side inspection. The earlier account-unverified
+notes above describe preparation before this native evidence.
+
+Deliberate external-preview rejection: test PR #673 was closed without merge.
+Native build 35555440 at source `8056bd791e7a2adaf2e0e7b6bd81986e54fb7398`
+reached the fictional rejection and exited 17 before rendering; GitHub reported
+RTD FAILURE. Earlier test revisions failed parsing, not this runtime path.
+After failure, the API default remained latest, normal build 35554945 stayed
+successful, and browser reload retained documentation revision `0991058d08067284b8346a05c62944bd71131a57`.
+This proves the same-repository external-build rejection/status path only;
+private-variable/fork isolation and hosted recovery remain open.

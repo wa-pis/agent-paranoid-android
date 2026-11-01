@@ -131,8 +131,9 @@ the package version when reading an older guide.
 
 The active OpenSpec is `migrate-documentation-to-readthedocs`. GitHub Pages
 remains the accepted publication while service access and public acceptance
-are incomplete. The reported connected-service failure has no confirmed cause;
-no successful account connection or imported project is recorded here.
+are incomplete. The original connected-service failure has no confirmed cause. The maintainer
+subsequently imported the public project; native normal and PR builds now
+succeed. The evidence and remaining serving constraints are recorded below.
 
 ### Reuse And Host Responsibilities
 
@@ -190,17 +191,18 @@ uses `READTHEDOCS_CANONICAL_URL`, verifies `READTHEDOCS_GIT_COMMIT_HASH` against
 the checkout, and writes HTML plus downloads under `READTHEDOCS_OUTPUT/html`.
 Ubuntu browser libraries and fonts are declared through RTD's supported
 `build.apt_packages`, based on the locked Playwright Chromium dependency list;
-installation does not require an ad hoc privileged shell command. Actual service execution and build time must
-still be verified; a local build does not prove the hosted environment works.
+installation does not require an ad hoc privileged shell command. Native
+execution was confirmed by build 35554945; a successful build still does not
+prove public byte integrity or accepted version/default mappings.
 
 ### Account Setup And Acceptance Still Required
 
 The Community service documents a 15-minute build limit, 7 GB memory and two
-concurrent builds. Confirm the actual account plan before import. Owner actions
-remain: connect the GitHub integration with only the intended repository,
-inspect the exact requested permissions, import the public repository, record
-the real project URL, configure version activation/defaults, and enable PR
-checks. Do not store private environment variables or publishing credentials
+concurrent builds. Confirm the actual account plan and configured limits. The public project is
+imported and produces PR checks. Owner-only work still includes reviewing the
+installed GitHub App repository selection/permissions and private-variable
+isolation, and configuring version activation/defaults. Build success does not
+prove these settings. Do not store private environment variables or publishing credentials
 in preview builds. A paid plan, custom domain or broader repository access is
 not assumed. The documented GitHub App permissions are: read account email,
 repository contents and metadata; write commit statuses, pull requests and
@@ -243,6 +245,69 @@ References: [configuration](https://docs.readthedocs.com/platform/stable/config-
 [build limits](https://docs.readthedocs.com/platform/stable/builds.html),
 [PR previews](https://docs.readthedocs.com/platform/stable/pull-requests.html),
 [browser versions](https://playwright.dev/python/docs/browsers).
+
+### Native Service Evidence — 2026-11-01
+
+The public project is [agent-paranoid-android](https://app.readthedocs.org/projects/agent-paranoid-android/).
+[Normal build 35554945](https://app.readthedocs.org/projects/agent-paranoid-android/builds/35554945/)
+succeeded at documentation revision `0991058d08067284b8346a05c62944bd71131a57`.
+Its [latest edition](https://agent-paranoid-android.readthedocs.io/en/latest/)
+correctly identifies package `1.7.0rc1`, package source
+`64b7c8c3bbb0174fd7e159c4dfb42312045a1716`, and `Development / not stable`.
+[PR build 35554849](https://app.readthedocs.org/projects/agent-paranoid-android/builds/35554849/)
+also succeeded for PR #671 at `5e2115b0386e9d039d248a112003bd48722d1b91`.
+These are native service results, not only GitHub build simulations. PR #671
+fixed the observed `uv: not found` by invoking the installed module through
+Python; all 39 checks passed before merge.
+
+The normal build's trusted raw log retains the full `DOCS_EXPORT_MANIFEST`.
+Browser-downloaded PDF, Markdown ZIP and site ZIP matched these SHA-256 values;
+both ZIP CRC checks passed and all 36 handbook chapter sources were present:
+
+| Artifact | SHA-256 from that native build |
+| --- | --- |
+| `handbook.pdf` | `f548b04b538f665831aa095aac89dcd983bc5279e2b0ea525d440fa4e70a92a3` |
+| `handbook.md.zip` | `1781c1ceeaffba643b742851a1f299d9b6afd38eea670ceeee02bc93123ebf56` |
+| `site.zip` | `b508b3e29c379d3ee8b06909fd4f413e35392d8f299ef9f79269771f579e0e84` |
+| `handbook.html` inside `site.zip` | `1f774626a043fc099a3f9824b14518bfee218301663f7fb38836fd88c76a6389` |
+
+The archived standalone HTML matched its build digest, contained no RTD/Addons
+or EthicalAds scripts and had no broken local fragment links. The archived
+entry HTML matched `1c8010ac5c81f28c8c8226b1845d052bcfe2445d1e6b1fd52dec7b9f459f3d01`.
+This proves the downloaded archive's original files, not the direct served HTML
+bytes. The public export manifest was readable in the browser and showed the
+same identity, chapter inventory and digests.
+
+Browser checks confirmed English/Russian pages, Trino search results in both
+search interfaces, and the stable link reaching maintained 1.6.0 guidance on
+Pages. The RTD versions page still describes parallel publication; it does not
+claim a managed release catalog. RTD's automatic `stable` resolves to package
+source `258c035c22408becf17ab090635710a50dda8ccc`; builds 35554830 and 35554859
+failed before executing checkout commands. That immutable old tag must not be
+rewritten to add host configuration.
+
+The directly served standalone HTML renders, but its browser DOM includes
+`/_/static/javascript/readthedocs-addons.js` and external EthicalAds scripts
+that are absent from the archived original. Ordinary HTTP verification received
+403 before reading the public identity, so the exact served entry/HTML hashes
+remain unverified; do not claim a measured raw-byte mismatch. A browser rendering
+or a successful normal build cannot close this integrity/offline requirement.
+Community remains a parallel experiment. No paid plan, host switch, relaxed
+integrity gate, secret/fork isolation or hosted rollback is accepted by this
+evidence. A maintainer decision on a compatible hosting/plan path is needed
+before committing to managed release refs and a canonical switch.
+
+Isolated rejection rehearsal: [test PR #673](https://github.com/wa-pis/agent-paranoid-android/pull/673)
+was closed without merging. Its final source `8056bd791e7a2adaf2e0e7b6bd81986e54fb7398`
+ran [native build 35555440](https://app.readthedocs.org/projects/agent-paranoid-android/builds/35555440/),
+which reached the explicit fictional rejection and exited with code 17 before
+rendering; GitHub's RTD status was `FAILURE`. Earlier rehearsal revisions failed
+configuration/command parsing and are not evidence of that executable path.
+After the final failure, the project API still selected default `latest`, normal
+build 35554945 remained successful, and a fresh browser reload showed the same
+package/source/documentation identity. This verifies external-build refusal and
+status/default preservation for this same-repository test, not fork/private-variable
+isolation, failure after rendering, rollback or release promotion.
 
 ### Verify A Published Normal Edition Against Its Build
 

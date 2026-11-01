@@ -29,10 +29,10 @@ completed work belongs in [release history](history.md), not this list.
 - Implement Read the Docs migration while preserving verified editions, bilingual
   guides, four download formats, old links and rollback; see the
   [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-readthedocs).
-  The parallel edition builder and retained-manifest verification are prepared;
-  hosted acceptance, version mapping,
-  preview integration and rollback remain open. GitHub Pages remains the current
-  host until parallel acceptance and switch.
+  Native normal and PR builds now succeed; PDF and both ZIP downloads matched
+  their native build. Served HTML gains service scripts, so public integrity,
+  managed version mapping, preview isolation and hosted rollback remain open.
+  GitHub Pages remains the accepted host until parallel acceptance and switch.
 - Design batch-based validation of CSV, JSON and Parquet so complete datasets
   need not remain in memory. Bound cross-table key and uniqueness checks,
   preserve deterministic results and measure memory on synthetic fixtures.
