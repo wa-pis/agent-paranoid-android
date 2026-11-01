@@ -51,3 +51,11 @@ as static data, verifies bilingual/search bytes and noindex, and posts exact-hea
 statuses. Fictional tests cover fork metadata, stale/closed/ambiguous sources,
 backend rejection, false labels and modified assets. Live positive/negative and
 private-variable rehearsals are still required; the preview checkbox stays open.
+
+Recovery preparation: a derived, separate `agent-paranoid-android-recovery`
+project permits production A/B and rollback rehearsals while normal publication
+remains a migration preview. Controlled identity/hash failures affect only a
+disposable downloaded copy and are disallowed outside recovery mode. Focused
+tests bind the destination and rejection-before-upload contract. Actual hosted
+A/B, base-URL rollback and unchanged-default evidence remain required; the
+recovery checkbox stays open.

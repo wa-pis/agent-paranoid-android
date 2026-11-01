@@ -65,6 +65,26 @@ class Payload:
     editions: int
 
 
+@dataclass(frozen=True)
+class Destination:
+    project: str
+    branch: str
+
+
+def destination(project: str, run_id: int, recovery: bool = False) -> Destination:
+    """Production rehearsal is confined to a distinct, derived recovery project."""
+    selected = project + "-recovery" if recovery else project
+    if (
+        type(run_id) is not int
+        or run_id <= 0
+        or type(recovery) is not bool
+        or re.fullmatch(r"[a-z0-9]([a-z0-9-]{0,56}[a-z0-9])?", project) is None
+        or re.fullmatch(r"[a-z0-9]([a-z0-9-]{0,56}[a-z0-9])?", selected) is None
+    ):
+        raise ValueError("invalid isolated publication destination")
+    return Destination(selected, "main" if recovery else f"migration-{run_id}")
+
+
 def source_run(metadata: dict[str, Any], run_id: int) -> SourceRun:
     """Accept only the public, exact main build selected by a trusted operator."""
     expected = {
@@ -160,6 +180,24 @@ def prepare(root: Path) -> Payload:
     return Payload(files + 1, total + len(headers), len(manifests))
 
 
+def exercise_rejection(root: Path, kind: str) -> None:
+    """Corrupt only a validated disposable static copy for a rejection rehearsal."""
+    if kind not in {"identity", "hash"}:
+        raise ValueError("unsupported fictional rejection exercise")
+    static_payload(root)
+    local_edition(root)
+    if kind == "identity":
+        path = root / "documentation.json"
+        identity = json.loads(path.read_text())
+        identity["documentation_revision"] = "0" * 40
+        path.write_text(json.dumps(identity))
+    else:
+        path = root / "index.html"
+        path.write_bytes(
+            path.read_bytes() + b"\n<!-- fictional rejection rehearsal -->\n"
+        )
+
+
 def verify_attachment(url: str) -> None:
     request = Request(url, headers={"User-Agent": DOCUMENTATION_USER_AGENT})
     with urlopen(request, timeout=20) as response:
@@ -206,13 +244,27 @@ def main() -> None:
     source = sub.add_parser("source")
     source.add_argument("--metadata", type=Path, required=True)
     source.add_argument("--run-id", type=int, required=True)
+    target = sub.add_parser("target")
+    target.add_argument("--project", required=True)
+    target.add_argument("--run-id", type=int, required=True)
+    target.add_argument("--recovery", action="store_true")
+    exercise = sub.add_parser("exercise")
+    exercise.add_argument("site", type=Path)
+    exercise.add_argument("--kind", choices=("identity", "hash"), required=True)
     payload = sub.add_parser("prepare")
     payload.add_argument("site", type=Path)
     public = sub.add_parser("verify")
     public.add_argument("site", type=Path)
     public.add_argument("--url", required=True)
     args = parser.parse_args()
-    if args.command == "source":
+    if args.command == "target":
+        selected_target = destination(args.project, args.run_id, args.recovery)
+        print(
+            f"target_project={selected_target.project}\ntarget_branch={selected_target.branch}"
+        )
+    elif args.command == "exercise":
+        exercise_rejection(args.site, args.kind)
+    elif args.command == "source":
         selected = source_run(json.loads(args.metadata.read_text()), args.run_id)
         print(f"source_sha={selected.commit}")
     elif args.command == "verify":
