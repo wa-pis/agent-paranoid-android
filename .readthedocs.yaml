@@ -38,12 +38,12 @@ build:
     create_environment:
       - python -m pip install uv==0.11.23
     install:
-      - uv sync --frozen --only-group docs --no-install-project
-      - uv run --no-sync python scripts/check_dependency_licenses.py
-      - if [ "$READTHEDOCS_VERSION_TYPE" != "external" ]; then uv run --no-sync playwright install --no-shell chromium; fi
+      - python -m uv sync --frozen --only-group docs --no-install-project
+      - python -m uv run --no-sync python scripts/check_dependency_licenses.py
+      - if [ "$READTHEDOCS_VERSION_TYPE" != "external" ]; then python -m uv run --no-sync playwright install --no-shell chromium; fi
     build:
       html:
-        - uv run --no-sync python -m scripts.build_readthedocs --output "$READTHEDOCS_OUTPUT/html"
+        - python -m uv run --no-sync python -m scripts.build_readthedocs --output "$READTHEDOCS_OUTPUT/html"
 
 mkdocs:
   configuration: mkdocs.yml
