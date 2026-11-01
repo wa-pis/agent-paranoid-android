@@ -44,7 +44,7 @@ build:
     build:
       html:
         - |
-            if [ "$READTHEDOCS_VERSION_TYPE" = "external" ]; then python -c 'raise SystemExit("Fictional preview rejection: isolated failure rehearsal")'; fi
+            if [ "$READTHEDOCS_VERSION_TYPE" = "external" ]; then echo fictional-preview-rejection; exit 17; fi
         - python -m uv run --no-sync python -m scripts.build_readthedocs --output "$READTHEDOCS_OUTPUT/html"
 
 mkdocs:
