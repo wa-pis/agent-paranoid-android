@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 508b39be4a2526ac1674ccb8da41780837a4cfe9
+  <br>Documentation 0014efa4b652c26573447734330f405918d6e13b
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -223,7 +223,7 @@ are retained snapshots and are no longer the primary publication.</p>
 <p>The material below records the completed experiment, including verified
 production, isolated previews and recovery. It does not authorize re-enabling
 publication. The repository return and its public verification are tracked in
-<code>migrate-documentation-to-cloudflare-pages</code>; the migration itself is cancelled,
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-11-01-migrate-documentation-to-cloudflare-pages">cancelled change archive</a>; the migration itself is cancelled,
 not completed. No paid plan, custom domain, DNS change or package release is
 required to return to GitHub Pages.</p>
 <h2 id="build-and-trust-boundary">Build And Trust Boundary<a class="headerlink" href="#build-and-trust-boundary" title="Permanent link">&para;</a></h2>
@@ -537,6 +537,15 @@ hosting systems. README and newly rendered canonicals return to GitHub Pages;
 public acceptance of that return is recorded separately once the main build
 and its public verifier succeed. Prior successful checks are retained as
 experiment evidence, not claimed as acceptance of the return.</p>
+<p>The return was accepted after <a href="https://github.com/wa-pis/agent-paranoid-android/pull/683">PR #683</a>
+merged as main <code>508b39be</code> and <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41336088977">Documentation 41336088977</a>
+passed build, GitHub Pages deployment, same-build public verification and mike
+retention. All five public edition canonicals point to GitHub Pages. Independent
+public reads also confirmed Russian entry pages and bilingual search (786 search
+records for stable, 823 for candidate/next). Stable root/aliases keep <code>5344b390</code>;
+candidate/next carry <code>508b39be</code>. Both Cloudflare workflows were rechecked as
+<code>disabled_manually</code> after merge. The proposed Cloudflare requirements were not
+added to the baseline. RTD build retirement remains manual owner follow-up.</p>
               
 </div>
 
