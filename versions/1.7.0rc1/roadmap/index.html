@@ -215,7 +215,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 43e917593140a58364bb760323c592ebef54191d
+  <br>Documentation 75dff820ba001ca612b684609105cd90112b7b98
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -250,7 +250,8 @@ completed work belongs in <a href="../history/">release history</a>, not this li
   guides, four download formats, old links and rollback; see the
   <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages">OpenSpec</a>.
   The first Cloudflare parallel upload passed exact-byte checks for all five retained editions and four downloads.
-  Isolated PR previews are being implemented; hosted rollback and the canonical switch remain open.
+  Isolated PR success/failure and private-variable absence are verified. A separate recovery project passed
+  real A/B rollback and identity/hash rejection with unchanged defaults. The canonical switch and final cleanup remain open.
   RTD evaluation is retained as partial evidence. Native normal and PR builds succeeded; PDF and both ZIP downloads matched
   their native build. Served HTML gains service scripts, so public integrity,
   managed version mapping, preview isolation and hosted rollback remain open.

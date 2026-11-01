@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 43e917593140a58364bb760323c592ebef54191d
+  <br>Documentation 75dff820ba001ca612b684609105cd90112b7b98
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -444,6 +444,39 @@ retained <code>e885a63d</code> preview exactly. Reverification passed all five n
 Cloudflare editions against retained build 41286373400 and the accepted GitHub
 Pages stable default. PR #678 was closed without merging. These are actual
 success/failure/default-preservation observations, not just workflow simulations.</p>
+<h2 id="live-hosted-recovery-evidence-2026-11-01">Live Hosted Recovery Evidence (2026-11-01)<a class="headerlink" href="#live-hosted-recovery-evidence-2026-11-01" title="Permanent link">&para;</a></h2>
+<p>The recovery project has production branch <code>main</code>, no Git connection, and a
+separate production base <code>https://agent-paranoid-android-recovery.pages.dev/</code>.
+Normal project production remained empty throughout this rehearsal.</p>
+<ul>
+<li>A: <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324897408">publisher 41324897408</a>
+  accepted source 41286373400 and deployed <code>bc8969bc</code>. Its candidate/next
+  documentation revision is <code>3c03ccca</code>. Both the immutable URL and the recovery
+  production base passed all five same-build edition/download checks.</li>
+<li>B: <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325086334">publisher 41325086334</a>
+  accepted source 41319731486 and deployed <code>eec2c87d</code>. Its candidate/next
+  documentation revision is <code>b99b7c8c</code>. The production base was demonstrably B,
+  not A, and passed all five checks against B's retained artifact. Root stable
+  retained documentation <code>5344b390</code> in both builds; checking root alone would
+  have missed the change.</li>
+<li>Cloudflare's real rollback control restored production to A/<code>bc8969bc</code>.
+  The production base's candidate identity changed back to A and differed from
+  B. All five editions, exact manifests/entries, all four exports and standalone
+  HTML attachment headers passed again against retained A.</li>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325547847">Identity rejection 41325547847</a>
+  and <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325550670">hash rejection 41325550670</a>
+  deliberately changed disposable B artifact copies. Each failed at the existing
+  static/provenance/hash preflight with the expected reason; project creation
+  and credentialed upload steps were skipped. After both refusals, the recovery
+  production base still passed all five A edition/download checks.</li>
+</ul>
+<p>A dashboard check then confirmed the normal project still said <strong>No production
+deployment yet</strong>, with only its two migration previews. The accepted GitHub Pages
+stable default had already passed unchanged after the failed PR rehearsal.
+The native mike selector was exercised on Cloudflare: selecting <code>1.7.0rc1</code> from
+<code>versions/stable/</code> opened that candidate on the same Cloudflare deployment,
+showing its explicit candidate label and <code>3c03ccca</code> identity. No normal-project
+production or canonical switch is implied by these recovery results.</p>
               
 </div>
 
