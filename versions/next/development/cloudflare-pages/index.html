@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 013adf428a73120481a0f7fbd863cd5808d97c0c
+  <br>Documentation 3292714b821cb5803c072b43b9eb87a82d681cd3
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -234,7 +234,7 @@ directory. Site artifacts are data: symlinks, Worker/Functions entrypoints and
 host/tool configuration are rejected. All local edition/entry/export hashes are
 checked before upload. Credential access belongs only to the pinned Cloudflare
 action steps; no PR source is checked out or run with that credential.</p>
-<p>Initial uploads always use <code>migration-RUN_ID</code>, never the production branch.
+<p>Normal parallel uploads always use <code>migration-RUN_ID</code>, never the production branch.
 The payload adds only <code>_headers</code>: noindex for parallel publication and attachment
 headers for standalone HTML, covering both <code>.html</code> and Cloudflare's extensionless
 paths at root and in version directories. Page/export bytes and recorded hashes
@@ -245,8 +245,8 @@ this is a local payload result, not evidence of a Cloudflare upload.</p>
 <p>Use an existing Cloudflare account. Create a Pages Direct Upload project with
 production branch <code>main</code>, or choose <code>create_project=true</code> on the first workflow
 run to create it through the reviewed uploader. Do not select Git integration
-for this project. A project name and actual <code>pages.dev</code> addresses are not yet
-assumed available.</p>
+for this project. The observed normal project is <code>agent-paranoid-android</code>; its parallel deployment
+addresses are recorded below.</p>
 <p>Create the GitHub environment <code>cloudflare-pages-preview</code>, restricted to main.
 Configure these values in that environment:</p>
 <table>
@@ -298,9 +298,9 @@ not need to read its value.</p>
 <li>A failed check leaves the accepted GitHub Pages site and canonical links
    unchanged. Uploading a parallel branch is not production promotion.</li>
 </ol>
-<p>The first workflow does not implement automatic PR publishing, managed production
-promotion, canonical replacement or hosted rollback. Those remain required tasks
-in the active OpenSpec. Existing RTD/GitHub Pages resources are retained until
+<p>The first workflow does not implement managed normal-project production
+promotion or canonical replacement. Separate PR publication and isolated recovery
+controls are described below; their live acceptance remains required. Existing RTD/GitHub Pages resources are retained until
 equivalent Cloudflare functionality and recovery are verified.</p>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ul>
@@ -373,6 +373,37 @@ preview UI checks and normal-default preservation must still be recorded before
 closing the preview task. See GitHub's
 <a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows">workflow event reference</a>
 and <a href="https://docs.github.com/en/actions/reference/security/secure-use">secure-use reference</a>.</p>
+<h2 id="isolated-hosted-recovery-rehearsal">Isolated Hosted Recovery Rehearsal<a class="headerlink" href="#isolated-hosted-recovery-rehearsal" title="Permanent link">&para;</a></h2>
+<p>The separate Direct Upload project <code>agent-paranoid-android-recovery</code> is reserved
+for recovery tests. In the manual workflow, <code>recovery=true</code> derives this name
+from the configured normal project and selects branch <code>main</code> only in that
+separate project. The default remains <code>recovery=false</code>: a normal-project
+<code>migration-RUN_ID</code> preview. No free-form project or production-branch input is
+accepted. The account-scoped Pages token already covers this project; no new
+permissions or private variables are required.</p>
+<p>Choose two successful main Documentation runs with retained artifacts and
+different candidate documentation revisions. Publish A and then B with
+<code>recovery=true</code>, leaving <code>rejection=none</code>. Both uploads must pass every edition's
+same-build verification. Confirm the recovery project's production base URL
+serves B, including its candidate identity; root stable alone may be identical
+between the two builds and cannot establish which deployment is active.</p>
+<p>Use Cloudflare's Deployments rollback control to restore the successful A
+production deployment. Verify the recovery <strong>production base URL</strong>, not A's
+immutable deployment URL, against A's retained artifact across all editions and
+all four exports. Cloudflare permits rollback only to successful production
+deployments; preview deployments are not rollback targets.</p>
+<p>For controlled failures, repeat the manual workflow with <code>recovery=true</code> and
+<code>rejection=identity</code>, then <code>rejection=hash</code>. These choices alter only the freshly
+downloaded disposable artifact copy: an identity mismatch or a fictional entry
+comment must fail the existing provenance/hash gate before uploader execution.
+They cannot be selected for normal publication. After each failure, verify the
+same known-good recovery production base against A again, and check the normal
+project/default and accepted GitHub Pages publication remain unchanged.</p>
+<p>These controls and their fictional tests prepare a rehearsal; they do not prove
+that a hosted rollback or rejected deployment has occurred. Record the actual
+run IDs, A/B identities, rollback result and unchanged-default checks before
+closing the recovery task. This does not authorize a normal-project production
+or canonical switch.</p>
               
 </div>
 
