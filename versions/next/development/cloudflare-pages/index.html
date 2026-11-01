@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/development/cloudflare-pages/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Parallel Cloudflare Pages Publication - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Parallel Cloudflare Pages Publication";
+        var mkdocs_page_input_path = "development/cloudflare-pages.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/development/cloudflare-pages/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Parallel Cloudflare Pages Publication</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/development/cloudflare-pages.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
+  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
+  <br>Documentation 3c03ccca95f430e928cd0e6af254e62d31043966
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="parallel-cloudflare-pages-publication">Parallel Cloudflare Pages Publication<a class="headerlink" href="#parallel-cloudflare-pages-publication" title="Permanent link">&para;</a></h1>
+<p>The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
+experiment. The active change is
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages"><code>migrate-documentation-to-cloudflare-pages</code></a>.
+This is preparation for a parallel deployment, not a completed hosting switch.
+GitHub Pages remains accepted. No paid plan, custom domain, DNS change, package
+release or tag rewrite is required by this implementation.</p>
+<h2 id="build-and-trust-boundary">Build And Trust Boundary<a class="headerlink" href="#build-and-trust-boundary" title="Permanent link">&para;</a></h2>
+<p>Keep the existing strict GitHub <code>Documentation</code> workflow, frozen Python/docs
+packages, Chromium PDF exporter, release verification, mike editions and retained
+rendered artifacts. Cloudflare receives prebuilt assets through Direct Upload;
+it does not need to run the Python build or receive private source data.</p>
+<p><code>Cloudflare documentation parallel acceptance</code> runs manually from main only.
+Its source-run gate requires a completed successful main-push run of
+<code>.github/workflows/docs.yml</code> in this repository, binds the exact source SHA and
+then downloads only that run's <code>documentation-site</code> artifact. PR, fork, failed,
+running and unrelated workflow sources are rejected before publication.</p>
+<p>The uploader executes only trusted main deployment code in an empty working
+directory. Site artifacts are data: symlinks, Worker/Functions entrypoints and
+host/tool configuration are rejected. All local edition/entry/export hashes are
+checked before upload. Credential access belongs only to the pinned Cloudflare
+action steps; no PR source is checked out or run with that credential.</p>
+<p>Initial uploads always use <code>migration-RUN_ID</code>, never the production branch.
+The payload adds only <code>_headers</code>: noindex for parallel publication and attachment
+headers for standalone HTML, covering both <code>.html</code> and Cloudflare's extensionless
+paths at root and in version directories. Page/export bytes and recorded hashes
+are preserved. The Free-plan preflight uses 20,000 files and 25 MiB per asset.
+A retained real site passed with 1,212 files, 91,676,529 bytes and five editions;
+this is a local payload result, not evidence of a Cloudflare upload.</p>
+<h2 id="owner-setup">Owner Setup<a class="headerlink" href="#owner-setup" title="Permanent link">&para;</a></h2>
+<p>Use an existing Cloudflare account. Create a Pages Direct Upload project with
+production branch <code>main</code>, or choose <code>create_project=true</code> on the first workflow
+run to create it through the reviewed uploader. Do not select Git integration
+for this project. A project name and actual <code>pages.dev</code> addresses are not yet
+assumed available.</p>
+<p>Create the GitHub environment <code>cloudflare-pages-preview</code>, restricted to main.
+Configure these values in that environment:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Kind</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLOUDFLARE_ACCOUNT_ID</code></td>
+<td>Variable</td>
+<td>The selected account's 32-character ID</td>
+</tr>
+<tr>
+<td><code>CLOUDFLARE_PAGES_PROJECT</code></td>
+<td>Variable</td>
+<td>The chosen Direct Upload project name</td>
+</tr>
+<tr>
+<td><code>CLOUDFLARE_API_TOKEN</code></td>
+<td>Secret</td>
+<td>Scoped Cloudflare API token described below</td>
+</tr>
+</tbody>
+</table>
+<p>The official Direct Upload integration requires <strong>Account → Cloudflare Pages →
+Edit</strong>, limited to the intended account. This is an account-wide Pages permission;
+it must not be described as limited to one project. Use a dedicated token and
+revoke it when no longer needed. The token does not need DNS, zone, Worker/KV/R2
+or repository administration permissions. The owner must review the actual
+permission screen before creating it. Never paste the token into chat, a file,
+workflow input, repository variable, command history or screenshot. Transfer it
+directly from Cloudflare to the named GitHub environment secret; the agent does
+not need to read its value.</p>
+<h2 id="first-parallel-deployment">First Parallel Deployment<a class="headerlink" href="#first-parallel-deployment" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Select a successful main <code>Documentation</code> run with a retained, unexpired
+   <code>documentation-site</code> artifact. Run 41284167968 is an observed example at
+   <code>2ea24cfebc74356c53c0117ca094ee9d60961cb9</code>, not a permanent default source.</li>
+<li>Run <code>Cloudflare documentation parallel acceptance</code> from main with that numeric
+   <code>source_run_id</code>. Select <code>create_project</code> only for the first project creation.</li>
+<li>Inspect the returned immutable deployment URL. The verifier retains the mike
+   stable alias/destination gate, compares each edition's public identity,
+   chapter/manifest inventory, exact entry bytes and all four exports against
+   that same downloaded build, and requires HTML attachment headers.</li>
+<li>A failed check leaves the accepted GitHub Pages site and canonical links
+   unchanged. Uploading a parallel branch is not production promotion.</li>
+</ol>
+<p>The first workflow does not implement automatic PR publishing, managed production
+promotion, canonical replacement or hosted rollback. Those remain required tasks
+in the active OpenSpec. Existing RTD/GitHub Pages resources are retained until
+equivalent Cloudflare functionality and recovery are verified.</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/">Direct Upload with CI</a></li>
+<li><a href="https://developers.cloudflare.com/pages/platform/limits/">Asset limits</a></li>
+<li><a href="https://developers.cloudflare.com/pages/configuration/headers/">Static response headers</a></li>
+<li><a href="https://developers.cloudflare.com/pages/configuration/preview-deployments/">Preview deployments</a></li>
+<li><a href="https://developers.cloudflare.com/pages/configuration/rollbacks/">Rollback</a></li>
+</ul>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
