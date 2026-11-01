@@ -106,8 +106,8 @@ def on_page_markdown(markdown, page, config, files):
         and page.file.src_uri.removeprefix("ru/") == "versions.md"
     ):
         if page.file.src_uri.startswith("ru/"):
-            return "# Параллельная публикация\n\nЭта редакция собрана для Read the Docs и ещё не заменяет принятую публикацию. Выбор управляемых редакций требует настройки проекта сервиса.\n\n[Принятая стабильная версия и сохранённые редакции](https://wa-pis.github.io/agent-paranoid-android/versions/stable/)\n"
-        return "# Parallel publication\n\nThis Read the Docs edition does not replace the accepted publication. Managed edition selection requires service project setup.\n\n[Accepted stable guide and retained editions](https://wa-pis.github.io/agent-paranoid-android/versions/stable/)\n"
+            return "# Параллельная публикация\n\nЭта редакция собрана отдельно и ещё не заменяет принятую публикацию. Выбор управляемых редакций требует настройки проекта сервиса.\n\n[Принятая стабильная версия и сохранённые редакции](https://wa-pis.github.io/agent-paranoid-android/versions/stable/)\n"
+        return "# Parallel publication\n\nThis parallel edition does not replace the accepted publication. Managed edition selection requires service project setup.\n\n[Accepted stable guide and retained editions](https://wa-pis.github.io/agent-paranoid-android/versions/stable/)\n"
     if (
         config.extra.get("host_preview")
         and page.file.src_uri.removeprefix("ru/") == "downloads.md"

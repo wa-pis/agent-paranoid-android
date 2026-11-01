@@ -16,7 +16,7 @@ acceptance remains incomplete.
   setup without exposing credentials; record real URLs and service limits.
 - [ ] Verify stable/candidate/development/historical mapping and faithful retained
   editions, bilingual navigation/search, old links/anchors and all four downloads.
-- [ ] Add isolated PR preview publication/statuses; verify success, deliberate
+- [x] Add isolated PR preview publication/statuses; verify success, deliberate
   failure, noindex/labels and absence of private variables/publication rights in PR code.
 - [ ] Rehearse hosted rollback and failed build/identity/hash/default preservation.
 - [ ] Switch canonical/default publication only after full acceptance; preserve
@@ -59,3 +59,14 @@ disposable downloaded copy and are disallowed outside recovery mode. Focused
 tests bind the destination and rejection-before-upload contract. Actual hosted
 A/B, base-URL rollback and unchanged-default evidence remain required; the
 recovery checkbox stays open.
+
+Live preview acceptance: PR #678 source 41323969881 at `e885a63d` passed the
+boolean-only absence observation and exact-byte/noindex bilingual verification
+at `e9c20db0.agent-paranoid-android-previews.pages.dev`. Deliberately failed source
+41324502142 at `be96b6da` produced exact-head failure through publisher
+41324670213, whose credentialed publication job was skipped. The previous
+`pr-678` preview remained byte-identical; all five normal Cloudflare editions
+and the accepted GitHub Pages stable default reverified unchanged. The test PR
+was closed without merging. Fork behavior is covered by fictional metadata tests,
+not a live fork rehearsal. PR #677 passed every applicable CI check and merged;
+its recovery controls are ready for hosted A/B acceptance, which remains open.

@@ -199,3 +199,50 @@ that a hosted rollback or rejected deployment has occurred. Record the actual
 run IDs, A/B identities, rollback result and unchanged-default checks before
 closing the recovery task. This does not authorize a normal-project production
 or canonical switch.
+
+
+## Live Preview And Link Evidence (2026-11-01)
+
+[PR #677](https://github.com/wa-pis/agent-paranoid-android/pull/677) produced a
+successful exact-head preview for `d439b5d5` through
+[publisher 41323969006](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41323969006)
+at [deployment 1a1ca15f](https://1a1ca15f.agent-paranoid-android-previews.pages.dev/).
+A browser confirmed its visible non-stable banner and edition-local Trino search.
+
+The disposable [PR #678](https://github.com/wa-pis/agent-paranoid-android/pull/678)
+then built fictional bilingual markers at `e885a63d`. Its
+[source run 41323969881](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41323969881)
+passed a separate observation job with no source checkout: checks reported only
+that the environment-scoped token and all three publication variables were absent;
+no values were printed. The actual preview job still has no secret expressions,
+publication environment or publication rights. The source run succeeded and its
+exact-head `docs/cloudflare-preview` status linked to
+[deployment e9c20db0](https://e9c20db0.agent-paranoid-android-previews.pages.dev/).
+An independent public verification against that run's retained artifact passed
+identity, bilingual entry/search bytes and noindex. The browser displayed the
+fictional marker and exact source SHA. This is a same-repository rehearsal;
+fork provenance rejection/acceptance is covered by fictional metadata tests,
+not claimed as a live fork run.
+
+On the accepted parallel normal deployment `1641144a`, 30 additional public
+files matched retained build 41286373400 exactly: Russian entries, English and
+Russian configuration/Trino pages, and search indices for all five editions.
+English `#trino-connection` and existing localized configuration heading anchors
+were retained. Each search index included Russian records and only relative
+edition-local locations (root/stable: 786 records, 355 Russian; candidate/next:
+816 records, 355 Russian). The current `next` is the RC copy alias while the
+package source remains 1.7.0rc1; it is not presented as a separate development
+release. Native mike's development mapping remains covered by standard-plugin
+tests, and no unverified stable version was added.
+
+
+At `be96b6da`, the same disposable PR deliberately failed its preview source step
+after rendering. [Source 41324502142](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324502142)
+failed while its strict normal build and boolean isolation observation passed.
+[Publisher 41324670213](https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324670213)
+validated the current head, posted `docs/cloudflare-preview=failure`, and skipped
+the credentialed upload job. The prior `pr-678` branch alias still matched the
+retained `e885a63d` preview exactly. Reverification passed all five normal
+Cloudflare editions against retained build 41286373400 and the accepted GitHub
+Pages stable default. PR #678 was closed without merging. These are actual
+success/failure/default-preservation observations, not just workflow simulations.

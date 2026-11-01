@@ -167,6 +167,8 @@ def test_actual_host_build_identity_search_and_downloads(source, tmp_path, previ
     )
     assert not (output / "versions/versions.json").exists()
     assert "Parallel publication" in (output / "versions/index.html").read_text()
+    assert "This parallel edition" in (output / "versions/index.html").read_text()
+    assert "This Read the Docs edition" not in (output / "versions/index.html").read_text()
     page = BeautifulSoup((output / "index.html").read_text(), "html.parser")
     assert page.select_one('link[rel="canonical"]')["href"] == selected.canonical_url
     assert page.select_one('meta[name="robots"]')["content"] == "noindex"
