@@ -10,9 +10,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
-from scripts.verify_documentation import EXPORT_NAMES, verify, verify_edition
+from scripts.verify_documentation import (
+    DOCUMENTATION_USER_AGENT,
+    EXPORT_NAMES,
+    verify,
+    verify_edition,
+)
 
 MAX_FILES = 20_000
 MAX_FILE_BYTES = 25 * 1024 * 1024
@@ -150,7 +155,8 @@ def prepare(root: Path) -> Payload:
 
 
 def verify_attachment(url: str) -> None:
-    with urlopen(url, timeout=20) as response:
+    request = Request(url, headers={"User-Agent": DOCUMENTATION_USER_AGENT})
+    with urlopen(request, timeout=20) as response:
         if (
             urlsplit(response.url).scheme != "https"
             or response.headers.get_content_disposition() != "attachment"
