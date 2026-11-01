@@ -6,9 +6,9 @@ All notable changes to this project are documented here.
 
 ### Changed
 
-- Versioned documentation is published on Cloudflare Pages with isolated PR
-  previews and the existing four offline formats. Original GitHub Pages links
-  remain available; retained historical guides keep their original identities.
+- Keep GitHub Pages as the primary documentation host after the Cloudflare
+  experiment; retain versioned guidance, four offline formats and historical
+  documentation identities.
 
 ### Fixed
 

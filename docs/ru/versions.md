@@ -4,7 +4,7 @@
 
 Default site содержит поддерживаемую документацию для последнего публично проверенного stable package. Banner различает версию/source пакета и documentation revision; исправления текста не считаются повторной проверкой package commit.
 
-Откройте [stable selector](https://agent-paranoid-android.pages.dev/versions/stable/) и выберите доступную версию. Mike хранит version directories, stable alias и отдельные search indexes. Старые guides автоматически сегодняшним текстом не пересобираются.
+Откройте [stable selector](https://wa-pis.github.io/agent-paranoid-android/versions/stable/) и выберите доступную версию. Mike хранит version directories, stable alias и отдельные search indexes. Старые guides автоматически сегодняшним текстом не пересобираются.
 
 Русская версия находится внутри той же выбранной версии сайта: /ru/ либо /versions/X.Y.Z/ru/. Переключатель языка сохраняет страницу, а не переводит на другой package release. Если перевода нет, ссылка явно ведёт на главную другого языка.
 

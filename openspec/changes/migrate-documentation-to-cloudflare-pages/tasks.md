@@ -1,6 +1,7 @@
 # Tasks: migrate-documentation-to-cloudflare-pages
 
-The maintainer selected Cloudflare on 2026-11-01. RTD evaluation is retained as
+Status: cancelled by the maintainer on 2026-11-01; return to GitHub Pages selected.
+The historical maintainer choice was Cloudflare on 2026-11-01. RTD evaluation is retained as
 partial evidence, not a completed/archived migration. Account existence is
 confirmed; the Direct Upload project and owner-installed GitHub secret are now
 configured. Live upload/verification evidence is scoped below; full migration
@@ -103,3 +104,23 @@ GitHub Pages canonical URLs. Native mike tests exercise the host change and exac
 stable-byte preservation. Public verification of that new canonical build and
 project-specific RTD trigger cleanup remain required; the combined switch task
 and final baseline/archive task stay open.
+
+
+## Owner-Directed Return (2026-11-01)
+
+The migration is cancelled, not successfully completed. Prior completed tasks
+remain evidence; unfinished Cloudflare acceptance/baseline tasks above are no
+longer the intended destination and their delta must not be applied on archival.
+
+- [x] Record the owner decision to keep GitHub Pages primary.
+- [x] Disable both Cloudflare publisher workflows in GitHub; API confirmed
+  `disabled_manually` for normal production and PR previews. Preserve projects,
+  deployments and secret values without reading or deleting them.
+- [ ] Restore README and new-edition canonical URLs to GitHub Pages through a
+  checked exact-SHA protected merge; retain native mike and frozen edition bytes.
+- [ ] Verify the actual successful main Documentation publication, public
+  identities/exports, new GitHub Pages canonical and old stable preservation.
+- [ ] Reconcile baseline/operator/roadmaps with the final owner decision and
+  archive cancelled Cloudflare/superseded RTD proposals without their unaccepted
+  host-specific deltas. RTD project-build cleanup is manual owner work; do not
+  claim it occurred or remove RTD config before confirmation.

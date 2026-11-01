@@ -1,7 +1,9 @@
 # Change Proposal: migrate-documentation-to-readthedocs
 
 Status: hosting choice superseded on 2026-11-01 by
-`migrate-documentation-to-cloudflare-pages`; partial evidence is retained.
+`migrate-documentation-to-cloudflare-pages`; that migration was then cancelled
+by the maintainer in favor of keeping GitHub Pages. Partial evidence is retained;
+uncompleted RTD hosting requirements are not accepted into the baseline.
 
 ## Why
 
