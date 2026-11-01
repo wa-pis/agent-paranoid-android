@@ -1,5 +1,8 @@
 # Change Proposal: migrate-documentation-to-readthedocs
 
+Status: hosting choice superseded on 2026-11-01 by
+`migrate-documentation-to-cloudflare-pages`; partial evidence is retained.
+
 ## Why
 
 GitHub Pages currently hosts our MkDocs/mike/Actions documentation pipeline.

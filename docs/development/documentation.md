@@ -127,6 +127,13 @@ Markdown and offline-site ZIPs include both editions. Do not make language
 switches point to the unversioned production root: that would silently change
 the package version when reading an older guide.
 
+## Hosting Decision And Retained RTD Evaluation
+
+On 2026-11-01 the maintainer selected Cloudflare Pages for the migration.
+Continue with [parallel Cloudflare publication](cloudflare-pages.md) and
+`migrate-documentation-to-cloudflare-pages`. The RTD material below retains
+actual experiment evidence; it is not the selected future hosting plan.
+
 ## Parallel Read the Docs Preparation
 
 The active OpenSpec is `migrate-documentation-to-readthedocs`. GitHub Pages
