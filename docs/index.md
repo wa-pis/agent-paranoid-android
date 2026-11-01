@@ -87,3 +87,6 @@ metadata, never raw PII, secrets or source rows. See the
 For offline reading use [Downloads](downloads.md). For another release use
 [Documentation Versions](versions.md). Maintainer and release records live in
 [History And Maintenance](history.md).
+
+
+Fictional Cloudflare preview rehearsal: synthetic documentation marker.
