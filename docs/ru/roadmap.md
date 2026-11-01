@@ -15,10 +15,10 @@
 
 ## Далее
 
-- Выполнить переход на Read the Docs с сохранением проверенных версий,
+- Выполнить выбранный переход на Cloudflare Pages с сохранением проверенных версий,
   двух языков, четырёх форматов скачивания, прежних ссылок и отката; см.
-  [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-readthedocs).
-  Сборки normal и PR на самом RTD уже успешны; PDF и оба ZIP совпали со своей
+  [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
+  Результаты проверки RTD сохранены. Сборки normal и PR на RTD успешны; PDF и оба ZIP совпали со своей
   сборкой. В открываемый HTML сервис добавляет скрипты, поэтому проверка
   целостности публичного HTML, управляемые версии, изоляция превью и откат
   ещё не завершены. До приёмки основной хостинг остаётся на GitHub Pages.

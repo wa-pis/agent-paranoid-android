@@ -1,6 +1,8 @@
 # Tasks: migrate-documentation-to-readthedocs
 
-Parallel-build implementation is in progress. Hosted acceptance and switching remain open.
+Hosting choice superseded on 2026-11-01 by the maintainer-selected
+`migrate-documentation-to-cloudflare-pages`. Keep the partial evidence below;
+this migration is not complete and is not archived as completed.
 
 ## Compatibility and setup
 

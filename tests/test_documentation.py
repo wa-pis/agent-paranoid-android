@@ -493,6 +493,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
         "migrate-documentation-to-readthedocs",
+        "migrate-documentation-to-cloudflare-pages",
     }
 
 
