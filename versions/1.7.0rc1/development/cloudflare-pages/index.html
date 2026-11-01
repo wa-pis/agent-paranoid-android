@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 3292714b821cb5803c072b43b9eb87a82d681cd3
+  <br>Documentation 43e917593140a58364bb760323c592ebef54191d
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -404,6 +404,46 @@ that a hosted rollback or rejected deployment has occurred. Record the actual
 run IDs, A/B identities, rollback result and unchanged-default checks before
 closing the recovery task. This does not authorize a normal-project production
 or canonical switch.</p>
+<h2 id="live-preview-and-link-evidence-2026-11-01">Live Preview And Link Evidence (2026-11-01)<a class="headerlink" href="#live-preview-and-link-evidence-2026-11-01" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/pull/677">PR #677</a> produced a
+successful exact-head preview for <code>d439b5d5</code> through
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41323969006">publisher 41323969006</a>
+at <a href="https://1a1ca15f.agent-paranoid-android-previews.pages.dev/">deployment 1a1ca15f</a>.
+A browser confirmed its visible non-stable banner and edition-local Trino search.</p>
+<p>The disposable <a href="https://github.com/wa-pis/agent-paranoid-android/pull/678">PR #678</a>
+then built fictional bilingual markers at <code>e885a63d</code>. Its
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41323969881">source run 41323969881</a>
+passed a separate observation job with no source checkout: checks reported only
+that the environment-scoped token and all three publication variables were absent;
+no values were printed. The actual preview job still has no secret expressions,
+publication environment or publication rights. The source run succeeded and its
+exact-head <code>docs/cloudflare-preview</code> status linked to
+<a href="https://e9c20db0.agent-paranoid-android-previews.pages.dev/">deployment e9c20db0</a>.
+An independent public verification against that run's retained artifact passed
+identity, bilingual entry/search bytes and noindex. The browser displayed the
+fictional marker and exact source SHA. This is a same-repository rehearsal;
+fork provenance rejection/acceptance is covered by fictional metadata tests,
+not claimed as a live fork run.</p>
+<p>On the accepted parallel normal deployment <code>1641144a</code>, 30 additional public
+files matched retained build 41286373400 exactly: Russian entries, English and
+Russian configuration/Trino pages, and search indices for all five editions.
+English <code>#trino-connection</code> and existing localized configuration heading anchors
+were retained. Each search index included Russian records and only relative
+edition-local locations (root/stable: 786 records, 355 Russian; candidate/next:
+816 records, 355 Russian). The current <code>next</code> is the RC copy alias while the
+package source remains 1.7.0rc1; it is not presented as a separate development
+release. Native mike's development mapping remains covered by standard-plugin
+tests, and no unverified stable version was added.</p>
+<p>At <code>be96b6da</code>, the same disposable PR deliberately failed its preview source step
+after rendering. <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324502142">Source 41324502142</a>
+failed while its strict normal build and boolean isolation observation passed.
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324670213">Publisher 41324670213</a>
+validated the current head, posted <code>docs/cloudflare-preview=failure</code>, and skipped
+the credentialed upload job. The prior <code>pr-678</code> branch alias still matched the
+retained <code>e885a63d</code> preview exactly. Reverification passed all five normal
+Cloudflare editions against retained build 41286373400 and the accepted GitHub
+Pages stable default. PR #678 was closed without merging. These are actual
+success/failure/default-preservation observations, not just workflow simulations.</p>
               
 </div>
 
