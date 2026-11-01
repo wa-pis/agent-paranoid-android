@@ -1,7 +1,7 @@
 strict: true
 site_name: Agent Paranoid Android
 site_description: Reproducible synthetic test data for CSV and database workflows
-site_url: https://agent-paranoid-android.pages.dev/
+site_url: https://wa-pis.github.io/agent-paranoid-android/
 repo_url: https://github.com/wa-pis/agent-paranoid-android
 repo_name: wa-pis/agent-paranoid-android
 edit_uri: edit/main/docs/

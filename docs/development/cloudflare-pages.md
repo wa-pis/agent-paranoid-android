@@ -1,14 +1,19 @@
 # Cloudflare Pages Publication
 
-The maintainer selected Cloudflare Pages on 2026-11-01 after the RTD Community
-experiment. The active change is
-[`migrate-documentation-to-cloudflare-pages`](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
-The normal production base is verified at
-<https://agent-paranoid-android.pages.dev/>. GitHub Pages continues publishing
-for existing links and recovery. The canonical/link switch and retirement of
-project-specific RTD automation are tracked separately below; migration archival
-waits for their completion. No paid plan, custom domain, DNS change, package
-release or tag rewrite is required by this implementation.
+**Status: cancelled by the maintainer on 2026-11-01; GitHub Pages is the selected
+primary host.** Cloudflare served the same MkDocs site and did not add managed
+Read the Docs functionality. Both `Cloudflare documentation` and `Cloudflare
+documentation PR preview` workflows were set to `disabled_manually` in GitHub.
+They do not automatically publish normal editions or PR previews. Projects,
+deployments and credentials were not deleted or read. Existing Cloudflare URLs
+are retained snapshots and are no longer the primary publication.
+
+The material below records the completed experiment, including verified
+production, isolated previews and recovery. It does not authorize re-enabling
+publication. The repository return and its public verification are tracked in
+`migrate-documentation-to-cloudflare-pages`; the migration itself is cancelled,
+not completed. No paid plan, custom domain, DNS change or package release is
+required to return to GitHub Pages.
 
 ## Build And Trust Boundary
 
@@ -333,3 +338,17 @@ when a new edition is rendered. GitHub Pages keeps the same retained tree for
 old links and recovery. Project-specific RTD automation must be disabled before
 its configuration is removed; this owner-session cleanup remains outstanding.
 No package release or stable catalog promotion occurs in this step.
+
+
+## Return To GitHub Pages
+
+The last Cloudflare canonical build was Documentation 41334153435 at
+`84edf346467a5b90ef7d395f54519ffa1b60afa7`, published successfully by 41334341512
+to `1a52d73d`. Immutable and production-base checks passed all five editions and
+four exports. Public candidate/next canonicals pointed to Cloudflare; frozen
+root/stable retained their original GitHub Pages canonicals and `5344b390`
+identity. The maintainer then chose GitHub Pages instead of maintaining two
+hosting systems. README and newly rendered canonicals return to GitHub Pages;
+public acceptance of that return is recorded separately once the main build
+and its public verifier succeed. Prior successful checks are retained as
+experiment evidence, not claimed as acceptance of the return.

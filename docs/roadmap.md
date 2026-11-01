@@ -26,18 +26,14 @@ completed work belongs in [release history](history.md), not this list.
 
 ## Next
 
-- Implement the maintainer-selected Cloudflare Pages migration while preserving verified editions, bilingual
-  guides, four download formats, old links and rollback; see the
-  [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/migrate-documentation-to-cloudflare-pages).
-  The first Cloudflare parallel upload passed exact-byte checks for all five retained editions and four downloads.
-  Isolated PR success/failure and private-variable absence are verified. A separate recovery project passed
-  real A/B rollback and identity/hash rejection with unchanged defaults. Automatic normal production
-  passed source 41331122749 / publisher 41331311059, including both immutable and production-base checks.
-  New canonical/README links and final RTD cleanup remain under review; frozen historical canonical URLs stay unchanged.
-  RTD evaluation is retained as partial evidence. Native normal and PR builds succeeded; PDF and both ZIP downloads matched
-  their native build. Served HTML gains service scripts, so public integrity,
-  managed version mapping, preview isolation and hosted rollback remain open.
-  GitHub Pages keeps publishing for existing links and recovery.
+- Keep GitHub Pages as the primary documentation host with native mike versions,
+  bilingual navigation/search and four verified offline formats. The maintainer
+  cancelled the Cloudflare migration on 2026-11-01: it served the same MkDocs site
+  rather than adding managed documentation features. Cloudflare publication and
+  preview workflows are disabled; successful experiment evidence remains in the
+  [operator record](development/cloudflare-pages.md). RTD is superseded and its
+  project-build retirement is owner-managed. The repository return and public
+  verification remain tracked until accepted.
 - Design batch-based validation of CSV, JSON and Parquet so complete datasets
   need not remain in memory. Bound cross-table key and uniqueness checks,
   preserve deterministic results and measure memory on synthetic fixtures.

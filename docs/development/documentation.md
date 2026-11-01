@@ -2,18 +2,18 @@
 
 ## Tools And Local Preview
 
-Primary hosting is **Cloudflare Pages**. The original GitHub Pages publication
-continues to preserve old URLs and recovery. MkDocs renders pages, **mike** owns
+Primary hosting is **GitHub Pages**. MkDocs renders pages, **mike** owns
 version storage, aliases and the version selector, and **mkdocs-print-site-plugin**
 assembles the printable handbook. HTMLArk embeds its assets; Chrome prints PDF.
-See the [Cloudflare operator guide](cloudflare-pages.md) for live production,
-preview and rollback evidence. The RTD sections below retain the earlier partial
-evaluation; they do not describe the selected primary host.
+The maintainer cancelled the Cloudflare migration on 2026-11-01 because it did
+not add the managed documentation functionality sought from Read the Docs.
+The [Cloudflare experiment record](cloudflare-pages.md) retains actual evidence;
+both Cloudflare publisher workflows are disabled in GitHub.
 
-Newly generated editions use the configured Cloudflare canonical URL. Retained
-historical/root/stable snapshots preserve their original HTML, identity, exports
-and GitHub Pages canonical URLs. Moving their unchanged bytes to Cloudflare does
-not relabel their documentation revision or claim a new package acceptance.
+Newly rendered editions use the configured GitHub Pages canonical URL. Retained
+historical/root/stable snapshots keep their original HTML, identity, exports and
+canonical URLs. Changing the primary host does not rewrite frozen snapshots or
+claim a new package acceptance.
 
 ```bash
 uv sync --frozen --only-group docs --no-install-project
@@ -135,14 +135,16 @@ the package version when reading an older guide.
 
 ## Hosting Decision And Retained RTD Evaluation
 
-On 2026-11-01 the maintainer selected Cloudflare Pages for the migration.
-Continue with [parallel Cloudflare publication](cloudflare-pages.md) and
-`migrate-documentation-to-cloudflare-pages`. The RTD material below retains
-actual experiment evidence; it is not the selected future hosting plan.
+GitHub Pages remains the selected primary host. The Cloudflare experiment was
+cancelled on 2026-11-01; its successful publication and recovery observations
+remain historical evidence, not a reason to maintain a second active publisher.
+RTD remains a partial evaluation, superseded without accepting its uncompleted
+hosting delta. The owner is disabling its project builds manually; retain RTD
+configuration until remote build triggers are confirmed disabled.
 
 ## Parallel Read the Docs Preparation
 
-The active OpenSpec is `migrate-documentation-to-readthedocs`. GitHub Pages
+The superseded experiment is `migrate-documentation-to-readthedocs`. GitHub Pages
 remains the accepted publication while service access and public acceptance
 are incomplete. The original connected-service failure has no confirmed cause. The maintainer
 subsequently imported the public project; native normal and PR builds now

@@ -145,8 +145,7 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "statistical anonymity" in readme
     assert "cross-environment byte identity" in readme
     assert "relationship or business-rule evidence" in readme
-    assert "[original GitHub Pages site](https://wa-pis.github.io/agent-paranoid-android/)" in readme
-    assert "[documentation](https://agent-paranoid-android.pages.dev/)" in readme
+    assert "[documentation](https://wa-pis.github.io/agent-paranoid-android/)" in readme
     assert "## Choose A Guide" in readme
     guide_section = readme.split("## Choose A Guide", 1)[1].split(
         "## Development", 1
@@ -1061,7 +1060,7 @@ def test_required_user_documentation_exists_and_is_navigable() -> None:
         for path in ("history.md", "reference/index.md", "reference/configuration.md")
     )
 
-    assert "site_url: https://agent-paranoid-android.pages.dev/" in config
+    assert "site_url: https://wa-pis.github.io/agent-paranoid-android/" in config
     for relative_path in REQUIRED_NAV_DOCS:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
         # Detailed reference/history is one index away, not repeated in every sidebar.

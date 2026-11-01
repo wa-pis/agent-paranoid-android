@@ -1,5 +1,11 @@
 # Change Proposal: migrate-documentation-to-cloudflare-pages
 
+Status: **cancelled by the maintainer on 2026-11-01**. GitHub Pages is selected
+as primary; Cloudflare added hosting rather than the sought managed documentation
+features. Completed experiment evidence is retained. The migration delta is not
+accepted into baseline specifications. Return tasks are tracked below before
+archival; incomplete acceptance boxes must not be converted to completed work.
+
 ## Why
 
 On 2026-11-01 the maintainer selected Cloudflare Pages after native RTD
