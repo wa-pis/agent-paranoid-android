@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 75dff820ba001ca612b684609105cd90112b7b98
+  <br>Documentation c8c7c97b7422c15e5068484919ca57536844c29c
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -477,6 +477,27 @@ The native mike selector was exercised on Cloudflare: selecting <code>1.7.0rc1</
 <code>versions/stable/</code> opened that candidate on the same Cloudflare deployment,
 showing its explicit candidate label and <code>3c03ccca</code> identity. No normal-project
 production or canonical switch is implied by these recovery results.</p>
+<h2 id="automatic-production-publisher-prepared">Automatic Production Publisher (Prepared)<a class="headerlink" href="#automatic-production-publisher-prepared" title="Permanent link">&para;</a></h2>
+<p>After preview and hosted recovery acceptance, the reviewed publisher can consume
+successful main-push Documentation completions automatically. It still checks
+source API provenance and every retained artifact hash; immediately before the
+credentialed upload it requires the source SHA to equal the current main SHA.
+Stale reruns, failed runs and PR sources cannot become normal production through
+this path. Only this trusted workflow event selects the configured normal
+project's <code>main</code> branch; manual dispatch remains a migration preview or an
+explicitly separate recovery rehearsal. The two modes cannot be mixed.</p>
+<p>Automatic production adds attachment headers without the parallel noindex rule.
+It verifies both the immutable deployment and the normal project's production
+base against every same-build retained edition and all four exports. PR previews
+and recovery remain separate and unindexed. The existing GitHub Pages publisher,
+public verification and native mike retention remain active for old links and
+recovery.</p>
+<p>This is publisher preparation until its PR is merged and an actual successful
+production-base verification is recorded. README links and newly generated
+canonical URLs switch in the subsequent reviewed change after that evidence.
+Existing rendered historical bytes, identities and their original canonical
+URLs are retained; they are not rewritten to pretend they were built on the new
+host. No package release or stable catalog promotion occurs in this step.</p>
               
 </div>
 
