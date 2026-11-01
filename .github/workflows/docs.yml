@@ -173,7 +173,10 @@ jobs:
           READTHEDOCS_VERSION_TYPE: external
           READTHEDOCS_GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
           READTHEDOCS_CANONICAL_URL: https://pr-${{ github.event.pull_request.number }}.agent-paranoid-android-previews.pages.dev/
-        run: uv run --no-sync python -m scripts.build_readthedocs --output pr-preview
+        run: |
+          uv run --no-sync python -m scripts.build_readthedocs --output pr-preview
+          echo "Deliberate fictional preview failure after rendering; do not publish."
+          exit 1
       - name: Retain static preview for the trusted publisher
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
