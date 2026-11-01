@@ -206,7 +206,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
   <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation b99b7c8cc2a52a8eea7c78ef15b57b25e6fd3941
+  <br>Documentation 013adf428a73120481a0f7fbd863cd5808d97c0c
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -336,8 +336,43 @@ and next remain 1.7.0rc1 at documentation <code>3c03ccca</code>, not stable. The
 payload contains 1,214 files and 91,808,365 bytes. A real browser HTML download
 was 710,301 bytes and matched the root retained manifest exactly.</p>
 <p>These results cover the named immutable deployment, not production promotion,
-automatic PR previews, hosted rollback or a completed migration. The corrected
-workflow must still pass on main before recording its CI acceptance.</p>
+automatic PR previews, hosted rollback or a completed migration. The corrected main workflow
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41319733062">41319733062</a>
+passed on publisher commit <code>b99b7c8cc2a52a8eea7c78ef15b57b25e6fd3941</code>,
+using the same source artifact 41286373400 and verifying all five editions at
+<a href="https://1641144a.agent-paranoid-android.pages.dev/">deployment 1641144a</a>.
+Production remains empty; both observed deployments are Preview/migration builds.</p>
+<h2 id="isolated-pr-preview-pipeline">Isolated PR Preview Pipeline<a class="headerlink" href="#isolated-pr-preview-pipeline" title="Permanent link">&para;</a></h2>
+<p>The separate Direct Upload project <code>agent-paranoid-android-previews</code> has been
+created. Configure <code>CLOUDFLARE_PAGES_PREVIEW_PROJECT</code> with that exact value in the
+existing main-only publication environment. This does not add private variables
+or bindings to the Cloudflare preview project.</p>
+<p>The Documentation workflow builds the exact PR source head in an unprivileged
+job, with no publication environment, Cloudflare credential or shared uploader
+cache. Strict normal documentation/release checks must pass first. The labelled
+preview artifact omits normal exports and retains bilingual pages/search.</p>
+<p><code>Cloudflare documentation PR preview</code> handles the completed run using only
+trusted default-branch code. GitHub API metadata must bind that repository's
+Documentation PR run to exactly one currently open PR with the same source head
+and head/base repositories. Fork metadata is supported; missing, changed, closed
+or ambiguous associations are rejected. The publisher checks the current head
+again immediately before upload. Source failure posts an exact-head failed
+<code>docs/cloudflare-preview</code> status without opening a publication environment.</p>
+<p>Successful source artifacts are treated only as data: the existing static asset
+checks reject Functions, Workers, deployment configuration, symlinks and oversized
+inputs. The PR identity must match the authenticated source SHA and be visibly
+labelled <code>PR preview / not stable</code>. The uploader runs in an empty directory and
+uses only the separate preview project with branch <code>pr-N</code>. It never checks out
+or executes PR code with publication rights. Byte verification covers identity,
+English/Russian entry/search pages and their shared search index, plus the real
+HTTPS/noindex response. The exact source head receives a success/failure status
+and immutable deployment link. Failed publication does not change normal editions.</p>
+<p>Pipeline implementation and fictional tests are preparation. Actual successful
+and deliberately failed PR rehearsals, private-variable isolation observations,
+preview UI checks and normal-default preservation must still be recorded before
+closing the preview task. See GitHub's
+<a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows">workflow event reference</a>
+and <a href="https://docs.github.com/en/actions/reference/security/secure-use">secure-use reference</a>.</p>
               
 </div>
 
