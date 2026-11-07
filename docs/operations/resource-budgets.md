@@ -40,6 +40,13 @@ cleanup are covered by separate operational-readiness gates.
 
 ## Database Source Budgets
 
+The development branch also has an explicit finite
+[large synthetic-generation policy](../how-to/dataset-capacity.md). It controls
+generation rows/cells, workers/batches, time, memory and output/temporary bytes;
+it does not change the source-file or database read limits below. The legacy
+100,000-row generation default remains without that opt-in. Memory checks are
+cooperative conservative bounds, not an OS-level peak-RSS guarantee.
+
 The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
 this section apply to stable `1.5.0` and are retained in stable
 `1.6.0`; see [release status](../1.6.0-release-status.md).

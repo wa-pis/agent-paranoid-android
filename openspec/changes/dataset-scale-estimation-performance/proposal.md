@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed 2026-11-04. Planning only; no implementation or release is claimed.
+Proposed 2026-11-04; implementation authorized 2026-11-08. Work is isolated on
+`codex/dataset-scale-estimation`. See progress.md for measured implementation
+evidence and remaining checks; no release is claimed.
 Select a release candidate after implementation scope and benchmark evidence
 are reviewed. This change does not authorize publication or live database tests.
 
@@ -35,6 +37,9 @@ budget and is not a user-facing prediction of actual serialized size.
   750,000 x 25 case without hidden environment edits or globally removing caps.
 - Profile, remove measured bottlenecks, stream bounded batches, and enable
   bounded process parallelism for eligible workloads when measurements justify it.
+  The first scalable engine supports independent tables in valid/edge modes;
+  relationships, global rules and negative/mixed/load-test modes reject before
+  generation. The legacy engine remains available for those bounded workloads.
 - Expose shared estimates and execution settings consistently through Python,
   CLI and MCP planning/inspection, preserving human approval and summary-only output.
 

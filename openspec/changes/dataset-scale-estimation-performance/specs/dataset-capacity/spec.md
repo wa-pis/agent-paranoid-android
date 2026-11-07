@@ -72,6 +72,8 @@ separate read-only database budgets and independent actual resource accounting.
 The scalable engine SHALL create fresh synthetic rows with exact requested
 counts and declared uniqueness, independent of worker count and batch size.
 It SHALL preserve relationships, business rules, privacy and source-reuse checks.
+The first engine SHALL explicitly reject related/global-rule workloads and
+unsupported modes before generation, retaining the bounded legacy path.
 Legacy engine seed behavior SHALL remain available and unchanged; manifests
 SHALL record engine/version and execution policy.
 

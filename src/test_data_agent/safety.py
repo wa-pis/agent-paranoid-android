@@ -307,10 +307,15 @@ def validate_generated_row_privacy(
 ) -> list[str]:
     """Check row values with the same synthetic namespace policy as generation."""
     for entity in spec.entities:
+        # Field policy is constant for this validation call, not for the model lifetime.
+        field_policies = [
+            (field, field.sensitive or is_sensitive_field(field.name, field.semantic_type))
+            for field in entity.fields
+        ]
         for row in rows_by_entity.get(entity.name, []):
             if not isinstance(row, Mapping):
                 return ["row privacy validation requires object rows"]
-            for field in entity.fields:
+            for field, sensitive in field_policies:
                 value = row.get(field.name)
                 if value in (None, ""):
                     continue
@@ -340,10 +345,6 @@ def validate_generated_row_privacy(
                     _decimal_sensitive_value_type(value)
                     if field.data_type == FieldType.DECIMAL
                     else infer_sensitive_value_type(value)
-                )
-                sensitive = field.sensitive or is_sensitive_field(
-                    field.name,
-                    field.semantic_type,
                 )
                 if field.data_type == FieldType.DECIMAL and isinstance(value, Decimal) and detected:
                     return ["generated dataset failed post-solve privacy validation"]

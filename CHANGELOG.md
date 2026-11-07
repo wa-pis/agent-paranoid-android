@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Forecast CSV/JSON/Parquet bytes, logical database payload and approximate
+  PostgreSQL heap storage; opt-in bounded synthetic calibration adds time ranges.
+- Opt-in `scalable-v1` streams distinct independent-table datasets with explicit
+  generation budgets and up to four processes. Policy changes require renewed
+  plan review; legacy seeded generation and database read limits are unchanged.
+
 ### Changed
 
 - Keep GitHub Pages as the primary documentation host after the Cloudflare

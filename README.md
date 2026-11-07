@@ -94,7 +94,7 @@ before regenerating existing fixtures.
 For selective replacement and preservation, use
 [Transform Local Data](docs/how-to/transformation.md). Registration grants no
 dataset permission: preservation requires exact local approval, which agents
-cannot issue. Ordinary generation remains source-free.
+cannot issue. Ordinary generation remains source-free. The development branch adds [capacity forecasts and bounded parallel generation](docs/how-to/dataset-capacity.md), unreleased after `1.7.0rc1`.
 
 ```bash
 python3 -m pip install "uv==0.11.23"

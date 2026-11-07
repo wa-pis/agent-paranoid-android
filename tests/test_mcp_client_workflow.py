@@ -18,8 +18,9 @@ import pytest
 
 
 @pytest.mark.parametrize("interrupted", [False, True])
+@pytest.mark.parametrize("scalable", [False, True])
 def test_client_plans_reviews_and_replays_synthetic_artifacts(
-    tmp_path: Path, interrupted: bool,
+    tmp_path: Path, interrupted: bool, scalable: bool,
 ) -> None:
     source = tmp_path / "customers.csv"
     source.write_text(
@@ -76,15 +77,24 @@ raise SystemExit(main())
                             "source_path": "customers.csv", "workspace_path": workspace,
                             "count": 4, "seed": 81, "output_format": "csv",
                             "table_name": "customers",
+                            "execution_policy": {"workers": 2, "batch_size": 2} if scalable else None,
                         })
                         assert plan["approval_required"] is True
                         generated = tmp_path / workspace / "generated"
                         assert not generated.exists()
                         state = await call("inspect_dataset_plan", {"workspace_path": workspace})
                         spec_path = tmp_path / plan["spec_path"]
+                        if scalable:
+                            forecast = await call("estimate_dataset_capacity", {"spec_path": plan["spec_path"]})
+                            assert forecast["duration_seconds"] is None
+                            assert forecast["entities"][0]["rows"] == 4
+                            assert not generated.exists()
                         spec_bytes = spec_path.read_bytes()
                         changed_spec = yaml.safe_load(spec_bytes)
-                        changed_spec["entities"][0]["row_count"] = 5
+                        if scalable:
+                            changed_spec["generation_settings"]["execution_policy"]["max_seconds"] = 60
+                        else:
+                            changed_spec["entities"][0]["row_count"] = 5
                         spec_path.write_text(yaml.safe_dump(changed_spec))
                         rejected = await client.call_tool("approve_dataset_plan", {
                             "workspace_path": workspace,

@@ -249,8 +249,12 @@ def validate_dataset_artifacts(
         raise ValueError(
             "validate expects a dataset output folder; pass the folder containing generated entity files"
         )
-    rows_by_entity = load_dataset_rows(rows_path)
-    report = validate_dataset(rows_by_entity, spec, budget=generation_budget_for_invocation())
+    if spec.generation_settings.execution_policy is not None:
+        from test_data_agent.io.scalable_validation import validate_scalable_bundle
+        report = validate_scalable_bundle(spec, rows_path)
+    else:
+        rows_by_entity = load_dataset_rows(rows_path)
+        report = validate_dataset(rows_by_entity, spec, budget=generation_budget_for_invocation())
     if output_path is not None:
         ensure_file_output_available(output_path, overwrite=overwrite)
         write_json_artifact(report, output_path)

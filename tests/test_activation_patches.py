@@ -15,6 +15,9 @@ def _compose_activation_patches(root: Path, destination: Path) -> None:
     if reconciliation.exists():
         names.append(reconciliation.name)
     patches = [directory / name for name in names]
+    capacity = root / "openspec/changes/dataset-scale-estimation-performance/public-contract-overlay.patch"
+    if capacity.exists():
+        patches.append(capacity)
     # Handle both Git-style and unified patches, including newly created files.
     targets = {line[6:] for patch in patches for line in patch.read_text().splitlines()
         if line.startswith("+++ b/")}

@@ -1,5 +1,62 @@
 {
   "approval_required": true,
+  "capacity_estimate": {
+    "assumptions": [
+      "Forecast ranges are uncertain, not hard safety bounds; values are bytes.",
+      "UTF-8; existing CSV quoting/null encoding or indented JSON; Parquet defaults to Snappy.",
+      "Database logical payload uses int64/float64, boolean, date/timestamp, decimal and UTF-8 values.",
+      "Database excludes indexes, WAL, replicas, backups and auxiliary storage.",
+      "Metadata forecasts have low confidence; use representative synthetic calibration for files/time.",
+      "Temporary disk and process memory are governed by execution policy, not predicted by file size.",
+      "Duration covers standalone source-free bundle generation; attached-source profiling/reuse scans and human review add uncalibrated time."
+    ],
+    "budget_findings": [],
+    "calibration": null,
+    "calibration_seconds": null,
+    "confidence": "low",
+    "control_artifact_bytes": {
+      "expected": 68212.0,
+      "high": 136424.0,
+      "low": 34106.0
+    },
+    "duration_seconds": null,
+    "duration_stages_seconds": {},
+    "duration_unknown_reason": "No matching local calibration; request bounded calibration.",
+    "entities": [
+      {
+        "cells": 9,
+        "entity": "orders",
+        "file_bytes": {
+          "expected": 431.75,
+          "high": 863.5,
+          "low": 215.875
+        },
+        "logical_database_bytes": {
+          "expected": 183.75,
+          "high": 257.25,
+          "low": 128.625
+        },
+        "postgres_table_bytes": null,
+        "rows": 3
+      }
+    ],
+    "estimator_version": "1",
+    "file_bytes": {
+      "expected": 431.75,
+      "high": 863.5,
+      "low": 215.875
+    },
+    "logical_database_bytes": {
+      "expected": 183.75,
+      "high": 257.25,
+      "low": 128.625
+    },
+    "method": "metadata",
+    "output_format": "json",
+    "postgres_table_bytes": null,
+    "schema_version": "1",
+    "spec_sha256": "1c4eb794266d6a4af0271ee15c0b1ae99e2b592176afa55d676d1b941d81a99e"
+  },
   "constraint_count": 0,
   "current_spec_sha256": "1c4eb794266d6a4af0271ee15c0b1ae99e2b592176afa55d676d1b941d81a99e",
   "entities": [

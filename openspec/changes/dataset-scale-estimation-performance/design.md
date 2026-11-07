@@ -41,6 +41,10 @@ without approval may run only explicitly requested calibration, not full generat
 Cache only value-free aggregate measurements, keyed by spec/settings fingerprint,
 engine/version, machine class, workers and format; invalidate incompatible data.
 Without relevant evidence, report unavailable/low confidence and the reason.
+Calibration in the first engine measures standalone bundle generation from the
+supplied spec. It does not contact or scan an attached source; profiling,
+source-reuse scans in agent approval and human review add unknown elapsed time.
+The response and usage guide must state this scope explicitly.
 
 Time includes setup, generation, constraint solving, privacy/source-reuse checks,
 validation, serialization and publication; estimation/calibration cost is shown
@@ -67,6 +71,25 @@ retain plan identity, actual counters and actionable failure states.
 
 ## Performance Strategy
 
+### Selected First Engine
+
+`scalable-v1` is explicit and limited to independent tables, valid/edge modes
+and CSV/JSON/Snappy Parquet. It rejects relationships, native constraints,
+business rules, relational scenarios and other modes before creating output.
+It does not silently fall back to a materialized legacy large run. Each table
+needs a synthetic-identifier primary key when complete-row distinctness is
+requested; a sufficient key domain proves distinctness without an unbounded set.
+Dependency-aware relational parallelism is deferred until its global state can
+be bounded and independently reconciled. This is an explicit eligibility limit,
+not evidence that related/global-rule performance was improved.
+
+Policy memory checks use a conservative preflight working-set estimate and
+parent/worker high-water RSS checks at batch boundaries. They are cooperative
+controls, not an OS-level memory sandbox. Benchmark evidence labels the sum of
+per-process high-water RSS as an upper bound, not a sampled simultaneous peak.
+Temporary output uses one staging bundle; final bundle bytes are its observed
+disk high-water mark in the no-existing-output benchmark.
+
 1. Capture a repeatable baseline with synthetic 25-column specifications and
    profile CPU, validation scans, allocation, serialization and IPC separately.
 2. Remove verified repeated work before adding concurrency. Preserve every check.
@@ -79,7 +102,8 @@ retain plan identity, actual counters and actionable failure states.
    cancel on failures/timeouts, terminate/reap children and clean staging files.
 5. Use deterministic entity/row/field substreams and global synthetic key ranges;
    workers and batch size must not cause duplicates, key collisions or reordered
-   output. Relationships follow a dependency-aware schedule, not arbitrary splits.
+   output. A future relational engine must follow a dependency-aware schedule;
+   scalable-v1 rejects relationships rather than splitting them arbitrarily.
 
 Changing random stream semantics can change historical seed output. Keep the
 legacy engine as the default compatibility path; make the scalable engine explicit,
@@ -97,7 +121,9 @@ Never use copied source rows or repeat a completed synthetic batch for speed.
   negative and mixed modes. Unsupported combinations fail explicitly.
 - Dedicated offline benchmark: 10k, 100k and 750k rows x 25 fields, plus a bounded
   linked-table case; explicit seeds, storage, CPU/RAM/OS/Python/library versions,
-  cold/warm cache conditions, >=3 repeats and median/range recorded. Baseline and
+  cold/warm cache conditions, >=3 repeats and median/range recorded. The linked
+  case verifies explicit scalable rejection and intact legacy behavior; it does
+  not claim parallel relational speedup. Baseline and
   optimized runs use the same host, fixture, validation and output settings.
 - For calibrated supported fixtures above 10k rows, measured CSV/JSON size must
   fall in forecast bounds with expected relative error <=25%; Parquet <=40%.
@@ -109,7 +135,8 @@ Never use copied source rows or repeat a completed synthetic batch for speed.
 - Performance target: >=2x median total speedup on the simple 750k x 25 fixture
   versus baseline on a >=4-core reference host; show actual 1/2/4-worker scaling.
   Small 10k-row serial work must not regress >15% under repeated controlled runs.
-- Show peak RSS for the whole process tree and temporary-disk high-water marks.
+- Show conservative whole-process-tree RSS upper bounds and observed
+  temporary-disk high-water marks, explicitly stating measurement limits.
   Memory stays within the approved policy as row count grows; account for any
   inherently growing uniqueness/relationship state rather than claiming O(1).
 - Validate 750k distinct complete rows using a synthetic unique key, exact counts,

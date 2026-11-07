@@ -379,7 +379,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
 
-_NATIVE_JSON_COMMANDS = {
+_NATIVE_JSON_COMMANDS = {"estimate-capacity",
     "agent-plan",
     "agent-approve",
     "agent-recover",

@@ -5,6 +5,8 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any
 
+from test_data_agent.core.execution_policy import GenerationExecutionPolicy
+
 from pydantic import BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, model_serializer
 
 
@@ -30,6 +32,7 @@ MAX_GENERATION_SEED = (1 << 63) - 1
 class GenerationSettings(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
+    execution_policy: GenerationExecutionPolicy | None = None
     seed: int | None = Field(default=None, ge=0, le=MAX_GENERATION_SEED)
     mode: GenerationMode = GenerationMode.VALID
     invalid_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -41,6 +44,8 @@ class GenerationSettings(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_settings(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
+        if self.execution_policy is None:
+            payload.pop("execution_policy", None)
         if self.load_multiplier == 10:
             payload.pop("load_multiplier", None)
         return payload

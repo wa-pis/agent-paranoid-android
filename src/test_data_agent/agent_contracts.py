@@ -6,9 +6,11 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, model_serializer
 
 from test_data_agent.core.field import FieldType
+from test_data_agent.core.execution_policy import GenerationExecutionPolicy
+from test_data_agent.generation.capacity import CapacityEstimate
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.relationship import RelationshipType
 from test_data_agent.core.settings import GenerationMode, OutputFormat
@@ -52,6 +54,14 @@ class AgentRequest(BaseModel):
     source_path: Path
     workspace: Path
     count: int = Field(default=100, ge=1)
+    execution_policy: GenerationExecutionPolicy | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_policy(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        if self.execution_policy is None:
+            payload.pop("execution_policy", None)
+        return payload
     seed: int = Field(default=12345, ge=0)
     output_format: OutputFormat = OutputFormat.CSV
     mode: GenerationMode = GenerationMode.VALID
@@ -112,6 +122,14 @@ class AgentSummary(BaseModel):
 
 
 class AgentPlanSummary(AgentSummary):
+    capacity_estimate: CapacityEstimate | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_capacity(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        if self.capacity_estimate is None:
+            payload.pop("capacity_estimate", None)
+        return payload
     metadata_trust: Literal["untrusted"] = "untrusted"
     source_type: str
     entities: list[AgentEntitySummary]
