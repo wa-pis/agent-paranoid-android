@@ -9,7 +9,7 @@ modules public.
 
 ## Python Versions
 
-The package supports CPython 3.11, 3.12, 3.13, and 3.14. Each supported
+The package supports CPython 3.11, 3.12, 3.13, 3.14, and 3.15. Each supported
 version runs the test suite and builds, installs, and checks an isolated base
 wheel before release. Alternative Python implementations may work, but are not
 release-gated.
@@ -23,6 +23,11 @@ release-gated.
   new `requires-python` constraint takes effect.
 - Security fixes may shorten that notice when the older runtime cannot be
   supported safely; the release notes must explain the exception.
+
+On Python 3.15, PyYAML 6.0.3 currently installs from source on macOS arm64;
+a working compiler may be required. PyArrow 26.0.1 and Pydantic 2.14.3 provide
+the native wheels used by the reviewed latest dependency profile. See
+[dependency compatibility](dependency-compatibility.md) for tested versions.
 
 ## Optional Extras
 

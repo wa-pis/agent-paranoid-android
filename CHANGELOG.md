@@ -13,6 +13,8 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Support standard CPython 3.15 alongside 3.11–3.14, with updated native
+  dependency locks and isolated base/extra installation checks.
 - Allow GigaChat SDK 0.2.4 in the optional advisor extra while retaining the
   0.2.3 minimum, bounded metadata-only requests and local review requirements.
 

@@ -40,3 +40,60 @@ Remaining implementation work: audit dependency/native-wheel availability,
 install a recorded stable interpreter, and execute the compatibility matrix
 before changing support claims. No runtime implementation or release has been
 performed by this specification-only change.
+
+## 2026-11-08 — Implementation Deferred By Owner
+
+The owner requested stopping and deferring the update. The local verification
+process was interrupted; the full release gate did not complete and no 3.15
+support is claimed. Work remains uncommitted in this isolated worktree; no
+implementation was pushed, merged, tagged or published.
+
+Before stopping, verified a standard GIL-enabled CPython 3.15.2 standalone
+build (20261026, macOS arm64), archive SHA-256
+285a6b924713bec9c1cdf442ba5ebfbafbab070060b34d607c30546b758e64a6.
+The previous lock lacked 3.15 PyArrow wheels and attempted a source build that
+failed for missing Arrow C++ development files. Targeted local lock updates
+installed all extras successfully: Pydantic 2.14.3/core 2.50.4, PyArrow 26.0.1,
+jiter 0.19.0, orjson 3.13.0, librt 0.16.0, typing-inspection 0.4.5. Some other
+native dependencies built locally; wheel-only installation is not proven.
+
+Local drafts extend CI matrices and compatibility policy/tests. Lint, typing,
+compilation, license/compatibility policy and 19 focused privacy/SQL checks
+passed. The full suite was interrupted during collection before running tests. No dependency
+range or runtime support classifier has changed. Do not mark implementation
+tasks complete. Resume only when requested, starting with current git/remote
+state and the remaining dependency/platform/test evidence.
+
+## 2026-11-08 — Owner Resumed Implementation
+
+The owner explicitly resumed Python 3.15 support. A new isolated branch
+`codex/python-315-support` starts from final main
+4e1651c6fe9f5573f280ef6497701a98f46d022e; the deferred worktree and unrelated
+workspace edits remain untouched. Rechecked the official release page and
+PEP 790: standard GIL-enabled CPython 3.15.2 is stable. Local interpreter is
+3.15.2, Clang 23.1.3, standalone build 20261026, macOS 26.6.2 arm64.
+
+Regenerated the lock with uv 0.11.23: only Pydantic 2.14.3/core 2.50.4,
+PyArrow 26.0.1, jiter 0.19.0, orjson 3.13.0, librt 0.16.0 and
+typing-inspection 0.4.5 changed versions. Retained merged GigaChat 0.2.4,
+Hatchling 1.33.0, pinned workflow actions and the security bootstrap fix.
+No runtime dependency range or Python 3.11 minimum profile changed.
+PyPI metadata confirms cp315 wheels for core/Arrow/jiter/orjson/librt on
+macOS and Linux x86_64/aarch64. This is availability evidence, not execution
+on another platform. PyYAML 6.0.3 has no cp315 wheel; binary-only resolution
+fails explicitly. Normal source installation succeeds locally; documentation
+records the possible compiler requirement rather than claiming wheel-only support.
+
+Built wheel/sdist and verified base, parquet, mcp, trino, postgres, openai,
+gigachat and all in eight clean CPython 3.15 environments outside the checkout.
+Every installed-package check and `doctor` passed, including optional capability
+checks. These unconstrained installs test the declared ranges; the full suite
+uses the reviewed frozen lock. No external databases/providers were contacted.
+
+Lint, type checking, compilation, license/compatibility policy and 19 direct
+privacy/SQL tests passed. Focused packaging/compatibility/runtime documentation:
+29 passed. Strict OpenSpec validation passed. First full-suite run in the
+restricted process environment rejected controlling-TTY fixtures. The exact six
+batch confirmation tests pass with normal terminal access, with no code change
+or relaxed approval check. The full gate is being repeated with that access;
+Linux CI and previous-runtime compatibility remain pending. No release is made.

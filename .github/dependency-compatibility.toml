@@ -8,7 +8,7 @@ latest = "40.35.0"
 requirement = "pydantic"
 extra = "base"
 minimum = "2.7.0"
-latest = "2.13.4"
+latest = "2.14.3"
 
 [dependencies.pyyaml]
 requirement = "PyYAML"
@@ -20,7 +20,7 @@ latest = "6.0.3"
 requirement = "pyarrow"
 extra = "parquet"
 minimum = "15.0.0"
-latest = "25.0.0"
+latest = "26.0.1"
 
 [dependencies.mcp]
 requirement = "mcp"

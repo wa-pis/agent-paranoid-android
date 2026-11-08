@@ -2,7 +2,7 @@
 
 [English](../../reference/support-policy.md) · Русский
 
-Поддерживаемая CI-матрица — CPython 3.11, 3.12, 3.13 и 3.14. Минимум — 3.11. Другие реализации Python могут работать, но не проходят release gate. Новая версия Python считается поддерживаемой после CI и installed-wheel smoke.
+Поддерживаемая CI-матрица — CPython 3.11, 3.12, 3.13, 3.14 и 3.15. Минимум — 3.11. Другие реализации Python могут работать, но не проходят release gate. Новая версия Python считается поддерживаемой после CI и installed-wheel smoke.
 
 Отказ от версии Python — breaking packaging change: нужны release notes, migration и предупреждение минимум за один feature release. Security constraint может сократить срок с явным объяснением. Python 3.11 сохраняется в 1.x, пока это допускают безопасность и зависимости.
 
@@ -22,3 +22,7 @@
 Provider-neutral DatasetAdvisor/AdvisorExchange/AdvisorProposal — версионированные контракты. OpenAI и GigaChat adapters экспериментальны. Они получают безопасные metadata, а не source/generated rows или секреты; результат ограничен и проверяется по fingerprint. SDK не входит в base. Реальные provider services не используются в обычных тестах.
 
 При сообщении об ошибке укажите версии пакета/Python, extras, платформу и минимальную синтетическую репродукцию. Не прикладывайте production rows, credentials, provider payload или audit keys.
+
+На Python 3.15 PyYAML 6.0.3 на macOS arm64 пока собирается из исходников;
+может потребоваться компилятор. Проверяемый профиль использует PyArrow 26.0.1
+и Pydantic 2.14.3.

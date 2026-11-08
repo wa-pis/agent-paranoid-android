@@ -98,7 +98,7 @@ The compressed project wheel has a 512 KiB regression ceiling; optional
 dependency-count budgets are checked separately.
 
 For a candidate containing GigaChat, the release matrix additionally requires
-isolated base, `gigachat`, and `all` wheel checks on Python 3.11 through 3.14,
+isolated base, `gigachat`, and `all` wheel checks on Python 3.11 through 3.15,
 `doctor --require-extra gigachat`, dependency/license verification, and the
 fake-SDK provider suite with no credentials or network access. A live provider
 call is optional manual evidence and must use only the fictional fixture.

@@ -9,7 +9,7 @@
 ## 2. Compatibility Investigation
 
 - [x] Verify actual CPython 3.15 release status from official sources (stable; 3.15.2 listed on 2026-11-08).
-- [ ] Select and record the exact installed stable 3.15 interpreter and build.
+- [x] Select and record the exact installed stable 3.15 interpreter and build.
 - [ ] Audit base, every documented extra, `all`, build and test dependencies on existing platforms.
 - [ ] Record wheel availability, resolver results and upstream blockers with exact versions.
 - [ ] Select and test dependency markers/profiles where 3.15 needs different minima; preserve 3.11 support.
@@ -17,7 +17,7 @@
 ## 3. Implementation And Evidence
 
 - [ ] Add blocking supported 3.15 quality/wheel/latest-all jobs after dependency compatibility is verified.
-- [ ] Test built-wheel base/extra/all installs and capability checks in isolated environments.
+- [x] Test built-wheel base/extra/all installs and capability checks in isolated environments.
 - [ ] Run full 3.15 suite and real bounded SDK stdio workflow/recovery contracts.
 - [ ] Verify both scalable engines, spawn determinism, cancellation, resource limits and atomic publication on Linux/macOS.
 - [ ] Keep all supported 3.11–3.14 jobs green and review any lock/profile changes.

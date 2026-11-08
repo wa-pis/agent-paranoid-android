@@ -1348,7 +1348,7 @@ def test_public_stability_table_covers_contract_surfaces() -> None:
 def test_runtime_support_policy_covers_release_boundaries() -> None:
     support = (ROOT / "docs" / "reference" / "support-policy.md").read_text()
 
-    for version in ("3.11", "3.12", "3.13", "3.14"):
+    for version in ("3.11", "3.12", "3.13", "3.14", "3.15"):
         assert version in support
     for extra in ("parquet", "mcp", "trino", "openai", "gigachat", "all"):
         assert f"`{extra}`" in support
