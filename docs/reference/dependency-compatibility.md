@@ -29,8 +29,9 @@ contract surfaces directly.
 
 Minimum candidates match the lower bounds in `pyproject.toml`. Latest versions
 are the versions in the reviewed `uv.lock` and
-`.github/dependency-compatibility.toml`, exercised by the
-[1.7.0rc1 exact-source gate](../release-evidence-1.7.0rc1.md).
+`.github/dependency-compatibility.toml`. The historical profile was exercised by
+the [1.7.0rc1 exact-source gate](../release-evidence-1.7.0rc1.md); the GigaChat
+0.2.4 update separately passes offline SDK transport and provider contract checks.
 “Latest tested” names that locked profile, not the newest packages on PyPI.
 The later installed feedback replay records its separately resolved environment;
 it does not replace the reviewed lock or minimum profiles.
@@ -44,7 +45,7 @@ it does not replace the reviewed lock or minimum profiles.
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
 | `gigachat-minimum` | 3.11 | Base minimum; GigaChat 0.2.3 |
 | `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0; sqlglot 30.0.0 |
-| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.3; Psycopg 3.3.4 |
+| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4 |
 
 MCP 1.28.1 requires Pydantic 2.11.0, so its minimum profile cannot reuse the
 base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
@@ -105,8 +106,9 @@ lowercase distribution names and includes installed optional integrations;
   OpenAI accepts `<4` with 2.46.0 minimum and 3.18.0 latest coverage.
   No new upper major bound is implied for Faker, Pydantic, PyYAML,
   PyArrow, sqlglot, or Trino until minimum/latest matrix evidence justifies it.
-- GigaChat remains on `>=0.2.3,<0.2.4` because its SDK changed the chat API
-  between 0.2.1 and 0.2.3; each later release needs a compatibility review.
+- GigaChat accepts `>=0.2.3,<0.2.5` after offline SDK contract checks for 0.2.4.
+  Its SDK changed the chat API between 0.2.1 and 0.2.3; the 0.2.3 minimum
+  remains, and each later release needs a compatibility review.
 - A failing profile is unsupported until fixed or explicitly removed from the
   documented range with release notes.
 
@@ -125,7 +127,7 @@ hashed dependency evidence in a generated manifest.
 | --- | --- | --- |
 | MCP | Accept `<3.0.0` | MCP 2.2.0 transport contracts cover byte budgets, redaction and request context; MCP 1.28.1 remains the minimum. |
 | OpenAI | Accept `<4.0.0` | OpenAI 3.18.0 evaluated with offline real-SDK HTTP transport, provider privacy contracts and doctor checks; 2.46.0 minimum retained. |
-| GigaChat | Retain `<0.2.4` | The adapter is tested against the current 0.2.3 `chat.create` contract; earlier 0.2.x releases use an incompatible call shape. |
+| GigaChat | Accept `<0.2.5` | The adapter retains the 0.2.3 minimum and checks the 0.2.4 `chat.create` contract with offline SDK transport; earlier 0.2.x releases use an incompatible call shape. |
 | Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg | Add no upper bound | The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible. |
 
 A newly discovered incompatibility must first be reproduced by a focused

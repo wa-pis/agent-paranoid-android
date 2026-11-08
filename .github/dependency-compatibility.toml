@@ -53,8 +53,8 @@ upper_major = 4
 requirement = "gigachat"
 extra = "gigachat"
 minimum = "0.2.3"
-latest = "0.2.3"
-upper = "0.2.4"
+latest = "0.2.4"
+upper = "0.2.5"
 
 [dependencies.psycopg]
 requirement = "psycopg"

@@ -845,6 +845,43 @@ def test_gigachat_sdk_local_contract_makes_no_network_call(
     assert network_called is False
 
 
+def test_gigachat_sdk_roundtrip_uses_offline_transport(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import httpx
+    from gigachat.models import ChatCompletionRequest
+
+    requests: list[httpx.Request] = []
+
+    def send(_client: httpx.Client, request: httpx.Request, **kwargs: Any) -> httpx.Response:
+        requests.append(request)
+        assert request.url.host == "api.giga.chat"
+        assert request.method == "POST"
+        assert b"SOURCE_LITERAL_SENTINEL" not in request.content
+        payload = ChatCompletionRequest.model_validate_json(request.content)
+        result = echo_safe_request(payload)
+        return httpx.Response(200, request=request, json={
+            "messages": [{"role": "assistant", "content": [
+                {"text": result.messages[0].content[0].text},
+            ]}],
+            "finish_reason": "stop",
+        })
+
+    monkeypatch.setattr(httpx.Client, "send", send)
+    exchange = local_category_exchange()
+    client = GigaChatAdvisorClient(
+        access_token="synthetic-local-token", environment={},
+    )
+    try:
+        proposal = client.complete(exchange)
+    finally:
+        client.close()
+    assert len(requests) == 1
+    assert proposal["approval_required"] is True
+    assert proposal["generation_performed"] is False
+    assert proposal["dataset_spec"] == exchange.request.baseline_spec.model_dump(mode="json")
+
+
 def test_gigachat_sdk_redacts_initialization_errors(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
