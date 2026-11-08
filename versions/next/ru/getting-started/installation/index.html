@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/ru/getting-started/installation/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc3/ru/getting-started/installation/" />
       <link rel="shortcut icon" href="../../../img/favicon.ico" />
     <title>Установка - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430";
         var mkdocs_page_input_path = "ru/getting-started/installation.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc2/ru/getting-started/installation/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc3/ru/getting-started/installation/";
       </script>
     
     <!--[if lt IE 9]>
@@ -228,9 +228,9 @@
 <div lang="ru">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
-  <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br>Documentation d5143ad8d580b7f5a9f23c9ed0e3ac33521b212a
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
+  <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
+  <br>Documentation 09b6fb207b22364ff41f70d7b51abe30d1a458fa
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -239,14 +239,14 @@
                 <h1 id="_1">Установка<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p><a href="../../../getting-started/installation/">English</a> · Русский</p>
 <p>Рекомендуемая стабильная версия — <strong>1.6.0</strong>; см. <a href="../../../release-evidence-1.6.0/">публичную проверку</a>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15; этот локальный аудит выполнен на macOS с Python 3.11.2.</p>
-<p>Команды этой инструкции явно выбирают <code>1.7.0rc2</code>. Перед установкой проверьте
-<a href="../../../1.7.0rc2-release-status/">статус кандидата</a>. Стабильная версия остаётся
+<p>Команды этой инструкции явно выбирают <code>1.7.0rc3</code>. Перед установкой проверьте
+<a href="../../../1.7.0rc3-release-status/">статус кандидата</a>. Стабильная версия остаётся
 <code>1.6.0</code>; её установка: <code>pip install "agent-paranoid-android==1.6.0"</code>.</p>
 <h2 id="pypi">Установка из PyPI<a class="headerlink" href="#pypi" title="Permanent link">&para;</a></h2>
 <p>На macOS/Linux откройте терминал в выбранной рабочей папке и выполните по очереди:</p>
 <pre><code class="language-bash">python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
+python -m pip install &quot;agent-paranoid-android==1.7.0rc3&quot;
 test-data-agent --version
 test-data-agent doctor
 </code></pre>
@@ -255,13 +255,13 @@ test-data-agent doctor
 <h2 id="windows-powershell">Windows PowerShell<a class="headerlink" href="#windows-powershell" title="Permanent link">&para;</a></h2>
 <p>Откройте PowerShell в рабочей папке; не используйте Bash activation. Отдельный маршрут без изменения ExecutionPolicy:</p>
 <pre><code class="language-powershell">py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
+.\.venv\Scripts\python.exe -m pip install &quot;agent-paranoid-android==1.7.0rc3&quot;
 .\.venv\Scripts\test-data-agent.exe --version
 .\.venv\Scripts\test-data-agent.exe doctor
 </code></pre>
 <p>Ожидается 1.6.0 и doctor passed. При отсутствии launcher установите поддерживаемый Python. Windows-выполнение здесь не проверено. В следующих инструкциях заменяйте python и test-data-agent этими путями; вводите Bash-команды с продолжением строки одной строкой.</p>
 <h2 id="extras">Необязательные extras<a class="headerlink" href="#extras" title="Permanent link">&para;</a></h2>
-<p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0rc2". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
+<p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0rc3". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
 <p>Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. <a href="../../reference/support-policy/">поддержку</a> и <a href="../../../reference/dependency-compatibility/#installation-footprint">footprint — English</a>.</p>
 <h2 id="_2">Когда нужна копия репозитория<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.6.0, например отдельный clone тега v1.6.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="../../../development/documentation/">Publishing Documentation — English</a>.</p>
