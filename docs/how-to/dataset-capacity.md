@@ -1,6 +1,6 @@
 # Forecast And Generate Larger Synthetic Datasets
 
-These additions target `1.7.0rc2`, whose publication is pending. They are not
+These additions are published in `1.7.0rc2`. They are not
 available in `1.7.0rc1`. Stable 1.6.0 remains the recommended default.
 
 ## Preview Storage And Time

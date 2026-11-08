@@ -18,7 +18,8 @@ The owner authorized `1.7.0rc2` on 2026-11-08 after implementation of
 independent technical AI review, Ubuntu preflight, signed acceptance and public
 verification described below. Candidate documentation belongs at
 `versions/1.7.0rc2/`; stable 1.6.0 remains the default. See
-[candidate status](1.7.0rc2-release-status.md). Publication is pending.
+[candidate status](1.7.0rc2-release-status.md). Publication and all 12 public
+acceptance jobs passed; see [published evidence](release-evidence-1.7.0rc2.md).
 
 ## 1.7.0rc1 Feedback Candidate
 
