@@ -490,12 +490,23 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
-        "_template", "selective-source-transformation", "dataset-scale-estimation-performance",
-        "scalable-relational-generation",
-        "python-315-support",
+        "_template", "selective-source-transformation",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
     }
+
+    for change_id, capability in (
+        ("dataset-scale-estimation-performance", "dataset-capacity"),
+        ("scalable-relational-generation", "scalable-relational-generation"),
+        ("python-315-support", "python-runtime-support"),
+    ):
+        completed = changes / "archive" / f"2026-11-09-{change_id}"
+        assert "- [ ]" not in (completed / "tasks.md").read_text()
+        delta = (completed / "specs" / capability / "spec.md").read_text()
+        baseline = (ROOT / "openspec/specs" / capability / "spec.md").read_text()
+        requirements = re.findall(r"^### Requirement: .+$", delta, re.MULTILINE)
+        assert requirements
+        assert all(requirement in baseline for requirement in requirements)
 
 
     for change_id, status in (

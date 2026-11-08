@@ -9,7 +9,8 @@ Stable 1.6.0 and candidate 1.7.0rc1 are now published; see
 [current documentary reconciliation](../documentation-consistency-2026-10-29.md).
 No accepted architectural decision is changed by this status update.
 
-The inventory covers the current 16 baseline OpenSpec capabilities, the
+The original inventory covered 16 baseline OpenSpec capabilities; the maintained
+coverage map below also includes subsequently archived capabilities and the
 cross-cutting architecture/operations contracts and the accepted selective
 transformation decisions. It does not attempt to turn every implementation
 choice, historical task or unapproved feature suggestion into an ADR.
@@ -141,6 +142,15 @@ Coverage is a navigation map, not a declaration that every requirement has passe
 | [container-deployment](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/container-deployment/spec.md) | [ADR-0018](0018-container-isolation.md), [ADR-0019](0019-release-integrity.md) |
 | [release-supply-chain](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/release-supply-chain/spec.md) | [ADR-0016](0016-compatibility-packaging.md), [ADR-0019](0019-release-integrity.md), [ADR-0027](0027-acceptance-evidence.md) |
 | [public-documentation](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/specs/public-documentation/spec.md) | [ADR-0001](0001-decision-records.md), [ADR-0028](0028-executable-documentation.md) |
+
+The 2026-11-09 archive adds these capability links. Their governing decisions
+remain unchanged; this is a navigation update, not a new architectural approval.
+
+| OpenSpec capability | Governing records |
+| --- | --- |
+| [dataset-capacity](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/dataset-capacity/spec.md) | [ADR-0005](0005-determinism-provenance.md), [ADR-0015](0015-resource-limits.md), [ADR-0027](0027-acceptance-evidence.md) |
+| [scalable-relational-generation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/scalable-relational-generation/spec.md) | [ADR-0005](0005-determinism-provenance.md), [ADR-0007](0007-deterministic-rules.md), [ADR-0014](0014-filesystem-publication.md), [ADR-0015](0015-resource-limits.md) |
+| [python-runtime-support](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/python-runtime-support/spec.md) | [ADR-0016](0016-compatibility-packaging.md), [ADR-0019](0019-release-integrity.md), [ADR-0027](0027-acceptance-evidence.md) |
 
 The active [selective-source-transformation change](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/plan.md)
 is covered by ADR-0008, ADR-0010, ADR-0015 and ADR-0020–0027; its SQL delta also

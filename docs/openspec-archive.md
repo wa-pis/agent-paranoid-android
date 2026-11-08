@@ -68,3 +68,21 @@ Both Cloudflare publishers are disabled; their projects and historical snapshots
 are retained. RTD project-build retirement remains manual owner follow-up and
 its configuration is retained until confirmed. No migration acceptance or
 package promotion is inferred from these archives.
+
+## 2026-11-09 RC3 reconciliation
+
+Archived `dataset-scale-estimation-performance`, `scalable-relational-generation`
+and `python-315-support` after their completed tasks and
+[RC3 public release evidence](release-evidence-1.7.0rc3.md) were verified.
+Normal archival integrated all 15 requirements into three new baseline
+capabilities: `dataset-capacity`, `scalable-relational-generation` and
+`python-runtime-support`; specification updates were not skipped. Historical
+benchmark JSON and activation overlay patch bytes are retained unchanged.
+The patch composition tests require the archived overlays explicitly.
+
+Four changes remain active (excluding `_template`): selective transformation,
+historical Trino configuration, external feedback intake and profile provenance.
+The two remaining transformation tasks are reconciled in its
+[dated follow-through](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/selective-source-transformation/follow-through-2026-11-09.md).
+Neither the owner-waived RC3 manual client check nor private scale evidence is
+relabelled as completed human or public/configured capacity acceptance.

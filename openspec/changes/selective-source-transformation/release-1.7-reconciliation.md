@@ -88,3 +88,12 @@ Historical Trino application configuration and external profile provenance
 remain unavailable in their focused changes. Source-row EAV pivot/unpivot
 requires its own explicitly authorized I/O/transformation change. No additional
 live/private input, secret lookup, human consent or release promotion is implied.
+
+## 2026-11-09 continuation
+
+Published RC3 now has a fresh small installed-only replacement replay and a
+[stage/contract audit of the two remaining tasks](follow-through-2026-11-09.md).
+It preserves this document's historical evidence identities. Capacity through
+current public/common/configured routes and the scoped trust-boundary amendment
+remain open; neither is closed by the separate RC3 release or owner-waived
+manual synthetic-client check.
