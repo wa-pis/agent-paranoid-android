@@ -19,9 +19,9 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
-Candidate `1.7.0rc1` is published; stable `1.6.0` remains recommended.
-Install explicitly with `python3 -m pip install "agent-paranoid-android==1.7.0rc1"`.
-See [candidate status](docs/1.7.0rc1-release-status.md) and its [guide](https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/).
+Prospective candidate `1.7.0rc2` is not yet published; stable `1.6.0` remains recommended.
+Install explicitly with `python3 -m pip install "agent-paranoid-android==1.7.0rc2"`.
+See [candidate status](docs/1.7.0rc2-release-status.md) and its [guide](https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/).
 
 ## Install And Try It
 
@@ -94,7 +94,7 @@ before regenerating existing fixtures.
 For selective replacement and preservation, use
 [Transform Local Data](docs/how-to/transformation.md). Registration grants no
 dataset permission: preservation requires exact local approval, which agents
-cannot issue. Ordinary generation remains source-free.
+cannot issue. Ordinary generation remains source-free. Candidate `1.7.0rc2` adds [capacity forecasts and bounded parallel generation](docs/how-to/dataset-capacity.md); check candidate status before installing.
 
 ```bash
 python3 -m pip install "uv==0.11.23"

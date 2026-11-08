@@ -4,14 +4,29 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.0rc2] - 2026-11-08
+
+Capacity forecasts and opt-in scalable synthetic generation. Stable 1.6.0
+remains the recommended default.
+
+### Added
+
+- Forecast CSV/JSON/Parquet bytes, logical database payload and approximate
+  PostgreSQL heap storage; opt-in bounded synthetic calibration adds time ranges.
+- Opt-in `scalable-v1` streams distinct independent-table datasets with explicit
+  generation budgets and up to four processes. Policy changes require renewed
+  plan review; legacy seeded generation and database read limits are unchanged.
+
 ### Changed
 
 - Keep GitHub Pages as the primary documentation host after the Cloudflare
   experiment; retain versioned guidance, four offline formats and historical
   documentation identities.
 
-### Fixed
+### Security
 
+- New container builds require fixed APT 2.6.2 packages for CVE-2026-109518;
+  package download retries are disabled while upgrading the pinned base.
 - Future container builds install Bookworm's fixed OpenSSL3.0.22 security
   packages for CVE-2026-84782 across all three targets. Existing signed release
   images remain immutable. Locked audit tooling updates MessagePack to1.2.3

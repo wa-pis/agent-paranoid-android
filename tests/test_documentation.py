@@ -199,6 +199,7 @@ def test_documentation_navigation_leads_with_database_workflows() -> None:
         "Profile PostgreSQL",
         "Profile Through Trino",
         "Transform Local Data",
+        "Forecast And Scale Datasets",
     ]
     assert [next(iter(item)) for item in navigation["Integrations"]] == [
         "Connect An MCP Client",
@@ -489,7 +490,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
-        "_template", "selective-source-transformation",
+        "_template", "selective-source-transformation", "dataset-scale-estimation-performance",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
     }

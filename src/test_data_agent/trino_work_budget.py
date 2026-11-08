@@ -531,8 +531,14 @@ def canonical_argument_size(
     """Return the stable UTF-8 JSON size of validated application arguments."""
     bound = inspect.signature(function).bind(*args, **kwargs)
     bound.apply_defaults()
+    def model_payload(value: Any) -> Any:
+        from pydantic import BaseModel
+        if isinstance(value, BaseModel):
+            return value.model_dump(mode='json')
+        raise TypeError('canonical arguments require JSON values or typed models')
     payload = json.dumps(
         dict(bound.arguments),
+        default=model_payload,
         ensure_ascii=False,
         separators=(",", ":"),
         sort_keys=True,

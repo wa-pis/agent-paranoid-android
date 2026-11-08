@@ -190,6 +190,21 @@ def generate_agent_dataset(
     review: AgentReviewState,
     output_folder: Path,
 ) -> AgentCompletionCheckpoint:
+    if spec.generation_settings.execution_policy is not None:
+        from test_data_agent.io.scalable import generate_scalable_bundle
+        checkpoint = AgentCompletionCheckpoint(
+            plan_id=review.plan_id, profile_sha256=review.profile_sha256,
+            reviewed_spec_sha256=review.current_spec_sha256,
+            source_type=agent_source_label(request, profile),
+            row_counts={e.name: e.row_count for e in spec.entities}, seed=request.seed,
+            output_format=request.output_format, validation_valid=True)
+        def before_publish(stage: Path, report: Any) -> None:
+            write_json_artifact(checkpoint, stage / COMPLETION_CHECKPOINT_FILE)
+        generate_scalable_bundle(spec, output_folder=output_folder, seed=request.seed, profile=profile,
+            check_batch=lambda rows: assert_agent_source_not_copied(request, spec, rows, source_sha256=review.source_sha256),
+            before_publish=before_publish,
+            progress=lambda status: write_json_artifact(status, request.workspace / "generation_progress.json"))
+        return checkpoint
     budget = prepare_generation_budget(spec, output_folder)
     temp_folder = make_temp_output_folder(output_folder)
     try:
@@ -318,6 +333,18 @@ def validate_agent_completion_checkpoint(
 
     manifest = GenerationManifest.model_validate_json(read_limited_text(manifest_path))
     report = DatasetValidationReport.model_validate_json(read_limited_text(report_path))
+    if spec.generation_settings.execution_policy is not None:
+        from test_data_agent.io.scalable_validation import validate_scalable_bundle
+        recovered_report = validate_scalable_bundle(spec, generated_folder,
+            check_batch=lambda values: assert_agent_source_not_copied(request, spec, values, source_sha256=review.source_sha256))
+        row_counts = {entity.name: entity.row_count for entity in spec.entities}
+        if (manifest.row_counts != row_counts or checkpoint.row_counts != row_counts
+                or manifest.spec_sha256 != review.current_spec_sha256
+                or manifest.seed != request.seed or manifest.output_format != request.output_format
+                or manifest.validation_valid != report.valid or checkpoint.validation_valid != report.valid
+                or recovered_report != report):
+            raise ValueError("streamed generation artifacts are inconsistent")
+        return checkpoint
     rows_by_entity = load_dataset_rows(generated_folder)
     row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
     if (

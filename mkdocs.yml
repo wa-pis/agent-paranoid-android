@@ -74,6 +74,7 @@ nav:
       - Profile PostgreSQL: how-to/postgresql.md
       - Profile Through Trino: how-to/trino.md
       - Transform Local Data: how-to/transformation.md
+      - Forecast And Scale Datasets: how-to/dataset-capacity.md
   - Integrations:
       - Connect An MCP Client: how-to/mcp.md
       - Connect An AI Client: ai_integration.md

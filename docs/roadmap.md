@@ -8,6 +8,11 @@ completed work belongs in [release history](history.md), not this list.
 
 ## Now
 
+- Implement and verify [capacity forecasts and bounded scalable generation](how-to/dataset-capacity.md)
+  under `dataset-scale-estimation-performance`. The source branch adds estimates
+  and explicit independent-table streaming; related/global-rule scaling remains
+  unsupported in this engine. No new release has been published for this work.
+
 - Follow up on the remaining external `1.6.0` evidence gaps through the
   [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):
   historical Trino application authentication settings and external profile
@@ -35,10 +40,9 @@ completed work belongs in [release history](history.md), not this list.
   project-build retirement is owner-managed. The GitHub Pages return passed main
   Documentation 41336088977, including public verification and retained versions.
   Cancelled/superseded hosting proposals are archived without accepting their deltas.
-- Design batch-based validation of CSV, JSON and Parquet so complete datasets
-  need not remain in memory. Bound cross-table key and uniqueness checks,
-  preserve deterministic results and measure memory on synthetic fixtures.
-  A separate OpenSpec change is required before implementation.
+- Extend bounded batch generation/validation to related tables and global rules
+  after the independent-table implementation has measured acceptance evidence.
+  Cross-table key/uniqueness state needs separate bounded planning and review.
 - Simplify CSV and database workflows using pilot feedback.
 - Publish runnable examples and short case studies using synthetic fixtures.
 - Improve diagnostics where users repeatedly need help.

@@ -235,6 +235,52 @@
     }
   },
   {
+    "description": "Forecast file bytes, DB payload and local generation time from a workspace spec.\n\nMetadata-only by default. Explicit calibration generates bounded temporary\nsynthetic samples (no final dataset); responses contain numeric summaries,\nuncertainty and assumptions only. This does not approve generation.",
+    "input_schema": {
+      "properties": {
+        "calibrate": {
+          "default": false,
+          "title": "Calibrate",
+          "type": "boolean"
+        },
+        "database": {
+          "default": "logical",
+          "enum": [
+            "logical",
+            "postgresql"
+          ],
+          "title": "Database",
+          "type": "string"
+        },
+        "sample_rows": {
+          "default": 2000,
+          "title": "Sample Rows",
+          "type": "integer"
+        },
+        "spec_path": {
+          "title": "Spec Path",
+          "type": "string"
+        },
+        "use_cache": {
+          "default": true,
+          "title": "Use Cache",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "spec_path"
+      ],
+      "title": "estimate_dataset_capacityArguments",
+      "type": "object"
+    },
+    "name": "estimate_dataset_capacity",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "estimate_dataset_capacityDictOutput",
+      "type": "object"
+    }
+  },
+  {
     "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\nRequires the reviewed snapshot digest and, for preservation, a matching\nreceipt issued by the separate controlling-TTY local approval operation.\nReturns bounded counts and digest metadata, never source or output rows.",
     "input_schema": {
       "properties": {
@@ -570,13 +616,100 @@
     }
   },
   {
-    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths and summaries without generating rows; inspect the plan and obtain human review before approval.",
+    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables, including explicit rows/cells/disk/time/memory and 1-4 workers. Policy changes require renewed exact-fingerprint review.",
     "input_schema": {
+      "$defs": {
+        "GenerationExecutionPolicy": {
+          "additionalProperties": false,
+          "properties": {
+            "batch_size": {
+              "default": 2000,
+              "maximum": 10000,
+              "minimum": 1,
+              "title": "Batch Size",
+              "type": "integer"
+            },
+            "engine": {
+              "default": "scalable-v1",
+              "pattern": "^scalable-v1$",
+              "title": "Engine",
+              "type": "string"
+            },
+            "max_cells": {
+              "default": 25000000,
+              "maximum": 100000000,
+              "minimum": 1,
+              "title": "Max Cells",
+              "type": "integer"
+            },
+            "max_memory_bytes": {
+              "default": 1073741824,
+              "maximum": 8589934592,
+              "minimum": 268435456,
+              "title": "Max Memory Bytes",
+              "type": "integer"
+            },
+            "max_output_bytes": {
+              "default": 536870912,
+              "maximum": 8589934592,
+              "minimum": 1,
+              "title": "Max Output Bytes",
+              "type": "integer"
+            },
+            "max_rows": {
+              "default": 1000000,
+              "maximum": 10000000,
+              "minimum": 1,
+              "title": "Max Rows",
+              "type": "integer"
+            },
+            "max_seconds": {
+              "default": 600,
+              "exclusiveMinimum": 0,
+              "maximum": 3600,
+              "title": "Max Seconds",
+              "type": "number"
+            },
+            "max_temporary_bytes": {
+              "default": 536870912,
+              "maximum": 8589934592,
+              "minimum": 1,
+              "title": "Max Temporary Bytes",
+              "type": "integer"
+            },
+            "require_distinct_rows": {
+              "default": true,
+              "title": "Require Distinct Rows",
+              "type": "boolean"
+            },
+            "workers": {
+              "default": 1,
+              "maximum": 4,
+              "minimum": 1,
+              "title": "Workers",
+              "type": "integer"
+            }
+          },
+          "title": "GenerationExecutionPolicy",
+          "type": "object"
+        }
+      },
       "properties": {
         "count": {
           "default": 100,
           "title": "Count",
           "type": "integer"
+        },
+        "execution_policy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GenerationExecutionPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "invalid_ratio": {
           "default": 0.0,

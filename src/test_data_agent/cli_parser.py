@@ -236,6 +236,12 @@ def register_dataset_commands(
     generate_epilog: str,
 ) -> None:
     """Register dataset profiling, generation, and validation commands."""
+    capacity_parser = subparsers.add_parser("estimate-capacity", help="Forecast file/database size and optionally calibrate generation time.")
+    capacity_parser.add_argument("spec", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
+    capacity_parser.add_argument("--database", choices=["logical", "postgresql"], default="logical")
+    capacity_parser.add_argument("--calibrate", action="store_true", help="Generate a bounded temporary synthetic sample for local size/time calibration.")
+    capacity_parser.add_argument("--sample-rows", type=positive_int, default=2000)
+    capacity_parser.add_argument("--no-cache", action="store_true", help="Skip the one-hour local aggregate calibration cache.")
     generate_parser = subparsers.add_parser(
         "generate",
         help="Generate a dataset from a DatasetSpec, or from a safe profile with --profile.",
@@ -703,6 +709,7 @@ def register_agent_commands(
         action="store_true",
         help="Force a fresh profile instead of reusing the metadata-only cache.",
     )
+    agent_plan_parser.add_argument("--execution-policy", type=Path, help="Explicit bounded scalable-v1 policy JSON to include in human review.")
     add_local_category_option(agent_plan_parser)
     agent_plan_parser.add_argument(
         "--json",

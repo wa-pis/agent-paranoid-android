@@ -11,6 +11,15 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.7.0rc2 Capacity And Performance Candidate
+
+The owner authorized `1.7.0rc2` on 2026-11-08 after implementation of
+`dataset-scale-estimation-performance`. Follow the same exact-source gates,
+independent technical AI review, Ubuntu preflight, signed acceptance and public
+verification described below. Candidate documentation belongs at
+`versions/1.7.0rc2/`; stable 1.6.0 remains the default. See
+[candidate status](1.7.0rc2-release-status.md). Publication is pending.
+
 ## 1.7.0rc1 Feedback Candidate
 
 The owner requested `1.7.0rc1` on 2026-10-25. It packages the post-1.6.0

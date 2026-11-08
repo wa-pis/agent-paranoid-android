@@ -40,7 +40,7 @@ def test_generator_stdio_inventory_and_every_tool_argument_refusal(tmp_path):
                     await client.initialize()
                     tools = (await client.list_tools()).tools
                     assert {tool.name for tool in tools} == expected
-                    assert len(expected) == 14
+                    assert len(expected) == 15
                     assert not any("approve_transformation" in tool.name for tool in tools)
                     for name in sorted(expected):
                         result = await client.call_tool(name, {"fictional-private-extra": True})

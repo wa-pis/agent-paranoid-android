@@ -29,6 +29,7 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
             )
         expected_fields = {field.name for field in entity.fields}
         primary_key_values: set[Any] = set()
+        field_distributions = [(field, field.typed_distribution) for field in entity.fields]
         for row_index, row in enumerate(rows):
             if not isinstance(row, Mapping):
                 errors.append(f"{entity.name}[{row_index}] row must be an object")
@@ -44,13 +45,12 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
                     errors.append(f"{entity.name}[{row_index}].{entity.primary_key} is not unique")
                 else:
                     primary_key_values.add(primary_key_value)
-            for field in entity.fields:
+            for field, distribution in field_distributions:
                 value = row.get(field.name)
                 if value in (None, ""):
                     if not field.nullable:
                         errors.append(f"{entity.name}[{row_index}].{field.name} is required")
                     continue
-                distribution = field.typed_distribution
                 if (
                     isinstance(value, str)
                     and isinstance(distribution, StringPatternDistribution)
@@ -58,7 +58,7 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
                 ):
                     errors.append(f"{entity.name}[{row_index}].{field.name} has wrong length")
                 if field.data_type == FieldType.DECIMAL:
-                    exact = field.typed_distribution
+                    exact = distribution
                     if not isinstance(exact, DecimalRangeDistribution) or not value_matches_decimal(
                         value, precision=exact.precision, scale=exact.scale,
                         low=exact.min, high=exact.max,

@@ -133,7 +133,12 @@ def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
         if args.source_type is not None
         else detect_agent_source_type(args.source)
     )
+    from test_data_agent.core.execution_policy import GenerationExecutionPolicy
+    from test_data_agent.core.limits import read_limited_text
+    policy_path = getattr(args, "execution_policy", None)
     return AgentRequest(
+        execution_policy=(GenerationExecutionPolicy.model_validate_json(read_limited_text(policy_path))
+                          if policy_path is not None else None),
         source_type=source_type,
         source_path=args.source,
         workspace=args.workspace,

@@ -46,6 +46,11 @@ Use these focused references for task detail:
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate generated data against a `DatasetSpec` | Validation report |
 
+Development-only addition: [`estimate-capacity`](../how-to/dataset-capacity.md)
+forecasts file/database bytes and optionally local generation time. The same
+guide describes opt-in `scalable-v1` policy settings. These additions are
+unreleased and absent from published `1.7.0rc1`.
+
 ## Selective Transformation (Review And Policy Decisions)
 
 `transform-review SOURCE POLICY.yaml` reads a fixed local source snapshot and
