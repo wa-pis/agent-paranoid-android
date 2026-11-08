@@ -225,6 +225,26 @@ def test_documentation_workflow_builds_strict_site() -> None:
     assert "persist-credentials: false" in workflow
 
 
+def test_documentation_parallel_editions_reuse_pinned_uv_executable() -> None:
+    workflow = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "docs.yml").read_text()
+    )
+    steps = workflow["jobs"]["build"]["steps"]
+    setup = next(step for step in steps if step["name"] == "Set up uv")
+    assert re.fullmatch(r"astral-sh/setup-uv@[0-9a-f]{40}", setup["uses"])
+    assert setup["with"]["version"] == "0.11.23"
+    editions = next(
+        step for step in steps
+        if step["name"] == "Exercise parallel host editions without deployment"
+    )
+    assert steps.index(setup) < steps.index(editions)
+    assert editions["run"].splitlines() == [
+        "uv run --no-sync playwright install --no-shell chromium",
+        "uv run --no-sync python -m scripts.build_readthedocs --output rtd-normal",
+        "READTHEDOCS_VERSION_TYPE=external uv run --no-sync python -m scripts.build_readthedocs --output rtd-preview",
+    ]
+
+
 def test_workflow_actions_are_pinned_to_full_commit_shas() -> None:
     action_reference = re.compile(r"^\s*uses:\s*[^@\s]+@([^\s#]+)", re.MULTILINE)
     workflows = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
