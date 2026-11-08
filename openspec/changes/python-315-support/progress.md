@@ -97,3 +97,23 @@ restricted process environment rejected controlling-TTY fixtures. The exact six
 batch confirmation tests pass with normal terminal access, with no code change
 or relaxed approval check. The full gate is being repeated with that access;
 Linux CI and previous-runtime compatibility remain pending. No release is made.
+
+### Full Local Gate And Linux Tooling Correction
+
+Source b2935188b69c3d7245825abfb73cf753603d93cc passed the complete
+`scripts/check_release.sh` under CPython 3.15.2/macOS arm64 with terminal access:
+4856 passed, 26 skipped, 2 warnings, 92% coverage, 179.12 seconds for the suite.
+Operational budgets, both schema freshness checks and synthetic quickstart
+passed. Existing opt-in live integrations remained skipped. The separately
+rechecked terminal/MCP transformation files passed 217 tests with 4 skips.
+The restricted run's eight failures were terminal-access failures; no runtime
+code or approval gates changed. The rebuilt wheel includes the 3.15 classifier
+and unchanged `Requires-Python: >=3.11`.
+
+PR #693 started Linux CI. All isolated optional/base/all wheel checks, including
+3.15, passed. Python 3.15 quality failed before project tests because pip-api
+0.0.34 vendors a parser importing removed `sre_constants`. Targeted update to
+pip-api 0.0.35 (development/audit dependency only) restores `pip_audit --version`.
+This is the eighth changed lock package; no runtime package/range changed.
+License/compatibility checks and the 30 focused tests pass with this update.
+Full hashed audit and refreshed CI remain pending; promotion is not yet complete.

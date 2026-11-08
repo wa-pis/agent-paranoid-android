@@ -156,3 +156,6 @@ environments that do not produce Parquet files.
 Python 3.15 compatibility is being verified in `python-315-support`. The locked
 profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing
 Python 3.11 minimum profiles and runtime dependency ranges.
+
+The locked development profile uses pip-api 0.0.35 so pip-audit can run on
+Python 3.15 without the removed `sre_constants` module.
