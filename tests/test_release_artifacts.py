@@ -56,7 +56,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     } <= set(metadata["keywords"])
     assert "agent" not in metadata["keywords"]
     assert "mcp" not in metadata["keywords"]
-    for version in ("3.11", "3.12", "3.13", "3.14"):
+    for version in ("3.11", "3.12", "3.13", "3.14", "3.15"):
         assert (
             f"Programming Language :: Python :: {version}"
             in metadata["classifiers"]
@@ -193,10 +193,11 @@ def test_ci_covers_supported_python_versions() -> None:
         "3.12",
         "3.13",
         "3.14",
+        "3.15",
     ]
     assert jobs["package-compatibility"]["strategy"]["matrix"][
         "python-version"
-    ] == ["3.11", "3.12", "3.13", "3.14"]
+    ] == ["3.11", "3.12", "3.13", "3.14", "3.15"]
     assert jobs["package-compatibility"]["name"] == (
         "Wheel compatibility (Python ${{ matrix.python-version }})"
     )
@@ -211,7 +212,12 @@ def test_ci_covers_supported_python_versions() -> None:
         for step in jobs["package-optional"]["steps"]
         if step["name"] == "Set up Python"
     )
-    assert optional_python["with"]["python-version"] == "3.14"
+    assert optional_python["with"]["python-version"] == "${{ matrix.python-version }}"
+    assert jobs["package-optional"]["strategy"]["matrix"]["python-version"] == [
+        "3.14", "3.15",
+    ]
+    for name in ("quality", "package-compatibility", "package-optional"):
+        assert not jobs[name].get("continue-on-error", False)
 
 
 def test_documentation_workflow_builds_strict_site() -> None:

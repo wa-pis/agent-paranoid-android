@@ -45,7 +45,7 @@ it does not replace the reviewed lock or minimum profiles.
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
 | `gigachat-minimum` | 3.11 | Base minimum; GigaChat 0.2.3 |
 | `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0; sqlglot 30.0.0 |
-| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4 |
+| `latest-all` | 3.11–3.15 | Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4 |
 
 MCP 1.28.1 requires Pydantic 2.11.0, so its minimum profile cannot reuse the
 base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
@@ -152,3 +152,11 @@ growth:
 These are regression budgets, not a guarantee that every platform installs the
 same count. `PyArrow` is the largest optional wheel, so keep `parquet` out of
 environments that do not produce Parquet files.
+
+Python 3.15 compatibility evidence is recorded in the `python-315-support`
+OpenSpec change. The locked
+profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing
+Python 3.11 minimum profiles and runtime dependency ranges.
+
+The locked development profile uses pip-api 0.0.35 so pip-audit can run on
+Python 3.15 without the removed `sre_constants` module.
