@@ -33,6 +33,12 @@ def _budget_findings(spec: DatasetSpec, estimate: CapacityEstimate) -> list[str]
             findings.append("Total cells exceed execution_policy.max_cells; reduce rows/columns or review a larger finite policy.")
         if estimate.file_bytes.high > min(policy.max_output_bytes, policy.max_temporary_bytes):
             findings.append("Forecast high bytes exceed output or temporary-disk policy; calibrate and review disk budgets. Actual byte limits remain authoritative.")
+        if policy.engine == 'scalable-relational-v1':
+            from test_data_agent.generation.scalable import check_scalable_spec
+            try:
+                check_scalable_spec(spec)
+            except ValueError:
+                findings.append('Relational execution is not admitted by this specification and policy; review supported acyclic synthetic keys, rules and finite budgets before generation.')
     return findings
 
 
@@ -50,7 +56,17 @@ def estimate_dataset_capacity(spec: DatasetSpec, *, database: Literal['logical',
         raise ValueError('calibration sample_rows must be between 100 and 5000')
     if sum(min(sample_rows, e.rows)*len(spec.entity(e.entity).fields) for e in estimate.entities) > 200_000:
         raise ValueError('calibration exceeds 200000-cell budget; reduce sample_rows')
-    if spec.relationships or spec.constraints or spec.business_rules or spec.relational_scenarios:
+    from test_data_agent.generation.relational import RELATIONAL_ENGINE
+    policy = spec.generation_settings.execution_policy
+    relational = policy is not None and policy.engine == RELATIONAL_ENGINE
+    if relational:
+        from test_data_agent.generation.scalable import check_scalable_spec
+        try:
+            check_scalable_spec(spec)
+        except ValueError:
+            estimate.duration_unknown_reason = 'Relational calibration requires a supported acyclic synthetic-key specification and finite execution policy.'
+            return estimate
+    if (spec.relationships and not relational) or spec.constraints or spec.business_rules or spec.relational_scenarios:
         estimate.duration_unknown_reason = 'Calibration of related or rule-constrained datasets is not supported; use a representative offline benchmark.'
         return estimate
     cache_path = workspace / '.apa-capacity-measurement.json' if workspace is not None and use_cache else None
@@ -158,6 +174,8 @@ def estimate_dataset_capacity(spec: DatasetSpec, *, database: Literal['logical',
     estimate.calibration = {'sample_rows_per_entity': sample_rows, 'python': sys.version.split()[0],
         'workers': sample.generation_settings.execution_policy.workers if sample.generation_settings.execution_policy else 1,
         'seconds': estimate.calibration_seconds}
+    if relational:
+        estimate.assumptions.append('Linked-table calibration measures the entire sampled graph; per-table time shares are apportioned by sampled cells, with no cross-table parallelism assumed.')
     estimate.assumptions += ['Calibration includes generation, safety validation, serialization and publication; same machine and engine required.',
         'Sample extrapolation can be optimistic for global state, compression, CPU contention and storage saturation.']
     if cache_path is not None and cache_writable:
@@ -175,6 +193,22 @@ def _calibrate(folder: Path, spec: DatasetSpec) -> None:
         started = time.monotonic()
         import pyarrow.parquet  # noqa: F401
         format_setup_seconds = time.monotonic()-started
+    from test_data_agent.generation.relational import RELATIONAL_ENGINE
+    policy = spec.generation_settings.execution_policy
+    if policy is not None and policy.engine == RELATIONAL_ENGINE:
+        # Keep the whole sampled graph: splitting tables would invalidate FK domains.
+        started = time.monotonic()
+        output = folder/'graph'
+        generate_dataset_bundle(spec, output_folder=output)
+        elapsed = time.monotonic()-started+format_setup_seconds
+        cells = sum(e.row_count*len(e.fields) for e in spec.entities)
+        result = {entity.name: {
+            'seconds': elapsed*entity.row_count*len(entity.fields)/max(1, cells),
+            'format_setup_seconds': 0.,
+            'bytes': (output/(entity.name+'.'+spec.generation_settings.output_format.value)).stat().st_size,
+        } for entity in spec.entities}
+        print(json.dumps({'entities': result}))
+        return
     # All sample output remains private, synthetic and temporary. No rows leave this process.
     for index, entity in enumerate(spec.entities):
         sample = spec.model_copy(update={

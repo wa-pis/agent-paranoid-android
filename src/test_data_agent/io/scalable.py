@@ -1,4 +1,4 @@
-"""Bounded streaming publication for explicitly opted-in independent datasets."""
+"""Bounded streaming publication for explicitly opted-in synthetic datasets."""
 from __future__ import annotations
 
 import csv
@@ -16,6 +16,8 @@ from test_data_agent.core.execution_policy import MAX_SCALABLE_JSON_ROW_CHARS
 from test_data_agent.core.generation_progress import GenerationProgress
 from test_data_agent.core.limits import GenerationBudget, GenerationLimitError, enforce_output_capacity, enforce_output_folder_size, max_output_bytes
 from test_data_agent.core.settings import OutputFormat, MAX_GENERATION_SEED
+from test_data_agent.generation.relational import RelationalPlan, merge_relationship_metrics, validate_relational_rows
+from test_data_agent.validation.relationship_validator import RelationshipMetrics
 from test_data_agent.generation.scalable import RowTask, RowBatch, check_scalable_spec, generate_task, resident_high_water_bytes
 from test_data_agent.io.artifacts import write_dataset_spec_artifact, write_dataset_profile_artifact, write_dataset_validation_report, write_generation_manifest, write_json_artifact
 from test_data_agent.io.csv_encoding import encode_csv_cell
@@ -46,16 +48,17 @@ BatchCheck = Callable[[dict[str, list[dict[str, Any]]]], None]
 BeforePublish = Callable[[Path, DatasetValidationReport], None]
 
 
-def _batches(spec: DatasetSpec, index: int, seed: int, budget: GenerationBudget) -> Generator[RowBatch, None, None]:
+def _batches(spec: DatasetSpec, index: int, seed: int, budget: GenerationBudget, plan: RelationalPlan | None = None) -> Generator[RowBatch, None, None]:
     policy = spec.generation_settings.execution_policy
     assert policy is not None
-    tasks = (RowTask(spec, index, start, min(policy.batch_size, spec.entities[index].row_count-start), seed)
+    tasks = (RowTask(spec, index, start, min(policy.batch_size, spec.entities[index].row_count-start), seed, plan)
              for start in range(0, spec.entities[index].row_count, policy.batch_size))
     if policy.workers == 1:
         for task in tasks:
             budget.check("streaming generation")
-            yield generate_task(task, budget=budget)
+            yield generate_task(task, budget=budget, reference_work_precharged=plan is not None)
         return
+    budget.check("parallel entity setup")
     pool = multiprocessing.get_context("spawn").Pool(policy.workers)
     try:
         while True:
@@ -99,12 +102,15 @@ def generate_scalable_bundle(
     if spec.generation_settings.seed is None:
         spec = spec.model_copy(deep=True)
         spec.generation_settings.seed = seed
-    check_scalable_spec(spec)
     policy = spec.generation_settings.execution_policy
     assert policy is not None
     if spec.generation_settings.output_format not in {OutputFormat.CSV, OutputFormat.JSON, OutputFormat.PARQUET}:
         raise ValueError("scalable-v1 supports csv, json and parquet")
     budget = generation_budget_for_invocation(max_seconds=policy.max_seconds)
+    plan = check_scalable_spec(spec, budget=budget)
+    if plan is not None:
+        budget.consume_rule_work(sum(entity.row_count*len(plan.incoming[index]) for index, entity in enumerate(spec.entities)))
+    relationship_metrics: list[RelationshipMetrics] = []
     started = time.monotonic()
     enforce_output_capacity(output_folder.parent)
     stage = make_staging_directory(output_folder)
@@ -121,7 +127,9 @@ def generate_scalable_bundle(
     total_rows = sum(e.row_count for e in spec.entities)
     fingerprint = model_fingerprint(spec)
     try:
-        for index, entity in enumerate(spec.entities):
+        for index in (plan.entity_order if plan is not None else range(len(spec.entities))):
+            budget.check("streaming entity setup")
+            entity = spec.entities[index]
             path = safe_entity_artifact_path(stage, entity.name, '.'+spec.generation_settings.output_format.value)
             parquet = None
             count = 0
@@ -136,7 +144,7 @@ def generate_scalable_bundle(
                 if spec.generation_settings.output_format == OutputFormat.JSON:
                     binary.write(b'[')
                 try:
-                    batches = _batches(spec, index, seed, budget)
+                    batches = _batches(spec, index, seed, budget, plan)
                     while True:
                         start = time.monotonic()
                         batch = next(batches, None)
@@ -152,6 +160,9 @@ def generate_scalable_bundle(
                             raise GenerationLimitError("process-tree memory exceeds execution policy")
                         if check_batch is not None:
                             check_batch({entity.name: rows})
+                        if plan is not None:
+                            merge_relationship_metrics(relationship_metrics, validate_relational_rows(
+                                spec, plan, index, rows, start=count, seed=seed, budget=budget))
                         start = time.monotonic()
                         if writer is not None:
                             writer.writerows([[encode_csv_cell(row[f.name]) for f in entity.fields] for row in rows])
@@ -205,12 +216,12 @@ def generate_scalable_bundle(
                 raise ValueError("streamed row count mismatch")
             actual_bytes += path.stat().st_size
             counts[entity.name] = count
-        report = independent_validation_report(spec)
+        report = scalable_validation_report(spec, relationship_metrics)
         write_dataset_spec_artifact(spec, stage/'dataset_spec.yaml')
         if profile is not None:
             write_dataset_profile_artifact(profile, stage/'profile.json')
         write_dataset_validation_report(report, stage)
-        write_json_artifact({'engine': 'scalable-v1', 'rows': sum(counts.values()),
+        write_json_artifact({'engine': policy.engine, 'rows': sum(counts.values()),
             'generation_and_validation_seconds': generation_seconds, 'writing_seconds': writing_seconds,
             'task_generation_seconds': task_generation_seconds, 'task_validation_seconds': task_validation_seconds,
             'task_count': task_count,
@@ -237,16 +248,24 @@ def generate_scalable_bundle(
         mode=spec.generation_settings.mode, row_counts=counts, validation=report)
 
 
-def independent_validation_report(spec: DatasetSpec) -> DatasetValidationReport:
-    """Canonical successful report after every batch and global identifier proof passed."""
+def scalable_validation_report(spec: DatasetSpec, metrics: list[RelationshipMetrics] | None = None) -> DatasetValidationReport:
+    """Successful report only after mandatory row and synthetic-reference proofs."""
+    by_key = {(item.parent_entity, item.parent_field, item.child_entity, item.child_field): item for item in metrics or []}
+    active = [relationship for relationship in spec.relationships if relationship.status != "rejected"]
+    ordered = []
+    for relationship in active:
+        key = (relationship.parent_entity, relationship.parent_field, relationship.child_entity, relationship.child_field)
+        if key not in by_key:
+            raise ValueError("missing executed relationship evidence")
+        ordered.append(by_key[key])
     settings = spec.validation_settings.model_copy(deep=True)
     sections = []
     for name, enabled in [('schema', settings.validate_schema), ('relationships', settings.validate_relationships),
                           ('constraints', settings.validate_constraints), ('privacy', settings.validate_privacy)]:
-        if enabled:
-            sections.append(ValidationSection(name=name, passed=0 if name == 'relationships' else 1,
-                checked=0 if name == 'relationships' else None,
-                relationship_metrics=[] if name == 'relationships' else None))
+        if enabled or (name == 'relationships' and active):
+            sections.append(ValidationSection(name=name, passed=len(ordered) if name == 'relationships' else 1,
+                checked=len(ordered) if name == 'relationships' else None,
+                relationship_metrics=ordered if name == 'relationships' else None))
     return DatasetValidationReport(valid=True, settings=settings, sections=sections,
-        utility=ValidationUtilityEvidence(spec_sha256=model_fingerprint(spec), active_relationships=0,
-            relationship_checks='not_declared', active_temporal_constraints=0, temporal_checks='not_declared'))
+        utility=ValidationUtilityEvidence(spec_sha256=model_fingerprint(spec), active_relationships=len(active),
+            relationship_checks='executed' if active else 'not_declared', active_temporal_constraints=0, temporal_checks='not_declared'))
