@@ -106,7 +106,8 @@ signatures and hardened container workloads. Container signature identity is
 [Capacity guidance](how-to/dataset-capacity.md) describes byte/time ranges,
 explicit budgets and the independent-table scalable engine. Relationships,
 global rules and unsupported generation modes use the existing bounded path;
-the new engine rejects them before generation. Memory checks are cooperative,
+the new engine rejects them before generation. Scalable execution requires Linux or macOS; native Windows execution of this
+engine is unsupported in this RC. Memory checks are cooperative,
 not OS isolation. Timing forecasts cover standalone source-free bundles and
 exclude attached-source scans and human review. Benchmark evidence retains its
 measured implementation/environment identity rather than becoming a later
