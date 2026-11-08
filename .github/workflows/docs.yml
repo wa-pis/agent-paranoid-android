@@ -37,7 +37,7 @@ jobs:
           python-version: "3.12"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version: "0.11.23"
           enable-cache: true
@@ -62,10 +62,9 @@ jobs:
           READTHEDOCS_GIT_COMMIT_HASH: ${{ github.sha }}
           READTHEDOCS_CANONICAL_URL: https://example.invalid/en/latest/
         run: |
-          python -m pip install uv==0.11.23
-          python -m uv run --no-sync playwright install --no-shell chromium
-          python -m uv run --no-sync python -m scripts.build_readthedocs --output rtd-normal
-          READTHEDOCS_VERSION_TYPE=external python -m uv run --no-sync python -m scripts.build_readthedocs --output rtd-preview
+          uv run --no-sync playwright install --no-shell chromium
+          uv run --no-sync python -m scripts.build_readthedocs --output rtd-normal
+          READTHEDOCS_VERSION_TYPE=external uv run --no-sync python -m scripts.build_readthedocs --output rtd-preview
 
       - name: Preserve parallel edition build evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -139,7 +138,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Set up uv without a shared privileged cache
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version: '0.11.23'
           enable-cache: false
