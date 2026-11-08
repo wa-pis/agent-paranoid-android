@@ -16,6 +16,7 @@
     "profile-csv-folder": "profile-example"
   },
   "commands": [
+    "estimate-capacity",
     "generate",
     "export-postgres-sql",
     "profile-example",

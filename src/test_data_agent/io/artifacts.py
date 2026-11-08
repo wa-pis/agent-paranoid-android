@@ -91,11 +91,12 @@ class GenerationManifest(BaseModel):
     source_rows_copied: Literal[False] = False
     entity_artifacts: dict[str, str] | None = Field(default=None)
     csv_encoding: Literal["backslash-null-v1"] | None = Field(default=None)
+    generation_execution: dict[str, Any] | None = None
 
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
-        for name in ("entity_artifacts", "csv_encoding"):
+        for name in ("entity_artifacts", "csv_encoding", "generation_execution"):
             if getattr(self, name) is None:
                 payload.pop(name, None)
         return payload
@@ -185,6 +186,8 @@ def write_generation_manifest(
     spec_sha256 = dataset_spec_fingerprint(spec)
     business_validation = business_validation_manifest(business_report)
     manifest = GenerationManifest(
+        generation_execution=(spec.generation_settings.execution_policy.model_dump()
+                              if spec.generation_settings.execution_policy is not None else None),
         entity_artifacts=entity_artifacts,
         csv_encoding=CSV_ENCODING if output_format == OutputFormat.CSV else None,
         dataset_spec_schema_version=spec.schema_version,

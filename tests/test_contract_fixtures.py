@@ -92,6 +92,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         "common_transformation",
         "configured_query_session",
         "export_dataset",
+        "estimate_dataset_capacity",
         "generate_dataset",
         "infer_dataset_spec",
         "inspect_dataset_plan",

@@ -93,8 +93,17 @@ def run_dataset_command(
     configured_applier = (
         make_business_rules_applier(load_business_rules(args.business_rules))
         if args.command in {"generate", "generate-from-csv"} and getattr(args, "business_rules", None) is not None
-        else apply_rules
+        else apply_rules if rules_path is not None else None
     )
+
+    if args.command == "estimate-capacity":
+        from test_data_agent.io.capacity import estimate_dataset_capacity
+        from test_data_agent.io.readers import load_dataset_spec
+        estimate = estimate_dataset_capacity(load_dataset_spec(args.spec), database=args.database,
+            calibrate=args.calibrate, sample_rows=args.sample_rows,
+            workspace=args.spec.resolve().parent, use_cache=not args.no_cache)
+        print(json.dumps(estimate.model_dump(mode="json")))
+        return 0
 
     if args.command == "generate":
         if args.profile is not None:

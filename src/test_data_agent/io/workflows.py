@@ -15,6 +15,7 @@ from test_data_agent.adapters import (
 from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.generation_progress import GenerationProgress
 from test_data_agent.rules.validation import BusinessValidationReport
 from test_data_agent.rules.models import BusinessRules
 from test_data_agent.rules.business_config import embed_configured_business_rules
@@ -91,6 +92,7 @@ def generate_dataset_bundle(
     overwrite: bool = False,
     profile: DatasetProfile | None = None,
     source_folder: Path | None = None,
+    progress: Callable[[GenerationProgress], None] | None = None,
 ) -> DatasetGenerationResult:
     if profile is not None:
         assert_profile_safe(profile)
@@ -110,7 +112,8 @@ def generate_dataset_bundle(
     if not effective_spec.entities:
         raise ValueError("dataset spec must contain at least one entity")
     effective_output_format = output_format or effective_spec.generation_settings.output_format
-    max_count = max_generation_count()
+    execution_policy = effective_spec.generation_settings.execution_policy
+    max_count = execution_policy.max_rows if execution_policy is not None else max_generation_count()
     if count is not None:
         if count < 1:
             raise ValueError("count must be positive")
@@ -134,6 +137,13 @@ def generate_dataset_bundle(
 
     if embed_configured_business_rules(effective_spec, business_rules_applier):
         business_rules_applier = None
+    if execution_policy is not None:
+        from test_data_agent.io.scalable import generate_scalable_bundle
+        if business_rules_applier is not None:
+            raise ValueError("scalable-v1 does not support callback business rules")
+        return generate_scalable_bundle(effective_spec, output_folder=output_folder,
+            seed=effective_seed, profile=profile, overwrite=overwrite, progress=progress,
+            check_batch=(lambda rows: assert_no_csv_folder_source_rows(source_folder, rows)) if source_folder is not None else None)
     budget = prepare_generation_budget(effective_spec, output_folder)
     embedded_reports: list[BusinessValidationReport] = []
     rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget, business_reports=embedded_reports)
@@ -571,12 +581,16 @@ def max_generation_count() -> int:
 
 
 def enforce_generation_row_count_limits(spec: DatasetSpec, *, max_count: int | None = None) -> None:
+    if spec.generation_settings.execution_policy is not None:
+        from test_data_agent.generation.scalable import check_scalable_spec
+        check_scalable_spec(spec)
+        max_count = spec.generation_settings.execution_policy.max_rows
     for entity in spec.entities:
         try:
             enforce_row_count_limit(entity.row_count, max_count=max_count)
         except ValueError as exc:
             effective_max = max_generation_count() if max_count is None else max_count
-            raise ValueError(f"entity row_count must be <= {effective_max}: {entity.name}") from exc
+            raise ValueError(f"entity row_count must be <= {effective_max}: {entity.name}; for supported independent tables, review an explicit finite execution_policy") from exc
 
 
 def prepare_generation_budget(spec: DatasetSpec, output_path: Path | None) -> GenerationBudget:

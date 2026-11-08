@@ -1,0 +1,503 @@
+{
+  "shape": {
+    "total_rows": 750000,
+    "columns_per_table": 25,
+    "tables": {
+      "accounts": 150000,
+      "purchases": 300000,
+      "items": 300000
+    },
+    "relationships": [
+      "accounts -> purchases",
+      "purchases -> items"
+    ],
+    "seed": 42,
+    "format": "csv",
+    "batch_size": 2000,
+    "memory_limit_bytes": 1073741824
+  },
+  "runs": [
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 1,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 59.169537333305925,
+      "bytes": 172881831,
+      "maxrss": 82067456,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 59.02505704201758,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 50.74075491959229,
+        "process_tree_peak_upper_bound_bytes": 156090368,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 40.42886343924329,
+        "task_validation_seconds": 10.309187666513026,
+        "writing_seconds": 4.019750995095819
+      },
+      "repeat": 0
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 1,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 58.124685999937356,
+      "bytes": 172881831,
+      "maxrss": 82788352,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 57.98045245883986,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 49.895723880734295,
+        "process_tree_peak_upper_bound_bytes": 156614656,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 39.90829864656553,
+        "task_validation_seconds": 9.984945255331695,
+        "writing_seconds": 3.911144294310361
+      },
+      "repeat": 1
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 1,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 58.69830812513828,
+      "bytes": 172881832,
+      "maxrss": 79183872,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 58.55677758296952,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 50.34778205258772,
+        "process_tree_peak_upper_bound_bytes": 156336128,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 40.20787338586524,
+        "task_validation_seconds": 10.137105936184525,
+        "writing_seconds": 3.9730925294570625
+      },
+      "repeat": 2
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 2,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 38.42828037496656,
+      "bytes": 172881832,
+      "maxrss": 84393984,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 38.2882902091369,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 29.893566788639873,
+        "process_tree_peak_upper_bound_bytes": 233160704,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 44.679312790278345,
+        "task_validation_seconds": 12.822016716003418,
+        "writing_seconds": 4.254120753612369
+      },
+      "repeat": 0
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 2,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 42.5197279592976,
+      "bytes": 172881834,
+      "maxrss": 85377024,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 42.374550082720816,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 32.84340433822945,
+        "process_tree_peak_upper_bound_bytes": 234192896,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 49.373767347075045,
+        "task_validation_seconds": 13.792540358845145,
+        "writing_seconds": 4.7877487181685865
+      },
+      "repeat": 1
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 2,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 63.84797570807859,
+      "bytes": 172881830,
+      "maxrss": 84328448,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 63.11079191695899,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 49.13348169904202,
+        "process_tree_peak_upper_bound_bytes": 232800256,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 73.99115012399852,
+        "task_validation_seconds": 20.92443470424041,
+        "writing_seconds": 6.593829968012869
+      },
+      "repeat": 2
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 4,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 109.96684437477961,
+      "bytes": 172881833,
+      "maxrss": 88850432,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 109.79197012493387,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 74.17636499321088,
+        "process_tree_peak_upper_bound_bytes": 389365760,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 213.30824657622725,
+        "task_validation_seconds": 60.31348862312734,
+        "writing_seconds": 18.260266046971083
+      },
+      "repeat": 0
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 4,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 29.936185208149254,
+      "bytes": 172881832,
+      "maxrss": 87834624,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 29.775743125006557,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 19.12380269076675,
+        "process_tree_peak_upper_bound_bytes": 390496256,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 55.01974908309057,
+        "task_validation_seconds": 15.756928445771337,
+        "writing_seconds": 5.483102960046381
+      },
+      "repeat": 1
+    },
+    {
+      "count": 750000,
+      "columns": 25,
+      "workers": 4,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "cc87478d87b9a37fcee97f79946157f2afeec283c2ee814a9b74124443282169",
+        "items.csv": "9c9e07263d63194d7d44584417a1b4b9026e63c6af45a12804cccca57656937d",
+        "purchases.csv": "04de20f7ad849324619f12b053991bdf2084fbc9d8fc06258a42fbad410b6a43"
+      },
+      "seconds": 30.057954707648605,
+      "bytes": 172881833,
+      "maxrss": 87851008,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 172858082,
+        "elapsed_seconds": 29.89849516702816,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 19.125002787914127,
+        "process_tree_peak_upper_bound_bytes": 390496256,
+        "rows": 750000,
+        "task_count": 375,
+        "task_generation_seconds": 55.143511783797294,
+        "task_validation_seconds": 15.970195130445063,
+        "writing_seconds": 5.514543589670211
+      },
+      "repeat": 2
+    }
+  ],
+  "smaller_runs": [
+    {
+      "count": 10000,
+      "columns": 25,
+      "workers": 1,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "e87ba5ba547b5d87d14da02ab0c07e86d4df0ec0e015d04821693d006d5b9c38",
+        "items.csv": "1eeb936dc28499047e5cfb4ba9536372fddb9d3d11fe7f72da1fc0bb1b7fe34e",
+        "purchases.csv": "ff6608982b5fef14f5ae7d3ce3fd19f0e407307f87f77a19b05743b36ae2ba38"
+      },
+      "seconds": 4.568072583060712,
+      "bytes": 2330546,
+      "maxrss": 77447168,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 2306826,
+        "elapsed_seconds": 4.509922625031322,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 3.842722706962377,
+        "process_tree_peak_upper_bound_bytes": 153141248,
+        "rows": 10000,
+        "task_count": 5,
+        "task_generation_seconds": 3.087526000570506,
+        "task_validation_seconds": 0.7550082914531231,
+        "writing_seconds": 0.295564791187644
+      },
+      "repeat": 0
+    },
+    {
+      "count": 10000,
+      "columns": 25,
+      "workers": 2,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "e87ba5ba547b5d87d14da02ab0c07e86d4df0ec0e015d04821693d006d5b9c38",
+        "items.csv": "1eeb936dc28499047e5cfb4ba9536372fddb9d3d11fe7f72da1fc0bb1b7fe34e",
+        "purchases.csv": "ff6608982b5fef14f5ae7d3ce3fd19f0e407307f87f77a19b05743b36ae2ba38"
+      },
+      "seconds": 7.34274254180491,
+      "bytes": 2330548,
+      "maxrss": 80101376,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 2306826,
+        "elapsed_seconds": 7.284666209015995,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 6.589954417198896,
+        "process_tree_peak_upper_bound_bytes": 225263616,
+        "rows": 10000,
+        "task_count": 5,
+        "task_generation_seconds": 4.125574708916247,
+        "task_validation_seconds": 1.0213530827313662,
+        "writing_seconds": 0.30845766607671976
+      },
+      "repeat": 0
+    },
+    {
+      "count": 10000,
+      "columns": 25,
+      "workers": 4,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "e87ba5ba547b5d87d14da02ab0c07e86d4df0ec0e015d04821693d006d5b9c38",
+        "items.csv": "1eeb936dc28499047e5cfb4ba9536372fddb9d3d11fe7f72da1fc0bb1b7fe34e",
+        "purchases.csv": "ff6608982b5fef14f5ae7d3ce3fd19f0e407307f87f77a19b05743b36ae2ba38"
+      },
+      "seconds": 7.493024374824017,
+      "bytes": 2330546,
+      "maxrss": 79921152,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 2306826,
+        "elapsed_seconds": 7.43534483294934,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 6.720130542758852,
+        "process_tree_peak_upper_bound_bytes": 368918528,
+        "rows": 10000,
+        "task_count": 5,
+        "task_generation_seconds": 4.132578042335808,
+        "task_validation_seconds": 1.0208210423588753,
+        "writing_seconds": 0.3056217501871288
+      },
+      "repeat": 0
+    },
+    {
+      "count": 100000,
+      "columns": 25,
+      "workers": 1,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "93f19e02d8c37d0a5870ec87f5326cb82f8ba4c997941e2f0c60e1a28bb13f60",
+        "items.csv": "fab8fa70c5329f3601d64f795d3ebbd48f2a81561a9dc91d946c5dbce821b16c",
+        "purchases.csv": "adc757e45b78d2ec9029f75ba69d753d5e86d14ac5a17cab9ae47d958211dccb"
+      },
+      "seconds": 14.805420042015612,
+      "bytes": 23075319,
+      "maxrss": 78086144,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 23051581,
+        "elapsed_seconds": 14.766561208292842,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 13.126856250222772,
+        "process_tree_peak_upper_bound_bytes": 154255360,
+        "rows": 100000,
+        "task_count": 50,
+        "task_generation_seconds": 10.419319748412818,
+        "task_validation_seconds": 2.706876914948225,
+        "writing_seconds": 1.0034143324010074
+      },
+      "repeat": 0
+    },
+    {
+      "count": 100000,
+      "columns": 25,
+      "workers": 2,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "93f19e02d8c37d0a5870ec87f5326cb82f8ba4c997941e2f0c60e1a28bb13f60",
+        "items.csv": "fab8fa70c5329f3601d64f795d3ebbd48f2a81561a9dc91d946c5dbce821b16c",
+        "purchases.csv": "adc757e45b78d2ec9029f75ba69d753d5e86d14ac5a17cab9ae47d958211dccb"
+      },
+      "seconds": 6.372322999872267,
+      "bytes": 23075319,
+      "maxrss": 83771392,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 23051581,
+        "elapsed_seconds": 6.343872708734125,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 5.0367571683600545,
+        "process_tree_peak_upper_bound_bytes": 229244928,
+        "rows": 100000,
+        "task_count": 50,
+        "task_generation_seconds": 6.8392973761074245,
+        "task_validation_seconds": 1.9180063740350306,
+        "writing_seconds": 0.6635912084020674
+      },
+      "repeat": 0
+    },
+    {
+      "count": 100000,
+      "columns": 25,
+      "workers": 4,
+      "engine": "scalable-relational-v1",
+      "data_sha256": {
+        "accounts.csv": "93f19e02d8c37d0a5870ec87f5326cb82f8ba4c997941e2f0c60e1a28bb13f60",
+        "items.csv": "fab8fa70c5329f3601d64f795d3ebbd48f2a81561a9dc91d946c5dbce821b16c",
+        "purchases.csv": "adc757e45b78d2ec9029f75ba69d753d5e86d14ac5a17cab9ae47d958211dccb"
+      },
+      "seconds": 5.159762290772051,
+      "bytes": 23075316,
+      "maxrss": 88670208,
+      "maxrss_unit": "bytes",
+      "python": "3.13.14",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "cpus": 14,
+      "valid": true,
+      "stages": {
+        "dataset_bytes": 23051581,
+        "elapsed_seconds": 5.126762916799635,
+        "engine": "scalable-relational-v1",
+        "generation_and_validation_seconds": 3.582140291109681,
+        "process_tree_peak_upper_bound_bytes": 389316608,
+        "rows": 100000,
+        "task_count": 50,
+        "task_generation_seconds": 8.266231454443187,
+        "task_validation_seconds": 2.287456165999174,
+        "writing_seconds": 0.7619421631097794
+      },
+      "repeat": 0
+    }
+  ]
+}

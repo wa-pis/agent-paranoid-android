@@ -32,6 +32,7 @@ from test_data_agent.agent import (
 )
 from test_data_agent.audit import audit_logger_from_env
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.execution_policy import GenerationExecutionPolicy
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
     enforce_profile_payload_size,
@@ -98,6 +99,23 @@ def review_transformation(input_path: str, policy_path: str, table_name: str | N
             max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=budget)
     return {"operation": "review_transformation", "status": "review_only",
             "snapshot_sha256": request.snapshot_sha256, "review": json.loads(request.review)}
+
+
+def estimate_dataset_capacity(spec_path: str, calibrate: bool = False,
+                              sample_rows: int = 2000,
+                              database: Literal["logical", "postgresql"] = "logical",
+                              use_cache: bool = True) -> dict[str, Any]:
+    """Forecast file bytes, DB payload and local generation time from a workspace spec.
+
+    Metadata-only by default. Explicit calibration generates bounded temporary
+    synthetic samples (no final dataset); responses contain numeric summaries,
+    uncertainty and assumptions only. This does not approve generation.
+    """
+    from test_data_agent.io.capacity import estimate_dataset_capacity as estimate
+    source = resolve_workspace_path(spec_path, must_exist=True, expect_file=True)
+    _require_suffix(source, {".json", ".yaml", ".yml"}, "spec input")
+    return estimate(load_dataset_spec(source), database=database, calibrate=calibrate,
+                    sample_rows=sample_rows, workspace=workspace_root(), use_cache=use_cache).model_dump(mode="json")
 
 
 def profile_csv(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
@@ -274,9 +292,11 @@ def plan_dataset(
     table_name: str | None = None,
     rule_sample_rows: int = 50_000,
     use_cache: bool = True,
+    execution_policy: GenerationExecutionPolicy | None = None,
 ) -> dict[str, Any]:
-    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths and summaries without generating rows; inspect the plan and obtain human review before approval."""
+    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables or scalable-relational-v1 for acyclic synthetic-primary-key many-to-one/one-to-one links. Both enforce explicit rows/cells/disk/time/memory limits and 1-4 workers; cycles and global rules reject. Policy changes require renewed exact-fingerprint review."""
 
+    policy = GenerationExecutionPolicy.model_validate(execution_policy) if execution_policy is not None else None
     source = resolve_workspace_path(source_path, must_exist=True)
     workspace = resolve_workspace_path(workspace_path)
     ensure_new_agent_workspace(workspace)
@@ -287,6 +307,7 @@ def plan_dataset(
     )
     result = plan_agent_request(
         AgentRequest(
+            execution_policy=policy,
             source_type=selected_source_type,
             source_path=source,
             workspace=workspace,
@@ -456,6 +477,13 @@ def inspect_dataset_plan(workspace_path: str) -> dict[str, Any]:
         response["summary"] = status.summary.model_dump(mode="json")
     elif isinstance(status.summary, AgentRecoverySummary):
         response["summary"] = status.summary.model_dump(mode="json")
+    progress_path = workspace / "generation_progress.json"
+    if progress_path.exists():
+        from test_data_agent.core.generation_progress import GenerationProgress
+        from test_data_agent.core.limits import read_limited_text
+        progress = GenerationProgress.model_validate_json(read_limited_text(progress_path, max_bytes=8192))
+        if status.review is not None and progress.spec_sha256 == status.review.current_spec_sha256:
+            response["generation_progress"] = progress.model_dump(mode="json")
     return response
 
 
@@ -463,6 +491,7 @@ def compact_agent_plan_summary(summary: AgentPlanSummary) -> dict[str, Any]:
     """Preserve the existing metadata-minimal MCP response contract."""
 
     return {
+        **({"capacity_estimate": summary.capacity_estimate.model_dump(mode="json")} if summary.capacity_estimate is not None else {}),
         "source_type": summary.source_type,
         "entities": [
             {
@@ -721,6 +750,7 @@ def execute_transformation(
 
 
 _GENERATOR_MCP_TOOLS = (
+    estimate_dataset_capacity,
     execute_transformation,
     review_transformation,
     profile_csv,

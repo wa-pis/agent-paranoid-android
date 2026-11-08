@@ -967,6 +967,80 @@
         "title": "FormulaRule",
         "type": "object"
       },
+      "GenerationExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "batch_size": {
+            "default": 2000,
+            "maximum": 10000,
+            "minimum": 1,
+            "title": "Batch Size",
+            "type": "integer"
+          },
+          "engine": {
+            "default": "scalable-v1",
+            "pattern": "^(scalable-v1|scalable-relational-v1)$",
+            "title": "Engine",
+            "type": "string"
+          },
+          "max_cells": {
+            "default": 25000000,
+            "maximum": 100000000,
+            "minimum": 1,
+            "title": "Max Cells",
+            "type": "integer"
+          },
+          "max_memory_bytes": {
+            "default": 1073741824,
+            "maximum": 8589934592,
+            "minimum": 268435456,
+            "title": "Max Memory Bytes",
+            "type": "integer"
+          },
+          "max_output_bytes": {
+            "default": 536870912,
+            "maximum": 8589934592,
+            "minimum": 1,
+            "title": "Max Output Bytes",
+            "type": "integer"
+          },
+          "max_rows": {
+            "default": 1000000,
+            "maximum": 10000000,
+            "minimum": 1,
+            "title": "Max Rows",
+            "type": "integer"
+          },
+          "max_seconds": {
+            "default": 600,
+            "exclusiveMinimum": 0,
+            "maximum": 3600,
+            "title": "Max Seconds",
+            "type": "number"
+          },
+          "max_temporary_bytes": {
+            "default": 536870912,
+            "maximum": 8589934592,
+            "minimum": 1,
+            "title": "Max Temporary Bytes",
+            "type": "integer"
+          },
+          "require_distinct_rows": {
+            "default": true,
+            "title": "Require Distinct Rows",
+            "type": "boolean"
+          },
+          "workers": {
+            "default": 1,
+            "maximum": 4,
+            "minimum": 1,
+            "title": "Workers",
+            "type": "integer"
+          }
+        },
+        "title": "GenerationExecutionPolicy",
+        "type": "object"
+      },
       "GenerationMode": {
         "enum": [
           "valid",
@@ -980,6 +1054,17 @@
       },
       "GenerationSettings": {
         "properties": {
+          "execution_policy": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/GenerationExecutionPolicy"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "invalid_ratio": {
             "default": 0.0,
             "maximum": 1.0,
