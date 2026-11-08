@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/1.7.0rc1/handbook/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/1.7.0rc2/handbook/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
     <title>User Handbook / Руководство пользователя - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "User Handbook / \u0420\u0443\u043a\u043e\u0432\u043e\u0434\u0441\u0442\u0432\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f";
         var mkdocs_page_input_path = "handbook.md";
-        var mkdocs_page_url = "/agent-paranoid-android/1.7.0rc1/handbook/";
+        var mkdocs_page_url = "/agent-paranoid-android/1.7.0rc2/handbook/";
       </script>
     
     <!--[if lt IE 9]>
@@ -86,6 +86,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -209,9 +211,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 0014efa4b652c26573447734330f405918d6e13b
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
+  <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
+  <br>Documentation b996da8e4db1435406ac39b5294d234c4a9f9c6c
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -224,7 +226,7 @@
 <ul><li><a href="#index">Overview</a></li><li><a href="#getting-started-installation">Installation</a></li><li><a href="#getting-started-first-csv">First CSV Dataset</a></li><li><a href="#getting-started-related-tables">Related Tables</a></li><li><a href="#getting-started-review-output">Review The Output</a></li></ul>
 
 <h2><a href="#section-2">How-To Guides</a></h2>
-<ul><li><a href="#how-to-business-rules">Add Business Rules</a></li><li><a href="#how-to-postgresql">Profile PostgreSQL</a></li><li><a href="#how-to-trino">Profile Through Trino</a></li><li><a href="#how-to-transformation">Transform Local Data</a></li></ul>
+<ul><li><a href="#how-to-business-rules">Add Business Rules</a></li><li><a href="#how-to-postgresql">Profile PostgreSQL</a></li><li><a href="#how-to-trino">Profile Through Trino</a></li><li><a href="#how-to-transformation">Transform Local Data</a></li><li><a href="#how-to-dataset-capacity">Forecast And Scale Datasets</a></li></ul>
 
 <h2><a href="#section-3">Integrations</a></h2>
 <ul><li><a href="#how-to-mcp">Connect An MCP Client</a></li><li><a href="#ai_integration">Connect An AI Client</a></li><li><a href="#operations-containers">Containers</a></li></ul>
@@ -254,10 +256,10 @@ explicit specification, then review the plan before generating fresh values.</p>
 <p>Stable <code>1.6.0</code> is the recommended release.
 Use the CLI below or the runnable
 <a href="https://github.com/wa-pis/agent-paranoid-android/tree/v1.6.0/examples/python_api">Python API example</a>.</p>
-<p>This source guide targets candidate <code>1.7.0rc1</code>; the commands below select it explicitly.
-See <a href="#1.7.0rc1-release-status">candidate status</a> for publication and acceptance.</p>
+<p>This source guide targets candidate <code>1.7.0rc2</code>; the commands below select it explicitly.
+See <a href="#1.7.0rc2-release-status">candidate status</a> for publication and acceptance.</p>
 <h2 id="index-five-minute-check">Five-Minute Check<a class="headerlink" href="#index-five-minute-check" title="Permanent link">&para;</a></h2>
-<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android==1.7.0rc1&quot;
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
 test-data-agent doctor
 test-data-agent demo --output out/demo
 </code></pre>
@@ -349,30 +351,30 @@ changing this matrix are defined in
 <a href="#reference-generation-contract-migration">migration notes</a> before
 regenerating existing fixtures.</p>
 <h2 id="getting-started-installation-install-from-pypi">Install From PyPI<a class="headerlink" href="#getting-started-installation-install-from-pypi" title="Permanent link">&para;</a></h2>
-<p>The stable release is <code>1.6.0</code>. This candidate guide pins <code>1.7.0rc1</code>
-explicitly; check <a href="#1.7.0rc1-release-status">candidate status</a> before installing.
+<p>The stable release is <code>1.6.0</code>. This candidate guide pins <code>1.7.0rc2</code>
+explicitly; check <a href="#1.7.0rc2-release-status">candidate status</a> before installing.
 For the recommended stable package use <code>pip install "agent-paranoid-android==1.6.0"</code>.</p>
 <p>Create an isolated environment:</p>
 <h3 id="getting-started-installation-macos-and-linux">macOS and Linux<a class="headerlink" href="#getting-started-installation-macos-and-linux" title="Permanent link">&para;</a></h3>
 <pre><code class="language-bash">python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install &quot;agent-paranoid-android==1.7.0rc1&quot;
+python3 -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
 </code></pre>
 <p>The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:</p>
-<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[parquet]==1.7.0rc1&quot;
-python3 -m pip install &quot;agent-paranoid-android[mcp]==1.7.0rc1&quot;
-python3 -m pip install &quot;agent-paranoid-android[mcp,trino]==1.7.0rc1&quot;
-python3 -m pip install &quot;agent-paranoid-android[postgres]==1.7.0rc1&quot;
-python3 -m pip install &quot;agent-paranoid-android[openai]==1.7.0rc1&quot;
-python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.7.0rc1&quot;
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[parquet]==1.7.0rc2&quot;
+python3 -m pip install &quot;agent-paranoid-android[mcp]==1.7.0rc2&quot;
+python3 -m pip install &quot;agent-paranoid-android[mcp,trino]==1.7.0rc2&quot;
+python3 -m pip install &quot;agent-paranoid-android[postgres]==1.7.0rc2&quot;
+python3 -m pip install &quot;agent-paranoid-android[openai]==1.7.0rc2&quot;
+python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.7.0rc2&quot;
 </code></pre>
 <p>Dependency footprint budgets live in <a href="#reference-dependency-compatibility-installation-footprint">Dependency Compatibility</a>.</p>
 <p>The <code>all</code> extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 <code>test-data-agent doctor --require-extra all</code> to verify that full environment.</p>
-<p>The experimental GigaChat adapter is retained in <code>1.7.0rc1</code> through its
+<p>The experimental GigaChat adapter is retained in <code>1.7.0rc2</code> through its
 explicit <code>gigachat</code> extra. Follow
 <a href="#how-to-gigachat">Use The GigaChat Advisor</a> for authentication, mandatory
 TLS verification, and the review-first workflow. The default provider remains
@@ -384,7 +386,7 @@ exact stable pin only when needed.</p>
 <pre><code class="language-powershell">py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install &quot;agent-paranoid-android==1.7.0rc1&quot;
+python -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
 </code></pre>
 <p>Run the self-contained environment check:</p>
 <pre><code class="language-bash">test-data-agent doctor
@@ -1391,7 +1393,127 @@ confined and return metadata, not rows.</p>
 <p>See the <a href="#reference-cli-implemented-rc-execution-candidate">CLI contract</a>
 for formats and arguments, <a href="#reference-mcp-permissions">MCP permissions</a>
 for integration rights, and <a href="#reference-configuration">Configuration</a>
-for schemas and budgets. Historical RC anchors remain valid links.</p></section></section>
+for schemas and budgets. Historical RC anchors remain valid links.</p></section><section class="print-page" id="how-to-dataset-capacity" heading-number="2.5"><h1 id="how-to-dataset-capacity-forecast-and-generate-larger-synthetic-datasets">Forecast And Generate Larger Synthetic Datasets<a class="headerlink" href="#how-to-dataset-capacity-forecast-and-generate-larger-synthetic-datasets" title="Permanent link">&para;</a></h1>
+<p>These additions target <code>1.7.0rc2</code>, whose publication is pending. They are not
+available in <code>1.7.0rc1</code>. Stable 1.6.0 remains the recommended default.</p>
+<h2 id="how-to-dataset-capacity-preview-storage-and-time">Preview Storage And Time<a class="headerlink" href="#how-to-dataset-capacity-preview-storage-and-time" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent estimate-capacity dataset_spec.yaml --json
+test-data-agent estimate-capacity dataset_spec.yaml --database postgresql --calibrate --json
+</code></pre>
+<p>The first operation uses metadata only and generates no rows. The second
+explicitly creates a temporary fictional sample (default 2,000 rows per entity,
+at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
+It removes the sample and returns numeric summaries. Calibration never approves
+or publishes the requested dataset and does not advance its random stream.
+Related/rule-constrained calibration is currently unsupported and reports why.</p>
+<p>File forecasts describe the selected CSV, indented JSON or Snappy Parquet
+settings. Change <code>generation_settings.output_format</code> to compare formats.
+Results include per-table and total low/expected/high bytes, separate control
+artifact overhead, confidence and assumptions. They are forecasts, not safety
+bounds. Metadata-only estimates have low confidence. Without calibration,
+time is explicitly unknown. Calibrated time includes generation, mandatory
+checks, writing and publication; scalable calibration separates their stage
+costs and fixed process setup. Contention, slower storage and other settings
+can invalidate timing. Legacy calibration reports end-to-end time only.
+Time covers standalone bundle generation from the supplied spec. Attached-source
+profiling/reuse scans and human review add uncalibrated time; these forecasts
+do not measure the complete elapsed time of a source-attached agent workflow.</p>
+<p>Database logical payload counts typed values, including UTF-8 text; it is not
+a physical table-size claim. The optional PostgreSQL model approximates base
+heap rows/pages with int64/float64/date/timestamp/decimal/text assumptions,
+null bitmap, headers/alignment, 8 KiB pages and line pointers. Wide values
+requiring uncertain TOAST storage, or integers outside int64, return unknown
+physical size. Other database
+engines and custom physical types are not modeled. Indexes, WAL, replicas,
+backups and auxiliary storage are excluded. No database is contacted.</p>
+<p>Explicit calibration can reuse one value-free measurement in
+<code>.apa-capacity-measurement.json</code> beside the CLI spec or in the MCP workspace.
+It expires after one hour; the key binds the spec, format, policy, sample size,
+estimator/dependency versions and machine. Only numeric cached values are
+reused. <code>--no-cache</code> / MCP <code>use_cache=false</code> forces a fresh measurement.</p>
+<h2 id="how-to-dataset-capacity-opt-into-bounded-streaming">Opt Into Bounded Streaming<a class="headerlink" href="#how-to-dataset-capacity-opt-into-bounded-streaming" title="Permanent link">&para;</a></h2>
+<p>Keep ordinary generation unchanged, or put an explicit policy in the reviewed
+specification for independent tables:</p>
+<pre><code class="language-yaml">generation_settings:
+  seed: 42
+  output_format: csv
+  execution_policy:
+    engine: scalable-v1
+    max_rows: 1000000
+    max_cells: 25000000
+    max_memory_bytes: 1073741824
+    max_output_bytes: 536870912
+    max_temporary_bytes: 536870912
+    max_seconds: 600
+    workers: 4
+    batch_size: 2000
+    require_distinct_rows: true
+</code></pre>
+<pre><code class="language-bash">test-data-agent generate dataset_spec.yaml --count 750000 --output out/large
+test-data-agent validate out/large/dataset_spec.yaml out/large
+</code></pre>
+<p><code>max_rows</code> is the total across all tables; cells are also cumulative. The
+100,000-row legacy default remains in effect without this opt-in. Source-file
+profiling limits and all database read budgets remain separate and unchanged.
+Existing administrator output/disk and MCP invocation limits remain additional
+ceilings. The policy does not widen database or filesystem authority.</p>
+<p><code>scalable-v1</code> supports independent tables in valid/edge modes and CSV/JSON/Parquet.
+Relationships, global constraints, business rules, scenarios and negative/mixed
+modes reject before generation; use the legacy engine for those bounded cases.
+Every table needs a synthetic-identifier primary key when distinct rows are
+requested. Repeated categorical field values are allowed; whole rows remain
+distinct through their key. Insufficient key pools reject. This engine never
+repeats a generated batch to achieve the count.</p>
+<p>Workers are bounded processes (1–4), with bounded batches/in-flight work.
+The parent controls ordering, deadlines, writing and atomic publication.
+Memory is conservatively checked at batch boundaries across parent/workers;
+it is not an operating-system memory sandbox. Large field/batch combinations
+reject before allocation. Existing output survives failed replacement; worker
+failures/deadlines reap processes and clean staging. <code>generation_statistics</code>
+is a reserved entity name in this engine only.
+Each serialized JSON row is limited to 4 MiB for bounded streamed recovery;
+oversized rows abort before publication.</p>
+<p>The new engine deliberately uses a new random stream. Legacy seeded output is
+unchanged. Within <code>scalable-v1</code>, the same spec/seed/environment yields identical
+logical rows and ordering across worker counts and batch sizes. CSV/JSON data
+bytes are identical; Parquet row-group/layout metadata can differ. Manifests
+record the policy/engine and include normal provenance/validation. Timing
+statistics and informational progress are not deterministic data artifacts.</p>
+<h2 id="how-to-dataset-capacity-review-and-inspect-in-mcp">Review And Inspect In MCP<a class="headerlink" href="#how-to-dataset-capacity-review-and-inspect-in-mcp" title="Permanent link">&para;</a></h2>
+<p>Use <code>estimate_dataset_capacity(spec_path, calibrate=false)</code> for a saved workspace
+spec. The same optional bounded calibration is available with <code>calibrate=true</code>.
+<code>plan_dataset</code> accepts <code>execution_policy</code> with the fields above and stops for
+human review. For CLI planning, pass the same policy as a JSON file with
+<code>agent-plan ... --execution-policy large-policy.json</code>.</p>
+<p>Planning/inspection summaries include capacity estimates. Review the exact
+specification and its policy before passing <code>review.current_spec_sha256</code> to
+<code>approve_dataset_plan</code>. Changing that policy invalidates old approval; changing
+ETA alone does not. <code>inspect_dataset_plan</code> may include value-free progress;
+it is informational and never substitutes for a completion checkpoint.
+Recovery and <code>validate</code> stream scalable bundles under the approved generation
+policy, without relaxing source/profiling budgets. They verify manifest hashes,
+row counts, unique synthetic key ranges, schema, privacy and applicable source
+reuse checks. No response contains dataset rows.
+Use the bundle's effective <code>dataset_spec.yaml</code> for revalidation when generation
+overrode the original counts, seed or format.</p>
+<h2 id="how-to-dataset-capacity-python">Python<a class="headerlink" href="#how-to-dataset-capacity-python" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">from pathlib import Path
+from test_data_agent.io.capacity import estimate_dataset_capacity
+from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent import generate_dataset_bundle
+
+spec = load_dataset_spec(Path(&quot;dataset_spec.yaml&quot;))
+forecast = estimate_dataset_capacity(spec, calibrate=True)
+result = generate_dataset_bundle(spec, output_folder=Path(&quot;out/large&quot;))
+</code></pre>
+<p>The in-memory <code>generate_dataset</code> operation explicitly rejects a scalable policy;
+use the file-bundle API. Its optional <code>progress</code> callback receives numeric typed
+progress and a final completed event after publication. See the OpenSpec change
+for benchmark acceptance criteria; do not assume the same timings on other hardware.</p>
+<p>Linux memory admission uses bounded <code>/proc/self/status</code> <code>VmHWM</code> for the current
+process image, avoiding the parent memory history retained by <code>getrusage</code> across
+<code>exec</code>. Missing or invalid proc metadata falls back to conservative <code>getrusage</code>
+accounting; memory checks and finite policy ceilings remain enabled.</p></section></section>
                     <section class='print-page md-section' id='section-3' heading-number='3'>
                         <h1>Integrations<a class='headerlink' href='#section-3' title='Permanent link'></a>
                         </h1>
@@ -2895,8 +3017,8 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p><a href="#.">English</a> · Русский</p>
 <p>Agent Paranoid Android создаёт воспроизводимые синтетические тестовые данные по структуре CSV, безопасному профилю или проверенному <code>DatasetSpec</code>. Он нужен, когда важны схема, связи и бизнес-правила, а исходные строки нельзя передавать разработчикам.</p>
 <p>Рекомендуемая стабильная версия — <strong>1.6.0</strong>. Её исходники, пакеты и контейнеры прошли <a href="#release-evidence-1.6.0">публичную проверку</a>. Версия сохраняет принятый runtime RC5. Перед обновлением фикстур прочитайте <a href="#ru-reference-generation-contract-migration">изменения контракта</a>.
-Эта инструкция относится к кандидату <code>1.7.0rc1</code>; команды явно выбирают его.
-См. <a href="#1.7.0rc1-release-status">статус кандидата</a> перед установкой.</p>
+Эта инструкция относится к кандидату <code>1.7.0rc2</code>; команды явно выбирают его.
+См. <a href="#1.7.0rc2-release-status">статус кандидата</a> перед установкой.</p>
 <h2 id="ru-_1">С чего начать<a class="headerlink" href="#ru-_1" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2948,14 +3070,14 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p>Исторические release evidence, ADR и служебные записи сопровождающих доступны в оригинале и помечены <strong>English</strong>. Они не представлены как переведённые страницы. Проверенные локальные примеры перенесены из прежнего русского руководства без изменения команд; условия и ограничения приведены в <a href="#ru-quality-report">отчёте</a>.</p></section><section class="print-page" id="ru-getting-started-installation" heading-number="8.1.2"><h1 id="ru-getting-started-installation-_1">Установка<a class="headerlink" href="#ru-getting-started-installation-_1" title="Permanent link">&para;</a></h1>
 <p><a href="#getting-started-installation">English</a> · Русский</p>
 <p>Рекомендуемая стабильная версия — <strong>1.6.0</strong>; см. <a href="#release-evidence-1.6.0">публичную проверку</a>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.14; этот локальный аудит выполнен на macOS с Python 3.11.2.</p>
-<p>Команды этой инструкции явно выбирают <code>1.7.0rc1</code>. Перед установкой проверьте
-<a href="#1.7.0rc1-release-status">статус кандидата</a>. Стабильная версия остаётся
+<p>Команды этой инструкции явно выбирают <code>1.7.0rc2</code>. Перед установкой проверьте
+<a href="#1.7.0rc2-release-status">статус кандидата</a>. Стабильная версия остаётся
 <code>1.6.0</code>; её установка: <code>pip install "agent-paranoid-android==1.6.0"</code>.</p>
 <h2 id="ru-getting-started-installation-pypi">Установка из PyPI<a class="headerlink" href="#ru-getting-started-installation-pypi" title="Permanent link">&para;</a></h2>
 <p>На macOS/Linux откройте терминал в выбранной рабочей папке и выполните по очереди:</p>
 <pre><code class="language-bash">python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install &quot;agent-paranoid-android==1.7.0rc1&quot;
+python -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
 test-data-agent --version
 test-data-agent doctor
 </code></pre>
@@ -2964,13 +3086,13 @@ test-data-agent doctor
 <h2 id="ru-getting-started-installation-windows-powershell">Windows PowerShell<a class="headerlink" href="#ru-getting-started-installation-windows-powershell" title="Permanent link">&para;</a></h2>
 <p>Откройте PowerShell в рабочей папке; не используйте Bash activation. Отдельный маршрут без изменения ExecutionPolicy:</p>
 <pre><code class="language-powershell">py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install &quot;agent-paranoid-android==1.7.0rc1&quot;
+.\.venv\Scripts\python.exe -m pip install &quot;agent-paranoid-android==1.7.0rc2&quot;
 .\.venv\Scripts\test-data-agent.exe --version
 .\.venv\Scripts\test-data-agent.exe doctor
 </code></pre>
 <p>Ожидается 1.6.0 и doctor passed. При отсутствии launcher установите поддерживаемый Python. Windows-выполнение здесь не проверено. В следующих инструкциях заменяйте python и test-data-agent этими путями; вводите Bash-команды с продолжением строки одной строкой.</p>
 <h2 id="ru-getting-started-installation-extras">Необязательные extras<a class="headerlink" href="#ru-getting-started-installation-extras" title="Permanent link">&para;</a></h2>
-<p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0rc1". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
+<p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0rc2". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
 <p>Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. <a href="#ru-reference-support-policy">поддержку</a> и <a href="#reference-dependency-compatibility-installation-footprint">footprint — English</a>.</p>
 <h2 id="ru-getting-started-installation-_2">Когда нужна копия репозитория<a class="headerlink" href="#ru-getting-started-installation-_2" title="Permanent link">&para;</a></h2>
 <p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.6.0, например отдельный clone тега v1.6.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="#development-documentation">Publishing Documentation — English</a>.</p>
@@ -4656,6 +4778,8 @@ test-data-agent doctor --json
 
 .print-site-enumerate-headings #how-to-transformation > h1:before { content: '2.4 ' }
 
+.print-site-enumerate-headings #how-to-dataset-capacity > h1:before { content: '2.5 ' }
+
 .print-site-enumerate-headings #section-3 > h1:before { content: '3 ' }
 .print-site-enumerate-headings #how-to-mcp > h1:before { content: '3.1 ' }
 
@@ -4755,7 +4879,7 @@ test-data-agent doctor --json
   </span>
 </div>
     <script src="../js/jquery-3.6.0.min.js"></script>
-    <script>var base_url = "/agent-paranoid-android/versions/1.7.0rc1/";</script>
+    <script>var base_url = "/agent-paranoid-android/versions/1.7.0rc2/";</script>
     <script src="../js/theme_extra.js"></script>
     <script src="../js/theme.js"></script>
       <script src="../js/print-site.js"></script>

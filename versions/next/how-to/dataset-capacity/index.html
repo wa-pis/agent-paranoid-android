@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/how-to/dataset-capacity/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Forecast And Scale Datasets - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Forecast And Scale Datasets";
+        var mkdocs_page_input_path = "how-to/dataset-capacity.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc2/how-to/dataset-capacity/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Forecast And Scale Datasets</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#preview-storage-and-time">Preview Storage And Time</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#opt-into-bounded-streaming">Opt Into Bounded Streaming</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#review-and-inspect-in-mcp">Review And Inspect In MCP</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#python">Python</a>
+    </li>
+    </ul></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-To Guides</li>
+      <li class="breadcrumb-item active">Forecast And Scale Datasets</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/dataset-capacity.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
+  <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
+  <br>Documentation b996da8e4db1435406ac39b5294d234c4a9f9c6c
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="forecast-and-generate-larger-synthetic-datasets">Forecast And Generate Larger Synthetic Datasets<a class="headerlink" href="#forecast-and-generate-larger-synthetic-datasets" title="Permanent link">&para;</a></h1>
+<p>These additions target <code>1.7.0rc2</code>, whose publication is pending. They are not
+available in <code>1.7.0rc1</code>. Stable 1.6.0 remains the recommended default.</p>
+<h2 id="preview-storage-and-time">Preview Storage And Time<a class="headerlink" href="#preview-storage-and-time" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">test-data-agent estimate-capacity dataset_spec.yaml --json
+test-data-agent estimate-capacity dataset_spec.yaml --database postgresql --calibrate --json
+</code></pre>
+<p>The first operation uses metadata only and generates no rows. The second
+explicitly creates a temporary fictional sample (default 2,000 rows per entity,
+at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
+It removes the sample and returns numeric summaries. Calibration never approves
+or publishes the requested dataset and does not advance its random stream.
+Related/rule-constrained calibration is currently unsupported and reports why.</p>
+<p>File forecasts describe the selected CSV, indented JSON or Snappy Parquet
+settings. Change <code>generation_settings.output_format</code> to compare formats.
+Results include per-table and total low/expected/high bytes, separate control
+artifact overhead, confidence and assumptions. They are forecasts, not safety
+bounds. Metadata-only estimates have low confidence. Without calibration,
+time is explicitly unknown. Calibrated time includes generation, mandatory
+checks, writing and publication; scalable calibration separates their stage
+costs and fixed process setup. Contention, slower storage and other settings
+can invalidate timing. Legacy calibration reports end-to-end time only.
+Time covers standalone bundle generation from the supplied spec. Attached-source
+profiling/reuse scans and human review add uncalibrated time; these forecasts
+do not measure the complete elapsed time of a source-attached agent workflow.</p>
+<p>Database logical payload counts typed values, including UTF-8 text; it is not
+a physical table-size claim. The optional PostgreSQL model approximates base
+heap rows/pages with int64/float64/date/timestamp/decimal/text assumptions,
+null bitmap, headers/alignment, 8 KiB pages and line pointers. Wide values
+requiring uncertain TOAST storage, or integers outside int64, return unknown
+physical size. Other database
+engines and custom physical types are not modeled. Indexes, WAL, replicas,
+backups and auxiliary storage are excluded. No database is contacted.</p>
+<p>Explicit calibration can reuse one value-free measurement in
+<code>.apa-capacity-measurement.json</code> beside the CLI spec or in the MCP workspace.
+It expires after one hour; the key binds the spec, format, policy, sample size,
+estimator/dependency versions and machine. Only numeric cached values are
+reused. <code>--no-cache</code> / MCP <code>use_cache=false</code> forces a fresh measurement.</p>
+<h2 id="opt-into-bounded-streaming">Opt Into Bounded Streaming<a class="headerlink" href="#opt-into-bounded-streaming" title="Permanent link">&para;</a></h2>
+<p>Keep ordinary generation unchanged, or put an explicit policy in the reviewed
+specification for independent tables:</p>
+<pre><code class="language-yaml">generation_settings:
+  seed: 42
+  output_format: csv
+  execution_policy:
+    engine: scalable-v1
+    max_rows: 1000000
+    max_cells: 25000000
+    max_memory_bytes: 1073741824
+    max_output_bytes: 536870912
+    max_temporary_bytes: 536870912
+    max_seconds: 600
+    workers: 4
+    batch_size: 2000
+    require_distinct_rows: true
+</code></pre>
+<pre><code class="language-bash">test-data-agent generate dataset_spec.yaml --count 750000 --output out/large
+test-data-agent validate out/large/dataset_spec.yaml out/large
+</code></pre>
+<p><code>max_rows</code> is the total across all tables; cells are also cumulative. The
+100,000-row legacy default remains in effect without this opt-in. Source-file
+profiling limits and all database read budgets remain separate and unchanged.
+Existing administrator output/disk and MCP invocation limits remain additional
+ceilings. The policy does not widen database or filesystem authority.</p>
+<p><code>scalable-v1</code> supports independent tables in valid/edge modes and CSV/JSON/Parquet.
+Relationships, global constraints, business rules, scenarios and negative/mixed
+modes reject before generation; use the legacy engine for those bounded cases.
+Every table needs a synthetic-identifier primary key when distinct rows are
+requested. Repeated categorical field values are allowed; whole rows remain
+distinct through their key. Insufficient key pools reject. This engine never
+repeats a generated batch to achieve the count.</p>
+<p>Workers are bounded processes (1–4), with bounded batches/in-flight work.
+The parent controls ordering, deadlines, writing and atomic publication.
+Memory is conservatively checked at batch boundaries across parent/workers;
+it is not an operating-system memory sandbox. Large field/batch combinations
+reject before allocation. Existing output survives failed replacement; worker
+failures/deadlines reap processes and clean staging. <code>generation_statistics</code>
+is a reserved entity name in this engine only.
+Each serialized JSON row is limited to 4 MiB for bounded streamed recovery;
+oversized rows abort before publication.</p>
+<p>The new engine deliberately uses a new random stream. Legacy seeded output is
+unchanged. Within <code>scalable-v1</code>, the same spec/seed/environment yields identical
+logical rows and ordering across worker counts and batch sizes. CSV/JSON data
+bytes are identical; Parquet row-group/layout metadata can differ. Manifests
+record the policy/engine and include normal provenance/validation. Timing
+statistics and informational progress are not deterministic data artifacts.</p>
+<h2 id="review-and-inspect-in-mcp">Review And Inspect In MCP<a class="headerlink" href="#review-and-inspect-in-mcp" title="Permanent link">&para;</a></h2>
+<p>Use <code>estimate_dataset_capacity(spec_path, calibrate=false)</code> for a saved workspace
+spec. The same optional bounded calibration is available with <code>calibrate=true</code>.
+<code>plan_dataset</code> accepts <code>execution_policy</code> with the fields above and stops for
+human review. For CLI planning, pass the same policy as a JSON file with
+<code>agent-plan ... --execution-policy large-policy.json</code>.</p>
+<p>Planning/inspection summaries include capacity estimates. Review the exact
+specification and its policy before passing <code>review.current_spec_sha256</code> to
+<code>approve_dataset_plan</code>. Changing that policy invalidates old approval; changing
+ETA alone does not. <code>inspect_dataset_plan</code> may include value-free progress;
+it is informational and never substitutes for a completion checkpoint.
+Recovery and <code>validate</code> stream scalable bundles under the approved generation
+policy, without relaxing source/profiling budgets. They verify manifest hashes,
+row counts, unique synthetic key ranges, schema, privacy and applicable source
+reuse checks. No response contains dataset rows.
+Use the bundle's effective <code>dataset_spec.yaml</code> for revalidation when generation
+overrode the original counts, seed or format.</p>
+<h2 id="python">Python<a class="headerlink" href="#python" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">from pathlib import Path
+from test_data_agent.io.capacity import estimate_dataset_capacity
+from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent import generate_dataset_bundle
+
+spec = load_dataset_spec(Path(&quot;dataset_spec.yaml&quot;))
+forecast = estimate_dataset_capacity(spec, calibrate=True)
+result = generate_dataset_bundle(spec, output_folder=Path(&quot;out/large&quot;))
+</code></pre>
+<p>The in-memory <code>generate_dataset</code> operation explicitly rejects a scalable policy;
+use the file-bundle API. Its optional <code>progress</code> callback receives numeric typed
+progress and a final completed event after publication. See the OpenSpec change
+for benchmark acceptance criteria; do not assume the same timings on other hardware.</p>
+<p>Linux memory admission uses bounded <code>/proc/self/status</code> <code>VmHWM</code> for the current
+process image, avoiding the parent memory history retained by <code>getrusage</code> across
+<code>exec</code>. Missing or invalid proc metadata falls back to conservative <code>getrusage</code>
+accounting; memory checks and finite policy ceilings remain enabled.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../transformation/" class="btn btn-neutral float-left" title="Transform Local Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mcp/" class="btn btn-neutral float-right" title="Connect An MCP Client">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../transformation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../mcp/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

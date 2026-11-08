@@ -1,6 +1,6 @@
 {
-  "package_version": "1.7.0rc1",
-  "package_commit": "64b7c8c3bbb0174fd7e159c4dfb42312045a1716",
-  "documentation_revision": "0014efa4b652c26573447734330f405918d6e13b",
+  "package_version": "1.7.0rc2",
+  "package_commit": "b996da8e4db1435406ac39b5294d234c4a9f9c6c",
+  "documentation_revision": "b996da8e4db1435406ac39b5294d234c4a9f9c6c",
   "status": "Release candidate / not stable"
 }

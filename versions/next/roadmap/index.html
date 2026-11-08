@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/roadmap/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/roadmap/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
     <title>Roadmap - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Roadmap";
         var mkdocs_page_input_path = "roadmap.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/roadmap/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc2/roadmap/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -213,9 +215,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 0014efa4b652c26573447734330f405918d6e13b
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
+  <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
+  <br>Documentation b996da8e4db1435406ac39b5294d234c4a9f9c6c
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -228,13 +230,21 @@ confirmed defects. Stable <code>1.6.0</code> is already published and publicly v
 completed work belongs in <a href="../history/">release history</a>, not this list.</p>
 <h2 id="now">Now<a class="headerlink" href="#now" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Follow up on the remaining external <code>1.6.0</code> evidence gaps through the
+<li>
+<p>Implement and verify <a href="../how-to/dataset-capacity/">capacity forecasts and bounded scalable generation</a>
+  under <code>dataset-scale-estimation-performance</code>. The source branch adds estimates
+  and explicit independent-table streaming; related/global-rule scaling remains
+  unsupported in this engine. No new release has been published for this work.</p>
+</li>
+<li>
+<p>Follow up on the remaining external <code>1.6.0</code> evidence gaps through the
   <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6">OpenSpec work plan</a>:
   historical Trino application authentication settings and external profile
   provenance. The numeric profiling, relational planning/utility, bounded
   statistics and CLI fixes shipped in the published
   <a href="../feedback-acceptance-1.7.0rc1/">1.7.0rc1 candidate</a>; its finite installed
-  checks do not reproduce missing private inputs or the historical 401.</li>
+  checks do not reproduce missing private inputs or the historical 401.</p>
+</li>
 <li>Complete remaining transformation evidence: target-size coverage of the final
   public/configured routes and the separately tracked trust-boundary amendment
   review. Prior approvals and private scale runs retain their original scope.</li>
@@ -255,10 +265,9 @@ completed work belongs in <a href="../history/">release history</a>, not this li
   project-build retirement is owner-managed. The GitHub Pages return passed main
   Documentation 41336088977, including public verification and retained versions.
   Cancelled/superseded hosting proposals are archived without accepting their deltas.</li>
-<li>Design batch-based validation of CSV, JSON and Parquet so complete datasets
-  need not remain in memory. Bound cross-table key and uniqueness checks,
-  preserve deterministic results and measure memory on synthetic fixtures.
-  A separate OpenSpec change is required before implementation.</li>
+<li>Extend bounded batch generation/validation to related tables and global rules
+  after the independent-table implementation has measured acceptance evidence.
+  Cross-table key/uniqueness state needs separate bounded planning and review.</li>
 <li>Simplify CSV and database workflows using pilot feedback.</li>
 <li>Publish runnable examples and short case studies using synthetic fixtures.</li>
 <li>Improve diagnostics where users repeatedly need help.</li>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/mcp-permissions/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/reference/mcp-permissions/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>MCP Permissions - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "MCP Permissions";
         var mkdocs_page_input_path = "reference/mcp-permissions.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/mcp-permissions/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc2/reference/mcp-permissions/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -204,9 +206,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Release candidate / not stable</strong> · Package 1.7.0rc1
-  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 0014efa4b652c26573447734330f405918d6e13b
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
+  <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
+  <br>Documentation b996da8e4db1435406ac39b5294d234c4a9f9c6c
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -349,6 +351,12 @@ including otherwise read-only tools.</p>
 </thead>
 <tbody>
 <tr>
+<td><code>estimate_dataset_capacity</code></td>
+<td>Workspace DatasetSpec and optional aggregate calibration cache</td>
+<td>Metadata-only by default; explicit calibration uses bounded temporary synthetic output and a value-free one-hour cache</td>
+<td>Does not approve generation; calibration requires the explicit argument.</td>
+</tr>
+<tr>
 <td><code>profile_csv</code></td>
 <td>Selected CSV</td>
 <td>New safe aggregate profile JSON</td>
@@ -435,7 +443,7 @@ including otherwise read-only tools.</p>
 </tbody>
 </table>
 <p>The generator <strong>console entrypoint</strong> injects a workspace and session owner and
-registers all 14 tools above. The module-level SDK object has only the 12 base
+registers all 15 tools above. The module-level SDK object has only the 13 base
 tools; <code>common_transformation</code> and <code>configured_query_session</code> need explicit
 runtime ownership when embedded. Do not use a shorter SDK inventory as the
 console server's permission list. The two extensions retain their separate

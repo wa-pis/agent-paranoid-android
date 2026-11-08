@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc1/reference/application-boundaries/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/reference/application-boundaries/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Application Boundaries - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Application Boundaries";
         var mkdocs_page_input_path = "reference/application-boundaries.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc1/reference/application-boundaries/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc2/reference/application-boundaries/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -204,9 +206,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Historical / maintainer material</strong> · Package 1.7.0rc1
-  <br>Package source 64b7c8c3bbb0174fd7e159c4dfb42312045a1716
-  <br>Documentation 0014efa4b652c26573447734330f405918d6e13b
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc2
+  <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
+  <br>Documentation b996da8e4db1435406ac39b5294d234c4a9f9c6c
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -764,6 +766,16 @@ closes that owner. The default module-level SDK object owns no SQL sessions.
 RC5 publication is recorded separately from this ownership map. Registration
 is not dataset authorization or completion of the broader transformation/session
 acceptance campaign.</p>
+<h2 id="capacity-and-scalable-generation-unreleased">Capacity And Scalable Generation (Unreleased)<a class="headerlink" href="#capacity-and-scalable-generation-unreleased" title="Permanent link">&para;</a></h2>
+<p><code>estimate_dataset_capacity</code> is an additive workspace-scoped generator MCP tool.
+The CLI <code>estimate-capacity</code> and Python <code>io.capacity.estimate_dataset_capacity</code>
+share the pure <code>generation.capacity</code> forecast and bounded synthetic calibration.
+<code>core.execution_policy</code> owns the finite opt-in policy; <code>generation.scalable</code> owns
+deterministic row tasks. <code>io.scalable</code> owns bounded processes, streaming writers,
+progress and atomic publication; <code>io.scalable_validation</code> rechecks generated
+bundles without reusing database/source read budgets. Agent lifecycle services
+retain exact-fingerprint human approval and recovery authority. Legacy generation
+and its seeded output remain the default. See <a href="../../how-to/dataset-capacity/">capacity usage</a>.</p>
               
 </div>
 

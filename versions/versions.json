@@ -1,10 +1,15 @@
 [
   {
-    "version": "1.7.0rc1",
-    "title": "1.7.0rc1 (release candidate)",
+    "version": "1.7.0rc2",
+    "title": "1.7.0rc2 (release candidate)",
     "aliases": [
       "next"
     ]
+  },
+  {
+    "version": "1.7.0rc1",
+    "title": "1.7.0rc1 (release candidate)",
+    "aliases": []
   },
   {
     "version": "1.6.0",
