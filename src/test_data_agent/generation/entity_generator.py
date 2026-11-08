@@ -58,6 +58,8 @@ def generate_dataset(
 ) -> dict[str, list[dict[str, Any]]]:
     if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
         raise GenerationLimitError("seed must be a signed 64-bit integer")
+    if spec.generation_settings.execution_policy is not None:
+        raise ValueError("scalable-v1 streams to files; use generate_dataset_bundle instead of in-memory generate_dataset")
     assert_spec_safe(spec)
     spec = spec.model_copy(deep=True)
     if spec.generation_settings.mode == GenerationMode.LOAD_TEST:

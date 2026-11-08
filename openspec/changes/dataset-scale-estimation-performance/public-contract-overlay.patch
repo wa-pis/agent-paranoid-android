@@ -1,0 +1,329 @@
+diff --git a/docs/reference/application-boundaries.md b/docs/reference/application-boundaries.md
+index debcdc7f..a15f41f3 100644
+--- a/docs/reference/application-boundaries.md
++++ b/docs/reference/application-boundaries.md
+@@ -452,3 +452,15 @@ closes that owner. The default module-level SDK object owns no SQL sessions.
+ RC5 publication is recorded separately from this ownership map. Registration
+ is not dataset authorization or completion of the broader transformation/session
+ acceptance campaign.
++
++## Capacity And Scalable Generation (Unreleased)
++
++`estimate_dataset_capacity` is an additive workspace-scoped generator MCP tool.
++The CLI `estimate-capacity` and Python `io.capacity.estimate_dataset_capacity`
++share the pure `generation.capacity` forecast and bounded synthetic calibration.
++`core.execution_policy` owns the finite opt-in policy; `generation.scalable` owns
++deterministic row tasks. `io.scalable` owns bounded processes, streaming writers,
++progress and atomic publication; `io.scalable_validation` rechecks generated
++bundles without reusing database/source read budgets. Agent lifecycle services
++retain exact-fingerprint human approval and recovery authority. Legacy generation
++and its seeded output remain the default. See [capacity usage](../how-to/dataset-capacity.md).
+diff --git a/src/test_data_agent/cli.py b/src/test_data_agent/cli.py
+index 0c058867..9cd9c0dc 100644
+--- a/src/test_data_agent/cli.py
++++ b/src/test_data_agent/cli.py
+@@ -379,7 +379,7 @@ def main(argv: list[str] | None = None) -> int:
+         )
+ 
+ 
+-_NATIVE_JSON_COMMANDS = {
++_NATIVE_JSON_COMMANDS = {"estimate-capacity",
+     "agent-plan",
+     "agent-approve",
+     "agent-recover",
+diff --git a/src/test_data_agent/cli_parser.py b/src/test_data_agent/cli_parser.py
+index 7e9e187c..03ad10a6 100644
+--- a/src/test_data_agent/cli_parser.py
++++ b/src/test_data_agent/cli_parser.py
+@@ -236,6 +236,12 @@ def register_dataset_commands(
+     generate_epilog: str,
+ ) -> None:
+     """Register dataset profiling, generation, and validation commands."""
++    capacity_parser = subparsers.add_parser("estimate-capacity", help="Forecast file/database size and optionally calibrate generation time.")
++    capacity_parser.add_argument("spec", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
++    capacity_parser.add_argument("--database", choices=["logical", "postgresql"], default="logical")
++    capacity_parser.add_argument("--calibrate", action="store_true", help="Generate a bounded temporary synthetic sample for local size/time calibration.")
++    capacity_parser.add_argument("--sample-rows", type=positive_int, default=2000)
++    capacity_parser.add_argument("--no-cache", action="store_true", help="Skip the one-hour local aggregate calibration cache.")
+     generate_parser = subparsers.add_parser(
+         "generate",
+         help="Generate a dataset from a DatasetSpec, or from a safe profile with --profile.",
+@@ -703,6 +709,7 @@ def register_agent_commands(
+         action="store_true",
+         help="Force a fresh profile instead of reusing the metadata-only cache.",
+     )
++    agent_plan_parser.add_argument("--execution-policy", type=Path, help="Explicit bounded scalable-v1 policy JSON to include in human review.")
+     add_local_category_option(agent_plan_parser)
+     agent_plan_parser.add_argument(
+         "--json",
+diff --git a/src/test_data_agent/mcp_generator_server.py b/src/test_data_agent/mcp_generator_server.py
+index d5261224..0c6173f1 100644
+--- a/src/test_data_agent/mcp_generator_server.py
++++ b/src/test_data_agent/mcp_generator_server.py
+@@ -32,6 +32,7 @@ from test_data_agent.agent import (
+ )
+ from test_data_agent.audit import audit_logger_from_env
+ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
++from test_data_agent.core.execution_policy import GenerationExecutionPolicy
+ from test_data_agent.core.limits import (
+     enforce_business_rules_payload_size,
+     enforce_profile_payload_size,
+@@ -100,6 +101,23 @@ def review_transformation(input_path: str, policy_path: str, table_name: str | N
+             "snapshot_sha256": request.snapshot_sha256, "review": json.loads(request.review)}
+ 
+ 
++def estimate_dataset_capacity(spec_path: str, calibrate: bool = False,
++                              sample_rows: int = 2000,
++                              database: Literal["logical", "postgresql"] = "logical",
++                              use_cache: bool = True) -> dict[str, Any]:
++    """Forecast file bytes, DB payload and local generation time from a workspace spec.
++
++    Metadata-only by default. Explicit calibration generates bounded temporary
++    synthetic samples (no final dataset); responses contain numeric summaries,
++    uncertainty and assumptions only. This does not approve generation.
++    """
++    from test_data_agent.io.capacity import estimate_dataset_capacity as estimate
++    source = resolve_workspace_path(spec_path, must_exist=True, expect_file=True)
++    _require_suffix(source, {".json", ".yaml", ".yml"}, "spec input")
++    return estimate(load_dataset_spec(source), database=database, calibrate=calibrate,
++                    sample_rows=sample_rows, workspace=workspace_root(), use_cache=use_cache).model_dump(mode="json")
++
++
+ def profile_csv(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
+     """Create a safe aggregate profile for one workspace CSV file."""
+ 
+@@ -274,9 +292,11 @@ def plan_dataset(
+     table_name: str | None = None,
+     rule_sample_rows: int = 50_000,
+     use_cache: bool = True,
++    execution_policy: GenerationExecutionPolicy | None = None,
+ ) -> dict[str, Any]:
+-    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths and summaries without generating rows; inspect the plan and obtain human review before approval."""
++    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables, including explicit rows/cells/disk/time/memory and 1-4 workers. Policy changes require renewed exact-fingerprint review."""
+ 
++    policy = GenerationExecutionPolicy.model_validate(execution_policy) if execution_policy is not None else None
+     source = resolve_workspace_path(source_path, must_exist=True)
+     workspace = resolve_workspace_path(workspace_path)
+     ensure_new_agent_workspace(workspace)
+@@ -287,6 +307,7 @@ def plan_dataset(
+     )
+     result = plan_agent_request(
+         AgentRequest(
++            execution_policy=policy,
+             source_type=selected_source_type,
+             source_path=source,
+             workspace=workspace,
+@@ -456,6 +477,13 @@ def inspect_dataset_plan(workspace_path: str) -> dict[str, Any]:
+         response["summary"] = status.summary.model_dump(mode="json")
+     elif isinstance(status.summary, AgentRecoverySummary):
+         response["summary"] = status.summary.model_dump(mode="json")
++    progress_path = workspace / "generation_progress.json"
++    if progress_path.exists():
++        from test_data_agent.core.generation_progress import GenerationProgress
++        from test_data_agent.core.limits import read_limited_text
++        progress = GenerationProgress.model_validate_json(read_limited_text(progress_path, max_bytes=8192))
++        if status.review is not None and progress.spec_sha256 == status.review.current_spec_sha256:
++            response["generation_progress"] = progress.model_dump(mode="json")
+     return response
+ 
+ 
+@@ -463,6 +491,7 @@ def compact_agent_plan_summary(summary: AgentPlanSummary) -> dict[str, Any]:
+     """Preserve the existing metadata-minimal MCP response contract."""
+ 
+     return {
++        **({"capacity_estimate": summary.capacity_estimate.model_dump(mode="json")} if summary.capacity_estimate is not None else {}),
+         "source_type": summary.source_type,
+         "entities": [
+             {
+@@ -721,6 +750,7 @@ def execute_transformation(
+ 
+ 
+ _GENERATOR_MCP_TOOLS = (
++    estimate_dataset_capacity,
+     execute_transformation,
+     review_transformation,
+     profile_csv,
+diff --git a/tests/fixtures/contracts/cli-parser-surface.json b/tests/fixtures/contracts/cli-parser-surface.json
+index 240fd595..aaae3ed4 100644
+--- a/tests/fixtures/contracts/cli-parser-surface.json
++++ b/tests/fixtures/contracts/cli-parser-surface.json
+@@ -16,6 +16,7 @@
+     "profile-csv-folder": "profile-example"
+   },
+   "commands": [
++    "estimate-capacity",
+     "generate",
+     "export-postgres-sql",
+     "profile-example",
+diff --git a/tests/fixtures/contracts/mcp-generator-tools.json b/tests/fixtures/contracts/mcp-generator-tools.json
+index 99c208a1..f3a4a4c6 100644
+--- a/tests/fixtures/contracts/mcp-generator-tools.json
++++ b/tests/fixtures/contracts/mcp-generator-tools.json
+@@ -234,6 +234,52 @@
+       "type": "object"
+     }
+   },
++  {
++    "description": "Forecast file bytes, DB payload and local generation time from a workspace spec.\n\nMetadata-only by default. Explicit calibration generates bounded temporary\nsynthetic samples (no final dataset); responses contain numeric summaries,\nuncertainty and assumptions only. This does not approve generation.",
++    "input_schema": {
++      "properties": {
++        "calibrate": {
++          "default": false,
++          "title": "Calibrate",
++          "type": "boolean"
++        },
++        "database": {
++          "default": "logical",
++          "enum": [
++            "logical",
++            "postgresql"
++          ],
++          "title": "Database",
++          "type": "string"
++        },
++        "sample_rows": {
++          "default": 2000,
++          "title": "Sample Rows",
++          "type": "integer"
++        },
++        "spec_path": {
++          "title": "Spec Path",
++          "type": "string"
++        },
++        "use_cache": {
++          "default": true,
++          "title": "Use Cache",
++          "type": "boolean"
++        }
++      },
++      "required": [
++        "spec_path"
++      ],
++      "title": "estimate_dataset_capacityArguments",
++      "type": "object"
++    },
++    "name": "estimate_dataset_capacity",
++    "output_schema": {
++      "additionalProperties": true,
++      "title": "estimate_dataset_capacityDictOutput",
++      "type": "object"
++    }
++  },
+   {
+     "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\nRequires the reviewed snapshot digest and, for preservation, a matching\nreceipt issued by the separate controlling-TTY local approval operation.\nReturns bounded counts and digest metadata, never source or output rows.",
+     "input_schema": {
+@@ -570,14 +616,101 @@
+     }
+   },
+   {
+-    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths and summaries without generating rows; inspect the plan and obtain human review before approval.",
++    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables, including explicit rows/cells/disk/time/memory and 1-4 workers. Policy changes require renewed exact-fingerprint review.",
+     "input_schema": {
++      "$defs": {
++        "GenerationExecutionPolicy": {
++          "additionalProperties": false,
++          "properties": {
++            "batch_size": {
++              "default": 2000,
++              "maximum": 10000,
++              "minimum": 1,
++              "title": "Batch Size",
++              "type": "integer"
++            },
++            "engine": {
++              "default": "scalable-v1",
++              "pattern": "^scalable-v1$",
++              "title": "Engine",
++              "type": "string"
++            },
++            "max_cells": {
++              "default": 25000000,
++              "maximum": 100000000,
++              "minimum": 1,
++              "title": "Max Cells",
++              "type": "integer"
++            },
++            "max_memory_bytes": {
++              "default": 1073741824,
++              "maximum": 8589934592,
++              "minimum": 268435456,
++              "title": "Max Memory Bytes",
++              "type": "integer"
++            },
++            "max_output_bytes": {
++              "default": 536870912,
++              "maximum": 8589934592,
++              "minimum": 1,
++              "title": "Max Output Bytes",
++              "type": "integer"
++            },
++            "max_rows": {
++              "default": 1000000,
++              "maximum": 10000000,
++              "minimum": 1,
++              "title": "Max Rows",
++              "type": "integer"
++            },
++            "max_seconds": {
++              "default": 600,
++              "exclusiveMinimum": 0,
++              "maximum": 3600,
++              "title": "Max Seconds",
++              "type": "number"
++            },
++            "max_temporary_bytes": {
++              "default": 536870912,
++              "maximum": 8589934592,
++              "minimum": 1,
++              "title": "Max Temporary Bytes",
++              "type": "integer"
++            },
++            "require_distinct_rows": {
++              "default": true,
++              "title": "Require Distinct Rows",
++              "type": "boolean"
++            },
++            "workers": {
++              "default": 1,
++              "maximum": 4,
++              "minimum": 1,
++              "title": "Workers",
++              "type": "integer"
++            }
++          },
++          "title": "GenerationExecutionPolicy",
++          "type": "object"
++        }
++      },
+       "properties": {
+         "count": {
+           "default": 100,
+           "title": "Count",
+           "type": "integer"
+         },
++        "execution_policy": {
++          "anyOf": [
++            {
++              "$ref": "#/$defs/GenerationExecutionPolicy"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null
++        },
+         "invalid_ratio": {
+           "default": 0.0,
+           "title": "Invalid Ratio",
+diff --git a/tests/test_contract_fixtures.py b/tests/test_contract_fixtures.py
+index b8b8bbb1..b7f8b0f9 100644
+--- a/tests/test_contract_fixtures.py
++++ b/tests/test_contract_fixtures.py
+@@ -92,6 +92,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
+         "common_transformation",
+         "configured_query_session",
+         "export_dataset",
++        "estimate_dataset_capacity",
+         "generate_dataset",
+         "infer_dataset_spec",
+         "inspect_dataset_plan",

@@ -452,3 +452,15 @@ closes that owner. The default module-level SDK object owns no SQL sessions.
 RC5 publication is recorded separately from this ownership map. Registration
 is not dataset authorization or completion of the broader transformation/session
 acceptance campaign.
+
+## Capacity And Scalable Generation (Unreleased)
+
+`estimate_dataset_capacity` is an additive workspace-scoped generator MCP tool.
+The CLI `estimate-capacity` and Python `io.capacity.estimate_dataset_capacity`
+share the pure `generation.capacity` forecast and bounded synthetic calibration.
+`core.execution_policy` owns the finite opt-in policy; `generation.scalable` owns
+deterministic row tasks. `io.scalable` owns bounded processes, streaming writers,
+progress and atomic publication; `io.scalable_validation` rechecks generated
+bundles without reusing database/source read budgets. Agent lifecycle services
+retain exact-fingerprint human approval and recovery authority. Legacy generation
+and its seeded output remain the default. See [capacity usage](../how-to/dataset-capacity.md).

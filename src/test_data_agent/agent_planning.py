@@ -293,6 +293,7 @@ def build_agent_spec(profile: DatasetProfile, request: AgentRequest) -> DatasetS
 
 
 def prepare_spec_for_approval(spec: DatasetSpec, request: AgentRequest) -> None:
+    spec.generation_settings.execution_policy = request.execution_policy
     spec.generation_settings.seed = request.seed
     spec.generation_settings.output_format = request.output_format
     apply_dataset_mode_options(
@@ -340,7 +341,9 @@ def build_agent_plan_summary(
     spec: DatasetSpec,
     request: AgentRequest,
 ) -> AgentPlanSummary:
+    from test_data_agent.generation.capacity import estimate_capacity
     return AgentPlanSummary(
+        capacity_estimate=(estimate_capacity(spec) if spec.generation_settings.output_format != "sql" else None),
         source_type=agent_source_label(request, profile),
         entities=entity_summary(spec),
         relationship_count=len(spec.relationships),

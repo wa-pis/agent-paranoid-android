@@ -36,9 +36,12 @@ FROM ${PYTHON_IMAGE} AS runtime-base
 # The pinned base predates these Bookworm security updates. Fail the build
 # if a fixed package cannot be installed; keep the scanner enabled.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends --only-upgrade \
+    && apt-get -o Acquire::Retries=0 install -y --no-install-recommends --only-upgrade \
+        apt=2.6.2 libapt-pkg6.0=2.6.2 \
         libpcre2-8-0=10.42-1+deb12u2 perl-base=5.36.0-7+deb12u4 \
         libssl3=3.0.22-1~deb12u2 openssl=3.0.22-1~deb12u2 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' apt)" ge 2.6.2 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libapt-pkg6.0)" ge 2.6.2 \
     && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libpcre2-8-0)" ge 10.42-1+deb12u2 \
     && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' perl-base)" ge 5.36.0-7+deb12u4 \
     && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libssl3)" ge 3.0.22-1~deb12u2 \

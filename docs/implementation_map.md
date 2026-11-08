@@ -479,3 +479,18 @@ atomic generated-key allocation in native relationship dependency order;
 `validation/relational_scenarios.py` independently reconciles final counts.
 Generation and writer entry points enforce the final contract even when optional
 reports are disabled. See the [relational synthesis contract](concepts/relational-synthesis-contract.md#explicit-relational-scenarios-unreleased).
+
+## Capacity And Scalable Streaming
+
+- `core/execution_policy.py`, `core/generation_progress.py`: typed finite execution
+  settings and informational progress.
+- `generation/capacity.py`: pure format/logical-DB estimates, uncertainty and assumptions.
+- `io/capacity.py`: opt-in bounded synthetic calibration, numeric-only cache and local ETA.
+- `generation/scalable.py`: versioned deterministic row tasks and eligibility checks.
+- `generation/relational.py`: bounded DAG planning, ordinal synthetic references
+  and streamed key/reference proofs for unreleased `scalable-relational-v1`.
+- `io/scalable.py`, `io/scalable_validation.py`: bounded processes, streaming
+  publication and revalidation/recovery. CLI/MCP/agent adapters reuse these services.
+
+See [usage and limits](how-to/dataset-capacity.md). Capacity and independent streaming shipped in 1.7.0rc2; linked-table streaming
+is a separate unreleased change.

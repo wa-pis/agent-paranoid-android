@@ -75,6 +75,7 @@ including otherwise read-only tools.
 
 | Tool | Reads | Writes or other effects | Review requirement |
 | --- | --- | --- | --- |
+| `estimate_dataset_capacity` | Workspace DatasetSpec and optional aggregate calibration cache | Metadata-only by default; explicit calibration uses bounded temporary synthetic output and a value-free one-hour cache | Does not approve generation; calibration requires the explicit argument. |
 | `profile_csv` | Selected CSV | New safe aggregate profile JSON | No generation approval; authorize profiling of the selected input. |
 | `infer_dataset_spec` | Safe profile file or bounded inline profile | New specification | Proposal only; no generation. |
 | `plan_dataset` | CSV, CSV folder, or safe profile | New planning directory, profile, spec and plan artifacts | Stops before generation for human review. |
@@ -91,7 +92,7 @@ including otherwise read-only tools.
 | `configured_query_session` | Batch profile, bounded SQL references and configured database on `open`; frozen captures afterward | Owned temporary captures; `execute` publishes selected output; `close`, expiry and shutdown clean up | `open` needs separate database authority. Validate/execute bind the digest; preservation consumes local approval. Review/validate/execute never reconnect. |
 
 The generator **console entrypoint** injects a workspace and session owner and
-registers all 14 tools above. The module-level SDK object has only the 12 base
+registers all 15 tools above. The module-level SDK object has only the 13 base
 tools; `common_transformation` and `configured_query_session` need explicit
 runtime ownership when embedded. Do not use a shorter SDK inventory as the
 console server's permission list. The two extensions retain their separate

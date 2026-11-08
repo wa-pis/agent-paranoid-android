@@ -1,0 +1,74 @@
+diff --git a/schemas/dataset_spec.schema.json b/schemas/dataset_spec.schema.json
+index dcc551cc..9977667b 100644
+--- a/schemas/dataset_spec.schema.json
++++ b/schemas/dataset_spec.schema.json
+@@ -718,7 +718,7 @@
+         },
+         "engine": {
+           "default": "scalable-v1",
+-          "pattern": "^scalable-v1$",
++          "pattern": "^(scalable-v1|scalable-relational-v1)$",
+           "title": "Engine",
+           "type": "string"
+         },
+diff --git a/src/test_data_agent/cli_parser.py b/src/test_data_agent/cli_parser.py
+index 03ad10a6..01cf54e0 100644
+--- a/src/test_data_agent/cli_parser.py
++++ b/src/test_data_agent/cli_parser.py
+@@ -709,7 +709,7 @@ def register_agent_commands(
+         action="store_true",
+         help="Force a fresh profile instead of reusing the metadata-only cache.",
+     )
+-    agent_plan_parser.add_argument("--execution-policy", type=Path, help="Explicit bounded scalable-v1 policy JSON to include in human review.")
++    agent_plan_parser.add_argument("--execution-policy", type=Path, help="Explicit bounded scalable-v1 or scalable-relational-v1 policy JSON to include in human review.")
+     add_local_category_option(agent_plan_parser)
+     agent_plan_parser.add_argument(
+         "--json",
+diff --git a/src/test_data_agent/mcp_generator_server.py b/src/test_data_agent/mcp_generator_server.py
+index 0c6173f1..598adcf2 100644
+--- a/src/test_data_agent/mcp_generator_server.py
++++ b/src/test_data_agent/mcp_generator_server.py
+@@ -294,7 +294,7 @@ def plan_dataset(
+     use_cache: bool = True,
+     execution_policy: GenerationExecutionPolicy | None = None,
+ ) -> dict[str, Any]:
+-    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables, including explicit rows/cells/disk/time/memory and 1-4 workers. Policy changes require renewed exact-fingerprint review."""
++    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables or scalable-relational-v1 for acyclic synthetic-primary-key many-to-one/one-to-one links. Both enforce explicit rows/cells/disk/time/memory limits and 1-4 workers; cycles and global rules reject. Policy changes require renewed exact-fingerprint review."""
+ 
+     policy = GenerationExecutionPolicy.model_validate(execution_policy) if execution_policy is not None else None
+     source = resolve_workspace_path(source_path, must_exist=True)
+diff --git a/tests/fixtures/contracts/advisor-exchange.json b/tests/fixtures/contracts/advisor-exchange.json
+index 43cb11b4..f4c68fa0 100644
+--- a/tests/fixtures/contracts/advisor-exchange.json
++++ b/tests/fixtures/contracts/advisor-exchange.json
+@@ -979,7 +979,7 @@
+           },
+           "engine": {
+             "default": "scalable-v1",
+-            "pattern": "^scalable-v1$",
++            "pattern": "^(scalable-v1|scalable-relational-v1)$",
+             "title": "Engine",
+             "type": "string"
+           },
+diff --git a/tests/fixtures/contracts/mcp-generator-tools.json b/tests/fixtures/contracts/mcp-generator-tools.json
+index f3a4a4c6..cd4cd447 100644
+--- a/tests/fixtures/contracts/mcp-generator-tools.json
++++ b/tests/fixtures/contracts/mcp-generator-tools.json
+@@ -616,7 +616,7 @@
+     }
+   },
+   {
+-    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables, including explicit rows/cells/disk/time/memory and 1-4 workers. Policy changes require renewed exact-fingerprint review.",
++    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables or scalable-relational-v1 for acyclic synthetic-primary-key many-to-one/one-to-one links. Both enforce explicit rows/cells/disk/time/memory limits and 1-4 workers; cycles and global rules reject. Policy changes require renewed exact-fingerprint review.",
+     "input_schema": {
+       "$defs": {
+         "GenerationExecutionPolicy": {
+@@ -631,7 +631,7 @@
+             },
+             "engine": {
+               "default": "scalable-v1",
+-              "pattern": "^scalable-v1$",
++              "pattern": "^(scalable-v1|scalable-relational-v1)$",
+               "title": "Engine",
+               "type": "string"
+             },
