@@ -11,6 +11,18 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.7.0rc3 Python 3.15 And Relational Candidate
+
+The owner authorized the next RC on 2026-11-08 after Python 3.15 support
+merged. Select `1.7.0rc3`, including the already merged bounded relational
+engine and dependency/security workflow corrections since rc2. Fresh exact-main
+CI, Containers, Documentation and Security, independent technical AI review,
+Ubuntu artifact preflight, signed acceptance and public verification remain
+mandatory. Complete the fictional manual client acceptance required by
+`scalable-relational-generation` before publication. Candidate documentation
+belongs at `versions/1.7.0rc3/`; stable 1.6.0 remains the default.
+See [candidate status](1.7.0rc3-release-status.md). No publication is claimed.
+
 ## 1.7.0rc2 Capacity And Performance Candidate
 
 The owner authorized `1.7.0rc2` on 2026-11-08 after implementation of

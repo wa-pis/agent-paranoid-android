@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.0rc3] - 2026-11-08
+
+Python 3.15 compatibility and bounded parallel generation of related tables.
+Stable 1.6.0 remains the recommended default.
+
+### Added
+
 - Add explicit `scalable-relational-v1` for bounded source-free many-to-one and
   one-to-one DAGs, including chains, multiple parents and nullable references.
   Streamed generation/recovery proves synthetic key assignments without loading

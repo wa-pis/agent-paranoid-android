@@ -144,3 +144,12 @@ PyYAML source-build availability is explicitly documented. No free-threaded,
 alternate interpreter, new platform, cross-Python byte identity or speedup is
 claimed. Implementation is verified; a future RC still needs its separate
 authorization, exact-release review/preflight/publication gates and artifacts.
+
+## 2026-11-08 — Next RC Authorized
+
+The owner authorized publication of the next RC with Python 3.15 support.
+Selected 1.7.0rc3 after verified 1.7.0rc2. Release preparation starts from
+main d5143ad8d580b7f5a9f23c9ed0e3ac33521b212a in an isolated worktree.
+Fresh exact-main gates/review, Ubuntu hashes, signed acceptance and public
+verification remain required. The relational manual client acceptance is
+not replaced by SDK tests or historical consent. No tag/publication yet.
