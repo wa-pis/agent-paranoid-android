@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.0rc2] - 2026-11-08
+
+Capacity forecasts and opt-in scalable synthetic generation. Stable 1.6.0
+remains the recommended default.
+
 ### Added
 
 - Forecast CSV/JSON/Parquet bytes, logical database payload and approximate

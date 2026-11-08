@@ -1,7 +1,7 @@
 # Forecast And Generate Larger Synthetic Datasets
 
-These additions are under development after `1.7.0rc1`; they are not available
-in that published candidate. Use this source branch until separately released.
+These additions target `1.7.0rc2`, whose publication is pending. They are not
+available in `1.7.0rc1`. Stable 1.6.0 remains the recommended default.
 
 ## Preview Storage And Time
 

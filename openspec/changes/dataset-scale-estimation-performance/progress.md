@@ -85,3 +85,11 @@ Implementation checks are complete. The delivery commit contains this log,
 the executable change and its evidence on `codex/dataset-scale-estimation`.
 Remaining release review/acceptance needs a separately authorized release.
 No public package, tag or container has been published by this change.
+
+## 2026-11-08 — RC2 Release Preparation
+
+The owner separately authorized a PR, merge after green checks and publication
+of the next RC. The latest published candidate is 1.7.0rc1; the selected next
+version is 1.7.0rc2. Version metadata and the changelog are prepared. Required
+independent exact-SHA review, exact-main workflows, Ubuntu artifact preflight,
+signed acceptance and public verification remain pending; none is claimed.

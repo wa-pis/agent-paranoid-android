@@ -43,5 +43,5 @@
   migration, implementation map and roadmap; use synthetic examples only.
 - [x] Validate OpenSpec, focused contract/safety tests and required release checks
   on the implementation; record the final gate outcome in progress.md.
-- [ ] Before a separately authorized release: independent exact-SHA review and
-  the normal release/artifact acceptance process. No release is authorized here.
+- [ ] Complete independent exact-SHA review and the normal release/artifact
+  acceptance process for the owner-authorized `1.7.0rc2` (2026-11-08).
