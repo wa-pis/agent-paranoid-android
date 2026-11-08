@@ -151,7 +151,9 @@ process image, avoiding the parent memory history retained by `getrusage` across
 accounting; memory checks and finite policy ceilings remain enabled.
 
 
-## Linked Tables (Unreleased)
+<a id="linked-tables-unreleased"></a>
+
+## Linked Tables (1.7.0rc3)
 
 Set `generation_settings.execution_policy.engine: scalable-relational-v1` to
 stream related synthetic tables. Use the same finite policy fields shown above.
@@ -169,7 +171,7 @@ one table; tables themselves are not generated concurrently. Parent keys are
 computed from synthetic ordinals, without retaining complete parent tables or
 key sets. The engine preserves logical rows across worker and batch settings
 within the same spec/seed/environment. It uses its own versioned FK stream;
-legacy output and the released independent engine are unchanged.
+legacy output and the independent engine are unchanged.
 
 Cycles, self-links, shared primary/foreign keys, non-primary parent references,
 type mismatches, conflicting active targets, global constraints, business rules,

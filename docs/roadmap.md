@@ -6,13 +6,11 @@ These are directions, not committed dates. Priorities follow user feedback and
 confirmed defects. Stable `1.6.0` is already published and publicly verified;
 completed work belongs in [release history](history.md), not this list.
 
-## Now
+Candidate [1.7.0rc3](release-evidence-1.7.0rc3.md) now includes Python 3.15
+and bounded source-free acyclic linked-table generation. Cycles, shared PK/FK
+identities and global rules remain outside the scalable engine’s scope.
 
-- Extend [bounded scalable generation](how-to/dataset-capacity.md) from the
-  published 1.7.0rc2 independent-table engine to source-free acyclic linked
-  tables under `scalable-relational-generation`. The new explicit engine is
-  unreleased; cycles, shared PK/FK identities and global business rules remain
-  outside its initial scope.
+## Now
 
 - Follow up on the remaining external `1.6.0` evidence gaps through the
   [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):

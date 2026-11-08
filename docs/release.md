@@ -18,10 +18,13 @@ merged. Select `1.7.0rc3`, including the already merged bounded relational
 engine and dependency/security workflow corrections since rc2. Fresh exact-main
 CI, Containers, Documentation and Security, independent technical AI review,
 Ubuntu artifact preflight, signed acceptance and public verification remain
-mandatory. Complete the fictional manual client acceptance required by
-`scalable-relational-generation` before publication. Candidate documentation
+mandatory. For this RC only, the owner explicitly waived the fictional manual
+client acceptance required by `scalable-relational-generation`; it was not
+executed or passed. See [the recorded exception](release-evidence-1.7.0rc3.md#explicit-manual-client-exception). Candidate documentation
 belongs at `versions/1.7.0rc3/`; stable 1.6.0 remains the default.
-See [candidate status](1.7.0rc3-release-status.md). No publication is claimed.
+See [candidate status](1.7.0rc3-release-status.md) and
+[source-bound evidence](release-evidence-1.7.0rc3.md). GitHub, PyPI and all three
+signed container targets are published; all 12 public acceptance jobs passed.
 
 ## 1.7.0rc2 Capacity And Performance Candidate
 

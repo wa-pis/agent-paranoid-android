@@ -103,3 +103,31 @@ main d5143ad8d580b7f5a9f23c9ed0e3ac33521b212a in an isolated worktree.
 Fresh exact-main gates/review, Ubuntu hashes, signed acceptance and public
 verification remain required. The relational manual client acceptance is
 not replaced by SDK tests or historical consent. No tag/publication yet.
+
+## 2026-11-08 — RC3 Tag And Manual-Client Exception
+
+Release PR #694 merged after 48 green checks. Exact main
+09b6fb207b22364ff41f70d7b51abe30d1a458fa passed four required workflows,
+Scorecard, full local Python 3.15 gate and Ubuntu no-publish preflight.
+Independent read-only technical AI source and artifact review found no
+actionable blockers; both Ubuntu archive digests match the signed manifest.
+
+After the concrete Claude Desktop packet was presented, the owner explicitly
+instructed “в этот раз пропустим”. Manual client acceptance is waived for this
+RC only, not completed or replaced by SDK tests. The fictional plan remains
+awaiting approval; no human dataset consent is claimed. Signed tag v1.7.0rc3
+was verified and pushed. Package/container publication and public acceptance
+are running; see docs/release-evidence-1.7.0rc3.md for source-bound evidence.
+
+## 2026-11-08 UTC — RC3 Published And Publicly Verified
+
+1.7.0rc3 is published on GitHub/PyPI with all three signed multi-platform
+container targets. Release 42516413538, PyPI 42517193106 and Containers
+42516413574 succeeded. Public acceptance 42517687082 passed all 12 jobs on
+attempt 1 against exact tagged source 09b6fb207b22364ff41f70d7b51abe30d1a458fa.
+Actual public package downloads match the signed Ubuntu hashes; portable
+provenance, Python 3.15 metadata, candidate docs, installation/upgrade and
+container signatures/workloads passed. Full evidence and image digests are
+in docs/release-evidence-1.7.0rc3.md. Stable 1.6.0 remains recommended.
+Manual Claude Desktop acceptance remains owner-waived, not completed.
+No production data, live database/provider calls or dataset consent is claimed.

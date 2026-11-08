@@ -27,4 +27,4 @@
 - [x] Record exact source, interpreter, platform, dependencies and executable evidence.
 - [x] After stable blocking checks pass, update classifiers, English/Russian runtime/dependency documentation, release guidance, changelog and focused tests.
 - [x] Validate OpenSpec and pass the full local implementation release gate.
-- [ ] Before a separately authorized RC, complete publication-specific release gates and artifact verification (no RC requested by this implementation task).
+- [x] Complete publication-specific gates and artifact verification for separately authorized 1.7.0rc3; all 12 public jobs passed (manual-client check explicitly owner-waived, not passed; see progress/evidence).
