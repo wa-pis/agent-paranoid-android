@@ -117,3 +117,30 @@ pip-api 0.0.35 (development/audit dependency only) restores `pip_audit --version
 This is the eighth changed lock package; no runtime package/range changed.
 License/compatibility checks and the 30 focused tests pass with this update.
 Full hashed audit and refreshed CI remain pending; promotion is not yet complete.
+
+### Verified Implementation And Promotion Evidence
+
+Implementation source: 76bfa0ecdaf1d9fed5fde76b3ec051e90cec66d3, PR
+[#693](https://github.com/wa-pis/agent-paranoid-android/pull/693).
+All 47 applicable checks passed on that exact head, with no pending or failed
+checks and a clean merge status. The final follow-up records documentation
+and task evidence only; it does not change the verified implementation.
+
+[Linux CI run 42488490529](https://github.com/wa-pis/agent-paranoid-android/actions/runs/42488490529)
+passed full Python 3.11, 3.12, 3.13, 3.14 and 3.15 jobs, every minimum profile,
+base/all wheel compatibility and every optional-extra install profile.
+Python 3.15.2 Linux x86_64: 4857 passed, 25 skipped, 2 warnings, 92% coverage,
+443.11 seconds. These include both scalable engines' 1/2/4-worker and batch
+comparisons, cancellation/resource/recovery/cleanup contracts and real SDK
+stdio tests. Prior macOS arm64 full-gate results above cover the other
+execution platform. Hash-checked pip-audit passed locally and in each Linux
+quality job; no known vulnerabilities were found. No audit was skipped,
+allowed to fail or moved to an older interpreter.
+
+Public metadata, blocking CI and English/Russian support/dependency/release
+guidance now include standard CPython 3.15. Python 3.11 minima, older jobs,
+source-free generation, workspace/SQL/approval gates and budgets remain intact.
+PyYAML source-build availability is explicitly documented. No free-threaded,
+alternate interpreter, new platform, cross-Python byte identity or speedup is
+claimed. Implementation is verified; a future RC still needs its separate
+authorization, exact-release review/preflight/publication gates and artifacts.

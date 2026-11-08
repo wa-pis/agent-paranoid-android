@@ -2,9 +2,10 @@
 
 ## Status
 
-Proposed on 2026-11-08 at the owner's request. This change specifies support;
-it does not implement or announce it. The current tested runtime range is
-CPython 3.11–3.14. Official sources verified on 2026-11-08 confirm that
+Proposed and implemented on 2026-11-08 at the owner's request.
+Implementation evidence is recorded in `progress.md`: CPython 3.11–3.15
+blocking CI and CPython 3.15.2 Linux/macOS verification passed. No release
+is published by this change. At proposal time the tested range was 3.11–3.14. Official sources verified on 2026-11-08 confirm that
 [3.15.0 became stable on 2026-10-09](https://www.python.org/downloads/release/python-3150/)
 and [3.15.2 was released on 2026-10-26](https://peps.python.org/pep-0790/).
 Available local interpreters and dependency wheels remain to be verified.

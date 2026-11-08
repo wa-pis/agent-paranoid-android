@@ -153,7 +153,8 @@ These are regression budgets, not a guarantee that every platform installs the
 same count. `PyArrow` is the largest optional wheel, so keep `parquet` out of
 environments that do not produce Parquet files.
 
-Python 3.15 compatibility is being verified in `python-315-support`. The locked
+Python 3.15 compatibility evidence is recorded in the `python-315-support`
+OpenSpec change. The locked
 profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing
 Python 3.11 minimum profiles and runtime dependency ranges.
 
