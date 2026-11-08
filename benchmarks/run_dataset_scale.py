@@ -18,7 +18,10 @@ def main() -> None:
     baseline.add_argument('--baseline-root', type=Path)
     baseline.add_argument('--legacy', action='store_true')
     parser.add_argument('--result', type=Path, required=True)
+    parser.add_argument('--relational', action='store_true')
     args = parser.parse_args()
+    if args.relational and (args.baseline_root or args.legacy):
+        parser.error('relational benchmark compares its serial and parallel engine only')
     if not 1 <= args.repeat <= 5 or any(not 1 <= n <= 750000 for n in args.counts):
         parser.error('bounded benchmark: repeat 1..5, rows 1..750000')
     if any(n not in (1, 2, 4) for n in args.workers):
@@ -41,6 +44,8 @@ def main() -> None:
                             TEST_DATA_AGENT_MAX_GENERATION_SECONDS='1800')
                     else:
                         command.extend(['--workers', str(workers)])
+                    if args.relational:
+                        command.append('--relational')
                     result = subprocess.run(command, cwd=root, env=env, capture_output=True,
                                             text=True, check=True, timeout=1800)
                     measurement = json.loads(result.stdout)
@@ -48,6 +53,10 @@ def main() -> None:
                     if stats.exists():
                         measurement['stages'] = json.loads(stats.read_text())
                     measurement['repeat'] = repeat
+                    if args.relational:
+                        previous = [m for m in measurements if m['count'] == count]
+                        if previous and measurement['data_sha256'] != previous[0]['data_sha256']:
+                            raise ValueError('relational benchmark changed data across workers or repeats')
                     measurements.append(measurement)
                     args.result.write_text(json.dumps(measurements, indent=2)+'\n')
                     print(json.dumps(measurement), flush=True)

@@ -192,3 +192,70 @@ raise SystemExit(main())
     assert caught.value.subgroup(ValueError if failure == "error" else TimeoutError)
     with pytest.raises(ProcessLookupError):
         os.kill(int(pid_path.read_text()), 0)
+
+
+@pytest.mark.parametrize('interrupted', [False, True])
+def test_client_relational_plan_exact_engine_review_and_recovery(tmp_path: Path, interrupted: bool) -> None:
+    """Synthetic SDK evidence only; this is not manual human acceptance."""
+    source = tmp_path/'source'
+    source.mkdir()
+    (source/'customers.csv').write_text('customer_id,label\nC1,fictional alpha\nC2,fictional beta\n')
+    (source/'orders.csv').write_text('order_id,customer_id,label\nO1,C1,fictional one\nO2,C2,fictional two\nO3,C1,fictional three\n')
+    env = {**os.environ, 'TEST_DATA_AGENT_WORKSPACE_ROOT': str(tmp_path),
+           'PYTHONPATH': str(Path(__file__).resolve().parents[1]/'src')}
+    program = '''
+import test_data_agent.agent_approval as approval
+from test_data_agent.mcp_generator_server import main
+original = approval.publish_agent_completion
+
+def interrupt_once(*args, **kwargs):
+    approval.publish_agent_completion = original
+    raise RuntimeError('fictional-private-interruption')
+'''
+    if interrupted:
+        program += '\napproval.publish_agent_completion = interrupt_once\n'
+    program += '\nraise SystemExit(main())\n'
+    async def run() -> None:
+        with (tmp_path/'stderr.txt').open('w+') as errors:
+            async with stdio_client(StdioServerParameters(command=sys.executable, args=['-c', program], env=env), errlog=errors) as (read, write):
+                async with ClientSession(read, write) as client:
+                    await client.initialize()
+                    responses = []
+                    async def call(name, args):
+                        result = await client.call_tool(name, args)
+                        responses.append(result.model_dump_json())
+                        assert not result.model_dump(by_alias=True)["isError"], responses[-1]
+                        return json.loads(next(item.text for item in result.content if item.type == 'text'))
+                    plan = await call('plan_dataset', dict(source_path='source', workspace_path='plan', count=7,
+                        seed=42, output_format='csv', execution_policy=dict(engine='scalable-relational-v1', workers=2, batch_size=3)))
+                    path = tmp_path/plan['spec_path']
+                    data = yaml.safe_load(path.read_text())
+                    assert data['relationships']
+                    state = await call('inspect_dataset_plan', dict(workspace_path='plan'))
+                    reviewed = state['review']['current_spec_sha256']
+                    original = path.read_bytes()
+                    data['generation_settings']['execution_policy']['engine'] = 'scalable-v1'
+                    path.write_text(yaml.safe_dump(data))
+                    rejection = await client.call_tool('approve_dataset_plan', dict(workspace_path='plan', reviewed_spec_sha256=reviewed))
+                    assert rejection.model_dump(by_alias=True)["isError"]
+                    assert not (tmp_path/'plan/generated').exists()
+                    path.write_bytes(original)
+                    state = await call('inspect_dataset_plan', dict(workspace_path='plan'))
+                    args = dict(workspace_path='plan', reviewed_spec_sha256=state['review']['current_spec_sha256'])
+                    if interrupted:
+                        failure = await client.call_tool('approve_dataset_plan', args)
+                        assert failure.model_dump(by_alias=True)["isError"]
+                        assert (await call('inspect_dataset_plan', dict(workspace_path='plan')))['phase'] == 'recovery_required'
+                        result = await call('recover_dataset_plan', args)
+                    else:
+                        result = await call('approve_dataset_plan', args)
+                    assert result['row_counts'] == {'customers': 7, 'orders': 7}
+                    assert result['validation_valid'] and result['source_rows_copied'] is False
+                    report = json.loads((tmp_path/'plan/generated/validation_report.json').read_text())
+                    assert report['utility']['relationship_checks'] == 'executed'
+                    assert report['utility']['active_relationships'] == 1
+                    assert 'fictional-private-interruption' not in '\n'.join(responses)
+                    assert 'fictional alpha' not in '\n'.join(responses)
+            errors.seek(0)
+            assert 'fictional-private-interruption' not in errors.read()
+    asyncio.run(asyncio.wait_for(run(), timeout=60))

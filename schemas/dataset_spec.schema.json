@@ -718,7 +718,7 @@
         },
         "engine": {
           "default": "scalable-v1",
-          "pattern": "^scalable-v1$",
+          "pattern": "^(scalable-v1|scalable-relational-v1)$",
           "title": "Engine",
           "type": "string"
         },

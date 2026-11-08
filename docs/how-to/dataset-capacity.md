@@ -1,6 +1,6 @@
 # Forecast And Generate Larger Synthetic Datasets
 
-These additions target `1.7.0rc2`, whose publication is pending. They are not
+These additions are published in `1.7.0rc2`. They are not
 available in `1.7.0rc1`. Stable 1.6.0 remains the recommended default.
 
 ## Preview Storage And Time
@@ -79,6 +79,8 @@ Existing administrator output/disk and MCP invocation limits remain additional
 ceilings. The policy does not widen database or filesystem authority.
 
 `scalable-v1` supports independent tables in valid/edge modes and CSV/JSON/Parquet.
+Use Linux or macOS for scalable execution in this RC; native Windows execution
+of this engine is unsupported.
 Relationships, global constraints, business rules, scenarios and negative/mixed
 modes reject before generation; use the legacy engine for those bounded cases.
 Every table needs a synthetic-identifier primary key when distinct rows are
@@ -89,7 +91,9 @@ repeats a generated batch to achieve the count.
 Workers are bounded processes (1–4), with bounded batches/in-flight work.
 The parent controls ordering, deadlines, writing and atomic publication.
 Memory is conservatively checked at batch boundaries across parent/workers;
-it is not an operating-system memory sandbox. Large field/batch combinations
+it is not an operating-system memory sandbox. In a long-lived Python process,
+previous RSS high-water usage can also trigger admission; use a fresh process
+or review a larger finite policy for that embedding. Large field/batch combinations
 reject before allocation. Existing output survives failed replacement; worker
 failures/deadlines reap processes and clean staging. `generation_statistics`
 is a reserved entity name in this engine only.
@@ -145,3 +149,48 @@ Linux memory admission uses bounded `/proc/self/status` `VmHWM` for the current
 process image, avoiding the parent memory history retained by `getrusage` across
 `exec`. Missing or invalid proc metadata falls back to conservative `getrusage`
 accounting; memory checks and finite policy ceilings remain enabled.
+
+
+## Linked Tables (Unreleased)
+
+Set `generation_settings.execution_policy.engine: scalable-relational-v1` to
+stream related synthetic tables. Use the same finite policy fields shown above.
+`scalable-v1` keeps its existing independent-table behavior.
+
+The initial scope is acyclic many-to-one and one-to-one relationships to a
+non-null synthetic integer/string parent primary key. Chains and several
+parents per child are supported, with unequal table sizes and nullable child
+references. For one-to-one, the child row count must not exceed its parent's,
+even when some child links are null. Each table still needs a sufficient
+synthetic primary-key domain when distinct rows are requested.
+
+Parents complete before children. Up to four processes generate batches within
+one table; tables themselves are not generated concurrently. Parent keys are
+computed from synthetic ordinals, without retaining complete parent tables or
+key sets. The engine preserves logical rows across worker and batch settings
+within the same spec/seed/environment. It uses its own versioned FK stream;
+legacy output and the released independent engine are unchanged.
+
+Cycles, self-links, shared primary/foreign keys, non-primary parent references,
+type mismatches, conflicting active targets, global constraints, business rules,
+scenarios and negative/mixed/load modes reject before staging. Rejected
+relationship hypotheses do not create dependencies. Unsupported cases require
+a reviewed legacy-sized run or a future implementation, with no silent fallback.
+
+Mandatory checks prove actual PK domains/order and exact FK assignments before
+publication and during streamed recovery. Relationship metrics report executed
+reference/null counts even if optional relationship reporting was disabled.
+Late-child failure cancels the whole staged dataset and preserves existing
+output. All tables share the invocation deadline and operation/output budgets.
+
+Bounded calibration generates the entire sampled graph, retaining valid FK
+cardinality. It measures actual file sizes and apportions sampled elapsed time
+by cell count for extrapolation; individual table times are approximate. Parent
+barriers and small samples can make parallel ETA optimistic. The same
+200,000-cell, 16 MiB and 30-second calibration ceilings apply. Metadata forecasts
+flag unsupported relational execution rather than certifying it.
+
+Python file-bundle APIs, CLI `generate`/`validate`, and MCP planning/approval/
+recovery share this engine. Changing the engine changes the specification
+fingerprint and requires renewed human review. Automated SDK acceptance is
+technical evidence and does not represent manual client acceptance for a release.
