@@ -109,10 +109,17 @@ def estimate_capacity(spec: DatasetSpec, *, database: Literal["logical", "postgr
     multiplier = (spec.generation_settings.load_multiplier
                   if spec.generation_settings.mode == "load_test" else 1)
     identifier_domains = max(1, sum(field.is_identifier for entity in spec.entities for field in entity.fields))
+    reference_rows: dict[tuple[str, str], int] = {}
+    policy = spec.generation_settings.execution_policy
+    if policy is not None and policy.engine == 'scalable-relational-v1':
+        parents = {entity.name: entity.row_count*multiplier for entity in spec.entities}
+        reference_rows = {(r.child_entity, r.child_field): parents[r.parent_entity]
+            for r in spec.relationships if r.status != 'rejected' and r.parent_entity in parents}
     entities = []
     for entity in spec.entities:
         rows = entity.row_count*multiplier
-        widths = [field_width(field, rows) for field in entity.fields]
+        widths = [field_width(field.model_copy(update={'is_identifier': True})
+            if (entity.name, field.name) in reference_rows else field, rows) for field in entity.fields]
         logical = sum(item[1] for item in widths)
         text = sum(item[0] for item in widths)
         headers = sum(len(field.name.encode("utf-8"))+1 for field in entity.fields)+2
@@ -132,7 +139,9 @@ def estimate_capacity(spec: DatasetSpec, *, database: Literal["logical", "postgr
             or any(len(str(item.get("value", "")).encode("utf-8")) > 1800
                    for item in field.distribution.get("categories", []))) for field in entity.fields)
         outside_int64 = any(field.data_type == FieldType.INTEGER and (
-            (field.is_identifier and ((spec.generation_settings.seed or 0)*1_000_000+rows+1)*identifier_domains > 2**63-1)
+            ((field.is_identifier or (entity.name, field.name) in reference_rows)
+                and ((spec.generation_settings.seed or 0)*1_000_000
+                     +reference_rows.get((entity.name, field.name), rows)+1)*identifier_domains > 2**63-1)
             or (field.distribution.get('kind') == 'numeric_shape' and field.distribution['max_abs_magnitude'] >= 18)
             or any(abs(field.distribution.get(key) or 0)*field.distribution.get('scale_factor', 1) > 2**63-1
                    for key in ('min_value', 'max_value', 'p05', 'p95'))

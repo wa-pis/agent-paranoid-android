@@ -294,7 +294,7 @@ def plan_dataset(
     use_cache: bool = True,
     execution_policy: GenerationExecutionPolicy | None = None,
 ) -> dict[str, Any]:
-    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables, including explicit rows/cells/disk/time/memory and 1-4 workers. Policy changes require renewed exact-fingerprint review."""
+    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths, capacity forecasts and summaries without generating rows; inspect the plan and obtain human review before approval. Optional execution_policy selects bounded scalable-v1 for independent tables or scalable-relational-v1 for acyclic synthetic-primary-key many-to-one/one-to-one links. Both enforce explicit rows/cells/disk/time/memory limits and 1-4 workers; cycles and global rules reject. Policy changes require renewed exact-fingerprint review."""
 
     policy = GenerationExecutionPolicy.model_validate(execution_policy) if execution_policy is not None else None
     source = resolve_workspace_path(source_path, must_exist=True)

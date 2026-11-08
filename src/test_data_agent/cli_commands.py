@@ -93,7 +93,7 @@ def run_dataset_command(
     configured_applier = (
         make_business_rules_applier(load_business_rules(args.business_rules))
         if args.command in {"generate", "generate-from-csv"} and getattr(args, "business_rules", None) is not None
-        else apply_rules
+        else apply_rules if rules_path is not None else None
     )
 
     if args.command == "estimate-capacity":

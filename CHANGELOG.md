@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Add explicit `scalable-relational-v1` for bounded source-free many-to-one and
+  one-to-one DAGs, including chains, multiple parents and nullable references.
+  Streamed generation/recovery proves synthetic key assignments without loading
+  parent tables. Existing `scalable-v1` remains independent-table only.
+- Calibrate supported linked graphs as a whole under existing sample budgets;
+  changing engines requires review of the new specification fingerprint.
+
 ## [1.7.0rc2] - 2026-11-08
 
 Capacity forecasts and opt-in scalable synthetic generation. Stable 1.6.0

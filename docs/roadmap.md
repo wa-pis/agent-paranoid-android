@@ -8,10 +8,11 @@ completed work belongs in [release history](history.md), not this list.
 
 ## Now
 
-- Implement and verify [capacity forecasts and bounded scalable generation](how-to/dataset-capacity.md)
-  under `dataset-scale-estimation-performance`. The source branch adds estimates
-  and explicit independent-table streaming; related/global-rule scaling remains
-  unsupported in this engine. No new release has been published for this work.
+- Extend [bounded scalable generation](how-to/dataset-capacity.md) from the
+  published 1.7.0rc2 independent-table engine to source-free acyclic linked
+  tables under `scalable-relational-generation`. The new explicit engine is
+  unreleased; cycles, shared PK/FK identities and global business rules remain
+  outside its initial scope.
 
 - Follow up on the remaining external `1.6.0` evidence gaps through the
   [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):

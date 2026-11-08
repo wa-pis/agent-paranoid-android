@@ -111,3 +111,27 @@ Correction checks: 48 capacity tests passed on macOS; the Linux-only spawn
 regression is explicitly skipped here and must pass in Ubuntu CI. Ruff and
 strict typing (167 production modules) passed. Non-editable installed local
 execution had also passed all original 43 focused capacity tests.
+
+## 2026-11-08 — Published 1.7.0rc2
+
+PR #689 merged only after all 40 checks passed. Exact main
+b996da8e4db1435406ac39b5294d234c4a9f9c6c received renewed independent
+technical AI acceptance, all four exact-main gates, Ubuntu artifact preflight,
+independent archive/source correspondence checks and isolated installed-wheel
+capacity/identity acceptance (49 passed, one Linux-only skip on macOS).
+Ubuntu preflight passed 4827 tests, 25 skips, coverage 91.87%; the Linux spawn
+regression and previously failing parallel cases passed. Source budgets and
+policy gates were not widened.
+
+Signed tag v1.7.0rc2 (object 983ae3e75e77a79a1ccdea4225fb612fde445693)
+contains the validated JSON acceptance manifest and exact Ubuntu hashes.
+GitHub Release, PyPI and all three signed multi-platform GHCR images published.
+Public verification passed all 12 jobs on attempt 1:
+https://github.com/wa-pis/agent-paranoid-android/actions/runs/42457481438
+Release: https://github.com/wa-pis/agent-paranoid-android/releases/tag/v1.7.0rc2
+Canonical evidence: docs/release-evidence-1.7.0rc2.md.
+
+All change tasks are verified complete. These are technical AI and executable
+fictional-fixture checks, not new human client consent or live database/provider
+acceptance. No stable release was published. This documentation follow-up
+records results without changing the immutable package source or tag.

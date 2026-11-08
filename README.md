@@ -19,7 +19,7 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
-Prospective candidate `1.7.0rc2` is not yet published; stable `1.6.0` remains recommended.
+Candidate `1.7.0rc2` is published; stable `1.6.0` remains recommended.
 Install explicitly with `python3 -m pip install "agent-paranoid-android==1.7.0rc2"`.
 See [candidate status](docs/1.7.0rc2-release-status.md) and its [guide](https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/).
 

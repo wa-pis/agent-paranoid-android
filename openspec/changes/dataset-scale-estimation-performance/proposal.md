@@ -4,7 +4,8 @@
 
 Proposed 2026-11-04; implementation authorized 2026-11-08. Work is isolated on
 `codex/dataset-scale-estimation`. See progress.md for measured implementation
-evidence and remaining checks; no release is claimed.
+evidence. Candidate `1.7.0rc2` was subsequently published and passed all 12
+public acceptance jobs; see docs/release-evidence-1.7.0rc2.md.
 On 2026-11-08 the owner additionally authorized a pull request, merge after
 green checks and the next release candidate, selected as `1.7.0rc2`. Publication
 remains subject to docs/release.md; live database tests are outside this scope.
