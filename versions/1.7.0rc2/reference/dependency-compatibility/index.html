@@ -208,7 +208,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
   <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br>Documentation 4e1651c6fe9f5573f280ef6497701a98f46d022e
+  <br>Documentation d5143ad8d580b7f5a9f23c9ed0e3ac33521b212a
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -340,8 +340,8 @@ it does not replace the reviewed lock or minimum profiles.</p>
 </tr>
 <tr>
 <td><code>latest-all</code></td>
-<td>3.11–3.14</td>
-<td>Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
+<td>3.11–3.15</td>
+<td>Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
 </tr>
 </tbody>
 </table>
@@ -549,6 +549,12 @@ growth:</p>
 <p>These are regression budgets, not a guarantee that every platform installs the
 same count. <code>PyArrow</code> is the largest optional wheel, so keep <code>parquet</code> out of
 environments that do not produce Parquet files.</p>
+<p>Python 3.15 compatibility evidence is recorded in the <code>python-315-support</code>
+OpenSpec change. The locked
+profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing
+Python 3.11 minimum profiles and runtime dependency ranges.</p>
+<p>The locked development profile uses pip-api 0.0.35 so pip-audit can run on
+Python 3.15 without the removed <code>sre_constants</code> module.</p>
               
 </div>
 

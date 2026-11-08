@@ -194,7 +194,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
   <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br>Documentation 4e1651c6fe9f5573f280ef6497701a98f46d022e
+  <br>Documentation d5143ad8d580b7f5a9f23c9ed0e3ac33521b212a
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -202,7 +202,7 @@
 
                 <h1 id="runtime">Поддержка runtime и интеграций<a class="headerlink" href="#runtime" title="Permanent link">&para;</a></h1>
 <p><a href="../../../reference/support-policy/">English</a> · Русский</p>
-<p>Поддерживаемая CI-матрица — CPython 3.11, 3.12, 3.13 и 3.14. Минимум — 3.11. Другие реализации Python могут работать, но не проходят release gate. Новая версия Python считается поддерживаемой после CI и installed-wheel smoke.</p>
+<p>Поддерживаемая CI-матрица — CPython 3.11, 3.12, 3.13, 3.14 и 3.15. Минимум — 3.11. Другие реализации Python могут работать, но не проходят release gate. Новая версия Python считается поддерживаемой после CI и installed-wheel smoke.</p>
 <p>Отказ от версии Python — breaking packaging change: нужны release notes, migration и предупреждение минимум за один feature release. Security constraint может сократить срок с явным объяснением. Python 3.11 сохраняется в 1.x, пока это допускают безопасность и зависимости.</p>
 <table>
 <thead>
@@ -249,6 +249,9 @@
 <p>Удаление extra, перенос base-функции в extra или новая неожиданная зависимость между extras — breaking packaging change. JDBC-style URL — только синтаксис endpoint, без JVM.</p>
 <p>Provider-neutral DatasetAdvisor/AdvisorExchange/AdvisorProposal — версионированные контракты. OpenAI и GigaChat adapters экспериментальны. Они получают безопасные metadata, а не source/generated rows или секреты; результат ограничен и проверяется по fingerprint. SDK не входит в base. Реальные provider services не используются в обычных тестах.</p>
 <p>При сообщении об ошибке укажите версии пакета/Python, extras, платформу и минимальную синтетическую репродукцию. Не прикладывайте production rows, credentials, provider payload или audit keys.</p>
+<p>На Python 3.15 PyYAML 6.0.3 на macOS arm64 пока собирается из исходников;
+может потребоваться компилятор. Проверяемый профиль использует PyArrow 26.0.1
+и Pydantic 2.14.3.</p>
               
 </div>
 

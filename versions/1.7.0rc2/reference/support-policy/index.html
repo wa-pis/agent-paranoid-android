@@ -208,7 +208,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
   <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br>Documentation 4e1651c6fe9f5573f280ef6497701a98f46d022e
+  <br>Documentation d5143ad8d580b7f5a9f23c9ed0e3ac33521b212a
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -221,7 +221,7 @@ provider adapters the project supports. It complements the
 <a href="../stability/">Public Stability</a> contract map; it does not make internal
 modules public.</p>
 <h2 id="python-versions">Python Versions<a class="headerlink" href="#python-versions" title="Permanent link">&para;</a></h2>
-<p>The package supports CPython 3.11, 3.12, 3.13, and 3.14. Each supported
+<p>The package supports CPython 3.11, 3.12, 3.13, 3.14, and 3.15. Each supported
 version runs the test suite and builds, installs, and checks an isolated base
 wheel before release. Alternative Python implementations may work, but are not
 release-gated.</p>
@@ -236,6 +236,10 @@ release-gated.</p>
 <li>Security fixes may shorten that notice when the older runtime cannot be
   supported safely; the release notes must explain the exception.</li>
 </ul>
+<p>On Python 3.15, PyYAML 6.0.3 currently installs from source on macOS arm64;
+a working compiler may be required. PyArrow 26.0.1 and Pydantic 2.14.3 provide
+the native wheels used by the reviewed latest dependency profile. See
+<a href="../dependency-compatibility/">dependency compatibility</a> for tested versions.</p>
 <h2 id="optional-extras">Optional Extras<a class="headerlink" href="#optional-extras" title="Permanent link">&para;</a></h2>
 <p>The base installation is the supported deterministic CSV and JSON core.
 Optional extras are supported capabilities, but users install and operate only
