@@ -45,7 +45,7 @@
 <aside aria-label="Documentation version" class="documentation-identity">
 <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
   <br/>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br/>Documentation b1614e333e875a3373105011d937f828de73a2ff
+  <br/>Documentation 18cba3235752717632b511577fcab81517daa09c
   <br/><a href="https://wa-pis.github.io/agent-paranoid-android/versions/stable/">Stable version selector</a> · <a href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc2/downloads/">Downloads</a>
 </aside>
 <section class="handbook-cover"><h1>Agent Paranoid Android</h1><p>User Handbook / Руководство пользователя</p><p>Reproducible synthetic test data for CSV and database workflows</p></section>
@@ -1290,7 +1290,9 @@ repeats a generated batch to achieve the count.</p>
 <p>Workers are bounded processes (1–4), with bounded batches/in-flight work.
 The parent controls ordering, deadlines, writing and atomic publication.
 Memory is conservatively checked at batch boundaries across parent/workers;
-it is not an operating-system memory sandbox. Large field/batch combinations
+it is not an operating-system memory sandbox. In a long-lived Python process,
+previous RSS high-water usage can also trigger admission; use a fresh process
+or review a larger finite policy for that embedding. Large field/batch combinations
 reject before allocation. Existing output survives failed replacement; worker
 failures/deadlines reap processes and clean staging. <code>generation_statistics</code>
 is a reserved entity name in this engine only.
@@ -1336,7 +1338,43 @@ for benchmark acceptance criteria; do not assume the same timings on other hardw
 <p>Linux memory admission uses bounded <code>/proc/self/status</code> <code>VmHWM</code> for the current
 process image, avoiding the parent memory history retained by <code>getrusage</code> across
 <code>exec</code>. Missing or invalid proc metadata falls back to conservative <code>getrusage</code>
-accounting; memory checks and finite policy ceilings remain enabled.</p></section></section>
+accounting; memory checks and finite policy ceilings remain enabled.</p>
+<h2 id="how-to-dataset-capacity-linked-tables-unreleased">Linked Tables (Unreleased)<a class="headerlink" href="#how-to-dataset-capacity-linked-tables-unreleased" title="Permanent link">¶</a></h2>
+<p>Set <code>generation_settings.execution_policy.engine: scalable-relational-v1</code> to
+stream related synthetic tables. Use the same finite policy fields shown above.
+<code>scalable-v1</code> keeps its existing independent-table behavior.</p>
+<p>The initial scope is acyclic many-to-one and one-to-one relationships to a
+non-null synthetic integer/string parent primary key. Chains and several
+parents per child are supported, with unequal table sizes and nullable child
+references. For one-to-one, the child row count must not exceed its parent's,
+even when some child links are null. Each table still needs a sufficient
+synthetic primary-key domain when distinct rows are requested.</p>
+<p>Parents complete before children. Up to four processes generate batches within
+one table; tables themselves are not generated concurrently. Parent keys are
+computed from synthetic ordinals, without retaining complete parent tables or
+key sets. The engine preserves logical rows across worker and batch settings
+within the same spec/seed/environment. It uses its own versioned FK stream;
+legacy output and the released independent engine are unchanged.</p>
+<p>Cycles, self-links, shared primary/foreign keys, non-primary parent references,
+type mismatches, conflicting active targets, global constraints, business rules,
+scenarios and negative/mixed/load modes reject before staging. Rejected
+relationship hypotheses do not create dependencies. Unsupported cases require
+a reviewed legacy-sized run or a future implementation, with no silent fallback.</p>
+<p>Mandatory checks prove actual PK domains/order and exact FK assignments before
+publication and during streamed recovery. Relationship metrics report executed
+reference/null counts even if optional relationship reporting was disabled.
+Late-child failure cancels the whole staged dataset and preserves existing
+output. All tables share the invocation deadline and operation/output budgets.</p>
+<p>Bounded calibration generates the entire sampled graph, retaining valid FK
+cardinality. It measures actual file sizes and apportions sampled elapsed time
+by cell count for extrapolation; individual table times are approximate. Parent
+barriers and small samples can make parallel ETA optimistic. The same
+200,000-cell, 16 MiB and 30-second calibration ceilings apply. Metadata forecasts
+flag unsupported relational execution rather than certifying it.</p>
+<p>Python file-bundle APIs, CLI <code>generate</code>/<code>validate</code>, and MCP planning/approval/
+recovery share this engine. Changing the engine changes the specification
+fingerprint and requires renewed human review. Automated SDK acceptance is
+technical evidence and does not represent manual client acceptance for a release.</p></section></section>
 <section class="print-page md-section" heading-number="3" id="section-3">
 <h1>Integrations<a class="headerlink" href="#section-3" title="Permanent link"></a>
 </h1>
@@ -4687,4 +4725,4 @@ test-data-agent doctor --json
         });
     </script>
 </body>
-</html><!--Generated by HTMLArk 2026-11-08 07:16:06.385190. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-hjjy4n28/source/site/handbook/attachment.html-->
+</html><!--Generated by HTMLArk 2026-11-08 11:04:21.887147. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-u06a8zg4/source/site/handbook/attachment.html-->

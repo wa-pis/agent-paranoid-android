@@ -217,7 +217,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
   <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br>Documentation b1614e333e875a3373105011d937f828de73a2ff
+  <br>Documentation 18cba3235752717632b511577fcab81517daa09c
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -231,10 +231,11 @@ completed work belongs in <a href="../history/">release history</a>, not this li
 <h2 id="now">Now<a class="headerlink" href="#now" title="Permanent link">&para;</a></h2>
 <ul>
 <li>
-<p>Implement and verify <a href="../how-to/dataset-capacity/">capacity forecasts and bounded scalable generation</a>
-  under <code>dataset-scale-estimation-performance</code>. The source branch adds estimates
-  and explicit independent-table streaming; related/global-rule scaling remains
-  unsupported in this engine. No new release has been published for this work.</p>
+<p>Extend <a href="../how-to/dataset-capacity/">bounded scalable generation</a> from the
+  published 1.7.0rc2 independent-table engine to source-free acyclic linked
+  tables under <code>scalable-relational-generation</code>. The new explicit engine is
+  unreleased; cycles, shared PK/FK identities and global business rules remain
+  outside its initial scope.</p>
 </li>
 <li>
 <p>Follow up on the remaining external <code>1.6.0</code> evidence gaps through the

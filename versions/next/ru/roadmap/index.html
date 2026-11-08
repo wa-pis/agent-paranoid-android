@@ -204,7 +204,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc2
   <br>Package source b996da8e4db1435406ac39b5294d234c4a9f9c6c
-  <br>Documentation b1614e333e875a3373105011d937f828de73a2ff
+  <br>Documentation 18cba3235752717632b511577fcab81517daa09c
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -215,7 +215,12 @@
 <p>Это направления, а не обещанные даты. Приоритет определяется отзывами и подтверждёнными дефектами. Stable 1.6.0 уже опубликована и публично проверена; завершённая работа относится к <a href="../history/">истории</a>.</p>
 <h2 id="_2">Сейчас<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в опубликованный <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</li>
+<li>
+<p>Расширить быстрый режим из 1.7.0rc2 на связанные таблицы по OpenSpec <code>scalable-relational-generation</code>: отдельный <code>scalable-relational-v1</code>, ациклические many-to-one/one-to-one, цепочки и несколько родителей. Работа ещё не выпущена; циклы, общие PK/FK и глобальные бизнес-правила пока вне этого режима. <a href="../../how-to/dataset-capacity/#linked-tables-unreleased">Возможности и ограничения</a>.</p>
+</li>
+<li>
+<p>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в опубликованный <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</p>
+</li>
 <li>Завершить оставшиеся проверки преобразования: целевой объём на публичных/configured маршрутах и отдельно учитываемый review поправки к границе доверия. Прежние разрешения и частные нагрузочные прогоны сохраняют исходные ограничения.</li>
 <li>Улучшать инструкции по отзывам пилотов. Версионная документация и четыре формата скачивания уже <a href="../versions/">опубликованы</a>.</li>
 <li>Проводить пилоты разработки и аналитики.</li>
