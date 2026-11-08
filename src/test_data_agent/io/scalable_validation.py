@@ -17,7 +17,9 @@ from test_data_agent.generation.scalable import check_scalable_spec, resident_hi
 from test_data_agent.io.artifacts import validate_generation_bundle
 from test_data_agent.io.csv_encoding import decode_csv_cell
 from test_data_agent.io.path_policy import open_regular_file
-from test_data_agent.io.scalable import independent_validation_report
+from test_data_agent.io.scalable import scalable_validation_report
+from test_data_agent.generation.relational import merge_relationship_metrics, validate_relational_rows
+from test_data_agent.validation.relationship_validator import RelationshipMetrics
 from test_data_agent.io.writers import safe_entity_artifact_path
 from test_data_agent.trino_work_budget import generation_budget_for_invocation
 from test_data_agent.validation.reconciliation import DatasetValidationReport, validate_dataset
@@ -91,10 +93,11 @@ def _rows(path: Path, fmt: OutputFormat, columns: list[str], batch_size: int) ->
 
 def validate_scalable_bundle(spec: DatasetSpec, folder: Path, *,
                              check_batch: Callable[[dict[str, list[dict[str, Any]]]], None] | None = None) -> DatasetValidationReport:
-    check_scalable_spec(spec)
     policy = spec.generation_settings.execution_policy
     assert policy is not None
     budget = generation_budget_for_invocation(max_seconds=policy.max_seconds)
+    plan = check_scalable_spec(spec, budget=budget)
+    relationship_metrics: list[RelationshipMetrics] = []
     manifest = validate_generation_bundle(folder)
     if output_folder_size(folder) > policy.max_output_bytes:
         raise GenerationLimitError('scalable bundle exceeds execution-policy output bytes')
@@ -111,7 +114,8 @@ def validate_scalable_bundle(spec: DatasetSpec, folder: Path, *,
         raise ValueError('scalable bundle contains untracked artifacts')
     domains = {key: index for index, key in enumerate(sorted(
         (entity.name, field.name) for entity in spec.entities for field in entity.fields if field.is_identifier))}
-    for entity in spec.entities:
+    for entity_index in (plan.entity_order if plan is not None else range(len(spec.entities))):
+        entity = spec.entities[entity_index]
         count = 0
         batch = []
         path = safe_entity_artifact_path(folder, entity.name, '.'+manifest.output_format.value)
@@ -131,17 +135,23 @@ def validate_scalable_bundle(spec: DatasetSpec, folder: Path, *,
             batch.append(row)
             if len(batch) >= policy.batch_size:
                 _validate_batch(batch, entity.name, spec, check_batch, budget)
+                if plan is not None:
+                    merge_relationship_metrics(relationship_metrics, validate_relational_rows(
+                        spec, plan, entity_index, batch, start=count-len(batch), seed=manifest.seed, budget=budget))
                 batch = []
             if resident_high_water_bytes() > policy.max_memory_bytes:
                 raise GenerationLimitError('streaming validation exceeded memory policy')
         if batch:
             _validate_batch(batch, entity.name, spec, check_batch, budget)
+            if plan is not None:
+                merge_relationship_metrics(relationship_metrics, validate_relational_rows(
+                    spec, plan, entity_index, batch, start=count-len(batch), seed=manifest.seed, budget=budget))
         if count != entity.row_count or manifest.row_counts.get(entity.name) != count:
             raise ValueError('streamed row count does not match reviewed specification')
     if set(manifest.row_counts) != {e.name for e in spec.entities}:
         raise ValueError('streamed entity inventory mismatch')
     budget.check('streaming validation completion')
-    return independent_validation_report(spec)
+    return scalable_validation_report(spec, relationship_metrics)
 
 
 def _validate_batch(rows: list[dict[str, Any]], name: str, spec: DatasetSpec,
@@ -149,6 +159,7 @@ def _validate_batch(rows: list[dict[str, Any]], name: str, spec: DatasetSpec,
     entity = spec.entity(name).model_copy(update={'row_count': len(rows)})
     chunk = spec.model_copy(update={
         'entities': [entity],
+        'relationships': [],
         'privacy_rules': [rule for rule in spec.privacy_rules if rule.entity in (None, name)],
         'local_category_fields': [field for field in spec.local_category_fields if field.entity == name],
     })

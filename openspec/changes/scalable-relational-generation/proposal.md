@@ -2,8 +2,9 @@
 
 ## Status
 
-Proposed and implementation authorized by the owner on 2026-11-08 with a request
-to create an OpenSpec and start work. Baseline: published 1.7.0rc2, exact package
+Initial linked-table scope implemented and verified, unreleased. The owner
+authorized the OpenSpec and implementation on 2026-11-08. The performance
+target remains unmet at 1.953× four-worker median; see evidence.md. Baseline: published 1.7.0rc2, exact package
 source b996da8e4db1435406ac39b5294d234c4a9f9c6c; development starts from main
 b1614e333e875a3373105011d937f828de73a2ff. No new release is authorized here.
 

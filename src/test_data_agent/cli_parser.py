@@ -709,7 +709,7 @@ def register_agent_commands(
         action="store_true",
         help="Force a fresh profile instead of reusing the metadata-only cache.",
     )
-    agent_plan_parser.add_argument("--execution-policy", type=Path, help="Explicit bounded scalable-v1 policy JSON to include in human review.")
+    agent_plan_parser.add_argument("--execution-policy", type=Path, help="Explicit bounded scalable-v1 or scalable-relational-v1 policy JSON to include in human review.")
     add_local_category_option(agent_plan_parser)
     agent_plan_parser.add_argument(
         "--json",
