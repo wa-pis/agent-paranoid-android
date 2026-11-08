@@ -1,6 +1,6 @@
 # Forecast And Generate Larger Synthetic Datasets
 
-These additions target `1.7.0rc2`, whose publication is pending. They are not
+These additions are published in `1.7.0rc2`. They are not
 available in `1.7.0rc1`. Stable 1.6.0 remains the recommended default.
 
 ## Preview Storage And Time
@@ -79,6 +79,8 @@ Existing administrator output/disk and MCP invocation limits remain additional
 ceilings. The policy does not widen database or filesystem authority.
 
 `scalable-v1` supports independent tables in valid/edge modes and CSV/JSON/Parquet.
+Use Linux or macOS for scalable execution in this RC; native Windows execution
+of this engine is unsupported.
 Relationships, global constraints, business rules, scenarios and negative/mixed
 modes reject before generation; use the legacy engine for those bounded cases.
 Every table needs a synthetic-identifier primary key when distinct rows are
