@@ -57,7 +57,10 @@ def test_runtime_base_requires_fixed_bookworm_security_packages() -> None:
     dockerfile = (ROOT / "Dockerfile").read_text()
     runtime = dockerfile.split("FROM ${PYTHON_IMAGE} AS runtime-base", maxsplit=1)[1]
 
+    assert "apt-get -o Acquire::Retries=0 install" in runtime
     for package, fixed in (
+        ("apt", "2.6.2"),
+        ("libapt-pkg6.0", "2.6.2"),
         ("libpcre2-8-0", "10.42-1+deb12u2"),
         ("perl-base", "5.36.0-7+deb12u4"),
         ("libssl3", "3.0.22-1~deb12u2"),

@@ -93,3 +93,9 @@ of the next RC. The latest published candidate is 1.7.0rc1; the selected next
 version is 1.7.0rc2. Version metadata and the changelog are prepared. Required
 independent exact-SHA review, exact-main workflows, Ubuntu artifact preflight,
 signed acceptance and public verification remain pending; none is claimed.
+
+PR #689 container scanning identified CVE-2026-109518 in the pinned Debian
+base's apt/libapt-pkg6.0 2.6.1. Debian records 2.6.2 as fixed
+(https://security-tracker.debian.org/tracker/CVE-2026-109518). Runtime builds
+now require both fixed packages and disable acquisition retries during the
+upgrade. Scanner enforcement is unchanged; fresh container CI is required.

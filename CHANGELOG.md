@@ -23,8 +23,10 @@ remains the recommended default.
   experiment; retain versioned guidance, four offline formats and historical
   documentation identities.
 
-### Fixed
+### Security
 
+- New container builds require fixed APT 2.6.2 packages for CVE-2026-109518;
+  package download retries are disabled while upgrading the pinned base.
 - Future container builds install Bookworm's fixed OpenSSL3.0.22 security
   packages for CVE-2026-84782 across all three targets. Existing signed release
   images remain immutable. Locked audit tooling updates MessagePack to1.2.3
