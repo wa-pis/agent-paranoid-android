@@ -492,6 +492,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     assert active == {
         "_template", "selective-source-transformation", "dataset-scale-estimation-performance",
         "scalable-relational-generation",
+        "python-315-support",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
     }
