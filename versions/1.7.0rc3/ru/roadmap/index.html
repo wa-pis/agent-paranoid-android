@@ -204,7 +204,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 09b6fb207b22364ff41f70d7b51abe30d1a458fa
+  <br>Documentation 09be40b0d145699c804d6a8de6fdb9c5f2767bc1
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -213,14 +213,12 @@
                 <h1 id="_1">Дорожная карта<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p><a href="../../roadmap/">English</a> · Русский</p>
 <p>Это направления, а не обещанные даты. Приоритет определяется отзывами и подтверждёнными дефектами. Stable 1.6.0 уже опубликована и публично проверена; завершённая работа относится к <a href="../history/">истории</a>.</p>
+<p>В <a href="../../release-evidence-1.7.0rc3/">1.7.0rc3</a> опубликованы поддержка Python 3.15
+и быстрый режим для ациклических связанных синтетических таблиц. Циклы, общие
+PK/FK и глобальные бизнес-правила остаются вне этого режима.</p>
 <h2 id="_2">Сейчас<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li>
-<p>Расширить быстрый режим из 1.7.0rc2 на связанные таблицы по OpenSpec <code>scalable-relational-generation</code>: отдельный <code>scalable-relational-v1</code>, ациклические many-to-one/one-to-one, цепочки и несколько родителей. Работа ещё не выпущена; циклы, общие PK/FK и глобальные бизнес-правила пока вне этого режима. <a href="../../how-to/dataset-capacity/#linked-tables-unreleased">Возможности и ограничения</a>.</p>
-</li>
-<li>
-<p>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в опубликованный <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</p>
-</li>
+<li>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в опубликованный <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</li>
 <li>Завершить оставшиеся проверки преобразования: целевой объём на публичных/configured маршрутах и отдельно учитываемый review поправки к границе доверия. Прежние разрешения и частные нагрузочные прогоны сохраняют исходные ограничения.</li>
 <li>Улучшать инструкции по отзывам пилотов. Версионная документация и четыре формата скачивания уже <a href="../versions/">опубликованы</a>.</li>
 <li>Проводить пилоты разработки и аналитики.</li>

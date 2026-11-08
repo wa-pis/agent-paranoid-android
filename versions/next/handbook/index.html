@@ -213,7 +213,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 09b6fb207b22364ff41f70d7b51abe30d1a458fa
+  <br>Documentation 09be40b0d145699c804d6a8de6fdb9c5f2767bc1
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -1518,7 +1518,8 @@ for benchmark acceptance criteria; do not assume the same timings on other hardw
 process image, avoiding the parent memory history retained by <code>getrusage</code> across
 <code>exec</code>. Missing or invalid proc metadata falls back to conservative <code>getrusage</code>
 accounting; memory checks and finite policy ceilings remain enabled.</p>
-<h2 id="how-to-dataset-capacity-linked-tables-unreleased">Linked Tables (Unreleased)<a class="headerlink" href="#how-to-dataset-capacity-linked-tables-unreleased" title="Permanent link">&para;</a></h2>
+<p><a id="linked-tables-unreleased"></a></p>
+<h2 id="how-to-dataset-capacity-linked-tables-170rc3">Linked Tables (1.7.0rc3)<a class="headerlink" href="#how-to-dataset-capacity-linked-tables-170rc3" title="Permanent link">&para;</a></h2>
 <p>Set <code>generation_settings.execution_policy.engine: scalable-relational-v1</code> to
 stream related synthetic tables. Use the same finite policy fields shown above.
 <code>scalable-v1</code> keeps its existing independent-table behavior.</p>
@@ -1533,7 +1534,7 @@ one table; tables themselves are not generated concurrently. Parent keys are
 computed from synthetic ordinals, without retaining complete parent tables or
 key sets. The engine preserves logical rows across worker and batch settings
 within the same spec/seed/environment. It uses its own versioned FK stream;
-legacy output and the released independent engine are unchanged.</p>
+legacy output and the independent engine are unchanged.</p>
 <p>Cycles, self-links, shared primary/foreign keys, non-primary parent references,
 type mismatches, conflicting active targets, global constraints, business rules,
 scenarios and negative/mixed/load modes reject before staging. Rejected
