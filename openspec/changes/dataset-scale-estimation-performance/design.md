@@ -153,3 +153,8 @@ map and roadmap together with implementation. Larger benchmarks run explicitly
 or in a dedicated job rather than burdening every unit test. Benchmark results
 are release evidence; do not prefill invented measurements. Final release needs
 normal independent review and release gates; no version is selected by this plan.
+
+Linux memory admission uses bounded `/proc/self/status` `VmHWM` for the current
+process image, avoiding the parent memory history retained by `getrusage` across
+`exec`. Missing or invalid proc metadata falls back to conservative `getrusage`
+accounting; memory checks and finite policy ceilings remain enabled.

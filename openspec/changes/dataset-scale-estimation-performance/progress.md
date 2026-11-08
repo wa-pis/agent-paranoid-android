@@ -99,3 +99,15 @@ base's apt/libapt-pkg6.0 2.6.1. Debian records 2.6.2 as fixed
 (https://security-tracker.debian.org/tracker/CVE-2026-109518). Runtime builds
 now require both fixed packages and disable acquisition retries during the
 upgrade. Scanner enforcement is unchanged; fresh container CI is required.
+
+Full Ubuntu CI exposed three four-worker identity-test failures while local
+macOS checks passed. Linux getrusage retains pre-exec resource accounting;
+current-image VmHWM avoids counting the spawning pytest process's old memory
+image. Added bounded proc parsing with conservative fallback, fixed worker
+resource-policy diagnostics without exception values, and Linux spawn regression.
+Fresh full CI is required to confirm the correction; budgets were not widened.
+
+Correction checks: 48 capacity tests passed on macOS; the Linux-only spawn
+regression is explicitly skipped here and must pass in Ubuntu CI. Ruff and
+strict typing (167 production modules) passed. Non-editable installed local
+execution had also passed all original 43 focused capacity tests.

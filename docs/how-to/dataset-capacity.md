@@ -140,3 +140,8 @@ The in-memory `generate_dataset` operation explicitly rejects a scalable policy;
 use the file-bundle API. Its optional `progress` callback receives numeric typed
 progress and a final completed event after publication. See the OpenSpec change
 for benchmark acceptance criteria; do not assume the same timings on other hardware.
+
+Linux memory admission uses bounded `/proc/self/status` `VmHWM` for the current
+process image, avoiding the parent memory history retained by `getrusage` across
+`exec`. Missing or invalid proc metadata falls back to conservative `getrusage`
+accounting; memory checks and finite policy ceilings remain enabled.

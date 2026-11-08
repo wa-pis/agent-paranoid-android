@@ -372,3 +372,73 @@ def test_streamed_revalidation_checks_values_and_inventory(tmp_path: Path, tampe
     with pytest.raises(ValueError) as caught:
         validate_scalable_bundle(data, output)
     assert 'fictional-person' not in str(caught.value)
+
+
+def test_linux_memory_uses_current_image_high_water(monkeypatch: pytest.MonkeyPatch) -> None:
+    import io
+    from types import SimpleNamespace
+    from test_data_agent.generation import scalable
+    monkeypatch.setattr(scalable.sys, 'platform', 'linux')
+    monkeypatch.setattr(scalable.resource, 'getrusage', lambda _: SimpleNamespace(ru_maxrss=900000))
+    reads = []
+    class Status(io.StringIO):
+        def read(self, size: int = -1) -> str:
+            reads.append(size)
+            return super().read(size)
+    class ProcPath:
+        def __init__(self, path: str) -> None:
+            assert path == '/proc/self/status'
+        def open(self, **kwargs: object) -> Status:
+            return Status('Name: python\nVmHWM:\t12345 kB\n')
+    monkeypatch.setattr(scalable, 'Path', ProcPath)
+    assert scalable.resident_high_water_bytes() == 12345*1024
+    assert reads == [64*1024]
+
+
+@pytest.mark.parametrize('status', ['VmHWM: 0 kB', 'VmHWM: invalid kB', 'VmHWM: 123 MB', 'Name: python'])
+def test_linux_missing_memory_metadata_keeps_conservative_limit(monkeypatch: pytest.MonkeyPatch, status: str) -> None:
+    import io
+    from types import SimpleNamespace
+    from test_data_agent.generation import scalable
+    monkeypatch.setattr(scalable.sys, 'platform', 'linux')
+    monkeypatch.setattr(scalable.resource, 'getrusage', lambda _: SimpleNamespace(ru_maxrss=900000))
+    class ProcPath:
+        def __init__(self, path: str) -> None:
+            pass
+        def open(self, **kwargs: object) -> io.StringIO:
+            return io.StringIO(status)
+    monkeypatch.setattr(scalable, 'Path', ProcPath)
+    assert scalable.resident_high_water_bytes() == 900000*1024
+
+
+def test_linux_spawn_memory_excludes_parent_image(tmp_path: Path) -> None:
+    import subprocess
+    import sys
+    if not sys.platform.startswith('linux'):
+        pytest.skip('Linux exec resource-accounting regression')
+    script = tmp_path/'spawn_memory.py'
+    script.write_text("""
+import multiprocessing
+import resource
+from test_data_agent.generation.scalable import resident_high_water_bytes
+
+def measure(queue):
+    queue.put((resident_high_water_bytes(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024))
+
+if __name__ == '__main__':
+    allocation = bytearray(160*1024**2)
+    for page in range(0, len(allocation), 4096):
+        allocation[page] = 1
+    parent_peak = resident_high_water_bytes()
+    context = multiprocessing.get_context('spawn')
+    queue = context.Queue()
+    child = context.Process(target=measure, args=(queue,))
+    child.start()
+    current_image, inherited = queue.get(timeout=30)
+    child.join(30)
+    assert child.exitcode == 0
+    assert current_image < parent_peak-80*1024**2
+    assert inherited >= current_image
+""")
+    subprocess.run([sys.executable, str(script)], check=True, timeout=60,
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)

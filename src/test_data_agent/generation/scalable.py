@@ -1,10 +1,11 @@
-"""Bounded row tasks for scalable-v1; no filesystem or provider access."""
+"""Bounded row tasks for scalable-v1; no dataset filesystem or provider access."""
 from __future__ import annotations
 import random
 import resource
 import sys
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec, RESERVED_ENTITY_ARTIFACT_BASENAMES
@@ -33,6 +34,20 @@ class RowBatch:
 
 
 def resident_high_water_bytes() -> int:
+    if sys.platform.startswith("linux"):
+        try:
+            # getrusage survives exec on Linux, including the spawning parent's
+            # old address space. VmHWM measures this process's current image.
+            with Path("/proc/self/status").open(encoding="ascii") as handle:
+                status = handle.read(64*1024)
+            for line in status.splitlines():
+                parts = line.split()
+                if len(parts) == 3 and parts[0] == "VmHWM:" and parts[2] == "kB":
+                    if parts[1].isdigit() and int(parts[1]) > 0:
+                        return int(parts[1])*1024
+        except (OSError, UnicodeError, ValueError):
+            pass
+        # Conservative fallback: unavailable proc metadata cannot disable limits.
     amount = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return int(amount if sys.platform == "darwin" else amount*1024)
 

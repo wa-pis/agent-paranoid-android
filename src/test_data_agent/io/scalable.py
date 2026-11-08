@@ -76,6 +76,8 @@ def _batches(spec: DatasetSpec, index: int, seed: int, budget: GenerationBudget)
                     if request_budget is not None:
                         remaining = min(remaining, request_budget.remaining_invocation_seconds())
                     yield pending.get(timeout=max(.001, remaining))
+                except GenerationLimitError:
+                    raise GenerationLimitError("scalable worker exceeded its resource policy; reduce workers or batch size, or review the finite budget") from None
                 except Exception:
                     raise GenerationLimitError("scalable worker failed or exceeded its deadline; inspect policy and retry") from None
     finally:
