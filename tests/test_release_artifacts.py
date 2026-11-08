@@ -80,7 +80,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["optional-dependencies"]["mcp"] == ["mcp>=1.28.1,<3.0.0"]
     assert "mcp>=1.28.1,<3.0.0" in metadata["optional-dependencies"]["all"]
     assert metadata["optional-dependencies"]["gigachat"] == [
-        "gigachat>=0.2.3,<0.2.4"
+        "gigachat>=0.2.3,<0.2.5"
     ]
     assert metadata["urls"] == {
         "Homepage": "https://github.com/wa-pis/agent-paranoid-android",

@@ -78,8 +78,8 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "faker", specifier = ">=25.0.0" },
-    { name = "gigachat", marker = "extra == 'all'", specifier = ">=0.2.3,<0.2.4" },
-    { name = "gigachat", marker = "extra == 'gigachat'", specifier = ">=0.2.3,<0.2.4" },
+    { name = "gigachat", marker = "extra == 'all'", specifier = ">=0.2.3,<0.2.5" },
+    { name = "gigachat", marker = "extra == 'gigachat'", specifier = ">=0.2.3,<0.2.5" },
     { name = "hatchling", marker = "extra == 'dev'", specifier = "==1.33.0" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.100.0" },
     { name = "mcp", marker = "extra == 'all'", specifier = ">=1.28.1,<3.0.0" },
@@ -635,16 +635,16 @@ wheels = [
 
 [[package]]
 name = "gigachat"
-version = "0.2.3"
+version = "0.2.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/3e/42105fe7be2aa33907349fd177a2d8a97e14f434cfc1b8cbf3ba7b4a03f8/gigachat-0.2.3.tar.gz", hash = "sha256:b298dc70d28153e83780cdb7f40ec7273462ce497daafb1bee7e08509126aab3", size = 42631, upload-time = "2026-07-31T14:30:32.776Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/c1/368ee776ac970b8d52c0fa9df1085254f4c1a03af9d2b1b6b5f8eb4550d1/gigachat-0.2.4.tar.gz", hash = "sha256:a45c8d542c353dd4a61fceeca1ee0c2ff10219d891335b776a89d3de4f821fad", size = 52062, upload-time = "2026-10-30T12:46:19.207Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/89/c6/cea9fd75f06c4c5a3f00a96c157c183146cb42b20e58b7580cd723c359bb/gigachat-0.2.3-py3-none-any.whl", hash = "sha256:61a51bcb9c3888c7643a9ffabe191695279f7cfca6b9d9d639e60c073a2385da", size = 55335, upload-time = "2026-07-31T14:30:34.101Z" },
+    { url = "https://files.pythonhosted.org/packages/92/ab/85a6715edd5255d581f17fbd008c33e84cbb83cf32ce732a71e905492fe6/gigachat-0.2.4-py3-none-any.whl", hash = "sha256:a9299c1438b4a98c2a9c65b3655159cb39c353212ab26be2e075af9cef7751e1", size = 57284, upload-time = "2026-10-30T12:46:17.72Z" },
 ]
 
 [[package]]

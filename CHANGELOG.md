@@ -11,6 +11,11 @@ All notable changes to this project are documented here.
 - Calibrate supported linked graphs as a whole under existing sample budgets;
   changing engines requires review of the new specification fingerprint.
 
+### Changed
+
+- Allow GigaChat SDK 0.2.4 in the optional advisor extra while retaining the
+  0.2.3 minimum, bounded metadata-only requests and local review requirements.
+
 ## [1.7.0rc2] - 2026-11-08
 
 Capacity forecasts and opt-in scalable synthetic generation. Stable 1.6.0
