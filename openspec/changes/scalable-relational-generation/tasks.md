@@ -27,4 +27,4 @@
 - [x] Measure synthetic 750k×25 linked data and record performance/memory/byte evidence (1.953× median; ≥2× target not met).
 - [x] Update schema/contracts, guidance, roadmap and implementation map.
 - [x] Run focused and required full checks; mark only verified work complete.
-- [ ] Before a separately authorized RC: independent exact-SHA review and normal release gates.
+- [x] Complete independent exact-SHA review and automated release/publication gates for separately authorized 1.7.0rc3; all 12 public jobs passed (manual-client check explicitly owner-waived, not passed; see progress/evidence).
