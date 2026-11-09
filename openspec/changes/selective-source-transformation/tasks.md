@@ -228,12 +228,14 @@ that accepted activation or imply final release acceptance.
 See [milestones](plan.md) for the approved order and release scope. Safety-policy
 amendments still require scoped review and executable checks before activation.
 
-- [ ] Review the new trust boundary and approve a scoped amendment to
+- [x] Review the new trust boundary and approve a scoped amendment to
   AGENTS.md, project safety policy and affected baseline specifications.
   Current contract map and exact-scope closure criteria: [2026-11-09 follow-through](follow-through-2026-11-09.md#2-trust-boundary-amendment-prepare-a-scoped-evidence-dossier).
-  The scoped baseline and policy reconciliation is prepared for independent
-  review. Accepted ADR-0021/0029 decisions are retained; release acceptance
-  does not approve this amendment.
+  The owner authorized merging this documentary scope after independent review
+  and green checks. Independent AI review passed on
+  `1d8e9c26f1b0f465dc7622bd224fb50399cc296f`; see progress.md for scope and evidence.
+  AGENTS already matches the existing constraints. ADR-0021/0029 remain in force;
+  this disposition does not authorize data access, preservation or activation.
   - [x] Record owner decision separating closed development/tests from activation.
   - [x] Independently review this development/activation clarification.
     Historical clarification reviewed at0e7dee5 in mergedPR576; see progress.md

@@ -8242,3 +8242,23 @@ No production data, provider calls, database network access or fresh approval
 was used. Both parent tasks remain open. Next: extend installed public/common/
 configured acceptance to target scale and obtain independent review of the exact
 trust amendment.
+
+## 2026-11-09 — Independent Review and Registered Target Runs
+
+The independent read-only AI reviewer checked the documentary amendment
+`1d8e9c26f1b0f465dc7622bd224fb50399cc296f` against
+`9251612aee87132ca32f54a5acd6eb37aef528d5`. Final disposition: no findings.
+The amendment explicitly limits unknown/disputed fail-closed classification to
+preservation. The reviewer traced exact local receipt consumption, the
+registered CLI/MCP boundary, the isolation of source-free generation and the
+value-free explicit replacement contract. Strict OpenSpec checks for both
+baselines and the change and an exact-range diff check passed. The same runtime
+in the first review had 97 focused passes and six opt-in skips; the final
+wording change did not require repeating them. This is AI documentary review,
+not human consent, a GitHub review or a new runtime activation.
+
+Started the installed RC3 target runs: public CLI CSV → CSV, public MCP stdio
+Parquet → Parquet, and a sequential queue for common MCP, configured PostgreSQL
+and configured Trino. Small 2,051 × 100 smokes verified all three batch routes
+before launch. The fixture settings and exact scope are in
+[registered scale acceptance](registered-scale-acceptance-2026-11-09.md).
