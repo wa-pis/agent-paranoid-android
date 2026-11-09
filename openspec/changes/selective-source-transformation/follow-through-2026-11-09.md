@@ -111,3 +111,62 @@ budget and publication tests, and obtain an actual independent review of that
 specific amendment scope. Label AI review honestly; never synthesize human or
 GitHub approval. Only close the parent after the scoped disposition and required
 checks are recorded. This audit is author analysis, not independent clearance.
+
+## Follow-up execution
+
+The installed wheel and environment above were reused. The harness and
+configured worker tests are in `9251612aee87132ca32f54a5acd6eb37aef528d5`.
+The new opt-in `scripts/accept_transformation_csv_scale.py` SHA-256 was
+`08510430c19469869b013fd96c8cfb3e758c76540e7db023c5c235bfa614009c`.
+For a small reproduction, run the script with the isolated installed Python
+(`-I`), `--rows 2051 --columns 3 --output-format parquet --max-seconds 90`
+and one of `--entrance private`, `--entrance cli` or `--entrance mcp`.
+
+| Installed route | Ordered cells read back | Data bytes | End-to-end seconds | Refusals |
+| --- | ---: | ---: | ---: | ---: |
+| CSV → Parquet, private control | 6,153 | 2,034 | 0.299 | — |
+| CSV → Parquet, registered CLI | 6,153 | 2,034 | 1.575 | 3 |
+| CSV → Parquet, registered MCP SDK stdio | 6,153 | 2,034 | 1.996 | 3 |
+| Parquet → PostgreSQL SQL text, registered MCP SDK stdio | 6,153 | 212,448 | 1.341 | 3 |
+
+The runs used a 512 MiB harness budget. Both registered routes checked matching
+review and execution digests, stale digest, one-byte output cap and existing
+output; failures left the workspace and the existing artifact unchanged.
+Success checked ordered typed content, replacement provenance, unchanged input
+and scratch cleanup. The MCP client discovered review and execution and found
+no receipt issuer. The harness checks that its fictional mapping literals do
+not appear as quoted values in transport results or diagnostics. All runs are
+replacement-only, use local files, and do not establish human consent. SQL
+output was read back as text and never executed.
+
+The installed registered CLI also passed CSV → CSV at 300,000 × 50 using
+`--rows 300000 --columns 50 --output-format csv --max-seconds 1800 --entrance cli`
+and the default 512 MiB byte budget. Profile completed at 38.351 s, saved review
+at 75.990 s, and the full run at 455.275 s. The published CSV was 90,150,450
+bytes; all 15,000,000 cells, all three refusals, input digest, provenance and
+cleanup passed. Elapsed time includes setup, profile, repeated review/refusal
+work and complete readback; it is not a standalone generation-time benchmark.
+This is one installed intermediate-size route. Current public/common/configured
+1M × 100 runs are still required; the private historical matrix is not repeated.
+
+The configured PostgreSQL and Trino composition tests call the actual session
+loader and spawned workers with only the fictional driver factories substituted.
+For two inputs PostgreSQL opens four connections (metadata and read-only
+capture per input); Trino opens six (column discovery, no-row inspection and
+read-only capture per input). Both verify no reconnect on review/validate/execute,
+exact ordered replacement outputs, summary-only responses and owned capture/worker
+cleanup. These are small source-tree tests, not installed SDK stdio, live DB or
+target-scale SQL evidence. The latest affected query/session/worker suites passed
+88 tests, including the two configured composition cases. Existing admission
+and expiry tests also ran in the earlier focused suite.
+
+The trust amendment reconciles the shipped registration in the MCP baseline
+and active deltas, and records the accepted narrow transformation contract in
+its own baseline. SECURITY and the safety model align with those documents;
+AGENTS already expresses the applicable safety constraints. The patch does
+not change code, policy gates or the owner decisions in ADR-0021 and ADR-0029.
+The scoped proof set includes activation-boundary, receipt/approval, exact
+snapshot, unified mapping, MCP, configured-session, isolated PostgreSQL and
+documentation tests: the initial run passed 209 and skipped six. The skipped terminal cases
+are not new human or controlling-TTY evidence. Independent review of the
+finished amendment is outstanding; neither parent task is checked off.

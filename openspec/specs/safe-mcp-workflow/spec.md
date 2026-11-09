@@ -32,22 +32,21 @@ read-only query operations.
 The generator MCP server SHALL resolve input and output paths inside an
 explicit workspace root.
 
-Separate selective-transformation activation SHALL NOT authorize preservation
-through existing generator tools. Its prospective workspace execution SHALL
-only consume matching local controlling-terminal receipts, never issue them.
-Private implementation review alone SHALL NOT activate registration; matching
-policy amendments, executable interface evidence and exact-SHA independent
-safety review SHALL remain required.
+The reviewed, registered selective-transformation consumer SHALL NOT authorize
+preservation through ordinary generator tools. Workspace execution SHALL only
+consume matching local controlling-terminal receipts, never issue them.
+New or changed public activation SHALL require matching policy amendments,
+executable interface evidence and exact-SHA independent safety review.
 
-The separately selected candidate names the workspace consumer
+The separately selected transformation names the workspace consumer
 `execute_transformation`, local CLI consumer `transform-execute` and local
 controlling-terminal issuer `transform-approve`. Execution SHALL require the
 reviewed exact snapshot digest and a matching receipt for preservation. A fresh
 review digest SHALL NOT make an earlier receipt valid after source, policy or
-referenced input mutations. MCP SHALL register no receipt issuer. These named
-candidate interfaces MAY be registered in an isolated fictional acceptance
-candidate, but SHALL remain unavailable publicly until the activation gates
-above complete; ordinary generator tools remain source-free.
+referenced input mutations. MCP SHALL register no receipt issuer. Unreviewed
+extensions MAY be exercised in isolated fictional acceptance and SHALL remain
+unavailable on public surfaces until the activation gates above complete.
+Ordinary generator tools remain source-free.
 
 The owner-approved explicit replacement contract SHALL apply uniformly to all
 fields: mapped source membership or sensitive-value permutations alone SHALL

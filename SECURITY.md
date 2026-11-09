@@ -7,7 +7,7 @@ source rows, expose raw PII, or execute unrestricted SQL.
 ## Gated Mixed-Origin Transformation
 
 The source-free generation invariant above remains unchanged. The separately
-selected transformation candidate produces labelled mixed-origin local artifacts,
+selected, reviewed transformation produces labelled mixed-origin local artifacts,
 not synthetic datasets or a privacy guarantee. Its scoped contract is recorded
 in [ADR-0029](docs/adr/0029-unified-replacement-contract.md) and the
 [transformation safety boundary](openspec/changes/selective-source-transformation/safety-boundary.md).

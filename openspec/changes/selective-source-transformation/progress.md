@@ -8219,3 +8219,26 @@ and all 32 active/baseline OpenSpec items passed strict validation. Exact body
 comparison verified all 15 archived requirements; benchmark JSON and activation
 overlays are byte-identical to pre-archive main. No full runtime suite or large
 scale campaign was repeated for this documentary change.
+
+## 2026-11-09 — Registered Replay and Scoped Trust Amendment
+
+Installed RC3 CLI and genuine SDK stdio each passed fictional CSV → Parquet at
+2,051 × 3, full ordered readback and all three clean refusals. The existing
+private entrance also passed as a control. Installed SDK stdio also passed
+Parquet → PostgreSQL SQL text at the same shape (text readback, no execution).
+Installed CLI CSV → CSV at 300,000 × 50 passed all 15 million cells and three
+refusals in 455.275 seconds, with 90,150,450 output bytes. Configured PostgreSQL
+and Trino session tests used the real loaders and isolated workers with fictional
+drivers: no reconnect on review/validate/execute and owned capture/worker cleanup
+verified.
+The initial focused suite passed 209 tests (six interactive cases skipped);
+the latest affected query/session/worker suites passed 88 tests.
+
+The documentary amendment now describes the already registered trust boundary
+across SECURITY, the safety model and baseline/active OpenSpec. It preserves
+AGENTS and accepted ADR decisions. See follow-through-2026-11-09.md for artifact
+identity, reproduction, scope and the independent review still required.
+No production data, provider calls, database network access or fresh approval
+was used. Both parent tasks remain open. Next: extend installed public/common/
+configured acceptance to target scale and obtain independent review of the exact
+trust amendment.
