@@ -8280,5 +8280,8 @@ same byte/time bounds. The timeout is retained as evidence; small stdio tests,
 not the replay, establish the MCP refusals. See
 [registered scale acceptance](registered-scale-acceptance-2026-11-09.md) for
 exact harness and artifact identities, reproduction and per-route limits.
-The scoped trust amendment review is recorded above. Neither task disposition
+The scoped trust amendment review is recorded above. Unmeasured installed
+format combinations and full-size MCP refusal coverage remain open; the
+completed checklist item names the five measured routes. The initial PR
+documentation contract caught an overbroad checkbox closure. Neither result
 grants preservation authority or changes the runtime.
