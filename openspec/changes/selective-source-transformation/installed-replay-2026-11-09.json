@@ -1,0 +1,33 @@
+{
+  "release_commit": "09b6fb207b22364ff41f70d7b51abe30d1a458fa",
+  "wheel_sha256": "5345e27a5a8311d72cedda193747c861f2d646ef0de374bd9bd74e1405c5195d",
+  "harness_sha256": "b8cf5366a5ec9716066dd83c0fcab1b19f7076b38038ed0da55a1c474f35fb57",
+  "environment": {
+    "python": "3.15.2",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "package": "1.7.0rc3",
+    "mcp": "2.2.0",
+    "pyarrow": "26.0.1"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 48.8,
+  "routes": [
+    "csv->csv",
+    "csv->parquet",
+    "csv->postgresql_sql",
+    "parquet->csv",
+    "parquet->parquet",
+    "parquet->postgresql_sql",
+    "postgres_query->csv",
+    "postgres_query->parquet",
+    "postgres_query->postgresql_sql",
+    "trino_query->csv",
+    "trino_query->parquet",
+    "trino_query->postgresql_sql"
+  ],
+  "cli_refusal_checks": 36,
+  "installed_import_verified": true,
+  "fixture_rows_per_route": 2,
+  "fixture_columns_per_route": 5,
+  "scope": "fictional replacement-only public CLI and registered MCP application-function parity; SQL supplied Arrow streams; no stdio-wide, configured owned-transport, human approval or target-size acceptance"
+}

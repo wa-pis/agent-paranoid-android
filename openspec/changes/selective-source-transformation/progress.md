@@ -8182,3 +8182,40 @@ Focused correction checks: `tests/test_containers.py` 10 passed (0.40s);
 Ruff with cache disabled passed; strict documentation build passed (0.34s);
 `git diff --check` passed. Pytest reported only a sandbox cache-write warning.
 No container image or scanner success is claimed from these source checks.
+
+## 2026-11-09 — Two Remaining Tasks Reconciled Against RC3
+
+Main 09be40b0d145699c804d6a8de6fdb9c5f2767bc1 and published RC3 source
+09b6fb207b22364ff41f70d7b51abe30d1a458fa were audited. The public Ubuntu
+wheel (5345e27a5a8311d72cedda193747c861f2d646ef0de374bd9bd74e1405c5195d)
+was installed separately with frozen hash-checked dependencies on Python 3.15.2.
+Clean installed-only unchanged route harness passed all 12 small typed routes
+and 36 CLI refusals in 48.8 seconds; no receipt issuance, live database/provider
+call, target-size run, configured owned SQL capture or complete stdio claim.
+See installed-replay-2026-11-09.json and follow-through-2026-11-09.md.
+
+The capacity task now distinguishes existing private 12/12 proof from missing
+current registered/common/configured target-size evidence. Audit confirms
+shape limits already admit 1M × 100; byte ceilings, independent generation/MCP
+deadlines and non-refundable configured-session admission/lifetime must all be
+set explicitly. No global cap or policy change is justified by this audit.
+The next acceptance increment uses existing harnesses and small boundary fixtures
+before any costly large replay.
+
+The trust task maps accepted ADRs/AGENTS/SECURITY/MCP baseline and active delta.
+The narrow transformation baseline has only scalar-null relationship semantics;
+its broader active delta needs scoped reconciliation, not blind promotion or
+a new product decision. A finished exact-SHA documentary amendment, executable
+safety evidence and actual independent scoped disposition are still required.
+Both parent checkboxes remain open; the author audit is not review clearance.
+
+Follow-through checks: the initial focused run passed 122 tests and failed one
+documentation navigation check because the three newly archived baseline
+capabilities lacked ADR coverage links. Added the navigation map, without new
+ADRs or decision changes. The affected documentation/overlay suite then passed
+56 tests; the 67 transformation boundary/limit/session/mapping tests had already
+passed and their runtime code was unchanged. Ruff passed, strict MkDocs passed,
+and all 32 active/baseline OpenSpec items passed strict validation. Exact body
+comparison verified all 15 archived requirements; benchmark JSON and activation
+overlays are byte-identical to pre-archive main. No full runtime suite or large
+scale campaign was repeated for this documentary change.

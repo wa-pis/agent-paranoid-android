@@ -1,5 +1,13 @@
 # Change Proposal: dataset-scale-estimation-performance
 
+Archive status — 2026-11-09: implemented, merged and publicly verified in
+1.7.0rc3 (capacity first shipped in rc2). See
+[RC3 release evidence](../../../../docs/release-evidence-1.7.0rc3.md).
+The dated proposal/checkpoint descriptions below retain their original scope;
+archival grants no dataset authority and does not turn the explicitly waived
+RC3 manual client check into a passed check. Performance measurements retain
+their actual results and artifact identities.
+
 ## Status
 
 Proposed 2026-11-04; implementation authorized 2026-11-08. Work is isolated on

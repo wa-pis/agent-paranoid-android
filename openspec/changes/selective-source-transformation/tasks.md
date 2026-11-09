@@ -115,6 +115,9 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
 
 - [ ] Support target 1,000,000 rows x100 columns across transformation routes;
   audit hidden constants, byte/time ceilings and SQL aggregate-budget coupling.
+  Current gap, limit audit and fresh RC3 small installed replay: [2026-11-09 follow-through](follow-through-2026-11-09.md#1-target-capacity-separate-the-missing-proof-from-configurable-defaults).
+  Historical private 12/12 target evidence does not close current installed
+  public/common/configured-session capacity acceptance.
   - [x] Replace fixed generator MCP 120-second deadline with finite operator configuration shared by transport/services; verify startup/invalid settings. Validation: 192 focused tests passed; Ruff, server mypy, both strict OpenSpec checks and strict documentation build passed. Parent boundary review confirmed a shared captured finite deadline, unchanged default/byte caps, and value-free startup errors. Full release gate and independent audit must cover the final candidate SHA.
   - [x] Make CSV acceptance byte/time ceilings explicit; 10 × 3 smoke and five invalid-budget startup checks passed. Target fixture exceeds the old fixed 512MiB; target proof remains open.
   - [x] Installed private CSV 1M × 100 passed at b49ceed: 100M cells, complete readback/provenance/cleanup, 1188.870s, explicit 1GiB / 3600s. See csv-scale-acceptance.md.
@@ -225,6 +228,9 @@ amendments still require scoped review and executable checks before activation.
 
 - [ ] Review the new trust boundary and approve a scoped amendment to
   AGENTS.md, project safety policy and affected baseline specifications.
+  Current contract map and exact-scope closure criteria: [2026-11-09 follow-through](follow-through-2026-11-09.md#2-trust-boundary-amendment-prepare-a-scoped-evidence-dossier).
+  Accepted ADR-0021/0029 decisions are retained; this task is not permission
+  to reopen them or infer amendment approval from a release.
   - [x] Record owner decision separating closed development/tests from activation.
   - [x] Independently review this development/activation clarification.
     Historical clarification reviewed at0e7dee5 in mergedPR576; see progress.md
