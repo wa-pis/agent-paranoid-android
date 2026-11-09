@@ -158,7 +158,8 @@ async def run_route(root, route, rows, columns, started):
             POSTGRES_ALLOWED_SCHEMAS="public", POSTGRES_ALLOWED_TABLES="public.items",
             POSTGRES_ALLOWED_COLUMNS=",".join(f"public.items.{name}" for name in names))
     if route == "trino":
-        env.update(TRINO_HOST="fictional.invalid", TRINO_ALLOWED_CATALOGS="lake", TRINO_ALLOWED_SCHEMAS="safe",
+        env.update(TRINO_HOST="fictional.invalid", TRINO_MAX_INVOCATION_SECONDS=str(SECONDS),
+            TRINO_ALLOWED_CATALOGS="lake", TRINO_ALLOWED_SCHEMAS="safe",
             TRINO_ALLOWED_TABLE_COLUMNS=",".join(f"lake.safe.items.{name}" for name in names))
     args = (["-I", "-m", "test_data_agent.mcp_generator_server"] if route == "common" else
             ["-I", str(Path(__file__).resolve()), "--server", route, str(rows), str(columns)])
