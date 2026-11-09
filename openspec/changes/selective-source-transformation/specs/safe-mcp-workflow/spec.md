@@ -27,13 +27,13 @@ registration SHALL remain gated by finished-candidate independent safety review.
 
 Workspace transformation execution SHALL be a separately selected mixed-origin
 operation. It SHALL NOT reuse source-free generation approval or permit an
-agent/MCP client to issue or broaden a preservation receipt. Registration
-SHALL remain unavailable until matching policy amendments, executable interface
-evidence and independent safety review of the precise activation SHA complete.
+agent/MCP client to issue or broaden a preservation receipt. New or changed public
+activation SHALL remain unavailable until matching policy amendments, executable
+interface evidence and independent safety review of the precise activation SHA complete.
 Existing default profiling/generation tools and disclosure budgets SHALL remain
 unchanged.
 
-The concrete activation candidate SHALL name its separate workspace tool
+The registered separate workspace tool SHALL be named
 `execute_transformation`. It SHALL require the reviewed `snapshot_sha256`,
 resolve source/policy/receipt/output paths through the existing workspace
 boundary, share the bounded transport request budget and publish only a new
@@ -41,7 +41,7 @@ validated local bundle. Success SHALL return `transformation_completed`,
 digest, provenance counts and output-budget metadata, never rows or mapping
 literals. Local `transform-approve` SHALL be the only supported receipt issuer;
 `transform-execute` and MCP SHALL consume, not create, preservation authority.
-These names SHALL NOT imply that candidate registration is publicly active.
+These registered names SHALL NOT grant authority to activate further extensions.
 
 Explicit `substitute` and `replace_text` SHALL use the same replacement contract
 for sensitive, unknown and non-sensitive fields. Actual mapped output cells MAY
@@ -90,11 +90,11 @@ approval flag SHALL NOT provide that evidence.
 - **AND** paths remain workspace-confined and responses contain metadata only
 - **AND** changed input bytes require renewed local review and approval
 
-#### Scenario: Private code review has completed but activation has not
+#### Scenario: Private extension review has completed but activation has not
 
 - **WHEN** private implementation review passes without completed public
   amendment and registration evidence
-- **THEN** no transformation execution tool is registered
+- **THEN** the unreviewed extension is unavailable on the registered surface
 - **AND** source-free generation tools cannot consume preservation authority
 
 ### Requirement: Transformation Failure Does Not Imply Clean Publication

@@ -1,6 +1,10 @@
 """Fictional owned SQL snapshots through the same closed CLI/MCP common consumer."""
 import io
+import multiprocessing
+import os
 from dataclasses import replace
+from functools import partial
+from pathlib import Path
 
 import pytest
 import yaml
@@ -22,8 +26,9 @@ pa = pytest.importorskip("pyarrow")
 pq = pytest.importorskip("pyarrow.parquet")
 
 
-def fixture(tmp_path, adapter):
+def fixture(tmp_path, adapter, *, source_id="warehouse"):
     request, kwargs = setup(tmp_path, adapter)
+    request = replace(request, source_id=source_id)
     target = io.BytesIO()
     pq.write_table(pa.Table.from_arrays([pa.array(["alpha", "beta"]), pa.array([2, 1])],
         schema=kwargs["schema"]), target)
@@ -53,12 +58,71 @@ def fixture(tmp_path, adapter):
         bindings[path] = _QueryBatchInput(current, config, 3, 16384, 10.0)
         captures[current.entity_name] = source
     (tmp_path / "validation.yaml").write_text(yaml.safe_dump({"schema_version": "1.1", "entities": [
-        {"name": f"warehouse.summary{index}", "row_count": 2, "fields": [
+        {"name": f"{source_id}.summary{index}", "row_count": 2, "fields": [
             {"name": "label", "data_type": "string"}, {"name": "measured", "data_type": "integer"}]}
         for index in range(2)], "validation_settings": {"validate_schema": False,
         "validate_relationships": False, "validate_constraints": False, "validate_privacy": False}}))
     profile = BatchProfile.model_validate({"schema_version": "0.1", "validation": "validation.yaml", "inputs": inputs})
     return profile, bindings, captures
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_configured_session_uses_owned_worker_and_frozen_capture(tmp_path, monkeypatch, adapter):
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
+    from test_data_agent.mcp_transformation_candidate import _configured_query_session_tool
+    from tests.test_transformation_postgres_isolation import _metadata_driver
+    from tests.test_transformation_trino_isolation import _fictional_trino
+
+    is_postgres = adapter is SqlQueryAdapter.POSTGRES
+    source_id = "warehouse" if is_postgres else "trino"
+    profile, bindings, _ = fixture(tmp_path, adapter, source_id=source_id)
+    (tmp_path / "profile.yaml").write_text(yaml.safe_dump(profile.model_dump(mode="json", exclude_unset=True)))
+    (tmp_path / "references.yaml").write_text(yaml.safe_dump({"schema_version": "0.1", "queries": {
+        key: {"adapter": adapter.value, "source_id": source_id, "entity": item.request.entity,
+            "query_file": "query.sql", "max_rows": 3, "max_bytes": 16384, "max_seconds": 10.0}
+        for key, item in bindings.items()}}))
+    prefix = "POSTGRES_" if is_postgres else "TRINO_"
+    for key in tuple(os.environ):
+        if key.startswith(prefix):
+            monkeypatch.delenv(key)
+    config = ({"POSTGRES_SOURCE_ID": source_id, "POSTGRES_HOST": "fictional.invalid",
+        "POSTGRES_ALLOWED_SCHEMAS": "public", "POSTGRES_ALLOWED_TABLES": "public.orders",
+        "POSTGRES_ALLOWED_COLUMNS": "public.orders.status"} if is_postgres else {
+        "TRINO_HOST": "fictional.invalid", "TRINO_ALLOWED_CATALOGS": "lake",
+        "TRINO_ALLOWED_SCHEMAS": "safe", "TRINO_ALLOWED_TABLE_COLUMNS": "lake.safe.orders.status"})
+    for key, value in config.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
+    connections = multiprocessing.get_context("spawn").RawValue("i", 0)
+    if is_postgres:
+        monkeypatch.setattr("test_data_agent.io.transformation_postgres_capture._configured_postgres_driver",
+            partial(_metadata_driver, aggregate=True, connections=connections))
+    else:
+        monkeypatch.setattr("test_data_agent.io.transformation_trino_stream._configured_trino_driver",
+            partial(_fictional_trino, None, connections=connections))
+    children = {child.pid for child in multiprocessing.active_children()}
+    sessions = _ConfiguredQuerySessions(tmp_path, max_active=1, max_cumulative_bytes=65536, max_seconds=30)
+    tool = _configured_query_session_tool(sessions)
+    try:
+        opened = tool("open", profile="profile.yaml", references="references.yaml",
+            max_total_bytes=65536, max_review_bytes=32768, max_output_bytes=65536)
+        owned = Path(opened["local_approval"]["root"])
+        handle, digest = opened["handle"], opened["snapshot_sha256"]
+        # Trino uses separate connections for column discovery and no-row inspection.
+        capture_connections = 4 if is_postgres else 6
+        assert connections.value == capture_connections
+        assert {child.pid for child in multiprocessing.active_children()} == children
+        assert tool("review", handle=handle)["snapshot_sha256"] == digest
+        assert tool("validate", handle=handle, snapshot_sha256=digest)["status"] == "closed_validation_completed"
+        completed = tool("execute", handle=handle, snapshot_sha256=digest, destination="selected")
+        assert completed["status"] == "closed_publication_completed"
+        assert connections.value == capture_connections and not owned.exists()
+        for index in range(2):
+            assert (tmp_path / "selected" / f"input-{index}.csv").read_text().splitlines() == [
+                "label,measured", "gamma,8", "delta,7"]
+        assert all(value not in str(opened) + str(completed) for value in ("alpha", "beta", "gamma", "delta"))
+    finally:
+        sessions.close()
 
 
 @pytest.mark.parametrize("adapter", list(SqlQueryAdapter))

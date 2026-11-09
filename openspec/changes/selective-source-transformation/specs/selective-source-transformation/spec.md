@@ -458,8 +458,8 @@ preservation authority, or bypass existing review and approval boundaries.
 
 The system SHALL require a distinct opt-in transformation policy and SHALL NOT
 silently enable source copying in existing generation or profiling surfaces.
-Implementation SHALL require reviewed safety-policy amendments and executable
-tests before this proposed exception can become operational.
+New or changed public activation SHALL require matching safety-policy
+amendments, executable checks and independent review of the exact source.
 
 #### Scenario: Existing generation
 

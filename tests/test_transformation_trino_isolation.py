@@ -14,7 +14,7 @@ from test_data_agent.io.transformation_trino_stream import _TrinoCapture, _captu
 from test_data_agent.sql_query_source import SqlQueryAdapter
 
 
-def _fictional_trino(fault):
+def _fictional_trino(fault, *, connections=None):
     class Cursor(FakeCursor):
         def execute(self, sql, parameters):
             self.row_offset = 0
@@ -36,7 +36,17 @@ def _fictional_trino(fault):
                     time.sleep(1)
             return super().fetchmany(size)
 
-    return FakeDriver(Cursor([]))
+    driver = FakeDriver(Cursor([]))
+    if connections is not None:
+        connect = driver.dbapi.connect
+
+        def counted_connect(**kwargs):
+            assert kwargs["host"] == "fictional.invalid"
+            connections.value += 1
+            return connect(**kwargs)
+
+        driver.dbapi.connect = counted_connect
+    return driver
 
 
 @pytest.mark.parametrize("fault", [None, "metadata", "rows", "backend"])

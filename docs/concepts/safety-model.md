@@ -20,6 +20,14 @@ blocked. Receipt integrity does not prove personhood or anonymity. Existing
 generation, profiling and default responses retain their source-free contracts.
 Private implementation review does not activate public registration.
 
+Under [ADR-0029](../adr/0029-unified-replacement-contract.md), explicit
+`substitute` and `replace_text` mappings may produce another source value,
+including a sensitive mapped permutation. Actual mapped-cell evidence selects
+this replacement contract only in the local mixed-origin artifact. Sensitivity
+notes stay value-free; direct preserve, preserve fallback and source-free
+generation retain their existing rules. New or changed activation requires
+matching policy, executable checks and independent review of the exact source.
+
 Treat all of these as untrusted:
 
 - CSV, JSON, YAML, and Parquet files;

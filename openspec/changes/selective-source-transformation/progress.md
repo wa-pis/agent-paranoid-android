@@ -8219,3 +8219,69 @@ and all 32 active/baseline OpenSpec items passed strict validation. Exact body
 comparison verified all 15 archived requirements; benchmark JSON and activation
 overlays are byte-identical to pre-archive main. No full runtime suite or large
 scale campaign was repeated for this documentary change.
+
+## 2026-11-09 — Registered Replay and Scoped Trust Amendment
+
+Installed RC3 CLI and genuine SDK stdio each passed fictional CSV → Parquet at
+2,051 × 3, full ordered readback and all three clean refusals. The existing
+private entrance also passed as a control. Installed SDK stdio also passed
+Parquet → PostgreSQL SQL text at the same shape (text readback, no execution).
+Installed CLI CSV → CSV at 300,000 × 50 passed all 15 million cells and three
+refusals in 455.275 seconds, with 90,150,450 output bytes. Configured PostgreSQL
+and Trino session tests used the real loaders and isolated workers with fictional
+drivers: no reconnect on review/validate/execute and owned capture/worker cleanup
+verified.
+The initial focused suite passed 209 tests (six interactive cases skipped);
+the latest affected query/session/worker suites passed 88 tests.
+
+The documentary amendment now describes the already registered trust boundary
+across SECURITY, the safety model and baseline/active OpenSpec. It preserves
+AGENTS and accepted ADR decisions. See follow-through-2026-11-09.md for artifact
+identity, reproduction, scope and the independent review still required.
+No production data, provider calls, database network access or fresh approval
+was used. Both parent tasks remain open. Next: extend installed public/common/
+configured acceptance to target scale and obtain independent review of the exact
+trust amendment.
+
+## 2026-11-09 — Independent Review and Registered Target Runs
+
+The independent read-only AI reviewer checked the documentary amendment
+`1d8e9c26f1b0f465dc7622bd224fb50399cc296f` against
+`9251612aee87132ca32f54a5acd6eb37aef528d5`. Final disposition: no findings.
+The amendment explicitly limits unknown/disputed fail-closed classification to
+preservation. The reviewer traced exact local receipt consumption, the
+registered CLI/MCP boundary, the isolation of source-free generation and the
+value-free explicit replacement contract. Strict OpenSpec checks for both
+baselines and the change and an exact-range diff check passed. The same runtime
+in the first review had 97 focused passes and six opt-in skips; the final
+wording change did not require repeating them. This is AI documentary review,
+not human consent, a GitHub review or a new runtime activation.
+
+Started the installed RC3 target runs: public CLI CSV → CSV, public MCP stdio
+Parquet → Parquet, and a sequential queue for common MCP, configured PostgreSQL
+and configured Trino. Small 2,051 × 100 smokes verified all three batch routes
+before launch. The fixture settings and exact scope are in
+[registered scale acceptance](registered-scale-acceptance-2026-11-09.md).
+
+
+## 2026-11-10 — Registered Target Evidence Completed
+
+Installed RC3 passed 1,000,000 × 100 on five representative registered routes:
+CLI CSV → CSV (3355.787 s), genuine SDK stdio MCP Parquet → Parquet (2052.353 s),
+common MCP Parquet → CSV (2361.507 s), configured PostgreSQL → CSV (1823.197 s)
+and configured Trino → CSV (1847.678 s). Each completed run checked all 100M cells,
+ordered readback, provenance, immutable inputs and cleanup. Both configured
+sessions used real isolated workers with fictional drivers and no reconnect
+after review. The CLI passed all three target-size refusals.
+
+The combined public MCP scenario hit the 3600 s client harness timeout and
+cleaned up; the same-shape isolated publication replay then passed within the
+same byte/time bounds. The timeout is retained as evidence; small stdio tests,
+not the replay, establish the MCP refusals. See
+[registered scale acceptance](registered-scale-acceptance-2026-11-09.md) for
+exact harness and artifact identities, reproduction and per-route limits.
+The scoped trust amendment review is recorded above. Unmeasured installed
+format combinations and full-size MCP refusal coverage remain open; the
+completed checklist item names the five measured routes. The initial PR
+documentation contract caught an overbroad checkbox closure. Neither result
+grants preservation authority or changes the runtime.

@@ -1,16 +1,23 @@
-"""Opt-in fictional private CSV acceptance; no DB, API, receipts or permanent output.
+"""Opt-in fictional local-file acceptance; no DB, API, receipts or permanent output.
 
-Run against an installed candidate with --rows 300000 --columns 50. This is
-private replacement-only evidence, not public activation or full RC acceptance.
+Run against an installed candidate with --rows 2051 --columns 3 --entrance cli
+or --entrance mcp. The default private route retains historical scale coverage.
 """
 
 import argparse
+import asyncio
+from contextlib import nullcontext
 import csv
+from datetime import timedelta
 import hashlib
+from importlib.metadata import version
 import json
 import math
+import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
+import subprocess
+import sys
+from tempfile import TemporaryDirectory, TemporaryFile
 from time import monotonic
 
 import yaml
@@ -22,6 +29,96 @@ from test_data_agent.io.transformation_source import _profile_transformation_sou
 from test_data_agent.io.transformation_publish import temporary_csv_publication
 
 
+FIXTURE_VALUES = ("alpha", "beta", "first", "second", "omega", "theta", "cascade")
+
+
+def _assert_summary(text: str) -> None:
+    assert not any(f'"{value}"' in text for value in FIXTURE_VALUES), "fixture literal in response"
+
+
+def _registered_output(entrance: str, source: Path, digest: str, max_bytes: int,
+                       budget: GenerationBudget, *, include_refusals: bool) -> Path:
+    root = source.parent
+    destination = root / "registered-output"
+    existing = root / "existing-output"
+    sentinel = existing / "owner.txt"
+    if include_refusals:
+        existing.mkdir()
+        sentinel.write_text("fictional owner artifact", encoding="utf-8")
+    before = set(root.iterdir())
+    env = {key: os.environ[key] for key in ("PATH", "LANG", "TMPDIR", "SYSTEMROOT") if key in os.environ}
+    seconds = str(budget.remaining_seconds())
+    env.update(TEST_DATA_AGENT_WORKSPACE_ROOT=str(root),
+               TEST_DATA_AGENT_MAX_GENERATION_SECONDS=seconds,
+               TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS=seconds)
+    refusals = (("0" * 64, max_bytes, destination), (digest, 1, destination),
+                (digest, max_bytes, existing)) if include_refusals else ()
+
+    def refused_cleanly() -> None:
+        assert set(root.iterdir()) == before
+        assert list(existing.iterdir()) == [sentinel]
+        assert sentinel.read_text(encoding="utf-8") == "fictional owner artifact"
+
+    if entrance == "cli":
+        def call(*arguments: str, failure: bool = False) -> dict:
+            budget.check("installed CLI acceptance")
+            result = subprocess.run([sys.executable, "-I", "-m", "test_data_agent.cli", *arguments],
+                cwd=root, env=env, capture_output=True, text=True, timeout=budget.remaining_seconds())
+            _assert_summary(result.stdout + result.stderr)
+            assert (result.returncode != 0) == failure, "unexpected CLI result"
+            return json.loads(result.stdout)
+
+        policy = root / "behavior.yaml"
+        review = call("transform-review", str(source), str(policy), "--table", "items")
+        assert review["snapshot_sha256"] == digest
+        for fingerprint, cap, output in (*refusals, (digest, max_bytes, destination)):
+            failure = (fingerprint, cap, output) != (digest, max_bytes, destination)
+            result = call("transform-execute", str(source), str(policy), str(output),
+                "--table", "items", "--snapshot-sha256", fingerprint, "--max-output-bytes", str(cap),
+                "--max-total-input-bytes", str(max_bytes), "--json", failure=failure)
+            if failure:
+                assert "error" in result
+                refused_cleanly()
+            else:
+                assert result["result"]["snapshot_sha256"] == digest
+    else:
+        from mcp import ClientSession, StdioServerParameters
+        from mcp.client.stdio import stdio_client
+
+        async def invoke() -> None:
+            timeout = budget.remaining_seconds()
+            sdk_timeout = timeout if int(version("mcp").split(".")[0]) >= 2 else timedelta(seconds=timeout)
+            parameters = StdioServerParameters(command=sys.executable,
+                args=["-I", "-m", "test_data_agent.mcp_generator_server"], env=env, cwd=str(root))
+            with TemporaryFile(mode="w+", encoding="utf-8") as stderr:
+                async with asyncio.timeout(timeout), stdio_client(parameters, errlog=stderr) as (reader, writer):
+                    async with ClientSession(reader, writer, read_timeout_seconds=sdk_timeout) as session:
+                        await session.initialize()
+                        names = {tool.name for tool in (await session.list_tools()).tools}
+                        assert {"review_transformation", "execute_transformation"} <= names
+                        assert not {"transform-approve", "issue_local_receipt"} & names
+                        args = dict(input_path=source.name, policy_path="behavior.yaml", table_name="items")
+                        review = (await session.call_tool("review_transformation", args)).model_dump(by_alias=True)
+                        _assert_summary(json.dumps(review))
+                        assert not review.get("isError") and review["structuredContent"]["snapshot_sha256"] == digest
+                        for fingerprint, cap, output in (*refusals, (digest, max_bytes, destination)):
+                            failure = (fingerprint, cap, output) != (digest, max_bytes, destination)
+                            response = (await session.call_tool("execute_transformation", dict(args,
+                                output_path=output.name, snapshot_sha256=fingerprint, max_output_bytes=cap,
+                                max_total_input_bytes=max_bytes))).model_dump(by_alias=True)
+                            _assert_summary(json.dumps(response))
+                            assert bool(response.get("isError")) == failure, "unexpected MCP result"
+                            if failure:
+                                refused_cleanly()
+                            else:
+                                assert response["structuredContent"]["snapshot_sha256"] == digest
+                stderr.seek(0)
+                _assert_summary(stderr.read())
+
+        asyncio.run(invoke())
+    return destination
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
@@ -30,7 +127,12 @@ def main() -> None:
     parser.add_argument("--output-format", choices=("csv", "parquet", "postgresql_sql"), default="csv")
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--max-seconds", type=float, default=1800)
+    parser.add_argument("--entrance", choices=("private", "cli", "mcp"), default="private")
+    parser.add_argument("--execution-only", action="store_true",
+        help="Isolate registered review, publication and readback from the refusal suite.")
     args = parser.parse_args()
+    if args.execution_only and args.entrance == "private":
+        parser.error("--execution-only requires a registered entrance")
     if not 1 <= args.rows <= 1_000_000 or not 2 <= args.columns <= 100:
         parser.error("fixture supports 1..1000000 rows and 2..100 columns")
     if not 0 < args.max_bytes <= 2**63 - 1:
@@ -94,8 +196,12 @@ def main() -> None:
         request = prepare_csv_review_from_paths(source_path, "items", root, "behavior.yaml",
             max_total_bytes=max_bytes, max_review_bytes=1024 * 1024, budget=budget)
         print(json.dumps({"stage": "review", "elapsed_seconds": round(monotonic() - started, 3)}), flush=True)
-        with temporary_csv_publication(request, max_total_bytes=max_bytes,
-                max_review_bytes=1024 * 1024, max_output_bytes=max_bytes, budget=budget) as output:
+        publication = (temporary_csv_publication(request, max_total_bytes=max_bytes,
+            max_review_bytes=1024 * 1024, max_output_bytes=max_bytes, budget=budget)
+            if args.entrance == "private" else nullcontext(_registered_output(
+                args.entrance, source_path, request.snapshot_sha256, max_bytes, budget,
+                include_refusals=not args.execution_only)))
+        with publication as output:
             manifest = json.loads((output / "manifest.json").read_text())
             count = 0
             filename = "dataset." + ("sql" if args.output_format == "postgresql_sql" else args.output_format)
@@ -149,14 +255,16 @@ def main() -> None:
             assert manifest["provenance"]["replacement_percent"] == "100.00"
             output_bytes = (output / filename).stat().st_size
             assert hashlib.sha256(source_path.read_bytes()).hexdigest() == source_hash
-        assert not output.parent.exists(), "temporary publication not removed"
+        if args.entrance == "private":
+            assert not output.parent.exists(), "temporary publication not removed"
     assert not root.exists(), "fictional inputs not removed"
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "output_bytes": output_bytes,
         "max_bytes": max_bytes, "max_seconds": args.max_seconds,
         "input_format": args.input_format, "output_format": args.output_format,
         "elapsed_seconds": round(monotonic() - started, 3),
-        "scope": "private replacement-only local file input; no public activation"}), flush=True)
+        "entrance": args.entrance, "refusals_checked": 0 if args.entrance == "private" or args.execution_only else 3,
+        "scope": "fictional replacement-only local file input; no preservation or DB"}), flush=True)
 
 
 if __name__ == "__main__":

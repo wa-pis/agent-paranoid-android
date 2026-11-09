@@ -417,7 +417,7 @@ def test_capture_schema_preserves_exact_decimal_width_and_nullability():
     assert schema.field("count").nullable is True
 
 
-def _metadata_driver(fault=None):
+def _metadata_driver(fault=None, *, aggregate=False, connections=None):
     from types import SimpleNamespace
 
     class Cursor:
@@ -428,8 +428,12 @@ def _metadata_driver(fault=None):
                 self.rows = [("status", "text", True)]
             else:
                 self.description = [("other" if fault == "schema_drift" else "label",
-                    SimpleNamespace(name="text"), None, None, None, None, True)]
-                self.rows = [] if sql.endswith("WHERE FALSE") else [("alpha",), ("beta",)]
+                    SimpleNamespace(name="text"), None, None, None, None, not aggregate)]
+                if aggregate:
+                    self.description.append(("measured", SimpleNamespace(name="int8"),
+                        None, None, None, None, False))
+                rows = [("alpha", 2), ("beta", 1)] if aggregate else [("alpha",), ("beta",)]
+                self.rows = [] if sql.endswith("WHERE FALSE") else rows
 
         def fetchmany(self, size):
             assert size == 1
@@ -444,6 +448,9 @@ def _metadata_driver(fault=None):
     class Driver:
         def connect(self, **kwargs):
             assert "default_transaction_read_only=on" in kwargs["options"]
+            if connections is not None:
+                assert kwargs["host"] == "fictional.invalid"
+                connections.value += 1
             return self
 
         def cursor(self, **kwargs):
