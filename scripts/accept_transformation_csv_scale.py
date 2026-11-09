@@ -37,13 +37,14 @@ def _assert_summary(text: str) -> None:
 
 
 def _registered_output(entrance: str, source: Path, digest: str, max_bytes: int,
-                       budget: GenerationBudget) -> Path:
+                       budget: GenerationBudget, *, include_refusals: bool) -> Path:
     root = source.parent
     destination = root / "registered-output"
     existing = root / "existing-output"
-    existing.mkdir()
     sentinel = existing / "owner.txt"
-    sentinel.write_text("fictional owner artifact", encoding="utf-8")
+    if include_refusals:
+        existing.mkdir()
+        sentinel.write_text("fictional owner artifact", encoding="utf-8")
     before = set(root.iterdir())
     env = {key: os.environ[key] for key in ("PATH", "LANG", "TMPDIR", "SYSTEMROOT") if key in os.environ}
     seconds = str(budget.remaining_seconds())
@@ -51,7 +52,7 @@ def _registered_output(entrance: str, source: Path, digest: str, max_bytes: int,
                TEST_DATA_AGENT_MAX_GENERATION_SECONDS=seconds,
                TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS=seconds)
     refusals = (("0" * 64, max_bytes, destination), (digest, 1, destination),
-                (digest, max_bytes, existing))
+                (digest, max_bytes, existing)) if include_refusals else ()
 
     def refused_cleanly() -> None:
         assert set(root.iterdir()) == before
@@ -127,7 +128,11 @@ def main() -> None:
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--max-seconds", type=float, default=1800)
     parser.add_argument("--entrance", choices=("private", "cli", "mcp"), default="private")
+    parser.add_argument("--execution-only", action="store_true",
+        help="Isolate registered review, publication and readback from the refusal suite.")
     args = parser.parse_args()
+    if args.execution_only and args.entrance == "private":
+        parser.error("--execution-only requires a registered entrance")
     if not 1 <= args.rows <= 1_000_000 or not 2 <= args.columns <= 100:
         parser.error("fixture supports 1..1000000 rows and 2..100 columns")
     if not 0 < args.max_bytes <= 2**63 - 1:
@@ -194,7 +199,8 @@ def main() -> None:
         publication = (temporary_csv_publication(request, max_total_bytes=max_bytes,
             max_review_bytes=1024 * 1024, max_output_bytes=max_bytes, budget=budget)
             if args.entrance == "private" else nullcontext(_registered_output(
-                args.entrance, source_path, request.snapshot_sha256, max_bytes, budget)))
+                args.entrance, source_path, request.snapshot_sha256, max_bytes, budget,
+                include_refusals=not args.execution_only)))
         with publication as output:
             manifest = json.loads((output / "manifest.json").read_text())
             count = 0
@@ -257,7 +263,7 @@ def main() -> None:
         "max_bytes": max_bytes, "max_seconds": args.max_seconds,
         "input_format": args.input_format, "output_format": args.output_format,
         "elapsed_seconds": round(monotonic() - started, 3),
-        "entrance": args.entrance, "refusals_checked": 0 if args.entrance == "private" else 3,
+        "entrance": args.entrance, "refusals_checked": 0 if args.entrance == "private" or args.execution_only else 3,
         "scope": "fictional replacement-only local file input; no preservation or DB"}), flush=True)
 
 
