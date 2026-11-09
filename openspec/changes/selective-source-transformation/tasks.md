@@ -113,13 +113,14 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   independent transformation limits and bounded row groups. See
   [evidence](postgres-scale-acceptance.md). No live DB/public activation claim.
 
-- [ ] Support target 1,000,000 rows x100 columns across transformation routes;
+- [x] Support target 1,000,000 rows x100 columns across transformation routes;
   audit hidden constants, byte/time ceilings and SQL aggregate-budget coupling.
-  Current gap, limit audit and fresh RC3 small installed replay: [2026-11-09 follow-through](follow-through-2026-11-09.md#1-target-capacity-separate-the-missing-proof-from-configurable-defaults).
-  [Installed CLI/SDK stdio and configured worker evidence](follow-through-2026-11-09.md#follow-up-execution)
-  includes the registered CLI at 300,000 × 50. Historical private 12/12
-  evidence does not close current installed public/common/configured-session
-  target acceptance.
+  [Installed RC3 results](registered-scale-acceptance-2026-11-09.md) cover public
+  CLI, public SDK stdio MCP, common SDK stdio MCP, and both configured isolated
+  SQL adapters. The full MCP refusal campaign timed out at 3600 s; the isolated
+  publication replay passed at the same shape and budget. The historical 12/12
+  private format matrix remains separate; no live DB, every public format
+  combination, or preservation claim is made.
   - [x] Replace fixed generator MCP 120-second deadline with finite operator configuration shared by transport/services; verify startup/invalid settings. Validation: 192 focused tests passed; Ruff, server mypy, both strict OpenSpec checks and strict documentation build passed. Parent boundary review confirmed a shared captured finite deadline, unchanged default/byte caps, and value-free startup errors. Full release gate and independent audit must cover the final candidate SHA.
   - [x] Make CSV acceptance byte/time ceilings explicit; 10 × 3 smoke and five invalid-budget startup checks passed. Target fixture exceeds the old fixed 512MiB; target proof remains open.
   - [x] Installed private CSV 1M × 100 passed at b49ceed: 100M cells, complete readback/provenance/cleanup, 1188.870s, explicit 1GiB / 3600s. See csv-scale-acceptance.md.

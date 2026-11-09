@@ -8262,3 +8262,23 @@ Parquet → Parquet, and a sequential queue for common MCP, configured PostgreSQ
 and configured Trino. Small 2,051 × 100 smokes verified all three batch routes
 before launch. The fixture settings and exact scope are in
 [registered scale acceptance](registered-scale-acceptance-2026-11-09.md).
+
+
+## 2026-11-10 — Registered Target Evidence Completed
+
+Installed RC3 passed 1,000,000 × 100 on five representative registered routes:
+CLI CSV → CSV (3355.787 s), genuine SDK stdio MCP Parquet → Parquet (2052.353 s),
+common MCP Parquet → CSV (2361.507 s), configured PostgreSQL → CSV (1823.197 s)
+and configured Trino → CSV (1847.678 s). Each completed run checked all 100M cells,
+ordered readback, provenance, immutable inputs and cleanup. Both configured
+sessions used real isolated workers with fictional drivers and no reconnect
+after review. The CLI passed all three target-size refusals.
+
+The combined public MCP scenario hit the 3600 s client harness timeout and
+cleaned up; the same-shape isolated publication replay then passed within the
+same byte/time bounds. The timeout is retained as evidence; small stdio tests,
+not the replay, establish the MCP refusals. See
+[registered scale acceptance](registered-scale-acceptance-2026-11-09.md) for
+exact harness and artifact identities, reproduction and per-route limits.
+The scoped trust amendment review is recorded above. Neither task disposition
+grants preservation authority or changes the runtime.
