@@ -15,8 +15,8 @@ artifact and SHALL NOT supply preservation authority to ordinary generation,
 profiling or advisors. Preserving a value or using a preserve fallback SHALL
 require an explicitly non-sensitive decision, no positive or conflicting
 sensitivity evidence, a bounded operator comment and an exact matching local
-controlling-TTY receipt. Unknown or disputed fields SHALL fail closed; default
-DECIMAL preservation remains blocked. MCP SHALL NOT issue receipts or return
+controlling-TTY receipt. Unknown or disputed fields SHALL fail closed for
+preservation; default DECIMAL preservation remains blocked. MCP SHALL NOT issue receipts or return
 source or transformed rows.
 
 Explicit `substitute` and `replace_text` SHALL use deterministic evidence of
