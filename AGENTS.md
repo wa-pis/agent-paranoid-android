@@ -79,7 +79,7 @@ end-to-end tests and independent review of the implementation are prerequisites
 for activation, not prerequisites for writing the implementation and its tests.
 
 The scoped activation contract and historical development stages are defined in
-`openspec/changes/selective-source-transformation/safety-boundary.md`.
+`openspec/changes/archive/2026-11-10-selective-source-transformation/safety-boundary.md`.
 Its separate local-file execution contract permits only local controlling-TTY
 receipt issuance and matching-receipt consumption by noninteractive/workspace
 execution. Private `derive`, database capture and external APIs are not enabled

@@ -366,7 +366,7 @@ No new independent review was launched for these helper-level changes.
 
 ## Amended replacement acceptance — 2026-10-02
 
-Owner-approved [ADR-0029](../../../docs/adr/0029-unified-replacement-contract.md)
+Owner-approved [ADR-0029](../../../../docs/adr/0029-unified-replacement-contract.md)
 defines one explicit replacement contract for all fields. Sensitive-source
 membership and permutations are permitted for actual mapped output cells;
 review retains a value-free sensitivity note. Direct preservation and its
@@ -963,7 +963,7 @@ and execute.py500; optional flags do not disable final checks.
 
 ## Final-public installed original-finding replay — 2026-10-25
 
-The [new dated matrix and ledger](../../../docs/feedback-acceptance-1.7.0rc1.md)
+The [new dated matrix and ledger](../../../../docs/feedback-acceptance-1.7.0rc1.md)
 records actual public 1.6.0 versus 1.7.0rc1 payload identities, all findings 1–26,
 section E safeguards, six unchanged diagnostic scripts per package, 782 shared
 fictional assertions, separate harness corrections and 20 fresh real doctor
