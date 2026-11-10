@@ -27,6 +27,8 @@ from test_data_agent.core.transformation_policy import transformation_schema_fin
 
 MIB = 1024**2
 TOTAL_BYTES = 1024 * MIB
+SQL_OUTPUT_BYTES = 3 * TOTAL_BYTES
+OUTPUT_SUFFIXES = {"csv": "csv", "parquet": "parquet", "postgresql_sql": "sql"}
 CAPTURE_BYTES = 512 * MIB
 REVIEW_BYTES = MIB
 SECONDS = 3600
@@ -103,14 +105,14 @@ def server(adapter, rows, columns):
     return main()
 
 
-def fixture(root, route, rows, columns):
+def fixture(root, route, rows, columns, input_format, output_format, output_bytes):
     inputs, entities = [], []
     for index, (count, width) in enumerate(((rows, columns), (2, 2))):
         names = names_for(width)
         is_query = index == 0 and route != "common"
         entity = ("warehouse.items" if route == "postgres" else "trino.items") if is_query else f"items{index}"
-        source_format = f"{route}_query" if is_query else "parquet"
-        source_path = f"items{index}.query" if is_query else f"items{index}.parquet"
+        source_format = f"{route}_query" if is_query else input_format if index == 0 else "parquet"
+        source_path = f"items{index}." + ("query" if is_query else source_format)
         fields = [{"name": name, "data_type": "string"} for name in names]
         profile = DatasetProfile.model_validate({"entities": [{"name": entity, "row_count": count, "fields": fields}]})
         policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
@@ -118,11 +120,16 @@ def fixture(root, route, rows, columns):
                   "resource_limits": {"max_input_rows": 1_000_000, "max_input_columns": 100,
                       "max_input_cells": 100_000_000, "max_input_file_bytes": CAPTURE_BYTES,
                       "max_total_input_bytes": TOTAL_BYTES, "max_parquet_expanded_bytes": TOTAL_BYTES,
-                      "max_output_bytes": TOTAL_BYTES},
+                      "max_output_bytes": output_bytes},
                   "fields": [{"entity": entity, "field": name, "sensitivity": "non_sensitive",
                       "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
                           {"original": [a], "replacement": [b]} for a, b in zip(SOURCE_VALUES, OUTPUT_VALUES)]}}}
                       for name in names]}
+        if index == 0 and output_format != "csv":
+            policy["output"] = {"format": output_format,
+                                "fields": [{"name": name, "type": "string"} for name in names]}
+            if output_format == "postgresql_sql":
+                policy["output"]["table"] = "fictional_items"
         policy_path = f"policy{index}.yaml"
         (root / policy_path).write_text(yaml.safe_dump(policy))
         inputs.append({"entity": entity, "source": source_path, "policy": policy_path})
@@ -134,6 +141,12 @@ def fixture(root, route, rows, columns):
                 "adapter": route, "source_id": entity.split(".")[0], "entity": "items",
                 "query_file": "query.sql", "max_rows": count, "max_bytes": CAPTURE_BYTES, "max_seconds": SECONDS}}}
             (root / "references.yaml").write_text(yaml.safe_dump(references))
+        elif source_format == "csv":
+            with (root / source_path).open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.writer(handle, lineterminator="\n")
+                writer.writerow(names)
+                patterns = [[value] * width for value in SOURCE_VALUES]
+                writer.writerows(patterns[i % 2] for i in range(count))
         else:
             schema = pa.schema([pa.field(name, pa.string(), nullable=False) for name in names])
             with pq.ParquetWriter(root / source_path, schema) as writer:
@@ -142,11 +155,11 @@ def fixture(root, route, rows, columns):
                     writer.write_table(pa.Table.from_arrays([values] * width, schema=schema))
     (root / "validation.yaml").write_text(yaml.safe_dump({"schema_version": "1.1", "entities": entities}))
     (root / "batch.yaml").write_text(yaml.safe_dump({"schema_version": "0.1", "validation": "validation.yaml",
-        "resource_limits": {"max_total_input_bytes": TOTAL_BYTES, "max_output_bytes": TOTAL_BYTES},
+        "resource_limits": {"max_total_input_bytes": TOTAL_BYTES, "max_output_bytes": output_bytes},
         "inputs": inputs}))
 
 
-async def run_route(root, route, rows, columns, started):
+async def run_route(root, route, rows, columns, output_bytes, started):
     env = {key: os.environ[key] for key in ("PATH", "LANG", "TMPDIR", "SYSTEMROOT") if key in os.environ}
     env.update(TEST_DATA_AGENT_WORKSPACE_ROOT=str(root), TEST_DATA_AGENT_MAX_GENERATION_SECONDS=str(SECONDS),
         TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS=str(SECONDS), TEST_DATA_AGENT_QUERY_SESSION_MAX_ACTIVE="1",
@@ -182,7 +195,7 @@ async def run_route(root, route, rows, columns, started):
                     return result["structuredContent"]
 
                 bounds = dict(profile="batch.yaml", max_total_bytes=TOTAL_BYTES, max_review_bytes=REVIEW_BYTES,
-                              max_output_bytes=TOTAL_BYTES)
+                              max_output_bytes=output_bytes)
                 if route == "common":
                     review = await call("review", **bounds)
                     execute_args = bounds
@@ -207,6 +220,40 @@ async def run_route(root, route, rows, columns, started):
         assert not any(json.dumps(value) in diagnostics for value in SOURCE_VALUES)
 
 
+def verify_artifact(path, output_format, count, width):
+    names = names_for(width)
+    if output_format == "csv":
+        patterns = [[value] * width for value in OUTPUT_VALUES]
+        with path.open(newline="", encoding="utf-8") as handle:
+            reader = csv.reader(handle)
+            assert next(reader) == names
+            for i in range(count):
+                assert next(reader) == patterns[i % 2]
+            assert next(reader, None) is None
+    elif output_format == "parquet":
+        parquet = pq.ParquetFile(path)
+        assert parquet.schema_arrow.names == names
+        assert all(field.type == pa.string() and not field.nullable for field in parquet.schema_arrow)
+        seen = 0
+        for batch in parquet.iter_batches(batch_size=1024):
+            expected = pa.array([OUTPUT_VALUES[i % 2] for i in range(seen, seen + batch.num_rows)])
+            assert all(column.equals(expected) for column in batch.columns)
+            seen += batch.num_rows
+        assert seen == count
+    else:
+        columns = ", ".join(f'"{name}"' for name in names)
+        definitions = ", ".join(f'"{name}" TEXT NOT NULL' for name in names)
+        prefix = f'INSERT INTO "fictional_items" ({columns}) VALUES ('
+        inserts = [prefix + ", ".join([f"'{value}'"] * width) + ");\n" for value in OUTPUT_VALUES]
+        with path.open(encoding="utf-8") as handle:
+            assert handle.readline() == "BEGIN;\n"
+            assert handle.readline() == "SET LOCAL standard_conforming_strings = on;\n"
+            assert handle.readline() == f'CREATE TABLE "fictional_items" ({definitions});\n'
+            for i in range(count):
+                assert handle.readline() == inserts[i % 2]
+            assert handle.readline() == "COMMIT;\n" and handle.read(1) == ""
+
+
 def digest_file(path):
     with path.open("rb") as handle:
         return hashlib.file_digest(handle, "sha256").hexdigest()
@@ -220,33 +267,39 @@ def main():
     parser.add_argument("route", choices=("common", "postgres", "trino"))
     parser.add_argument("--rows", type=int, default=1_000_000)
     parser.add_argument("--columns", type=int, default=100)
+    parser.add_argument("--input-format", choices=("csv", "parquet"), help="Common MCP input only.")
+    parser.add_argument("--output-format", choices=tuple(OUTPUT_SUFFIXES), default="csv")
     args = parser.parse_args()
+    if args.input_format is not None and args.route != "common":
+        parser.error("--input-format is only for the common route")
+    input_format = args.input_format or "parquet"
+    output_cap = SQL_OUTPUT_BYTES if args.output_format == "postgresql_sql" else TOTAL_BYTES
     if not 1 <= args.rows <= 1_000_000 or not 2 <= args.columns <= 100:
         parser.error("fixture supports 1..1000000 rows and 2..100 columns")
     started = monotonic()
     with TemporaryDirectory(prefix="apa-batch-scale-fictional-") as directory:
         root = Path(directory).resolve()
-        fixture(root, args.route, args.rows, args.columns)
+        fixture(root, args.route, args.rows, args.columns, input_format, args.output_format, output_cap)
         inputs = {p: digest_file(p) for p in root.iterdir()}
-        asyncio.run(run_route(root, args.route, args.rows, args.columns, started))
+        asyncio.run(run_route(root, args.route, args.rows, args.columns, output_cap, started))
         output = root / "selected"
         manifest = json.loads((output / "manifest.json").read_bytes())
         assert manifest["origin"] == "transformed_mixed"
-        for index, (count, width) in enumerate(((args.rows, args.columns), (2, 2))):
+        target = output / f"input-0.{OUTPUT_SUFFIXES[args.output_format]}"
+        control = output / "input-1.csv"
+        assert set(output.iterdir()) == {target, control, output / "manifest.json"}
+        for index, (count, width, output_format, path) in enumerate((
+                (args.rows, args.columns, args.output_format, target), (2, 2, "csv", control))):
             assert manifest["provenance"][index]["output_cells"] == count * width
             assert manifest["provenance"][index]["replacement_percent"] == "100.00"
-            with (output / f"input-{index}.csv").open(newline="") as handle:
-                reader = csv.reader(handle)
-                assert next(reader) == names_for(width)
-                for i in range(count):
-                    assert next(reader) == [OUTPUT_VALUES[i % 2]] * width
-                assert next(reader, None) is None
-        assert all(digest_file(p) == digest
-                   for p, digest in inputs.items())
-        output_bytes = (output / "input-0.csv").stat().st_size
+            verify_artifact(path, output_format, count, width)
+        assert all(digest_file(p) == digest for p, digest in inputs.items())
+        output_bytes = target.stat().st_size
     assert not root.exists()
     print(json.dumps({"status": "passed", "route": args.route, "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "output_bytes": output_bytes, "max_total_bytes": TOTAL_BYTES,
+        "input_format": input_format if args.route == "common" else f"{args.route}_query",
+        "output_format": args.output_format, "max_output_bytes": output_cap,
         "capture_bytes_limit": CAPTURE_BYTES, "max_seconds": SECONDS,
         "elapsed_seconds": round(monotonic() - started, 3)}), flush=True)
     return 0

@@ -8,7 +8,7 @@ nine completed parent delivery tasks and their public-contract subtask. The
 new candidate wheel passed 600 source-free logical cells, five documented
 examples and 260 focused feedback checks. A corrected isolated-fixture loader
 then passed a separate 48-cell subset without its temporary helper workaround.
-The fresh [original-finding matrix and local replay](../../../docs/feedback-acceptance-1.7.0rc1.md)
+The fresh [original-finding matrix and local replay](../../../../docs/feedback-acceptance-1.7.0rc1.md)
 now records all 26 dispositions, original-script limitations and actual installed
 baseline/candidate outcomes. Historical preservation/scale results retain their
 actual artifacts. Two composite tasks remain open after the 2026-10-29 documentation audit; this proposal is not
@@ -24,7 +24,7 @@ or registration denials.
 all four exact-main gates and Ubuntu artifact preflight. GitHub Release,
 PyPI and signed containers succeeded. Public Verify Published Release
 37712402058 passed all package/documentation/container profiles; final public
-acceptance is complete and automation apa-security-fixes-audit-rc was deleted. See [published evidence](../../../docs/release-evidence-1.6.0rc1.md).
+acceptance is complete and automation apa-security-fixes-audit-rc was deleted. See [published evidence](../../../../docs/release-evidence-1.6.0rc1.md).
 Historical checkpoints below retain their original scope and are superseded
 only by the exact-current evidence; no new scale or live-provider claim.
 
@@ -113,11 +113,12 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   independent transformation limits and bounded row groups. See
   [evidence](postgres-scale-acceptance.md). No live DB/public activation claim.
 
-- [ ] Complete the installed public/common/configured format matrix at
-  1,000,000 rows × 100 columns. The five measured routes below establish
-  each registered workflow at the target size; unmeasured format combinations
-  and full-size MCP refusal coverage remain open. The historical private matrix
-  remains separate.
+- [x] Complete the installed public/common/configured format matrix at
+  1,000,000 rows × 100 columns: 36 registered format combinations and all
+  three isolated SDK stdio refusals passed. The
+  [complete matrix](registered-format-matrix-2026-11-10.md) includes the
+  five earlier passes and records the 34 additional checks. The historical
+  private matrix and the prior combined timeout remain separate evidence.
   - [x] Verify 1,000,000 rows × 100 columns through installed public CLI, public
     SDK stdio MCP, common SDK stdio MCP, and both configured isolated SQL
     adapters. See [installed RC3 results](registered-scale-acceptance-2026-11-09.md)
@@ -300,7 +301,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   unavailable private/live cases honestly. Full scope and final RC gates unchanged.
   2026-10-25: 782 shared installed cases, 33 conditional cases, six unchanged
   diagnostic scripts per package and section E guards are recorded in the new
-  [dated acceptance ledger](../../../docs/feedback-acceptance-1.7.0rc1.md).
+  [dated acceptance ledger](../../../../docs/feedback-acceptance-1.7.0rc1.md).
   Missing private inputs, unsupported monkeypatched arms and live costs are not passed.
 
 ### Existing transformation and release requirements
@@ -443,7 +444,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   files at b8524e8d, reconciled current English/Russian workflow/contract/status
   surfaces, corrected stale release/ADR/MCP claims and the planned evidence
   envelope. Historical records and unresolved authority/capacity remain scoped.
-  [Audit coverage, corrections and checks](../../../docs/documentation-consistency-2026-10-29.md):
+  [Audit coverage, corrections and checks](../../../../docs/documentation-consistency-2026-10-29.md):
   151 focused tests plus24 publication-build tests passed, strict MkDocs and
   all29 strict OpenSpec items passed. No new runtime or dataset permission.
   Earlier partial checkpoints below retain their original scope.

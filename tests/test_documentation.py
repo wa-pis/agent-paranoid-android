@@ -490,7 +490,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
-        "_template", "selective-source-transformation",
+        "_template",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
     }
@@ -543,8 +543,15 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     ):
         assert requirement in (ROOT / "openspec" / "specs" / spec / "spec.md").read_text()
 
-    transformation = changes / "selective-source-transformation"
-    assert "- [ ]" in (transformation / "tasks.md").read_text()
+    transformation = changes / "archive" / "2026-11-10-selective-source-transformation"
+    assert "- [ ]" not in (transformation / "tasks.md").read_text()
+    assert (transformation / "registered-format-matrix-2026-11-10.md").is_file()
+    for capability, requirement in (
+        ("selective-source-transformation", "Transformation limits and configured scale acceptance"),
+        ("safe-mcp-workflow", "Common saved-profile consumers preserve local authority"),
+    ):
+        baseline = (ROOT / "openspec" / "specs" / capability / "spec.md").read_text()
+        assert f"### Requirement: {requirement}" in baseline
     for filename in ("proposal.md", "design.md", "plan.md", "client-acceptance.md"):
         assert (transformation / filename).is_file()
     assert (

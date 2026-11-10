@@ -10,7 +10,7 @@ The source-free generation invariant above remains unchanged. The separately
 selected, reviewed transformation produces labelled mixed-origin local artifacts,
 not synthetic datasets or a privacy guarantee. Its scoped contract is recorded
 in [ADR-0029](docs/adr/0029-unified-replacement-contract.md) and the
-[transformation safety boundary](openspec/changes/selective-source-transformation/safety-boundary.md).
+[transformation safety boundary](openspec/changes/archive/2026-11-10-selective-source-transformation/safety-boundary.md).
 These documents do not authorize data access, dataset execution or registration.
 
 Explicit applied `substitute` and `replace_text` mappings may produce another

@@ -52,7 +52,7 @@ Code anchors: `core/transformation_limits.py`, `core/limits.py`,
 `mcp_generator_server.py`, `io/transformation_query_workflow.py`,
 `io/transformation_query_sessions.py` and `io/transformation_trino_stream.py`
 under `src/test_data_agent/`. Operator settings are already documented in
-[configuration](../../../docs/reference/configuration.md).
+[configuration](../../../../docs/reference/configuration.md).
 
 ### Next capacity deliverable
 

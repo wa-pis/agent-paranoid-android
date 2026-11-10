@@ -1,8 +1,8 @@
 # Behavior Policy Contract — Review Draft
 
 Decision navigation (recorded 2026-09-29): see the project-wide
-[ADR register](../../../docs/adr/index.md) and
-[known conflicts](../../../docs/adr/open-questions.md). This document contains
+[ADR register](../../../../docs/adr/index.md) and
+[known conflicts](../../../../docs/adr/open-questions.md). This document contains
 historical implementation slices as well as dated owner decisions. Later
 explicit scope/provenance decisions govern conflicting earlier prose; old
 formula, retention and parser-status paragraphs do not create new authority or

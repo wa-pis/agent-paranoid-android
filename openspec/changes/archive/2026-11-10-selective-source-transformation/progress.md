@@ -8285,3 +8285,54 @@ format combinations and full-size MCP refusal coverage remain open; the
 completed checklist item names the five measured routes. The initial PR
 documentation contract caught an overbroad checkbox closure. Neither result
 grants preservation authority or changes the runtime.
+
+## 2026-11-10 — Remaining installed matrix started
+
+The same isolated published RC3 artifact is used, with no product changes.
+The five previously measured route selections are reused. The new campaign
+runs 31 missing combinations: ten single-file cases, twelve saved SQL-result
+envelope cases through registered single CLI and SDK stdio MCP, five common
+MCP cases, and four configured MCP cases. Three independent SDK stdio refusal
+runs use a wrong snapshot digest, a one-byte output cap and a destination with
+an existing owner sentinel. They require a sanitized refusal, no new paths,
+unchanged inputs and owner sentinel, and cleanup. Each run has its own finite
+deadline; the SQL-text output tests use an explicit 3 GiB cap and never execute
+their output.
+
+Small 2,051 × 100 checks passed for all three refusal branches, both saved
+query envelopes (PostgreSQL → Parquet through CLI, Trino → SQL text through
+MCP), and four extended batch paths (common CSV → Parquet, common Parquet →
+SQL text, configured PostgreSQL → Parquet and configured Trino → SQL text).
+Ruff and diff whitespace checks passed. These are smoke results, not full-size
+evidence. The broad capacity task and archival remain pending. Next: verify
+the independently logged target results and archive only after all pass.
+
+Five additional installed 2,051 × 100 smokes passed: common CSV → SQL text,
+configured PostgreSQL → SQL text and Trino → Parquet, saved PostgreSQL through
+MCP → CSV, and saved Trino through CLI → Parquet. The exact target campaign is
+queued in three bounded lanes; the archive and PR remain gated on the complete
+results.
+
+All three installed SDK stdio refusals passed at 1,000,000 × 100, isolated per
+case: wrong digest (1123.115 s), one-byte output cap (1351.469 s), existing
+owned destination (1662.271 s). No output bytes were published; source and
+policy/mapping hashes, workspace inventory and owner sentinel were checked.
+Six newly measured format combinations also passed at the target shape. The
+remaining format lanes are still running; the composite task stays open.
+
+The ten remaining single-file CSV/Parquet combinations, six saved PostgreSQL
+result combinations and five cases in the first batch lane passed at the target
+shape. Together with the three isolated refusals, 24 of 34 new checks are
+verified. The saved Trino cases and four common MCP cases are still pending;
+no failures have been recorded in this campaign.
+
+## 2026-11-10 — Complete registered matrix and archive
+
+All 31 remaining registered format combinations and three isolated SDK stdio
+refusals passed at 1,000,000 × 100. Including the five earlier format passes,
+the [complete matrix](registered-format-matrix-2026-11-10.md) covers 36 format
+combinations plus the three refusals. The runtime is the same published RC3
+wheel. This closes the capacity follow-through; the independent trust-boundary
+review is recorded above. The archive retains the original deltas and integrates
+the shipped contracts into the canonical specs without changing the runtime,
+authority or deployment defaults.

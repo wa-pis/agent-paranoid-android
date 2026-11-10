@@ -39,7 +39,7 @@ this is not a new activation patch applied to production.
 
 Continued feedback work also reconciles nine completed transformation delivery
 tasks and their public-contract subtask with actual stable/candidate evidence.
-The [remaining scope and installed replay](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/selective-source-transformation/release-1.7-reconciliation.md)
+The [remaining scope and installed replay](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/release-1.7-reconciliation.md)
 retain the original source identities. A subsequent [installed feedback replay](feedback-acceptance-1.7.0rc1.md)
 closes the findings 1–26/section E matrix and reviewed-script replay; three
 transformation composite tasks remain unchecked.
@@ -83,6 +83,17 @@ The patch composition tests require the archived overlays explicitly.
 Four changes remain active (excluding `_template`): selective transformation,
 historical Trino configuration, external feedback intake and profile provenance.
 The two remaining transformation tasks are reconciled in its
-[dated follow-through](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/selective-source-transformation/follow-through-2026-11-09.md).
+[dated follow-through](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/follow-through-2026-11-09.md).
 Neither the owner-waived RC3 manual client check nor private scale evidence is
 relabelled as completed human or public/configured capacity acceptance.
+
+## 2026-11-10 transformation reconciliation
+
+Archived `selective-source-transformation` after
+[36 registered format combinations and three SDK stdio refusals](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/registered-format-matrix-2026-11-10.md)
+passed at 1,000,000 × 100. The installed runs used fictional replacement-only
+inputs and the published 1.7.0rc3 package. The
+[archive disposition](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/disposition.md)
+explains which shipped requirements were integrated and why the original
+historical deltas were retained. External feedback intake, historical Trino
+configuration and bounded-profile provenance remain active.

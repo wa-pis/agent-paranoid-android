@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def _compose_activation_patches(root: Path, destination: Path) -> None:
-    directory = root / "openspec/changes/selective-source-transformation"
+    directory = root / "openspec/changes/archive/2026-11-10-selective-source-transformation"
     names = ["common-cli-activation.patch", "common-mcp-activation.patch",
         "oauth-browser-registration.patch", "registration-contract-activation.patch"]
     sql = directory / "sql-query-public-activation.patch"

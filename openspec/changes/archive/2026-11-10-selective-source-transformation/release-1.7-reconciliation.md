@@ -7,7 +7,7 @@ historical acceptance under a new version nor grants preservation/source access.
 
 Stable baseline: `v1.6.0`, source `258c035c22408becf17ab090635710a50dda8ccc`,
 wheel SHA-256 `7c2c9b9399112cbfaa08dd3164f0f5b040396ebaa606a9ba42734161d7029ef6`.
-Its [published evidence](../../../docs/release-evidence-1.6.0.md) records actual
+Its [published evidence](../../../../docs/release-evidence-1.6.0.md) records actual
 independent final-source review, 1080 tracked installed executions, 22 external
 CLI scenarios, genuine fictional controlling-terminal/common/configured capture
 acceptance, and all 12 public verification jobs. Those are historical results.
@@ -15,7 +15,7 @@ acceptance, and all 12 public verification jobs. Those are historical results.
 New candidate: `v1.7.0rc1`, source
 `64b7c8c3bbb0174fd7e159c4dfb42312045a1716`, wheel SHA-256
 `4aaf9d7914b97e9b02837cedd76339475d083d34fc0b008087b7917fdf7ddc6a`.
-[Candidate evidence](../../../docs/release-evidence-1.7.0rc1.md) records exact-main
+[Candidate evidence](../../../../docs/release-evidence-1.7.0rc1.md) records exact-main
 review, complete locked Ubuntu gates, Python/minimum profiles and public
 verification 40173739663 (all 12 jobs). Independent actual GitHub/PyPI downloads
 match the signed manifest. The new installed source-free matrix passed 600
@@ -76,11 +76,11 @@ failure. This is a labelled subset, not another full 600-cell execution.
   requirements and source-free guarantees. This reconciliation does not invent
   a new scoped AGENTS/SECURITY approval or amend them by release authority.
 - The original findings matrix and reviewed local baseline/candidate replay
-  are now reconciled in the [dated installed acceptance](../../../docs/feedback-acceptance-1.7.0rc1.md).
+  are now reconciled in the [dated installed acceptance](../../../../docs/feedback-acceptance-1.7.0rc1.md).
   That closes the accessible fictional/replay tasks with explicit private/live
   exclusions; it does not claim private client inputs or monkeypatched arms passed.
 - Whole-documentation consistency audit completed on 2026-10-29 with
-  [inventory, semantic reconciliation and executable checks](../../../docs/documentation-consistency-2026-10-29.md).
+  [inventory, semantic reconciliation and executable checks](../../../../docs/documentation-consistency-2026-10-29.md).
   Historical pages retain their source identities; this does not claim a new
   line-by-line review of every historical paragraph or settle capacity/authority.
 

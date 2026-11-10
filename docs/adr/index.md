@@ -152,7 +152,7 @@ remain unchanged; this is a navigation update, not a new architectural approval.
 | [scalable-relational-generation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/scalable-relational-generation/spec.md) | [ADR-0005](0005-determinism-provenance.md), [ADR-0007](0007-deterministic-rules.md), [ADR-0014](0014-filesystem-publication.md), [ADR-0015](0015-resource-limits.md) |
 | [python-runtime-support](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/python-runtime-support/spec.md) | [ADR-0016](0016-compatibility-packaging.md), [ADR-0019](0019-release-integrity.md), [ADR-0027](0027-acceptance-evidence.md) |
 
-The active [selective-source-transformation change](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/plan.md)
+The historical [selective-source-transformation change](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/plan.md)
 is covered by ADR-0008, ADR-0010, ADR-0015 and ADR-0020–0027; its SQL delta also
 maps to ADR-0010/0026. Module extraction maps to ADR-0003 and the
 [application-boundary inventory](../reference/application-boundaries.md).
