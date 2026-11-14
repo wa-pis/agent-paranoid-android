@@ -20,6 +20,10 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Update the documentation lock to Soup Sieve 4.1 to remove vulnerable CSS
+  selector parsing and matching versions. The docs toolchain requires Python
+  3.11.5 or later; the package runtime requirement is unchanged.
+
 - Bump locked `opentelemetry-api` to 1.45.2 for
   [CVE-2026-126360](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg).
 
