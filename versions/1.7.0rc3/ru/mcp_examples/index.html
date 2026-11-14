@@ -194,7 +194,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -212,6 +212,8 @@
 <li>Validate_dataset перепроверяет результат; при recovery_required используйте matching reviewed fingerprint.</li>
 </ol>
 <p>Generate_dataset и export_dataset — lower-level direct generation. Они не обеспечивают сами по себе human planning gate; клиент должен требовать рассмотрение spec до вызова.</p>
+<p>Для Parquet см. <a href="../how-to/mcp/#local-parquet-profiles">пример профилирования</a>:
+<code>profile_parquet</code> сохраняет JSON для <code>plan_dataset</code> (ещё не выпущен).</p>
 <h2 id="_1">Отдельные поверхности<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>Review_transformation не выдаёт receipt. Execute_transformation/common_transformation потребляют exact digest и ранее выданный человеком local receipt, если preservation требуется. Configured_query_session захватывает данные один раз в owned snapshot, затем не reconnect; требует отдельной DB authority и cleanup/expiry.</p>
 <p>Default aggregate-only Trino tools не возвращают source rows. Explicit opt-in run_safe_select имеет отдельный row-privacy контракт: source non-string values могут остаться. Он не нужен synthetic workflow и не должен поставлять строки генератору или LLM.</p>

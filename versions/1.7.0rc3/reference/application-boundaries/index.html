@@ -208,7 +208,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -333,22 +333,22 @@ dispatches that command to <code>cli_transformation_candidate.py</code>; the oth
 handlers are composed by <code>cli_application.py</code>. Moving handlers must not change
 those contracts.</p>
 <h2 id="mcp-tool-surfaces">MCP Tool Surfaces<a class="headerlink" href="#mcp-tool-surfaces" title="Permanent link">&para;</a></h2>
-<p><code>mcp-generator-tools.json</code> freezes these 14 tools in the running generator
+<p><code>mcp-generator-tools.json</code> freezes these 16 tools in the running generator
 server composition:</p>
 <ul>
-<li><code>approve_dataset_plan</code>, <code>export_dataset</code>, <code>generate_dataset</code></li>
+<li><code>approve_dataset_plan</code>, <code>estimate_dataset_capacity</code>, <code>export_dataset</code>, <code>generate_dataset</code></li>
 <li><code>review_transformation</code> (read-only local snapshot review; no execution or receipt)</li>
 <li><code>execute_transformation</code> (reviewed snapshot/receipt consumer; no receipt issuer)</li>
 <li><code>common_transformation</code> (bounded common-profile review/validate/execute consumer)</li>
 <li><code>configured_query_session</code> (configured capture, frozen review/validate/execute
   and close; no receipt issuer or row-returning response)</li>
 <li><code>infer_dataset_spec</code>, <code>inspect_dataset_plan</code>, <code>plan_dataset</code></li>
-<li><code>plan_trino_dataset</code>, <code>profile_csv</code>,
+<li><code>plan_trino_dataset</code>, <code>profile_csv</code>, <code>profile_parquet</code>,
   <code>recover_dataset_plan</code>, <code>validate_dataset</code></li>
 </ul>
 <p><code>mcp_generator_server:main</code> injects the workspace and session manager needed for
 the two common/configured consumers. The module-level SDK object retains the
-12 base tools and no SQL sessions; it is not the full running-server inventory.</p>
+14 base tools and no SQL sessions; it is not the full running-server inventory.</p>
 <p><code>mcp-trino-tools.json</code> freezes these default aggregate-only Trino tools:</p>
 <ul>
 <li><code>describe_table</code>, <code>list_catalogs</code>, <code>list_schemas</code>,

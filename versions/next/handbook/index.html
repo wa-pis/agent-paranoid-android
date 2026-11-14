@@ -213,7 +213,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -1560,7 +1560,7 @@ technical evidence and does not represent manual client acceptance for a release
                         </h1>
                     <section class="print-page" id="how-to-mcp" heading-number="3.1"><h1 id="how-to-mcp-connect-an-mcp-client">Connect An MCP Client<a class="headerlink" href="#how-to-mcp-connect-an-mcp-client" title="Permanent link">&para;</a></h1>
 <p>English · <a href="#ru-how-to-mcp">Русский</a></p>
-<p>These workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
+<p>Unless marked otherwise, these workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
 server and enable only tools required for your task. For local preservation
 approval use <a href="#how-to-transformation">Transform Local Data</a>; MCP cannot issue it.</p>
 <p>The project exposes two MCP servers with separate trust boundaries:</p>
@@ -1809,7 +1809,7 @@ access or external APIs.</p>
 <li>Call <code>approve_dataset_plan</code> with that exact fingerprint only after review.</li>
 <li>Report summaries and artifact paths, not generated rows.</li>
 </ol>
-<p>Use <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
+<p>Use <code>profile_csv</code>, <code>profile_parquet</code> (unreleased), <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
 <code>validate_dataset</code> separately when an advanced client needs control over each
 pipeline stage. Direct <code>generate_dataset</code> and <code>export_dataset</code> do not require a
 planning approval argument; configure the client's confirmation policy before
@@ -1819,6 +1819,17 @@ not evidence that the human reviewed the displayed specification.</p>
 DatasetSpec. Direct <code>generate_dataset</code> and <code>export_dataset</code> calls can instead
 provide <code>business_rules_path</code> or a bounded structured <code>business_rules_payload</code>.
 Use one rule source: external rules cannot be combined with embedded rules.</p>
+<h3 id="how-to-mcp-local-parquet-profiles">Local Parquet profiles (unreleased)<a class="headerlink" href="#how-to-mcp-local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p>When the installed development build lists <code>profile_parquet</code>, enable
+<code>agent-paranoid-android[mcp,parquet]</code> in the server's Python environment. Put
+one regular Parquet file in the workspace and call the tool with
+<code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
+The optional <code>table_name</code> defaults to the file stem.</p>
+<p>The server applies the local profiling budgets and writes a new metadata-only
+JSON profile. The reply contains a relative path and counts. Pass that path as
+<code>source_path</code> with <code>source_type: "profile"</code> to <code>plan_dataset</code> and review the
+resulting spec before approval. Unavailable null ratios stay unknown; if those
+or other missing statistics prevent inference, supply a reviewed spec.</p>
 <p>Generator MCP reads newline-framed requests through the same bounded transport
 used by Trino MCP. Each request receives a fresh non-resettable budget. The
 default boundary rejects raw frames above 1 MiB, JSON deeper than 100 levels,
@@ -4101,6 +4112,16 @@ PYCODE
 <p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
 <p>Trino <strong>default aggregate-only</strong> инструменты возвращают метаданные без исходных литералов. Отдельный <strong>explicit opt-in</strong> <code>run_safe_select</code> включается через <code>TRINO_ENABLE_SAFE_SELECT</code>; он маскирует строки, но может сохранять нечувствительные нестроковые значения источника. Такой результат не является анонимным или source-free; его нельзя передавать LLM или использовать как сгенерированные данные. Не включайте этот инструмент для описанного workflow.</p>
 <p>Generator ограничивает пути workspace, но это не sandbox процесса. Используйте отдельного системного пользователя/контейнер для недоверенных клиентов. Значения по умолчанию: frame 1 MiB, response 4 MiB, 32 active requests; Trino дополнительно ограничивает работу и параллельность. См. <a href="#ru-how-to-mcp">границы MCP</a> и <a href="#operations-audit-logging">аудит</a>.</p>
+<h3 id="ru-how-to-mcp-local-parquet-profiles">Профиль локального Parquet (ещё не выпущен)<a class="headerlink" href="#ru-how-to-mcp-local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p>В сборке, где <code>tools/list</code> показывает <code>profile_parquet</code>, установите дополнения
+<code>agent-paranoid-android[mcp,parquet]</code> в окружение сервера. Поместите один Parquet
+в рабочую папку и передайте <code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
+Если не передать <code>table_name</code>, используется имя входного файла без расширения.</p>
+<p>Новый JSON содержит только метаданные профиля; ответ содержит относительный
+путь и счётчики. Передайте этот путь в <code>plan_dataset</code> как <code>source_path</code> с
+<code>source_type: "profile"</code> и проверьте спецификацию перед подтверждением. Если
+для вывода не хватает статистики, например доли пропусков, используйте
+проверенную спецификацию.</p>
 <h2 id="ru-how-to-mcp-_8">Следующий шаг<a class="headerlink" href="#ru-how-to-mcp-_8" title="Permanent link">&para;</a></h2>
 <p><a href="#ru-ai_integration">AI workflow</a>.</p>
 <h2 id="ru-how-to-mcp-160">Отдельные инструменты трансформации 1.6.0<a class="headerlink" href="#ru-how-to-mcp-160" title="Permanent link">&para;</a></h2>

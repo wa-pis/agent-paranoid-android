@@ -121,6 +121,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#_6">Типичные ошибки</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#_7">Безопасная последовательность инструментов</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#local-parquet-profiles">Профиль локального Parquet (ещё не выпущен)</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#_8">Следующий шаг</a>
     </li>
@@ -224,7 +228,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -315,6 +319,16 @@
 <p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
 <p>Trino <strong>default aggregate-only</strong> инструменты возвращают метаданные без исходных литералов. Отдельный <strong>explicit opt-in</strong> <code>run_safe_select</code> включается через <code>TRINO_ENABLE_SAFE_SELECT</code>; он маскирует строки, но может сохранять нечувствительные нестроковые значения источника. Такой результат не является анонимным или source-free; его нельзя передавать LLM или использовать как сгенерированные данные. Не включайте этот инструмент для описанного workflow.</p>
 <p>Generator ограничивает пути workspace, но это не sandbox процесса. Используйте отдельного системного пользователя/контейнер для недоверенных клиентов. Значения по умолчанию: frame 1 MiB, response 4 MiB, 32 active requests; Trino дополнительно ограничивает работу и параллельность. См. <a href="./">границы MCP</a> и <a href="../../../operations/audit-logging/">аудит</a>.</p>
+<h3 id="local-parquet-profiles">Профиль локального Parquet (ещё не выпущен)<a class="headerlink" href="#local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p>В сборке, где <code>tools/list</code> показывает <code>profile_parquet</code>, установите дополнения
+<code>agent-paranoid-android[mcp,parquet]</code> в окружение сервера. Поместите один Parquet
+в рабочую папку и передайте <code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
+Если не передать <code>table_name</code>, используется имя входного файла без расширения.</p>
+<p>Новый JSON содержит только метаданные профиля; ответ содержит относительный
+путь и счётчики. Передайте этот путь в <code>plan_dataset</code> как <code>source_path</code> с
+<code>source_type: "profile"</code> и проверьте спецификацию перед подтверждением. Если
+для вывода не хватает статистики, например доли пропусков, используйте
+проверенную спецификацию.</p>
 <h2 id="_8">Следующий шаг<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p><a href="../../ai_integration/">AI workflow</a>.</p>
 <h2 id="160">Отдельные инструменты трансформации 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h2>

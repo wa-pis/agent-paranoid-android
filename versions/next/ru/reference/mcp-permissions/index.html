@@ -194,7 +194,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -260,6 +260,10 @@
 <td>Прочитать выбранный CSV, создать безопасный profile</td>
 </tr>
 <tr>
+<td>profile_parquet (ещё не выпущен)</td>
+<td>Прочитать один файл Parquet; нужен пакет с дополнением <code>parquet</code>. Записать новый JSON-профиль без перезаписи. Ответ содержит относительный путь и счётчики.</td>
+</tr>
+<tr>
 <td>infer_dataset_spec</td>
 <td>Создать spec из безопасного profile; без generation</td>
 </tr>
@@ -313,7 +317,7 @@
 </tr>
 </tbody>
 </table>
-<p>Console composition регистрирует 14 tools. Module-level SDK object содержит 12 base tools; common/session extensions требуют явно внедрённого workspace/session owner и close при shutdown. Ответы содержат metadata, reports и paths, а не source/generated rows или mapping literals. Audit добавляет started/terminal events даже к read-only calls.</p>
+<p>Текущая версия разработки регистрирует 16 инструментов через консольную команду и 14 через объект SDK уровня модуля. Дополнительные инструменты для пакетов и SQL-сессий требуют отдельного управления рабочей папкой и сессией. Ответы содержат метаданные, отчёты и пути. Строки данных и значения из правил замены в ответы не входят. При включённом аудите регистрируются начало и итог вызова.</p>
 <p>Synthetic approval проверяет hash, но не может доказать фактическое чтение spec человеком. Клиент обязан получить review перед approve; direct generation не должна обходить эту политику. Возобновление старого чата не расширяет scope: проверьте сохранённый plan и полный текущий spec перед новым consent.</p>
 <p>Preservation receipt выдаёт только человек в local controlling-TTY. MCP не имеет issuer, approved boolean или права вводить APPROVE. Tool confirmation, database grant и новый hash не заменяют matching receipt. После изменения source/policy/classification/mapping нужен новый review/approval.</p>
 <h2 id="trino-tools">Trino tools<a class="headerlink" href="#trino-tools" title="Permanent link">&para;</a></h2>

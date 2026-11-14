@@ -112,6 +112,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#mcp-client-configuration">MCP Client Configuration</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#safe-generator-sequence">Safe Generator Sequence</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#local-parquet-profiles">Local Parquet profiles (unreleased)</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#safe-trino-sequence">Safe Trino Sequence</a>
     </li>
@@ -237,7 +241,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -245,7 +249,7 @@
 
                 <h1 id="connect-an-mcp-client">Connect An MCP Client<a class="headerlink" href="#connect-an-mcp-client" title="Permanent link">&para;</a></h1>
 <p>English · <a href="../../ru/how-to/mcp/">Русский</a></p>
-<p>These workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
+<p>Unless marked otherwise, these workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
 server and enable only tools required for your task. For local preservation
 approval use <a href="../transformation/">Transform Local Data</a>; MCP cannot issue it.</p>
 <p>The project exposes two MCP servers with separate trust boundaries:</p>
@@ -494,7 +498,7 @@ access or external APIs.</p>
 <li>Call <code>approve_dataset_plan</code> with that exact fingerprint only after review.</li>
 <li>Report summaries and artifact paths, not generated rows.</li>
 </ol>
-<p>Use <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
+<p>Use <code>profile_csv</code>, <code>profile_parquet</code> (unreleased), <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
 <code>validate_dataset</code> separately when an advanced client needs control over each
 pipeline stage. Direct <code>generate_dataset</code> and <code>export_dataset</code> do not require a
 planning approval argument; configure the client's confirmation policy before
@@ -504,6 +508,17 @@ not evidence that the human reviewed the displayed specification.</p>
 DatasetSpec. Direct <code>generate_dataset</code> and <code>export_dataset</code> calls can instead
 provide <code>business_rules_path</code> or a bounded structured <code>business_rules_payload</code>.
 Use one rule source: external rules cannot be combined with embedded rules.</p>
+<h3 id="local-parquet-profiles">Local Parquet profiles (unreleased)<a class="headerlink" href="#local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p>When the installed development build lists <code>profile_parquet</code>, enable
+<code>agent-paranoid-android[mcp,parquet]</code> in the server's Python environment. Put
+one regular Parquet file in the workspace and call the tool with
+<code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
+The optional <code>table_name</code> defaults to the file stem.</p>
+<p>The server applies the local profiling budgets and writes a new metadata-only
+JSON profile. The reply contains a relative path and counts. Pass that path as
+<code>source_path</code> with <code>source_type: "profile"</code> to <code>plan_dataset</code> and review the
+resulting spec before approval. Unavailable null ratios stay unknown; if those
+or other missing statistics prevent inference, supply a reviewed spec.</p>
 <p>Generator MCP reads newline-framed requests through the same bounded transport
 used by Trino MCP. Each request receives a fresh non-resettable budget. The
 default boundary rejects raw frames above 1 MiB, JSON deeper than 100 levels,

@@ -208,7 +208,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -218,8 +218,8 @@
 <p>Use this reference to decide which MCP tools a client may call and which local
 resources each server process needs. Start with the
 <a href="../../how-to/mcp/#generator-only-quickstart">generator-only quickstart</a>.
-The tables describe stable <code>1.6.0</code>; installed versions can
-expose fewer tools. Check the installed version and its <code>tools/list</code> response.
+The tables include unreleased tools where marked. Check the installed version
+and its <code>tools/list</code> response.
 Discovery is an inventory, not authorization to use a dataset or activate a
 gated transformation extension.</p>
 <h2 id="who-grants-access">Who Grants Access<a class="headerlink" href="#who-grants-access" title="Permanent link">&para;</a></h2>
@@ -363,6 +363,12 @@ including otherwise read-only tools.</p>
 <td>No generation approval; authorize profiling of the selected input.</td>
 </tr>
 <tr>
+<td><code>profile_parquet</code></td>
+<td>One selected regular Parquet file; requires the <code>parquet</code> extra (unreleased tool)</td>
+<td>New safe aggregate profile JSON, no overwrite</td>
+<td>Same local profiling authority as CSV. Returns a relative path and counts; no generation or database access.</td>
+</tr>
+<tr>
 <td><code>infer_dataset_spec</code></td>
 <td>Safe profile file or bounded inline profile</td>
 <td>New specification</td>
@@ -443,7 +449,7 @@ including otherwise read-only tools.</p>
 </tbody>
 </table>
 <p>The generator <strong>console entrypoint</strong> injects a workspace and session owner and
-registers all 15 tools above. The module-level SDK object has only the 13 base
+registers all 16 tools above. The module-level SDK object has only the 14 base
 tools; <code>common_transformation</code> and <code>configured_query_session</code> need explicit
 runtime ownership when embedded. Do not use a shorter SDK inventory as the
 console server's permission list. The two extensions retain their separate
@@ -596,7 +602,7 @@ does not grant access to more data.</p>
 <code>plan_trino_dataset</code>) and <code>inspect_dataset_plan</code>; require explicit human review
 before <code>approve_dataset_plan</code>. Allow <code>recover_dataset_plan</code> only with that same
 reviewed fingerprint and the recovery state reported by inspection. Add
-<code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>validate_dataset</code> and direct generation
+<code>profile_csv</code>, <code>profile_parquet</code>, <code>infer_dataset_spec</code>, <code>validate_dataset</code> and direct generation
 only as the workflow needs them. Keep transformation and optional row tools
 outside a synthetic-only client's callable set. Apply these choices using the
 client's supported settings; the table is not a server configuration format.</p>

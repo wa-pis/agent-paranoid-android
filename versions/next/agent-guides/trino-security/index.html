@@ -208,7 +208,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Historical / maintainer material</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 7ca678a866b56fa17eff9bab531961f734b1fd60
+  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -339,10 +339,10 @@ SQL-dependency inference and must not be advertised as preserving query formulas
 <li>Do not log SQL parameters, source values, credentials, prompts, or secrets.</li>
 <li>Replace FastMCP/Pydantic argument-validation failures with a fixed detached
   error before returning a tool result; never reflect rejected values.</li>
-<li>MCP 2 unexpected errors remain generic and detached. Only exact typed
-  transformation-limit and query-work-budget failures retain reconstructed,
-  value-free dimensions, counters and supported recovery settings; never forward
-  arbitrary exception messages or backend causes.</li>
+<li>MCP 2 unexpected errors remain generic and detached. Reconstruct only
+  recognized diagnostics: value-free transformation and request budget failures,
+  and the fixed missing-Parquet-extra hint. Never forward arbitrary exception
+  messages or backend causes.</li>
 <li>Reject malformed typed MCP requests and notifications before SDK dispatch;
   never pass their caller-controlled values into SDK logs or exceptions.</li>
 <li>Audit-log capacity must reject a new invocation before its <code>started</code> record
