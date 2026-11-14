@@ -459,6 +459,42 @@
       "title": "EntitySpec",
       "type": "object"
     },
+    "FieldInferenceEffect": {
+      "properties": {
+        "action": {
+          "enum": [
+            "synthetic_identifier",
+            "keep_builtin"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "entity_index": {
+          "minimum": 0,
+          "title": "Entity Index",
+          "type": "integer"
+        },
+        "field_index": {
+          "minimum": 0,
+          "title": "Field Index",
+          "type": "integer"
+        },
+        "rule_index": {
+          "exclusiveMaximum": 128,
+          "minimum": 0,
+          "title": "Rule Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "entity_index",
+        "field_index",
+        "rule_index",
+        "action"
+      ],
+      "title": "FieldInferenceEffect",
+      "type": "object"
+    },
     "FieldRule": {
       "additionalProperties": false,
       "properties": {
@@ -853,6 +889,55 @@
         }
       },
       "title": "GenerationSettings",
+      "type": "object"
+    },
+    "InferenceEvidence": {
+      "properties": {
+        "constraints_filtered": {
+          "minimum": 0,
+          "title": "Constraints Filtered",
+          "type": "integer"
+        },
+        "field_effects": {
+          "items": {
+            "$ref": "#/$defs/FieldInferenceEffect"
+          },
+          "maxItems": 100000,
+          "title": "Field Effects",
+          "type": "array"
+        },
+        "min_constraint_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Min Constraint Confidence",
+          "type": "number"
+        },
+        "min_relationship_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Min Relationship Confidence",
+          "type": "number"
+        },
+        "options_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Options Sha256",
+          "type": "string"
+        },
+        "relationships_filtered": {
+          "minimum": 0,
+          "title": "Relationships Filtered",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "options_sha256",
+        "field_effects",
+        "min_relationship_confidence",
+        "min_constraint_confidence",
+        "relationships_filtered",
+        "constraints_filtered"
+      ],
+      "title": "InferenceEvidence",
       "type": "object"
     },
     "LocalCategoryField": {
@@ -1255,6 +1340,17 @@
     },
     "generation_settings": {
       "$ref": "#/$defs/GenerationSettings"
+    },
+    "inference_evidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InferenceEvidence"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "local_category_fields": {
       "items": {
