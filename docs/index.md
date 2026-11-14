@@ -12,13 +12,13 @@ Stable `1.6.0` is the recommended release.
 Use the CLI below or the runnable
 [Python API example](https://github.com/wa-pis/agent-paranoid-android/tree/v1.6.0/examples/python_api).
 
-This source guide targets candidate `1.7.0rc3`; the commands below select it explicitly.
-See [candidate status](1.7.0rc3-release-status.md) for publication and acceptance.
+This source guide targets candidate `1.7.0rc4`; the commands below select it explicitly.
+See [candidate status](1.7.0rc4-release-status.md) for publication and acceptance.
 
 ## Five-Minute Check
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.7.0rc3"
+python3 -m pip install "agent-paranoid-android==1.7.0rc4"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```

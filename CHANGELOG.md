@@ -4,7 +4,16 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.0rc4]
+
+Configurable inference, local Parquet profiling and safer recovery. Stable
+1.6.0 remains the recommended default.
+
 ### Added
+
+- Allow scoped inference rules and confidence floors in Python, CLI and MCP.
+  The resulting specification records the options digest, winning rules and
+  threshold effects for review.
 
 - Add generator MCP `profile_parquet` for local workspace files. It writes a
   safe JSON profile for review-first planning and returns counts and a relative
@@ -26,6 +35,8 @@ All notable changes to this project are documented here.
 
 - Bump locked `opentelemetry-api` to 1.45.2 for
   [CVE-2026-126360](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg).
+
+- Refresh pinned CI, release, signing and container login actions.
 
 ## [1.7.0rc3] - 2026-11-08
 

@@ -11,6 +11,12 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.7.0rc4 Candidate
+
+See [candidate status](1.7.0rc4-release-status.md) for scope and gates.
+Publish candidate documentation at `versions/1.7.0rc4/` after verification.
+The manual client exception for rc3 does not carry over.
+
 ## 1.7.0rc3 Python 3.15 And Relational Candidate
 
 The owner authorized the next RC on 2026-11-08 after Python 3.15 support
