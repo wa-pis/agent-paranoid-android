@@ -78,7 +78,7 @@ including otherwise read-only tools.
 | `estimate_dataset_capacity` | Workspace DatasetSpec and optional aggregate calibration cache | Metadata-only by default; explicit calibration uses bounded temporary synthetic output and a value-free one-hour cache | Does not approve generation; calibration requires the explicit argument. |
 | `profile_csv` | Selected CSV | New safe aggregate profile JSON | No generation approval; authorize profiling of the selected input. |
 | `profile_parquet` | One selected regular Parquet file; requires the `parquet` extra (unreleased tool) | New safe aggregate profile JSON, no overwrite | Same local profiling authority as CSV. Returns a relative path and counts; no generation or database access. |
-| `infer_dataset_spec` | Safe profile file or bounded inline profile | New specification | Proposal only; no generation. |
+| `infer_dataset_spec` | Safe profile file or bounded inline profile; optional inline `inference_options` | New specification | Proposal only; no generation or additional access. |
 | `plan_dataset` | CSV, CSV folder, or safe profile | New planning directory, profile, spec and plan artifacts | Stops before generation for human review. |
 | `plan_trino_dataset` | Bounded safe Trino profile payload | New planning directory and spec/plan artifacts | Stops for review; this tool makes no database connection. |
 | `inspect_dataset_plan` | Existing plan, spec and completion artifacts | None, apart from optional audit | Read-only inspection; returns the current spec fingerprint. |

@@ -8,6 +8,7 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldProfile, FieldType
+from test_data_agent.core.inference import InferenceOptions
 from test_data_agent.core.privacy import is_sensitive_field, validate_local_category_field
 from test_data_agent.safety import assert_profile_safe, assert_spec_safe
 
@@ -17,6 +18,7 @@ def infer_dataset_spec(
     decimal_fields: Mapping[str, FieldSpec] | None = None,
     entity_counts: Mapping[str, int] | None = None,
     max_total_rows: int | None = None,
+    inference_options: InferenceOptions | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
     if profile.source_type in {"postgres_query", "trino_query"} and profile.has_unmodeled_expressions is None:
@@ -51,6 +53,11 @@ def infer_dataset_spec(
         }
     if set(overrides) - (decimal_names | csv_replacement_names):
         raise ValueError("reviewed decimal fields must match decimal profile fields or eligible CSV numeric fields")
+    preserved_categories = {(item.entity, item.field) for item in profile.local_category_fields}
+    rules = inference_options.identifier_rules if inference_options is not None else ()
+    if rules and sum(len(entity.fields) for entity in profile.entities) * len(rules) > 100_000:
+        raise ValueError("inference rule evaluation limit exceeded")
+    threshold = inference_options.min_relationship_confidence if inference_options is not None else 0.0
     entities: list[EntitySpec] = []
     for entity in profile.entities:
         if any(field.null_ratio is None for field in entity.fields):
@@ -65,6 +72,15 @@ def infer_dataset_spec(
                     _infer_field(
                         field, overrides.get(f"{entity.name}.{field.name}"),
                         csv_numeric_replacement=f"{entity.name}.{field.name}" in csv_replacement_names,
+                        custom_identifier=bool(rules) and field.data_type == FieldType.STRING
+                        and not field.is_identifier
+                        and (entity.name, field.name) not in preserved_categories
+                        and not (field.sensitive or is_sensitive_field(field.name, field.semantic_type))
+                        and any(
+                            (rule.entity is None or rule.entity == entity.name)
+                            and field.name.endswith(rule.field_suffix)
+                            for rule in rules
+                        ),
                     )
                     for field in entity.fields
                 ],
@@ -72,17 +88,21 @@ def infer_dataset_spec(
         )
     spec = DatasetSpec(
         entities=entities,
-        relationships=profile.relationships,
+        relationships=[
+            edge for edge in profile.relationships
+            if edge.status != "inferred" or edge.confidence >= threshold
+        ],
         constraints=profile.constraints,
         local_category_fields=profile.local_category_fields,
     )
-    if overrides:
+    if overrides or inference_options is not None:
         assert_spec_safe(spec)
     return spec
 
 
 def _infer_field(
     field: FieldProfile, reviewed: FieldSpec | None, *, csv_numeric_replacement: bool = False,
+    custom_identifier: bool = False,
 ) -> FieldSpec:
     if reviewed is not None and csv_numeric_replacement and field.data_type != FieldType.DECIMAL:
         return _reviewed_csv_numeric_field(field, reviewed)
@@ -106,8 +126,8 @@ def _infer_field(
         name=field.name, data_type=field.data_type, nullable=field.nullable,
         null_ratio=field.null_ratio if field.null_ratio is not None else 0.0,
         sensitive=field.sensitive or is_sensitive_field(field.name, field.semantic_type),
-        semantic_type=field.semantic_type, is_identifier=field.is_identifier,
-        distribution=field.distribution,
+        semantic_type=field.semantic_type, is_identifier=field.is_identifier or custom_identifier,
+        distribution={} if custom_identifier else field.distribution,
     )
 
 

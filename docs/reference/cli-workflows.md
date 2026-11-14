@@ -62,6 +62,29 @@ changes the requested volume and requires a new size review. Existing generation
 row, byte and work limits still apply. Neither option changes DatasetSpec schema
 1.1 or source access.
 
+To adjust inference, pass `--inference-options options.yaml`:
+
+```yaml
+version: "1"
+identifier_rules:
+  - entity: widgets
+    field_suffix: "_code"
+min_relationship_confidence: 0.8
+```
+
+Suffixes and optional entity names match case-sensitively. Matches mark eligible
+string fields as synthetic identifiers and drop their inferred distributions.
+Sensitive fields, existing identifiers and explicitly preserved categories are
+untouched. The threshold filters only relationships marked `inferred`; it
+keeps declared relationships. Omit the options to retain baseline inference.
+Review the resulting spec before generating. Generation business rules remain
+separate and still apply to the reviewed spec.
+
+Python callers can pass `inference_options=parse_inference_options(payload)` to
+`infer_dataset_spec` using the parser in `test_data_agent.core.inference`. For
+the MCP `infer_dataset_spec` tool, pass the same configuration as an inline
+`inference_options` object.
+
 `infer-spec` expects a profiling-command artifact, not an existing DatasetSpec.
 JSON keys `schema_version`, `privacy_rules`, `privacy_settings`,
 `generation_settings` and `validation_settings` select spec parsing even if

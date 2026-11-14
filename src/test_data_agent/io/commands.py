@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import urlsplit
 
+from yaml import YAMLError
+
 from pydantic import TypeAdapter, ValidationError
 
 from test_data_agent.adapters import load_profile_or_spec
@@ -48,6 +50,7 @@ from test_data_agent.postgres_config import PostgresConfig
 from test_data_agent.postgres_profiler import PostgresProfileError, dataset_profile_from_postgres
 from test_data_agent.postgres_sql_export import write_postgres_sql
 from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.inference import parse_inference_options
 from test_data_agent.core.serialization import load_limited_yaml
 from test_data_agent.rules.business_config import load_business_rules
 from test_data_agent.safety import assert_profile_safe
@@ -324,10 +327,21 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
     entity_counts = dict(count_pairs)
     if len(entity_counts) != len(count_pairs):
         raise ValueError("entity count overrides must not repeat an entity")
+    options_path = getattr(args, "inference_options", None)
+    inference_options = None
+    if options_path is not None:
+        ensure_paths_distinct(options_path, args.output)
+        try:
+            inference_options = parse_inference_options(
+                load_limited_yaml(read_limited_text(options_path, max_bytes=65_536))
+            )
+        except (ValueError, YAMLError):
+            raise ValueError("invalid inference options file") from None
     spec = infer_dataset_spec_artifact(
         loaded, output_path=args.output, count=args.count, decimal_fields=decimal_fields,
         entity_counts=entity_counts, max_total_rows=getattr(args, "max_total_rows", None),
         business_rules=load_business_rules(rules_path) if rules_path is not None else None,
+        inference_options=inference_options,
     )
     print(
         "Wrote dataset spec: "

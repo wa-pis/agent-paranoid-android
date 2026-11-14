@@ -1,10 +1,14 @@
 # Tasks: configurable-inference-heuristics
 
 - [x] Record future scope and proposed capability requirements.
-- [ ] Inventory current inference entry points and supported metadata by source.
-- [ ] Specify the versioned schema, matching semantics, precedence, conflict
-      handling, limits and explicit Python/CLI/MCP configuration contract.
-- [ ] Implement shared deterministic evaluation and effective-config fingerprints.
+- [x] Inventory current inference entry points and supported metadata by source.
+- [x] Implement version 1 for explicit profile-to-spec inference via Python,
+      CLI and MCP: scoped literal suffix rules for synthetic string identifiers,
+      and a confidence floor for inferred relationships. Rules are additive and
+      cannot conflict in this first version. Bound rule count, selector length
+      and field/rule evaluations; preserve reviewed inputs and protected fields.
+- [ ] Design broader rule actions and incompatible-proposal diagnostics.
+- [ ] Add effective-config fingerprints.
 - [ ] Integrate provenance, cache invalidation and existing review bindings.
 - [ ] Test default compatibility, custom overrides, conflicts, invalid settings,
       bounded execution and privacy/approval rejection using fictional fixtures.
