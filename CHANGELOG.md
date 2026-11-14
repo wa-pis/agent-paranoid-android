@@ -10,6 +10,11 @@ All notable changes to this project are documented here.
   safe JSON profile for review-first planning and returns counts and a relative
   path. Parquet support uses the existing optional extra.
 
+### Security
+
+- Bump locked `opentelemetry-api` to 1.45.2 for
+  [CVE-2026-126360](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg).
+
 ## [1.7.0rc3] - 2026-11-08
 
 Python 3.15 compatibility and bounded parallel generation of related tables.
