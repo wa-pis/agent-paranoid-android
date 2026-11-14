@@ -32,6 +32,7 @@ from test_data_agent.agent import (
 )
 from test_data_agent.audit import audit_logger_from_env
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.inference import parse_inference_options
 from test_data_agent.core.execution_policy import GenerationExecutionPolicy
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
@@ -188,6 +189,7 @@ def infer_dataset_spec(
     profile_path: str | None = None,
     profile_payload: dict[str, Any] | None = None,
     count: int | None = None,
+    inference_options: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Infer and persist a versioned DatasetSpec from safe profile metadata."""
 
@@ -206,7 +208,10 @@ def infer_dataset_spec(
     else:
         loaded = load_inline_profile_payload(profile_payload or {})
     assert_profile_safe(loaded)
-    spec = infer_dataset_spec_artifact(loaded, output_path=output, count=count)
+    spec = infer_dataset_spec_artifact(
+        loaded, output_path=output, count=count,
+        inference_options=parse_inference_options(inference_options) if inference_options is not None else None,
+    )
     return {
         "operation": "infer_dataset_spec",
         "spec_path": workspace_path_label(output),

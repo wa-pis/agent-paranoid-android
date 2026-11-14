@@ -15,6 +15,7 @@ from test_data_agent.adapters import (
 from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.inference import InferenceOptions
 from test_data_agent.core.generation_progress import GenerationProgress
 from test_data_agent.rules.validation import BusinessValidationReport
 from test_data_agent.rules.models import BusinessRules
@@ -268,11 +269,12 @@ def infer_dataset_spec_artifact(
     max_total_rows: int | None = None,
     decimal_fields: dict[str, FieldSpec] | None = None,
     business_rules: BusinessRules | None = None,
+    inference_options: InferenceOptions | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
     spec = infer_dataset_spec(
         profile, count=count, decimal_fields=decimal_fields,
-        entity_counts=entity_counts, max_total_rows=max_total_rows,
+        entity_counts=entity_counts, max_total_rows=max_total_rows, inference_options=inference_options,
     )
     if business_rules is not None:
         from test_data_agent.rules.contract import validate_business_rules_for_spec

@@ -550,6 +550,19 @@
           "default": null,
           "title": "Count"
         },
+        "inference_options": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inference Options"
+        },
         "output_path": {
           "title": "Output Path",
           "type": "string"

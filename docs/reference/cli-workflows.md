@@ -62,6 +62,46 @@ changes the requested volume and requires a new size review. Existing generation
 row, byte and work limits still apply. Neither option changes DatasetSpec schema
 1.1 or source access.
 
+To adjust inference, pass `--inference-options options.yaml`:
+
+```yaml
+version: "1"
+identifier_rules:
+  - entity: widgets
+    field_suffix: "_code"
+field_rules:
+  - entity: parts
+    field_suffix: "_code"
+    action: keep_builtin
+    priority: 10
+min_relationship_confidence: 0.8
+min_constraint_confidence: 0.7
+```
+
+Suffixes and optional entity names match case-sensitively. Matches mark eligible
+string fields as synthetic identifiers and drop their inferred distributions.
+Sensitive fields, existing identifiers and explicitly preserved categories are
+untouched. The two thresholds filter only
+relationships or constraints marked `inferred`; they keep declared or reviewed
+items. The highest matching priority wins. Opposing actions at the same highest
+priority stop inference; `identifier_rules` entries have priority zero.
+Supported field actions are `synthetic_identifier` and `keep_builtin`. Omit the options to retain baseline inference.
+Review the resulting spec before generating. Generation business rules remain
+separate and still apply to the reviewed spec.
+
+Python callers can pass `inference_options=parse_inference_options(payload)` to
+`infer_dataset_spec` using the parser in `test_data_agent.core.inference`. For
+the MCP `infer_dataset_spec` tool, pass the same configuration as an inline
+`inference_options` object.
+
+When options are provided, the specification includes `inference_evidence`:
+a configuration digest, winning field rules and counts filtered at each
+confidence threshold. Indices are zero-based: field and entity positions refer
+to the emitted spec, and rule positions refer to `identifier_rules` followed
+by `field_rules`. Evidence includes neither selector text nor source values.
+It is advisory metadata and participates in the exact spec fingerprint; it
+does not confer approval or change generation behavior.
+
 `infer-spec` expects a profiling-command artifact, not an existing DatasetSpec.
 JSON keys `schema_version`, `privacy_rules`, `privacy_settings`,
 `generation_settings` and `validation_settings` select spec parsing even if

@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from test_data_agent.core.constraint import Constraint
 from test_data_agent.core.entity import EntityProfile, EntitySpec
+from test_data_agent.core.inference import InferenceEvidence
 from test_data_agent.core.privacy import LocalCategoryField, PrivacyRule, PrivacySettings
 from test_data_agent.core.relational_scenario import RelationalScenario
 from test_data_agent.core.relationship import Relationship
@@ -81,6 +82,7 @@ class DatasetSpec(BaseModel):
     constraints: list[Constraint] = Field(default_factory=list)
     relational_scenarios: list[RelationalScenario] = Field(default_factory=list, max_length=1000)
     business_rules: BusinessRules | None = Field(default=None)
+    inference_evidence: InferenceEvidence | None = None
     privacy_rules: list[PrivacyRule] = Field(default_factory=list)
     privacy_settings: PrivacySettings = Field(default_factory=PrivacySettings)
     local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
@@ -97,7 +99,7 @@ class DatasetSpec(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
-        for name in ("business_rules",):
+        for name in ("business_rules", "inference_evidence"):
             if getattr(self, name) is None:
                 payload.pop(name, None)
         if not self.relational_scenarios:

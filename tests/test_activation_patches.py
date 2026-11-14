@@ -19,6 +19,7 @@ def _compose_activation_patches(root: Path, destination: Path) -> None:
     patches.extend([
         archive / "2026-11-09-dataset-scale-estimation-performance/public-contract-overlay.patch",
         archive / "2026-11-09-scalable-relational-generation/public-contract-overlay.patch",
+        archive.parent / "configurable-inference-heuristics/public-contract-overlay.patch",
     ])
     # Handle both Git-style and unified patches, including newly created files.
     targets = {line[6:] for patch in patches for line in patch.read_text().splitlines()
