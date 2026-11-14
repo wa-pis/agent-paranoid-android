@@ -45,8 +45,8 @@
 <div lang="en">
 <aside aria-label="Documentation version" class="documentation-identity">
 <strong>Development / not stable</strong> · Package 1.7.0
-  <br/>Package source 51f67b02f3fdd6527c50931bc917d3cac704183d
-  <br/>Documentation 51f67b02f3fdd6527c50931bc917d3cac704183d
+  <br/>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br/>Documentation daf3ec87c404ca76b81ca81b3aba635125060240
   <br/><a href="https://wa-pis.github.io/agent-paranoid-android/versions/stable/">Stable version selector</a> · <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/downloads/">Downloads</a>
 </aside>
 <section class="handbook-cover"><h1>Agent Paranoid Android</h1><p>User Handbook / Руководство пользователя</p><p>Reproducible synthetic test data for CSV and database workflows</p></section>
@@ -1954,13 +1954,13 @@ deterministic generation, validates the output, and reports the result.</p>
 <pre><code class="language-bash">python3 -m pip install agent-paranoid-android
 </code></pre>
 <p>Add only the integrations the AI client needs. The exact pin below selects
-verified stable 1.6.0; see <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/1.6.0-release-status/">release status</a>.</p>
+stable 1.7.0; see <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/1.7.0-release-status/">publication status</a>.</p>
 <pre><code class="language-bash">python3 -m pip install "agent-paranoid-android[mcp,trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.6.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.7.0"
 </code></pre>
 <p>The experimental GigaChat adapter is included in stable <code>1.5.0</code> as an explicit
-opt-in and retained in stable <code>1.6.0</code>. OpenAI remains the default
+opt-in and retained in stable <code>1.7.0</code>. OpenAI remains the default
 provider. Follow
 <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/how-to/gigachat/">Use The GigaChat Advisor</a> before configuring credentials.</p>
 <h2 id="ai_integration-agent-mode">Agent Mode<a class="headerlink" href="#ai_integration-agent-mode" title="Permanent link">¶</a></h2>
@@ -2760,7 +2760,7 @@ package or a problem with deployment credentials.</p>
 structured-response mapping and cleanup. It does not read
 <code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>, obtain a token, or contact
 GigaChat. Install stable <code>1.7.0</code> with the <code>gigachat</code> extra.
-See <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/1.6.0-release-status/">release status</a>.</p>
+See <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/1.7.0-release-status/">release status</a>.</p>
 <h2 id="operations-troubleshooting-jdbc-style-url-rejected">JDBC-Style URL Rejected<a class="headerlink" href="#operations-troubleshooting-jdbc-style-url-rejected" title="Permanent link">¶</a></h2>
 <p>JDBC-style endpoint input, qualified column wildcards, and <code>profile-query</code> are
 available in stable <code>1.5.0</code> and retained in stable <code>1.7.0</code>.</p>
@@ -3036,7 +3036,7 @@ resource and artifact durability limits remain in their respective guides.</p>
 </tr>
 </tbody>
 </table>
-<p>Для первого знакомства: <a href="#ru-getting-started-installation">установка и встроенное демо</a>. Демо не требует базы, AI или копии репозитория. Примерам с <code>examples/</code> нужен checkout версии 1.6.0.</p>
+<p>Для первого знакомства: <a href="#ru-getting-started-installation">установка и встроенное демо</a>. Демо не требует базы, AI или копии репозитория. Примерам с <code>examples/</code> нужен checkout версии 1.7.0.</p>
 <h2 id="ru-_2">Основной процесс<a class="headerlink" href="#ru-_2" title="Permanent link">¶</a></h2>
 <ol>
 <li>Получите структуру и ограниченные агрегаты.</li>
@@ -3055,7 +3055,7 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p>Это русская редакция существующих пользовательских разделов: пути после <code>ru/</code> соответствуют английским страницам. Переключатель <strong>English / Русский</strong> открывает соответствующую страницу; ссылки доступны и при чтении Markdown в репозитории. Техническая справка <code>--help</code>, имена API и ключи остаются в оригинале.</p>
 <p>Исторические release evidence, ADR и служебные записи сопровождающих доступны в оригинале и помечены <strong>English</strong>. Они не представлены как переведённые страницы. Проверенные локальные примеры перенесены из прежнего русского руководства без изменения команд; условия и ограничения приведены в <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/ru/quality-report/">отчёте</a>.</p></section><section class="print-page" heading-number="8.1.2" id="ru-getting-started-installation"><h1 id="ru-getting-started-installation-_1">Установка<a class="headerlink" href="#ru-getting-started-installation-_1" title="Permanent link">¶</a></h1>
 <p><a href="#getting-started-installation">English</a> · Русский</p>
-<p>Рекомендуемая стабильная версия — <strong>1.6.0</strong>; см. <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/release-evidence-1.6.0/">публичную проверку</a>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15; этот локальный аудит выполнен на macOS с Python 3.11.2.</p>
+<p>После публикации рекомендуемая стабильная версия — <strong>1.7.0</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
 <p>Перед установкой проверьте <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/1.7.0-release-status/">статус выпуска</a>.</p>
 <h2 id="ru-getting-started-installation-pypi">Установка из PyPI<a class="headerlink" href="#ru-getting-started-installation-pypi" title="Permanent link">¶</a></h2>
 <p>На macOS/Linux откройте терминал в выбранной рабочей папке и выполните по очереди:</p>
@@ -3079,7 +3079,7 @@ test-data-agent doctor
 <p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
 <p>Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/ru/reference/support-policy/">поддержку</a> и <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/reference/dependency-compatibility/#installation-footprint">footprint — English</a>.</p>
 <h2 id="ru-getting-started-installation-_2">Когда нужна копия репозитория<a class="headerlink" href="#ru-getting-started-installation-_2" title="Permanent link">¶</a></h2>
-<p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.6.0, например отдельный clone тега v1.6.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/development/documentation/">Publishing Documentation — English</a>.</p>
+<p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.7.0, например отдельный clone тега v1.7.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/development/documentation/">Publishing Documentation — English</a>.</p>
 <p>Перед обновлением существующих фикстур прочитайте <a href="https://wa-pis.github.io/agent-paranoid-android/versions/next/ru/reference/generation-contract-migration/">миграцию</a>. Package version и DatasetSpec schema_version различаются.</p>
 <h2 id="ru-getting-started-installation-_3">Первый запуск без собственных данных<a class="headerlink" href="#ru-getting-started-installation-_3" title="Permanent link">¶</a></h2>
 <h3 id="ru-getting-started-installation-_4">Для чего это нужно<a class="headerlink" href="#ru-getting-started-installation-_4" title="Permanent link">¶</a></h3>
@@ -4863,4 +4863,4 @@ test-data-agent doctor --json
         });
     </script>
 </body>
-</html><!--Generated by HTMLArk 2026-11-14 21:04:46.777206. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-5y_m2uxa/source/site/handbook/attachment.html-->
+</html><!--Generated by HTMLArk 2026-11-14 21:20:03.426503. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-yxjcr7lr/source/site/handbook/attachment.html-->

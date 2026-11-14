@@ -229,8 +229,8 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Development / not stable</strong> · Package 1.7.0
-  <br>Package source 51f67b02f3fdd6527c50931bc917d3cac704183d
-  <br>Documentation 51f67b02f3fdd6527c50931bc917d3cac704183d
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation daf3ec87c404ca76b81ca81b3aba635125060240
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -238,7 +238,7 @@
 
                 <h1 id="_1">Установка<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p><a href="../../../getting-started/installation/">English</a> · Русский</p>
-<p>Рекомендуемая стабильная версия — <strong>1.6.0</strong>; см. <a href="../../../release-evidence-1.6.0/">публичную проверку</a>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15; этот локальный аудит выполнен на macOS с Python 3.11.2.</p>
+<p>После публикации рекомендуемая стабильная версия — <strong>1.7.0</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
 <p>Перед установкой проверьте <a href="../../../1.7.0-release-status/">статус выпуска</a>.</p>
 <h2 id="pypi">Установка из PyPI<a class="headerlink" href="#pypi" title="Permanent link">&para;</a></h2>
 <p>На macOS/Linux откройте терминал в выбранной рабочей папке и выполните по очереди:</p>
@@ -262,7 +262,7 @@ test-data-agent doctor
 <p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
 <p>Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. <a href="../../reference/support-policy/">поддержку</a> и <a href="../../../reference/dependency-compatibility/#installation-footprint">footprint — English</a>.</p>
 <h2 id="_2">Когда нужна копия репозитория<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.6.0, например отдельный clone тега v1.6.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="../../../development/documentation/">Publishing Documentation — English</a>.</p>
+<p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.7.0, например отдельный clone тега v1.7.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="../../../development/documentation/">Publishing Documentation — English</a>.</p>
 <p>Перед обновлением существующих фикстур прочитайте <a href="../../reference/generation-contract-migration/">миграцию</a>. Package version и DatasetSpec schema_version различаются.</p>
 <h2 id="_3">Первый запуск без собственных данных<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="_4">Для чего это нужно<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
