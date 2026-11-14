@@ -2,7 +2,7 @@
 
 English · [Русский](../ru/how-to/trino.md)
 
-Database profiling is available in stable `1.6.0` and requires explicit
+Database profiling is available in stable `1.7.0` and requires explicit
 read-only configuration, allowlists and resource budgets.
 
 Install the optional Trino client and, when using MCP, the MCP SDK:
@@ -12,7 +12,7 @@ pip install "agent-paranoid-android[trino]"
 pip install "agent-paranoid-android[mcp,trino]"
 ```
 
-Stable `1.6.0` supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
+Stable `1.7.0` supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
 certificates are documented in the
 [configuration reference](../reference/configuration.md#trino-connection). Follow its
 runtime secret-indirection, HTTPS verification and local OAuth opt-in rules.

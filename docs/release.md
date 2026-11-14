@@ -11,6 +11,11 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.7.0 Stable Promotion
+
+Promote the [publicly verified 1.7.0rc4 candidate](release-evidence-1.7.0rc4.md).
+Compare every hunk with the signed candidate tag; see [status](1.7.0-release-status.md).
+
 ## 1.7.0rc4 Candidate
 
 See [candidate status](1.7.0rc4-release-status.md) for scope and gates.

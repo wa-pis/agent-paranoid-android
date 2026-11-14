@@ -6,8 +6,7 @@ Deterministic synthetic test data from CSV and database metadata, without
 copying source rows. Use the CLI or Python library to profile structure, review
 a `DatasetSpec`, generate reproducible datasets, and validate the result.
 
-Stable `1.6.0` is the recommended release. Its signed source, packages and
-containers passed [public verification](docs/release-evidence-1.6.0.md).
+Stable `1.7.0` is the recommended release. See [publication status](docs/1.7.0-release-status.md) before installing.
 
 Read the [documentation](https://wa-pis.github.io/agent-paranoid-android/)
 for task guides, [offline downloads](docs/downloads.md), and
@@ -19,10 +18,6 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
-Prospective candidate `1.7.0rc4` is not yet published; stable `1.6.0` remains recommended.
-See [candidate status](docs/1.7.0rc4-release-status.md) before installing.
-After publication: `python3 -m pip install "agent-paranoid-android==1.7.0rc4"`.
-
 ## Install And Try It
 
 Python 3.11 or newer is required.
@@ -30,7 +25,7 @@ Python 3.11 or newer is required.
 Install the exact stable release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.6.0"
+python3 -m pip install "agent-paranoid-android==1.7.0"
 test-data-agent demo --output out/demo
 ```
 
@@ -77,7 +72,7 @@ database, Parquet, MCP, or AI support only when you need it; see
 The project does not certify statistical anonymity, protection from every
 re-identification attack, or cross-environment byte identity.
 
-Stable `1.6.0` includes the accepted RC1–RC5 generation, validation and business-rule
+Stable `1.6.0` introduced the accepted RC1–RC5 generation, validation and business-rule
 changes. Read the [migration notes](docs/reference/generation-contract-migration.md)
 before regenerating existing fixtures.
 

@@ -2,7 +2,7 @@
 
 English · [Русский](../ru/how-to/postgresql.md)
 
-Database profiling is available in stable `1.6.0` and requires explicit
+Database profiling is available in stable `1.7.0` and requires explicit
 read-only configuration, allowlists and resource budgets.
 
 Install the optional driver:

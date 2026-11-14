@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.0]
+
+Promotes the verified 1.7.0rc4 runtime. Changes since 1.6.0 include bounded
+scalable generation and capacity forecasts, CPython 3.15 support, configurable
+inference, local Parquet profiling in generator MCP and safer CSV recovery.
+The source-free generation and local human approval boundaries remain in force.
+
 ## [1.7.0rc4]
 
 Configurable inference, local Parquet profiling and safer recovery. Stable
