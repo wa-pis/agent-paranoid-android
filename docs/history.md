@@ -13,6 +13,7 @@ activate extensions or authorize a dataset.
 - [1.7.0rc1 feedback candidate evidence](release-evidence-1.7.0rc1.md)
 - [Installed original-feedback replay and dispositions](feedback-acceptance-1.7.0rc1.md)
 - [Current stable release status](1.6.0-release-status.md)
+- [Stable 1.7.0 publication evidence](release-evidence-1.7.0.md)
 - [Stable 1.6.0 publication evidence](release-evidence-1.6.0.md)
 - [Release evidence index](release-evidence.md)
 - [Generation contract migration](reference/generation-contract-migration.md)
