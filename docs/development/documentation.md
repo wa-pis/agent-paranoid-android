@@ -74,7 +74,9 @@ does not claim successful package publication or public acceptance.
 
 ## Publication And Release Gates
 
-1. Finish the existing exact-source package release gates and public verification.
+1. Finish the exact-source package release gates. Run Verify Published Release
+   on main with the release tag, its exact commit and `scope=artifacts`.
+   This verifies the published packages and containers before the stable site moves.
 2. Add its stable version, exact release commit and successful public-verification
    run ID to `docs/releases.json`; retain prior catalog entries. Advance `stable`
    only for the publicly verified stable package. RCs stay out of this pointer.
@@ -85,6 +87,7 @@ does not claim successful package publication or public acceptance.
 5. Public verification compares exact metadata, the native stable alias/destination, entry-page hash and all four
    download hashes. **Only after that succeeds** does a separate write-scoped job
    retain the native mike Git bundle in `gh-pages`, without force-pushing.
+   Then run Verify Published Release with `scope=full` to include the live site.
 
 PR builds have read-only repository permissions and never push state. Complete
 main publications are serialized. Build/export failure leaves the deployed site

@@ -91,6 +91,34 @@ def test_public_gate_rejects_wrong_verification(tmp_path, monkeypatch, failure):
         docs.verify_release(RELEASE, tmp_path)
 
 
+@pytest.mark.parametrize("correct_commit", [True, False])
+def test_public_gate_accepts_only_matching_artifact_run(tmp_path, monkeypatch, correct_commit):
+    named_commit = RELEASE.commit if correct_commit else "c" * 40
+    run = {
+        "conclusion": "success",
+        "status": "completed",
+        "head_sha": "b" * 40,
+        "path": ".github/workflows/verify-published-release.yml",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "display_title": f"Verify v{RELEASE.version} {named_commit} (artifacts)",
+    }
+
+    def result(args, **kwargs):
+        if args[0] == "git":
+            return RELEASE.commit
+        return json.dumps(
+            run if "/actions/runs/" in args[-1] else {"draft": False, "prerelease": False}
+        )
+
+    monkeypatch.setattr(docs, "command", result)
+    if correct_commit:
+        docs.verify_release(RELEASE, tmp_path)
+    else:
+        with pytest.raises(ValueError, match="exact-source"):
+            docs.verify_release(RELEASE, tmp_path)
+
+
 def test_public_verification_compares_identity_and_each_artifact(monkeypatch):
     identity = {**asdict(IDENTITY), "documentation_revision": "b" * 40}
     files = {
