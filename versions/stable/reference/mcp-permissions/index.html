@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/reference/mcp-permissions/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0/reference/mcp-permissions/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>MCP Permissions - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "MCP Permissions";
         var mkdocs_page_input_path = "reference/mcp-permissions.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/reference/mcp-permissions/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0/reference/mcp-permissions/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -204,8 +206,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -215,8 +218,8 @@
 <p>Use this reference to decide which MCP tools a client may call and which local
 resources each server process needs. Start with the
 <a href="../../how-to/mcp/#generator-only-quickstart">generator-only quickstart</a>.
-The tables describe stable <code>1.6.0</code>; installed versions can
-expose fewer tools. Check the installed version and its <code>tools/list</code> response.
+The tables include unreleased tools where marked. Check the installed version
+and its <code>tools/list</code> response.
 Discovery is an inventory, not authorization to use a dataset or activate a
 gated transformation extension.</p>
 <h2 id="who-grants-access">Who Grants Access<a class="headerlink" href="#who-grants-access" title="Permanent link">&para;</a></h2>
@@ -348,16 +351,28 @@ including otherwise read-only tools.</p>
 </thead>
 <tbody>
 <tr>
+<td><code>estimate_dataset_capacity</code></td>
+<td>Workspace DatasetSpec and optional aggregate calibration cache</td>
+<td>Metadata-only by default; explicit calibration uses bounded temporary synthetic output and a value-free one-hour cache</td>
+<td>Does not approve generation; calibration requires the explicit argument.</td>
+</tr>
+<tr>
 <td><code>profile_csv</code></td>
 <td>Selected CSV</td>
 <td>New safe aggregate profile JSON</td>
 <td>No generation approval; authorize profiling of the selected input.</td>
 </tr>
 <tr>
+<td><code>profile_parquet</code></td>
+<td>One selected regular Parquet file; requires the <code>parquet</code> extra (unreleased tool)</td>
+<td>New safe aggregate profile JSON, no overwrite</td>
+<td>Same local profiling authority as CSV. Returns a relative path and counts; no generation or database access.</td>
+</tr>
+<tr>
 <td><code>infer_dataset_spec</code></td>
-<td>Safe profile file or bounded inline profile</td>
+<td>Safe profile file or bounded inline profile; optional inline <code>inference_options</code></td>
 <td>New specification</td>
-<td>Proposal only; no generation.</td>
+<td>Proposal only; no generation or additional access.</td>
 </tr>
 <tr>
 <td><code>plan_dataset</code></td>
@@ -434,7 +449,7 @@ including otherwise read-only tools.</p>
 </tbody>
 </table>
 <p>The generator <strong>console entrypoint</strong> injects a workspace and session owner and
-registers all 14 tools above. The module-level SDK object has only the 12 base
+registers all 16 tools above. The module-level SDK object has only the 14 base
 tools; <code>common_transformation</code> and <code>configured_query_session</code> need explicit
 runtime ownership when embedded. Do not use a shorter SDK inventory as the
 console server's permission list. The two extensions retain their separate
@@ -587,7 +602,7 @@ does not grant access to more data.</p>
 <code>plan_trino_dataset</code>) and <code>inspect_dataset_plan</code>; require explicit human review
 before <code>approve_dataset_plan</code>. Allow <code>recover_dataset_plan</code> only with that same
 reviewed fingerprint and the recovery state reported by inspection. Add
-<code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>validate_dataset</code> and direct generation
+<code>profile_csv</code>, <code>profile_parquet</code>, <code>infer_dataset_spec</code>, <code>validate_dataset</code> and direct generation
 only as the workflow needs them. Keep transformation and optional row tools
 outside a synthetic-only client's callable set. Apply these choices using the
 client's supported settings; the table is not a server configuration format.</p>
@@ -618,9 +633,12 @@ policy. These MCP servers do not need OpenAI/GigaChat API credentials for the
 workflows above and expose no advisor tool. Provider integration, shell/CLI
 access and arbitrary file-reading tools are separate capabilities with their
 own permissions; enabling MCP does not grant or constrain them.</p>
-<p>The planned <a href="../../acceptance-matrix/">final acceptance campaign</a> will exercise
-this inventory through installed stdio clients, permissions, failures and
-deployment workloads. The plan does not claim those runs have completed.</p>
+<p>The finite stable 1.6.0 campaign completed with
+<a href="../../release-evidence-1.6.0/">recorded coverage and limits</a>. Candidate 1.7.0rc1
+has separate <a href="../../release-evidence-1.7.0rc1/">installed-interface evidence</a>.
+The <a href="../../acceptance-matrix/">acceptance matrix</a> also contains historical and
+remaining targets; it does not establish new live database, client UI,
+preservation approval or all-route capacity acceptance.</p>
               
 </div>
 

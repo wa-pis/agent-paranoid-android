@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/reference/profiling/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0/reference/profiling/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>CSV Profiling Details - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "CSV Profiling Details";
         var mkdocs_page_input_path = "reference/profiling.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/reference/profiling/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0/reference/profiling/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -204,8 +206,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -268,7 +271,7 @@ sensitive profiles omit ranges as well as source categories. Ambiguous financial
 columns require review; local category permission is not declassification.</p>
 <p>NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-Folder cache format 8 recomputes older cached profiles. Reprofile saved standalone
+Folder cache format 9 recomputes older cached profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.</p>
 <p>Generated string identifiers use the <code>synthetic_</code> prefix. This changes exact
@@ -325,7 +328,7 @@ its classification. For an awaiting-approval agent workspace, infer to a separat
 the reviewed field into <code>dataset_spec.yaml</code>, preserve the planned generation
 settings, run <code>agent-review</code>, and approve the newly reported fingerprint.
 Do not overwrite the workspace spec with default inference settings.</p>
-<p>Folder cache format 8 recomputes older profiles. An old ambiguous profile without
+<p>Folder cache format 9 recomputes older profiles. An old ambiguous profile without
 storage evidence requires fresh profiling; saved profiles/plans are not silently
 upgraded. Evidence changes the profile fingerprint, and edited synthetic bounds
 change the spec fingerprint. Obtain new review/approval after either change.

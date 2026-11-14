@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/reference/dependency-compatibility/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0/reference/dependency-compatibility/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Dependency Compatibility - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Dependency Compatibility";
         var mkdocs_page_input_path = "reference/dependency-compatibility.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/reference/dependency-compatibility/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0/reference/dependency-compatibility/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -204,8 +206,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -284,8 +287,13 @@ not receive an independent support promise unless they affect one of these
 contract surfaces directly.</p>
 <h2 id="profiles">Profiles<a class="headerlink" href="#profiles" title="Permanent link">&para;</a></h2>
 <p>Minimum candidates match the lower bounds in <code>pyproject.toml</code>. Latest versions
-are the versions in the reviewed <code>uv.lock</code> used by the release gate on
-2026-08-12.</p>
+are the versions in the reviewed <code>uv.lock</code> and
+<code>.github/dependency-compatibility.toml</code>. The historical profile was exercised by
+the <a href="../../release-evidence-1.7.0rc1/">1.7.0rc1 exact-source gate</a>; the GigaChat
+0.2.4 update separately passes offline SDK transport and provider contract checks.
+“Latest tested” names that locked profile, not the newest packages on PyPI.
+The later installed feedback replay records its separately resolved environment;
+it does not replace the reviewed lock or minimum profiles.</p>
 <table>
 <thead>
 <tr>
@@ -332,8 +340,8 @@ are the versions in the reviewed <code>uv.lock</code> used by the release gate o
 </tr>
 <tr>
 <td><code>latest-all</code></td>
-<td>3.11–3.14</td>
-<td>Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.3; Psycopg 3.3.4</td>
+<td>3.11–3.15</td>
+<td>Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
 </tr>
 </tbody>
 </table>
@@ -441,8 +449,9 @@ lowercase distribution names and includes installed optional integrations;
   OpenAI accepts <code>&lt;4</code> with 2.46.0 minimum and 3.18.0 latest coverage.
   No new upper major bound is implied for Faker, Pydantic, PyYAML,
   PyArrow, sqlglot, or Trino until minimum/latest matrix evidence justifies it.</li>
-<li>GigaChat remains on <code>&gt;=0.2.3,&lt;0.2.4</code> because its SDK changed the chat API
-  between 0.2.1 and 0.2.3; each later release needs a compatibility review.</li>
+<li>GigaChat accepts <code>&gt;=0.2.3,&lt;0.2.5</code> after offline SDK contract checks for 0.2.4.
+  Its SDK changed the chat API between 0.2.1 and 0.2.3; the 0.2.3 minimum
+  remains, and each later release needs a compatibility review.</li>
 <li>A failing profile is unsupported until fixed or explicitly removed from the
   documented range with release notes.</li>
 </ul>
@@ -475,8 +484,8 @@ hashed dependency evidence in a generated manifest.</p>
 </tr>
 <tr>
 <td>GigaChat</td>
-<td>Retain <code>&lt;0.2.4</code></td>
-<td>The adapter is tested against the current 0.2.3 <code>chat.create</code> contract; earlier 0.2.x releases use an incompatible call shape.</td>
+<td>Accept <code>&lt;0.2.5</code></td>
+<td>The adapter retains the 0.2.3 minimum and checks the 0.2.4 <code>chat.create</code> contract with offline SDK transport; earlier 0.2.x releases use an incompatible call shape.</td>
 </tr>
 <tr>
 <td>Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg</td>
@@ -540,6 +549,12 @@ growth:</p>
 <p>These are regression budgets, not a guarantee that every platform installs the
 same count. <code>PyArrow</code> is the largest optional wheel, so keep <code>parquet</code> out of
 environments that do not produce Parquet files.</p>
+<p>Python 3.15 compatibility evidence is recorded in the <code>python-315-support</code>
+OpenSpec change. The locked
+profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing
+Python 3.11 minimum profiles and runtime dependency ranges.</p>
+<p>The locked development profile uses pip-api 0.0.35 so pip-audit can run on
+Python 3.15 without the removed <code>sre_constants</code> module.</p>
               
 </div>
 

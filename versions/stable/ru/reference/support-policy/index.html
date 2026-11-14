@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/ru/reference/support-policy/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0/ru/reference/support-policy/" />
       <link rel="shortcut icon" href="../../../img/favicon.ico" />
     <title>Поддержка runtime и интеграций - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "\u041f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0430 runtime \u0438 \u0438\u043d\u0442\u0435\u0433\u0440\u0430\u0446\u0438\u0439";
         var mkdocs_page_input_path = "ru/reference/support-policy.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/ru/reference/support-policy/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0/ru/reference/support-policy/";
       </script>
     
     <!--[if lt IE 9]>
@@ -192,8 +192,9 @@
 <div lang="ru">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -201,7 +202,7 @@
 
                 <h1 id="runtime">Поддержка runtime и интеграций<a class="headerlink" href="#runtime" title="Permanent link">&para;</a></h1>
 <p><a href="../../../reference/support-policy/">English</a> · Русский</p>
-<p>Поддерживаемая CI-матрица — CPython 3.11, 3.12, 3.13 и 3.14. Минимум — 3.11. Другие реализации Python могут работать, но не проходят release gate. Новая версия Python считается поддерживаемой после CI и installed-wheel smoke.</p>
+<p>Поддерживаемая CI-матрица — CPython 3.11, 3.12, 3.13, 3.14 и 3.15. Минимум — 3.11. Другие реализации Python могут работать, но не проходят release gate. Новая версия Python считается поддерживаемой после CI и installed-wheel smoke.</p>
 <p>Отказ от версии Python — breaking packaging change: нужны release notes, migration и предупреждение минимум за один feature release. Security constraint может сократить срок с явным объяснением. Python 3.11 сохраняется в 1.x, пока это допускают безопасность и зависимости.</p>
 <table>
 <thead>
@@ -248,6 +249,9 @@
 <p>Удаление extra, перенос base-функции в extra или новая неожиданная зависимость между extras — breaking packaging change. JDBC-style URL — только синтаксис endpoint, без JVM.</p>
 <p>Provider-neutral DatasetAdvisor/AdvisorExchange/AdvisorProposal — версионированные контракты. OpenAI и GigaChat adapters экспериментальны. Они получают безопасные metadata, а не source/generated rows или секреты; результат ограничен и проверяется по fingerprint. SDK не входит в base. Реальные provider services не используются в обычных тестах.</p>
 <p>При сообщении об ошибке укажите версии пакета/Python, extras, платформу и минимальную синтетическую репродукцию. Не прикладывайте production rows, credentials, provider payload или audit keys.</p>
+<p>На Python 3.15 PyYAML 6.0.3 на macOS arm64 пока собирается из исходников;
+может потребоваться компилятор. Проверяемый профиль использует PyArrow 26.0.1
+и Pydantic 2.14.3.</p>
               
 </div>
 

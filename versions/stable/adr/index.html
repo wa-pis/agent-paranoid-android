@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/adr/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0/adr/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
     <title>Architecture Decision Records - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Architecture Decision Records";
         var mkdocs_page_input_path = "adr/index.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/adr/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0/adr/";
       </script>
     
     <!--[if lt IE 9]>
@@ -80,6 +80,8 @@
   <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
 </ul>
 
@@ -204,17 +206,25 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Historical / maintainer material</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
 
 
                 <h1 id="architecture-decision-records">Architecture Decision Records<a class="headerlink" href="#architecture-decision-records" title="Permanent link">&para;</a></h1>
-<p>Recorded <strong>2026-09-29</strong>. This is a project-wide retrospective register, not a
-proposal to rewrite the product and not a claim that 1.6.0rc1 is ready.</p>
-<p>The inventory covers the current 16 baseline OpenSpec capabilities, the
+<p>Recorded <strong>2026-09-29</strong>; release-status reconciliation <strong>2026-10-29</strong>.
+The inventory and pinned links below describe that retrospective baseline,
+not the current number of specifications or current release readiness.
+Stable 1.6.0 and candidate 1.7.0rc1 are now published; see
+<a href="../release-evidence-1.6.0/">stable evidence</a>,
+<a href="../release-evidence-1.7.0rc1/">candidate evidence</a> and the
+<a href="../documentation-consistency-2026-10-29/">current documentary reconciliation</a>.
+No accepted architectural decision is changed by this status update.</p>
+<p>The original inventory covered 16 baseline OpenSpec capabilities; the maintained
+coverage map below also includes subsequently archived capabilities and the
 cross-cutting architecture/operations contracts and the accepted selective
 transformation decisions. It does not attempt to turn every implementation
 choice, historical task or unapproved feature suggestion into an ADR.</p>
@@ -239,8 +249,8 @@ an authority source explicitly records their consideration; they are not minutes
 of a historical vote. Original approval dates are unknown unless stated.</p>
 <p>Repository/code/spec links are pinned to baseline commit
 <a href="https://github.com/wa-pis/agent-paranoid-android/commit/637065966c12584e11c9b437c1e8b8f8d708c0df"><code>6370659</code></a> (merged PR #594).
-Relative links point to maintained documentation. The current worktree also has
-uncommitted private SQL-limit work: its presence does not establish an accepted
+Relative links point to maintained documentation. At the original recording
+checkpoint, the worktree also had uncommitted private SQL-limit work: its presence does not establish an accepted
 implementation, new public interface or release. Test links identify coverage
 anchors, <strong>not tests run during ADR collection</strong>.</p>
 <h2 id="how-to-use-this-register">How to use this register<a class="headerlink" href="#how-to-use-this-register" title="Permanent link">&para;</a></h2>
@@ -515,11 +525,77 @@ rather than guessing a new product/security policy.</p>
 </tr>
 </tbody>
 </table>
-<p>The active <a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/plan.md">selective-source-transformation change</a>
+<p>The 2026-11-09 archive adds these capability links. Their governing decisions
+remain unchanged; this is a navigation update, not a new architectural approval.</p>
+<table>
+<thead>
+<tr>
+<th>OpenSpec capability</th>
+<th>Governing records</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/dataset-capacity/spec.md">dataset-capacity</a></td>
+<td><a href="0005-determinism-provenance/">ADR-0005</a>, <a href="0015-resource-limits/">ADR-0015</a>, <a href="0027-acceptance-evidence/">ADR-0027</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/scalable-relational-generation/spec.md">scalable-relational-generation</a></td>
+<td><a href="0005-determinism-provenance/">ADR-0005</a>, <a href="0007-deterministic-rules/">ADR-0007</a>, <a href="0014-filesystem-publication/">ADR-0014</a>, <a href="0015-resource-limits/">ADR-0015</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/python-runtime-support/spec.md">python-runtime-support</a></td>
+<td><a href="0016-compatibility-packaging/">ADR-0016</a>, <a href="0019-release-integrity/">ADR-0019</a>, <a href="0027-acceptance-evidence/">ADR-0027</a></td>
+</tr>
+</tbody>
+</table>
+<p>The historical <a href="https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/plan.md">selective-source-transformation change</a>
 is covered by ADR-0008, ADR-0010, ADR-0015 and ADR-0020–0027; its SQL delta also
 maps to ADR-0010/0026. Module extraction maps to ADR-0003 and the
 <a href="../reference/application-boundaries/">application-boundary inventory</a>.
 Provider integrations map to ADR-0012/0016, not to a new source-data permission.</p>
+<h2 id="capability-navigation-added-after-archival-2026-10-25">Capability navigation added after archival — 2026-10-25<a class="headerlink" href="#capability-navigation-added-after-archival-2026-10-25" title="Permanent link">&para;</a></h2>
+<p>The original inventory and implementation snapshot retain their recorded dates.
+Archiving accepted changes added these baseline files; this navigation maps them
+to existing decisions without inventing a new decision or activation authority.</p>
+<table>
+<thead>
+<tr>
+<th>OpenSpec capability</th>
+<th>Governing records</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/feedback-corrections/spec.md">feedback-corrections</a></td>
+<td>ADR-0004, ADR-0007, ADR-0008, ADR-0027</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/generation/spec.md">generation</a></td>
+<td>ADR-0005, ADR-0007, ADR-0014, ADR-0015</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/mcp-transport/spec.md">mcp-transport</a></td>
+<td>ADR-0003, ADR-0013, ADR-0015, ADR-0016</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/portable-generation/spec.md">portable-generation</a></td>
+<td>ADR-0013, ADR-0030</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/security-boundary-enforcement/spec.md">security-boundary-enforcement</a></td>
+<td>ADR-0002, ADR-0003, ADR-0006, ADR-0015, ADR-0019</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/selective-source-transformation/spec.md">selective-source-transformation</a></td>
+<td>ADR-0020, ADR-0021, ADR-0023, ADR-0029</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/specs/synthetic-data-generation/spec.md">synthetic-data-generation</a></td>
+<td>ADR-0002, ADR-0005, ADR-0006, ADR-0008</td>
+</tr>
+</tbody>
+</table>
 <h2 id="implementation-and-acceptance-snapshot">Implementation and acceptance snapshot<a class="headerlink" href="#implementation-and-acceptance-snapshot" title="Permanent link">&para;</a></h2>
 <p>Owner successor <a href="0029-unified-replacement-contract/">ADR-0029: unified replacement contract</a>
 permits explicit mapped source-membership/permutations for every field, with
