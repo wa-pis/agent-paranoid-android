@@ -79,3 +79,57 @@ def test_invalid_inference_options_are_redacted(invalid):
     with pytest.raises(ValueError, match="^invalid inference options;") as error:
         parse_inference_options(invalid)
     assert "private-marker" not in str(error.value)
+
+
+def test_rule_priority_and_evidence_bind_reviewed_spec():
+    from test_data_agent.io import dataset_spec_fingerprint
+
+    original = profile()
+    payload = {
+        **OPTIONS,
+        "field_rules": [{"field_suffix": "_code", "action": "keep_builtin", "priority": 1}],
+    }
+    options = parse_inference_options(payload)
+    spec = infer_dataset_spec(original, inference_options=options)
+    assert not spec.entities[0].fields[0].is_identifier
+    evidence = spec.inference_evidence
+    assert evidence is not None
+    assert evidence.options_sha256 == options.fingerprint()
+    assert evidence.relationships_filtered == 1
+    assert [(effect.entity_index, effect.field_index, effect.rule_index) for effect in evidence.field_effects] == [
+        (0, 0, 1), (1, 0, 1),
+    ]
+    assert "_code" not in evidence.model_dump_json()
+    payload["field_rules"][0]["priority"] = 2
+    other = infer_dataset_spec(original, inference_options=parse_inference_options(payload))
+    assert dataset_spec_fingerprint(spec) != dataset_spec_fingerprint(other)
+    assert "inference_evidence" not in infer_dataset_spec(original).model_dump()
+
+
+def test_conflicting_rules_stop_before_artifact_write(tmp_path, monkeypatch):
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
+    options = {
+        **OPTIONS,
+        "field_rules": [{"field_suffix": "_code", "action": "keep_builtin"}],
+    }
+    with pytest.raises(ValueError, match="conflicting inference rules"):
+        infer_mcp("spec.json", profile_payload=profile().model_dump(mode="json"), inference_options=options)
+    assert not (tmp_path / "spec.json").exists()
+
+
+def test_constraint_floor_preserves_confirmed_constraints():
+    from test_data_agent.core.constraint import Constraint
+
+    original = profile()
+    item = Constraint(
+        type="conditional_required", entity="widgets", fields=["widget_code"],
+        condition={"field": "widget_code", "equals": "fictional"}, confidence=0.4,
+    )
+    original.constraints = [item, item.model_copy(update={"status": "confirmed"})]
+    spec = infer_dataset_spec(
+        original, inference_options=parse_inference_options({"version": "1", "min_constraint_confidence": 0.8}),
+    )
+    assert len(spec.constraints) == 1
+    assert spec.constraints[0].status == "confirmed"
+    assert spec.inference_evidence is not None
+    assert spec.inference_evidence.constraints_filtered == 1

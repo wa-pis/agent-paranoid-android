@@ -7,9 +7,11 @@
       and a confidence floor for inferred relationships. Rules are additive and
       cannot conflict in this first version. Bound rule count, selector length
       and field/rule evaluations; preserve reviewed inputs and protected fields.
-- [ ] Design broader rule actions and incompatible-proposal diagnostics.
-- [ ] Add effective-config fingerprints.
-- [ ] Integrate provenance, cache invalidation and existing review bindings.
+- [x] Add explicit field actions, priorities, conflict rejection and a confidence
+      floor for inferred constraints.
+- [x] Record the options digest, winning rules and threshold effects in the
+      DatasetSpec; its existing fingerprint binds the evidence to exact review.
+      Inference runs after profile caching and does not cache configured results.
 - [ ] Test default compatibility, custom overrides, conflicts, invalid settings,
       bounded execution and privacy/approval rejection using fictional fixtures.
 - [ ] Verify equivalent metadata across sources, output formats and Python/CLI/MCP;
