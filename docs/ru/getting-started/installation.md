@@ -5,8 +5,8 @@
 Рекомендуемая стабильная версия — **1.6.0**; см. [публичную проверку](../../release-evidence-1.6.0.md). Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15; этот локальный аудит выполнен на macOS с Python 3.11.2.
 
 
-Команды этой инструкции явно выбирают `1.7.0rc3`. Перед установкой проверьте
-[статус кандидата](../../1.7.0rc3-release-status.md). Стабильная версия остаётся
+Команды этой инструкции явно выбирают `1.7.0rc4`. Перед установкой проверьте
+[статус кандидата](../../1.7.0rc4-release-status.md). Стабильная версия остаётся
 `1.6.0`; её установка: `pip install "agent-paranoid-android==1.6.0"`.
 
 ## Установка из PyPI
@@ -16,7 +16,7 @@
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install "agent-paranoid-android==1.7.0rc3"
+python -m pip install "agent-paranoid-android==1.7.0rc4"
 test-data-agent --version
 test-data-agent doctor
 ```
@@ -31,7 +31,7 @@ test-data-agent doctor
 
 ```powershell
 py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install "agent-paranoid-android==1.7.0rc3"
+.\.venv\Scripts\python.exe -m pip install "agent-paranoid-android==1.7.0rc4"
 .\.venv\Scripts\test-data-agent.exe --version
 .\.venv\Scripts\test-data-agent.exe doctor
 ```
@@ -40,7 +40,7 @@ py -3.11 -m venv .venv
 
 ## Необязательные extras
 
-Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0rc3". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.
+Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.0rc4". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.
 
 Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. [поддержку](../reference/support-policy.md) и [footprint — English](../../reference/dependency-compatibility.md#installation-footprint).
 
