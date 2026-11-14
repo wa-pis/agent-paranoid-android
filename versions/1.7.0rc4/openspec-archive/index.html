@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc4/openspec-archive/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>OpenSpec Archive - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "OpenSpec Archive";
+        var mkdocs_page_input_path = "openspec-archive.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc4/openspec-archive/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">OpenSpec Archive</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/openspec-archive.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.7.0rc4
+  <br>Package source ab511904a8a95319fb25a0728deff1afdf347187
+  <br>Documentation ab511904a8a95319fb25a0728deff1afdf347187
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="openspec-archive">OpenSpec Archive<a class="headerlink" href="#openspec-archive" title="Permanent link">&para;</a></h1>
+<p>Completed design changes are retained in the
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive">OpenSpec archive</a>.
+The archive records accepted proposals, designs, tasks, and capability deltas;
+it is implementation history rather than user documentation.</p>
+<p>Current product direction is summarized in the <a href="../roadmap/">Roadmap</a>. Public
+behavior is described by the canonical
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/specs">OpenSpec capabilities</a>
+and the task-oriented documentation site.</p>
+<h2 id="2026-10-25-reconciliation">2026-10-25 reconciliation<a class="headerlink" href="#2026-10-25-reconciliation" title="Permanent link">&para;</a></h2>
+<p>Fourteen completed changes were archived after checking their actual merge,
+review and release evidence. Their requirement deltas were integrated into
+<code>openspec/specs</code> by the normal archive operation; archival did not skip baseline
+updates. Nine changes were already complete, and five remaining delivery gates
+were reconciled with <a href="../release-evidence-1.7.0rc1/">1.7.0rc1 public acceptance</a>.
+Historical checkpoints retain their source identities.</p>
+<p>Four changes remain active: external 1.6 feedback intake, historical Trino
+configuration evidence, bounded-profile provenance and selective transformation
+follow-through. Source-row EAV pivot/unpivot remains deferred in the roadmap,
+outside the completed synthetic EAV slice. Unavailable historical
+settings, live/private acceptance and new preservation authority are not inferred
+from release publication. See the <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes">current work plan</a>.</p>
+<p>Baseline reconciliation retains historical RC3 refusal text in its archive and
+uses the later accepted edge/load/overwrite contract in current capabilities.
+New capability purposes and ADR navigation are filled explicitly; current
+release requirements use the authorized candidate rather than a historical
+1.6-only version. No executable behavior or authority changes with this cleanup.</p>
+<p>The historical activation-composition fixture retains its executable/contract
+tail byte-for-byte. Its maintained documentation projection was refreshed for
+the corrected architecture page so forward/reverse composition remains tested;
+this is not a new activation patch applied to production.</p>
+<p>Continued feedback work also reconciles nine completed transformation delivery
+tasks and their public-contract subtask with actual stable/candidate evidence.
+The <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/release-1.7-reconciliation.md">remaining scope and installed replay</a>
+retain the original source identities. A subsequent <a href="../feedback-acceptance-1.7.0rc1/">installed feedback replay</a>
+closes the findings 1–26/section E matrix and reviewed-script replay; three
+transformation composite tasks remain unchecked.</p>
+<p>The completed conditional-formula/source-free EAV change was also archived,
+bringing this reconciliation to fifteen archives. Its exact requirement delta
+already matched the business-rules baseline, so the normal archive operation
+needed no duplicate specification update. The deferred source-row operation is
+explicitly retained in both roadmaps; it was not implemented or accepted by
+archival.</p>
+<h2 id="2026-11-01-hosting-decisions">2026-11-01 hosting decisions<a class="headerlink" href="#2026-11-01-hosting-decisions" title="Permanent link">&para;</a></h2>
+<p>The Cloudflare proposal is archived as <strong>cancelled</strong>, and the earlier RTD
+proposal as <strong>superseded</strong>. These are disposition archives, not completed
+capabilities. Historical incomplete checkboxes remain open. Both were archived
+with <code>--skip-specs</code>; neither unaccepted hosting delta was applied to the baseline.
+The baseline records the maintainer's final choice of GitHub Pages, while its
+existing edition/export/public-verification requirements remain intact.</p>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/pull/683">PR #683</a> restored links
+and new canonicals; <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41336088977">Documentation 41336088977</a>
+passed main build, publication, public verification and retained mike versions.
+Both Cloudflare publishers are disabled; their projects and historical snapshots
+are retained. RTD project-build retirement remains manual owner follow-up and
+its configuration is retained until confirmed. No migration acceptance or
+package promotion is inferred from these archives.</p>
+<h2 id="2026-11-09-rc3-reconciliation">2026-11-09 RC3 reconciliation<a class="headerlink" href="#2026-11-09-rc3-reconciliation" title="Permanent link">&para;</a></h2>
+<p>Archived <code>dataset-scale-estimation-performance</code>, <code>scalable-relational-generation</code>
+and <code>python-315-support</code> after their completed tasks and
+<a href="../release-evidence-1.7.0rc3/">RC3 public release evidence</a> were verified.
+Normal archival integrated all 15 requirements into three new baseline
+capabilities: <code>dataset-capacity</code>, <code>scalable-relational-generation</code> and
+<code>python-runtime-support</code>; specification updates were not skipped. Historical
+benchmark JSON and activation overlay patch bytes are retained unchanged.
+The patch composition tests require the archived overlays explicitly.</p>
+<p>Four changes remain active (excluding <code>_template</code>): selective transformation,
+historical Trino configuration, external feedback intake and profile provenance.
+The two remaining transformation tasks are reconciled in its
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/follow-through-2026-11-09.md">dated follow-through</a>.
+Neither the owner-waived RC3 manual client check nor private scale evidence is
+relabelled as completed human or public/configured capacity acceptance.</p>
+<h2 id="2026-11-10-transformation-reconciliation">2026-11-10 transformation reconciliation<a class="headerlink" href="#2026-11-10-transformation-reconciliation" title="Permanent link">&para;</a></h2>
+<p>Archived <code>selective-source-transformation</code> after
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/registered-format-matrix-2026-11-10.md">36 registered format combinations and three SDK stdio refusals</a>
+passed at 1,000,000 × 100. The installed runs used fictional replacement-only
+inputs and the published 1.7.0rc3 package. The
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-11-10-selective-source-transformation/disposition.md">archive disposition</a>
+explains which shipped requirements were integrated and why the original
+historical deltas were retained. External feedback intake, historical Trino
+configuration and bounded-profile provenance remain active.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

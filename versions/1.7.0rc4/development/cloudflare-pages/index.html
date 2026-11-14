@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0rc4/development/cloudflare-pages/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Cloudflare Pages Publication - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Cloudflare Pages Publication";
+        var mkdocs_page_input_path = "development/cloudflare-pages.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0rc4/development/cloudflare-pages/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Cloudflare Pages Publication</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/development/cloudflare-pages.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Release candidate / not stable</strong> · Package 1.7.0rc4
+  <br>Package source ab511904a8a95319fb25a0728deff1afdf347187
+  <br>Documentation ab511904a8a95319fb25a0728deff1afdf347187
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="cloudflare-pages-publication">Cloudflare Pages Publication<a class="headerlink" href="#cloudflare-pages-publication" title="Permanent link">&para;</a></h1>
+<p><strong>Status: cancelled by the maintainer on 2026-11-01; GitHub Pages is the selected
+primary host.</strong> Cloudflare served the same MkDocs site and did not add managed
+Read the Docs functionality. Both <code>Cloudflare documentation</code> and <code>Cloudflare
+documentation PR preview</code> workflows were set to <code>disabled_manually</code> in GitHub.
+They do not automatically publish normal editions or PR previews. Projects,
+deployments and credentials were not deleted or read. Existing Cloudflare URLs
+are retained snapshots and are no longer the primary publication.</p>
+<p>The material below records the completed experiment, including verified
+production, isolated previews and recovery. It does not authorize re-enabling
+publication. The repository return and its public verification are tracked in
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-11-01-migrate-documentation-to-cloudflare-pages">cancelled change archive</a>; the migration itself is cancelled,
+not completed. No paid plan, custom domain, DNS change or package release is
+required to return to GitHub Pages.</p>
+<h2 id="build-and-trust-boundary">Build And Trust Boundary<a class="headerlink" href="#build-and-trust-boundary" title="Permanent link">&para;</a></h2>
+<p>Keep the existing strict GitHub <code>Documentation</code> workflow, frozen Python/docs
+packages, Chromium PDF exporter, release verification, mike editions and retained
+rendered artifacts. Cloudflare receives prebuilt assets through Direct Upload;
+it does not need to run the Python build or receive private source data.</p>
+<p><code>Cloudflare documentation</code> supports trusted automatic production and manual
+parallel/recovery publication from main only.
+Its source-run gate requires a completed successful main-push run of
+<code>.github/workflows/docs.yml</code> in this repository, binds the exact source SHA and
+then downloads only that run's <code>documentation-site</code> artifact. PR, fork, failed,
+running and unrelated workflow sources are rejected before publication.</p>
+<p>The uploader executes only trusted main deployment code in an empty working
+directory. Site artifacts are data: symlinks, Worker/Functions entrypoints and
+host/tool configuration are rejected. All local edition/entry/export hashes are
+checked before upload. Credential access belongs only to the pinned Cloudflare
+action steps; no PR source is checked out or run with that credential.</p>
+<p>Normal parallel uploads always use <code>migration-RUN_ID</code>, never the production branch.
+The payload adds only <code>_headers</code>: noindex for parallel publication and attachment
+headers for standalone HTML, covering both <code>.html</code> and Cloudflare's extensionless
+paths at root and in version directories. Page/export bytes and recorded hashes
+are preserved. The Free-plan preflight uses 20,000 files and 25 MiB per asset.
+A retained real site passed with 1,212 files, 91,676,529 bytes and five editions;
+this is a local payload result, not evidence of a Cloudflare upload.</p>
+<h2 id="owner-setup">Owner Setup<a class="headerlink" href="#owner-setup" title="Permanent link">&para;</a></h2>
+<p>Use an existing Cloudflare account. Create a Pages Direct Upload project with
+production branch <code>main</code>, or choose <code>create_project=true</code> on the first workflow
+run to create it through the reviewed uploader. Do not select Git integration
+for this project. The observed normal project is <code>agent-paranoid-android</code>; its parallel deployment
+addresses are recorded below.</p>
+<p>Create the GitHub environment <code>cloudflare-pages-preview</code>, restricted to main.
+Configure these values in that environment:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Kind</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLOUDFLARE_ACCOUNT_ID</code></td>
+<td>Variable</td>
+<td>The selected account's 32-character ID</td>
+</tr>
+<tr>
+<td><code>CLOUDFLARE_PAGES_PROJECT</code></td>
+<td>Variable</td>
+<td>The chosen Direct Upload project name</td>
+</tr>
+<tr>
+<td><code>CLOUDFLARE_API_TOKEN</code></td>
+<td>Secret</td>
+<td>Scoped Cloudflare API token described below</td>
+</tr>
+</tbody>
+</table>
+<p>The official Direct Upload integration requires <strong>Account → Cloudflare Pages →
+Edit</strong>, limited to the intended account. This is an account-wide Pages permission;
+it must not be described as limited to one project. Use a dedicated token and
+revoke it when no longer needed. The token does not need DNS, zone, Worker/KV/R2
+or repository administration permissions. The owner must review the actual
+permission screen before creating it. Never paste the token into chat, a file,
+workflow input, repository variable, command history or screenshot. Transfer it
+directly from Cloudflare to the named GitHub environment secret; the agent does
+not need to read its value.</p>
+<h2 id="first-parallel-deployment">First Parallel Deployment<a class="headerlink" href="#first-parallel-deployment" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Select a successful main <code>Documentation</code> run with a retained, unexpired
+   <code>documentation-site</code> artifact. Run 41284167968 is an observed example at
+   <code>2ea24cfebc74356c53c0117ca094ee9d60961cb9</code>, not a permanent default source.</li>
+<li>Run <code>Cloudflare documentation parallel acceptance</code> from main with that numeric
+   <code>source_run_id</code>. Select <code>create_project</code> only for the first project creation.</li>
+<li>Inspect the returned immutable deployment URL. The verifier retains the mike
+   stable alias/destination gate, compares each edition's public identity,
+   chapter/manifest inventory, exact entry bytes and all four exports against
+   that same downloaded build, and requires HTML attachment headers.</li>
+<li>A failed check leaves the accepted GitHub Pages site and canonical links
+   unchanged. Uploading a parallel branch is not production promotion.</li>
+</ol>
+<p>The first workflow does not implement managed normal-project production
+promotion or canonical replacement. Separate PR publication and isolated recovery
+controls are described below; their live acceptance remains required. Existing RTD/GitHub Pages resources are retained until
+equivalent Cloudflare functionality and recovery are verified.</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/">Direct Upload with CI</a></li>
+<li><a href="https://developers.cloudflare.com/pages/platform/limits/">Asset limits</a></li>
+<li><a href="https://developers.cloudflare.com/pages/configuration/headers/">Static response headers</a></li>
+<li><a href="https://developers.cloudflare.com/pages/configuration/preview-deployments/">Preview deployments</a></li>
+<li><a href="https://developers.cloudflare.com/pages/configuration/rollbacks/">Rollback</a></li>
+</ul>
+<h2 id="first-live-evidence-2026-11-01">First Live Evidence (2026-11-01)<a class="headerlink" href="#first-live-evidence-2026-11-01" title="Permanent link">&para;</a></h2>
+<p>The owner created <code>agent-paranoid-android</code> as a Direct Upload project. Its
+production branch is <code>main</code>; Git integration, project variables and bindings
+are absent. The GitHub environment restricts deployment to main and contains
+the account/project variables and an owner-installed <code>CLOUDFLARE_API_TOKEN</code>.
+The prepared token summary grants Pages Edit to the selected account and expires
+on 2027-01-30; its value was not read by the agent.</p>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41317904495">Workflow 41317904495</a>
+uploaded trusted Documentation run 41286373400 at
+<code>3c03ccca95f430e928cd0e6af254e62d31043966</code> to
+<a href="https://42e53263.agent-paranoid-android.pages.dev/">immutable deployment 42e53263</a>.
+The upload succeeded, but the workflow's verification failed with HTTP 403/error
+1010 from the default Python urllib User-Agent. This is not a green workflow.
+Cloudflare's <a href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1010/">documented resolution</a>
+is a descriptive application User-Agent. Both byte verification and attachment
+checks identify the documentation verifier explicitly; browser impersonation or
+security-setting changes are not required.</p>
+<p>Using that correction, the local verifier passed all five same-build editions:
+root, <code>versions/1.6.0</code>, <code>versions/stable</code>, <code>versions/1.7.0rc1</code> and <code>versions/next</code>.
+It checked identities, the stable alias, exact full manifests/chapter inventory,
+entry bytes, all four export hashes and standalone HTML attachment headers.
+Root/stable remain maintained 1.6.0 guidance at documentation <code>5344b390</code>; candidate
+and next remain 1.7.0rc1 at documentation <code>3c03ccca</code>, not stable. The fresh upload
+payload contains 1,214 files and 91,808,365 bytes. A real browser HTML download
+was 710,301 bytes and matched the root retained manifest exactly.</p>
+<p>These results cover the named immutable deployment, not production promotion,
+automatic PR previews, hosted rollback or a completed migration. The corrected main workflow
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41319733062">41319733062</a>
+passed on publisher commit <code>b99b7c8cc2a52a8eea7c78ef15b57b25e6fd3941</code>,
+using the same source artifact 41286373400 and verifying all five editions at
+<a href="https://1641144a.agent-paranoid-android.pages.dev/">deployment 1641144a</a>.
+Production remains empty; both observed deployments are Preview/migration builds.</p>
+<h2 id="isolated-pr-preview-pipeline">Isolated PR Preview Pipeline<a class="headerlink" href="#isolated-pr-preview-pipeline" title="Permanent link">&para;</a></h2>
+<p>The separate Direct Upload project <code>agent-paranoid-android-previews</code> has been
+created. Configure <code>CLOUDFLARE_PAGES_PREVIEW_PROJECT</code> with that exact value in the
+existing main-only publication environment. This does not add private variables
+or bindings to the Cloudflare preview project.</p>
+<p>The Documentation workflow builds the exact PR source head in an unprivileged
+job, with no publication environment, Cloudflare credential or shared uploader
+cache. Strict normal documentation/release checks must pass first. The labelled
+preview artifact omits normal exports and retains bilingual pages/search.</p>
+<p><code>Cloudflare documentation PR preview</code> handles the completed run using only
+trusted default-branch code. GitHub API metadata must bind that repository's
+Documentation PR run to exactly one currently open PR with the same source head
+and head/base repositories. Fork metadata is supported; missing, changed, closed
+or ambiguous associations are rejected. The publisher checks the current head
+again immediately before upload. Source failure posts an exact-head failed
+<code>docs/cloudflare-preview</code> status without opening a publication environment.</p>
+<p>Successful source artifacts are treated only as data: the existing static asset
+checks reject Functions, Workers, deployment configuration, symlinks and oversized
+inputs. The PR identity must match the authenticated source SHA and be visibly
+labelled <code>PR preview / not stable</code>. The uploader runs in an empty directory and
+uses only the separate preview project with branch <code>pr-N</code>. It never checks out
+or executes PR code with publication rights. Byte verification covers identity,
+English/Russian entry/search pages and their shared search index, plus the real
+HTTPS/noindex response. The exact source head receives a success/failure status
+and immutable deployment link. Failed publication does not change normal editions.</p>
+<p>Pipeline implementation and fictional tests are preparation. Actual successful
+and deliberately failed PR rehearsals, private-variable isolation observations,
+preview UI checks and normal-default preservation must still be recorded before
+closing the preview task. See GitHub's
+<a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows">workflow event reference</a>
+and <a href="https://docs.github.com/en/actions/reference/security/secure-use">secure-use reference</a>.</p>
+<h2 id="isolated-hosted-recovery-rehearsal">Isolated Hosted Recovery Rehearsal<a class="headerlink" href="#isolated-hosted-recovery-rehearsal" title="Permanent link">&para;</a></h2>
+<p>The separate Direct Upload project <code>agent-paranoid-android-recovery</code> is reserved
+for recovery tests. In the manual workflow, <code>recovery=true</code> derives this name
+from the configured normal project and selects branch <code>main</code> only in that
+separate project. The default remains <code>recovery=false</code>: a normal-project
+<code>migration-RUN_ID</code> preview. No free-form project or production-branch input is
+accepted. The account-scoped Pages token already covers this project; no new
+permissions or private variables are required.</p>
+<p>Choose two successful main Documentation runs with retained artifacts and
+different candidate documentation revisions. Publish A and then B with
+<code>recovery=true</code>, leaving <code>rejection=none</code>. Both uploads must pass every edition's
+same-build verification. Confirm the recovery project's production base URL
+serves B, including its candidate identity; root stable alone may be identical
+between the two builds and cannot establish which deployment is active.</p>
+<p>Use Cloudflare's Deployments rollback control to restore the successful A
+production deployment. Verify the recovery <strong>production base URL</strong>, not A's
+immutable deployment URL, against A's retained artifact across all editions and
+all four exports. Cloudflare permits rollback only to successful production
+deployments; preview deployments are not rollback targets.</p>
+<p>For controlled failures, repeat the manual workflow with <code>recovery=true</code> and
+<code>rejection=identity</code>, then <code>rejection=hash</code>. These choices alter only the freshly
+downloaded disposable artifact copy: an identity mismatch or a fictional entry
+comment must fail the existing provenance/hash gate before uploader execution.
+They cannot be selected for normal publication. After each failure, verify the
+same known-good recovery production base against A again, and check the normal
+project/default and accepted GitHub Pages publication remain unchanged.</p>
+<p>These controls and their fictional tests prepare a rehearsal; they do not prove
+that a hosted rollback or rejected deployment has occurred. Record the actual
+run IDs, A/B identities, rollback result and unchanged-default checks before
+closing the recovery task. This does not authorize a normal-project production
+or canonical switch.</p>
+<h2 id="live-preview-and-link-evidence-2026-11-01">Live Preview And Link Evidence (2026-11-01)<a class="headerlink" href="#live-preview-and-link-evidence-2026-11-01" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/wa-pis/agent-paranoid-android/pull/677">PR #677</a> produced a
+successful exact-head preview for <code>d439b5d5</code> through
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41323969006">publisher 41323969006</a>
+at <a href="https://1a1ca15f.agent-paranoid-android-previews.pages.dev/">deployment 1a1ca15f</a>.
+A browser confirmed its visible non-stable banner and edition-local Trino search.</p>
+<p>The disposable <a href="https://github.com/wa-pis/agent-paranoid-android/pull/678">PR #678</a>
+then built fictional bilingual markers at <code>e885a63d</code>. Its
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41323969881">source run 41323969881</a>
+passed a separate observation job with no source checkout: checks reported only
+that the environment-scoped token and all three publication variables were absent;
+no values were printed. The actual preview job still has no secret expressions,
+publication environment or publication rights. The source run succeeded and its
+exact-head <code>docs/cloudflare-preview</code> status linked to
+<a href="https://e9c20db0.agent-paranoid-android-previews.pages.dev/">deployment e9c20db0</a>.
+An independent public verification against that run's retained artifact passed
+identity, bilingual entry/search bytes and noindex. The browser displayed the
+fictional marker and exact source SHA. This is a same-repository rehearsal;
+fork provenance rejection/acceptance is covered by fictional metadata tests,
+not claimed as a live fork run.</p>
+<p>On the accepted parallel normal deployment <code>1641144a</code>, 30 additional public
+files matched retained build 41286373400 exactly: Russian entries, English and
+Russian configuration/Trino pages, and search indices for all five editions.
+English <code>#trino-connection</code> and existing localized configuration heading anchors
+were retained. Each search index included Russian records and only relative
+edition-local locations (root/stable: 786 records, 355 Russian; candidate/next:
+816 records, 355 Russian). The current <code>next</code> is the RC copy alias while the
+package source remains 1.7.0rc1; it is not presented as a separate development
+release. Native mike's development mapping remains covered by standard-plugin
+tests, and no unverified stable version was added.</p>
+<p>At <code>be96b6da</code>, the same disposable PR deliberately failed its preview source step
+after rendering. <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324502142">Source 41324502142</a>
+failed while its strict normal build and boolean isolation observation passed.
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324670213">Publisher 41324670213</a>
+validated the current head, posted <code>docs/cloudflare-preview=failure</code>, and skipped
+the credentialed upload job. The prior <code>pr-678</code> branch alias still matched the
+retained <code>e885a63d</code> preview exactly. Reverification passed all five normal
+Cloudflare editions against retained build 41286373400 and the accepted GitHub
+Pages stable default. PR #678 was closed without merging. These are actual
+success/failure/default-preservation observations, not just workflow simulations.</p>
+<h2 id="live-hosted-recovery-evidence-2026-11-01">Live Hosted Recovery Evidence (2026-11-01)<a class="headerlink" href="#live-hosted-recovery-evidence-2026-11-01" title="Permanent link">&para;</a></h2>
+<p>The recovery project has production branch <code>main</code>, no Git connection, and a
+separate production base <code>https://agent-paranoid-android-recovery.pages.dev/</code>.
+Normal project production remained empty throughout this rehearsal.</p>
+<ul>
+<li>A: <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41324897408">publisher 41324897408</a>
+  accepted source 41286373400 and deployed <code>bc8969bc</code>. Its candidate/next
+  documentation revision is <code>3c03ccca</code>. Both the immutable URL and the recovery
+  production base passed all five same-build edition/download checks.</li>
+<li>B: <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325086334">publisher 41325086334</a>
+  accepted source 41319731486 and deployed <code>eec2c87d</code>. Its candidate/next
+  documentation revision is <code>b99b7c8c</code>. The production base was demonstrably B,
+  not A, and passed all five checks against B's retained artifact. Root stable
+  retained documentation <code>5344b390</code> in both builds; checking root alone would
+  have missed the change.</li>
+<li>Cloudflare's real rollback control restored production to A/<code>bc8969bc</code>.
+  The production base's candidate identity changed back to A and differed from
+  B. All five editions, exact manifests/entries, all four exports and standalone
+  HTML attachment headers passed again against retained A.</li>
+<li><a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325547847">Identity rejection 41325547847</a>
+  and <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41325550670">hash rejection 41325550670</a>
+  deliberately changed disposable B artifact copies. Each failed at the existing
+  static/provenance/hash preflight with the expected reason; project creation
+  and credentialed upload steps were skipped. After both refusals, the recovery
+  production base still passed all five A edition/download checks.</li>
+</ul>
+<p>A dashboard check then confirmed the normal project still said <strong>No production
+deployment yet</strong>, with only its two migration previews. The accepted GitHub Pages
+stable default had already passed unchanged after the failed PR rehearsal.
+The native mike selector was exercised on Cloudflare: selecting <code>1.7.0rc1</code> from
+<code>versions/stable/</code> opened that candidate on the same Cloudflare deployment,
+showing its explicit candidate label and <code>3c03ccca</code> identity. No normal-project
+production or canonical switch is implied by these recovery results.</p>
+<h2 id="automatic-production-publisher">Automatic Production Publisher<a class="headerlink" href="#automatic-production-publisher" title="Permanent link">&para;</a></h2>
+<p>After preview and hosted recovery acceptance, the reviewed publisher can consume
+successful main-push Documentation completions automatically. It still checks
+source API provenance and every retained artifact hash; immediately before the
+credentialed upload it requires the source SHA to equal the current main SHA.
+Stale reruns, failed runs and PR sources cannot become normal production through
+this path. Only this trusted workflow event selects the configured normal
+project's <code>main</code> branch; manual dispatch remains a migration preview or an
+explicitly separate recovery rehearsal. The two modes cannot be mixed.</p>
+<p>Automatic production adds attachment headers without the parallel noindex rule.
+It verifies both the immutable deployment and the normal project's production
+base against every same-build retained edition and all four exports. PR previews
+and recovery remain separate and unindexed. The existing GitHub Pages publisher,
+public verification and native mike retention remain active for old links and
+recovery.</p>
+<p>PR #681 enabled this publisher. The first normal production publication passed:</p>
+<ul>
+<li>Source <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41331122749">Documentation 41331122749</a>
+  built main <code>c8c7c97b7422c15e5068484919ca57536844c29c</code> successfully.</li>
+<li>Automatic <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41331311059">publisher 41331311059</a>
+  deployed <a href="https://bad72846.agent-paranoid-android.pages.dev/">immutable <code>bad72846</code></a>.
+  The static payload contained 1,214 files, 91,943,587 bytes and five editions.
+  Both immutable and production-base verification passed every edition and all
+  four same-build exports. A browser visit confirmed the production root.</li>
+<li>Root and maintained stable retain documentation identity <code>5344b390</code>; the RC
+  and <code>next</code> aliases carry this source build's documentation revision. Publication
+  does not promote the RC package or change the verified stable catalog.</li>
+</ul>
+<p>The subsequent canonical/link change makes Cloudflare the README entry point
+and the configured host for newly rendered editions. The native mike hook uses
+that configured host with its existing <code>versions/</code> deploy prefix; it does not
+introduce a second edition catalog. Actual standard-plugin tests build a new
+candidate/development edition on a changed host and verify its canonical URL
+while checking retained stable HTML and identities byte for byte.</p>
+<p>Existing rendered historical/root/stable bytes, identities, exports and their
+original GitHub Pages canonical URLs are retained. They are not rewritten to
+pretend they were built on the new host. New canonical URLs take effect only
+when a new edition is rendered. GitHub Pages keeps the same retained tree for
+old links and recovery. Project-specific RTD automation must be disabled before
+its configuration is removed; this owner-session cleanup remains outstanding.
+No package release or stable catalog promotion occurs in this step.</p>
+<h2 id="return-to-github-pages">Return To GitHub Pages<a class="headerlink" href="#return-to-github-pages" title="Permanent link">&para;</a></h2>
+<p>The last Cloudflare canonical build was Documentation 41334153435 at
+<code>84edf346467a5b90ef7d395f54519ffa1b60afa7</code>, published successfully by 41334341512
+to <code>1a52d73d</code>. Immutable and production-base checks passed all five editions and
+four exports. Public candidate/next canonicals pointed to Cloudflare; frozen
+root/stable retained their original GitHub Pages canonicals and <code>5344b390</code>
+identity. The maintainer then chose GitHub Pages instead of maintaining two
+hosting systems. README and newly rendered canonicals return to GitHub Pages;
+public acceptance of that return is recorded separately once the main build
+and its public verifier succeed. Prior successful checks are retained as
+experiment evidence, not claimed as acceptance of the return.</p>
+<p>The return was accepted after <a href="https://github.com/wa-pis/agent-paranoid-android/pull/683">PR #683</a>
+merged as main <code>508b39be</code> and <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/41336088977">Documentation 41336088977</a>
+passed build, GitHub Pages deployment, same-build public verification and mike
+retention. All five public edition canonicals point to GitHub Pages. Independent
+public reads also confirmed Russian entry pages and bilingual search (786 search
+records for stable, 823 for candidate/next). Stable root/aliases keep <code>5344b390</code>;
+candidate/next carry <code>508b39be</code>. Both Cloudflare workflows were rechecked as
+<code>disabled_manually</code> after merge. The proposed Cloudflare requirements were not
+added to the baseline. RTD build retirement remains manual owner follow-up.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
