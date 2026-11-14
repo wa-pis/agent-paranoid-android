@@ -5,7 +5,7 @@ English · [Русский](../ru/reference/configuration.md)
 Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.
 
-These settings describe stable `1.6.0`. Historical anchors remain available.
+These settings describe stable `1.7.0`. Historical anchors remain available.
 Configuration and tool registration do not grant dataset permission or local
 preservation approval. Existing component settings and exact allowlists remain
 supported.
@@ -25,7 +25,7 @@ does not read provider credentials or test remote reachability.
 
 ## Common Transformation Profile
 
-Stable `1.6.0` provides the common CLI/MCP workflow. Its versioned reference profile combines two or more inputs
+Stable `1.7.0` provides the common CLI/MCP workflow. Its versioned reference profile combines two or more inputs
 with one independently reviewed DatasetSpec for final linked validation:
 
 ```yaml
@@ -112,7 +112,7 @@ does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
 ## Transformation Input Limits
 
 These settings apply to transformation acquisition, decoding and policy-aware
-review preflight in stable `1.6.0`, plus CSV profiling/trace shape checks.
+review preflight in stable `1.7.0`, plus CSV profiling/trace shape checks.
 They do not change source-free profiling/MCP budgets or themselves establish
 end-to-end capacity. Remaining pipeline caps still apply. The fictional private replacement-only CSV scenario
 passed 300,000 rows × 50 columns; see
@@ -394,7 +394,7 @@ or the [Russian guide](../ru/how-to/trino.md#trino-mcp-basic).
 | `TRINO_PORT` | `8080` | Trino port |
 | `TRINO_USER` | `test_data_agent` | Trino user |
 | `TRINO_HTTP_SCHEME` | `https` | `https` or explicitly allowed `http` |
-| `TRINO_AUTH_METHOD` | `none` | Optional methods in stable `1.6.0`: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
+| `TRINO_AUTH_METHOD` | `none` | Optional methods in stable `1.7.0`: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
 | `TRINO_AUTH_SECRET_ENV` | unset | Name of a runtime environment variable containing the Basic password or JWT, not the secret itself |
 | `TRINO_AUTH_CERTIFICATE_ENV` | unset | Name of a runtime environment variable containing the client certificate path |
 | `TRINO_AUTH_KEY_ENV` | unset | Name of a runtime environment variable containing the private-key path |
