@@ -1,6 +1,6 @@
 {
-  "package_version": "1.7.0rc4",
-  "package_commit": "ab511904a8a95319fb25a0728deff1afdf347187",
-  "documentation_revision": "ab511904a8a95319fb25a0728deff1afdf347187",
-  "status": "Release candidate / not stable"
+  "package_version": "1.7.0",
+  "package_commit": "51f67b02f3fdd6527c50931bc917d3cac704183d",
+  "documentation_revision": "51f67b02f3fdd6527c50931bc917d3cac704183d",
+  "status": "Development / not stable"
 }

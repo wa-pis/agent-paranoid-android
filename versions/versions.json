@@ -1,10 +1,13 @@
 [
   {
+    "version": "next",
+    "title": "1.7.0 (development)",
+    "aliases": []
+  },
+  {
     "version": "1.7.0rc4",
     "title": "1.7.0rc4 (release candidate)",
-    "aliases": [
-      "next"
-    ]
+    "aliases": []
   },
   {
     "version": "1.7.0rc3",
