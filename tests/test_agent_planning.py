@@ -162,3 +162,31 @@ def _top_level_imports(module: ModuleType) -> set[str]:
         elif isinstance(node, ast.Import):
             imports.update(alias.name for alias in node.names)
     return imports
+
+
+@pytest.mark.parametrize("source_type", [AgentSourceType.CSV, AgentSourceType.CSV_FOLDER])
+def test_agent_plan_rejects_source_swapped_only_during_profiling(tmp_path, monkeypatch, source_type):
+    folder = tmp_path / "source"
+    folder.mkdir()
+    source = folder / "orders.csv"
+    original = "amount\n10\n20\n"
+    source.write_text(original)
+    build_profile = agent_planning_module.build_agent_profile
+
+    def read_changed(*args, **kwargs):
+        source.write_text("amount\n90\n99\n")
+        try:
+            return build_profile(*args, **kwargs)
+        finally:
+            source.write_text(original)
+
+    monkeypatch.setattr(agent_planning_module, "build_agent_profile", read_changed)
+    workspace = tmp_path / "agent"
+    with pytest.raises(ValueError, match="source changed since planning"):
+        agent_module.plan_agent_request(AgentRequest(
+            source_type=source_type,
+            source_path=source if source_type == AgentSourceType.CSV else folder,
+            workspace=workspace,
+            count=3,
+        ))
+    assert not workspace.exists()

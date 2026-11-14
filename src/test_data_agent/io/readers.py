@@ -83,6 +83,7 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
     total_rows = 0
     total_cells = 0
     decoded_bytes = 0
+    parquet_expanded_bytes = 0
     for path in input_paths:
         entity_name = artifact_entities.get(path.name, path.stem)
         if path.suffix == ".csv":
@@ -136,7 +137,12 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
                     "Parquet input requires agent-paranoid-android[parquet]"
                 ) from exc
             parquet_file = pq.ParquetFile(path)
-            enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
+            metadata = parquet_file.metadata
+            parquet_expanded_bytes = enforce_parquet_metadata_limits(
+                metadata, label="dataset Parquet input", prior_expanded_bytes=parquet_expanded_bytes,
+            )
+            enforce_input_row_count(total_rows + metadata.num_rows, label="dataset")
+            enforce_input_cell_count(total_cells + metadata.num_rows * metadata.num_columns, label="dataset")
             rows = []
             for batch in parquet_file.iter_batches(batch_size=256):
                 total_rows += batch.num_rows

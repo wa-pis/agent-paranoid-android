@@ -10,6 +10,14 @@ All notable changes to this project are documented here.
   safe JSON profile for review-first planning and returns counts and a relative
   path. Parquet support uses the existing optional extra.
 
+### Fixed
+
+- Scope CSV folder caches to their source identity and category policy.
+- Bind CSV plans to the parsed source bytes and verify exact generated bundles
+  during recovery. Interrupted workspaces without a manifest-bound checkpoint
+  require a new plan.
+- Check cumulative Parquet metadata budgets before decoding each input file.
+
 ### Security
 
 - Update the documentation lock to Soup Sieve 4.1 to remove vulnerable CSS

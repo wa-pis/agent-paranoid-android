@@ -13,12 +13,13 @@ import json
 import math
 import re
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from contextlib import contextmanager
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, Field, model_validator, model_serializer
 from test_data_agent.core.csv_reader import ScopedDictReader
@@ -46,6 +47,10 @@ from test_data_agent.core.privacy import (
 from test_data_agent.profile_types import ProfileDataType, infer_profile_data_type
 
 from test_data_agent.trino_work_budget import generation_budget_for_invocation
+
+
+if TYPE_CHECKING:
+    from test_data_agent.io.csv_source import CsvSourceBinding
 
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -163,12 +168,14 @@ def profile_csv(
     *,
     local_category_fields: Sequence[LocalCategoryField] = (),
     budget: GenerationBudget | None = None,
+    source_binding: CsvSourceBinding | None = None,
 ) -> CSVProfile:
     return _profile_csv(
         path,
         table_name=table_name,
         local_category_fields=local_category_fields,
         budget=budget,
+        source_binding=source_binding,
     )
 
 
@@ -226,10 +233,14 @@ def _profile_csv(
     row_digests: set[bytes] | None = None,
     local_category_fields: Sequence[LocalCategoryField] = (),
     budget: GenerationBudget | None = None,
+    source_binding: CsvSourceBinding | None = None,
 ) -> CSVProfile:
     budget = budget or generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
     budget.check("CSV profiling preflight")
     enforce_input_files([path])
+    if source_binding is not None:
+        with bound_csv_reader(path, source_binding, check=lambda: budget.check("CSV profiling")) as reader:
+            return _profile_csv_rows(reader, table_name or path.stem, local_category_fields, row_digests, budget)
     encoding = detect_csv_encoding(path)
     sample = read_csv_sample(path, encoding)
     dialect = detect_csv_dialect(sample)
@@ -295,9 +306,28 @@ def csv_row_digest(row: Mapping[str, Any], field_names: Sequence[str]) -> bytes:
     return hashlib.sha256(payload).digest()
 
 
+@contextmanager
+def bound_csv_reader(
+    path: Path, binding: CsvSourceBinding, *, check: Callable[[], None],
+) -> Iterator[csv.DictReader[str]]:
+    with binding.read(path, check=check) as source:
+        sample = source.peek(CSV_SAMPLE_BYTES)[:CSV_SAMPLE_BYTES]
+        encoding = _csv_sample_encoding(sample)
+        dialect = detect_csv_dialect(sample.decode(encoding, errors="replace"))
+        text = io.TextIOWrapper(source, encoding=encoding, newline="")
+        try:
+            yield ScopedDictReader(text, dialect=dialect)
+        finally:
+            text.detach()
+
+
 def detect_csv_encoding(path: Path) -> str:
     with path.open("rb") as handle:
         raw = handle.read(CSV_SAMPLE_BYTES)
+    return _csv_sample_encoding(raw)
+
+
+def _csv_sample_encoding(raw: bytes) -> str:
     try:
         raw.decode("utf-8-sig")
     except UnicodeDecodeError:

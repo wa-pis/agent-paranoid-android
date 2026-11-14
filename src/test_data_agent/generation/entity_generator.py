@@ -6,7 +6,7 @@ import random
 import string
 import math
 from datetime import datetime, timedelta
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from test_data_agent.rules.validation import BusinessValidationReport
@@ -20,6 +20,7 @@ from test_data_agent.core.distribution import (
     CategoricalDistribution,
     DateRangeDistribution,
     DateTimeRangeDistribution,
+    FieldDistribution,
     DecimalRangeDistribution,
     NumericDistribution,
     NumericShapeDistribution,
@@ -93,6 +94,7 @@ def generate_dataset(
         enforce_row_count_limit(entity.row_count)
         rng = random.Random(seed + entity_index)
         rows: list[dict[str, Any]] = []
+        distributions = [field.typed_distribution for field in entity.fields]
         for row_index in range(entity.row_count):
             budget.check(f"entity {entity.name!r} row generation")
             rows.append(
@@ -107,6 +109,7 @@ def generate_dataset(
                     invalid_ratio=invalid_ratio,
                     semantic_provider=semantic_provider,
                     identifier_domains=identifier_domains,
+                    distributions=distributions,
                 )
             )
         rows_by_entity[entity.name] = rows
@@ -149,7 +152,10 @@ def generate_row(
     invalid_ratio: float,
     semantic_provider: SemanticValueProvider | None = None,
     identifier_domains: dict[tuple[str, str], int] | None = None,
+    distributions: list[FieldDistribution | None] | None = None,
 ) -> dict[str, Any]:
+    if distributions is None:
+        distributions = [field.typed_distribution for field in entity.fields]
     return {
         field.name: generate_field_value(
             entity.name,
@@ -159,13 +165,14 @@ def generate_row(
             faker,
             seed,
             mode=mode,
+            resolved_distribution=distribution,
             invalid_ratio=invalid_ratio,
             semantic_provider=semantic_provider,
             allow_null=field.name != entity.primary_key,
             identifier_domain=(identifier_domains or {}).get((entity.name, field.name), 0),
             identifier_domain_count=max(1, len(identifier_domains or {})),
         )
-        for field in entity.fields
+        for field, distribution in zip(entity.fields, distributions, strict=True)
     }
 
 
@@ -183,6 +190,7 @@ def generate_field_value(
     allow_null: bool = True,
     identifier_domain: int = 0,
     identifier_domain_count: int = 1,
+    resolved_distribution: FieldDistribution | None | Literal[False] = False,
 ) -> Any:
     if allow_null and field.nullable:
         if mode == GenerationMode.EDGE:
@@ -221,7 +229,7 @@ def generate_field_value(
         if provider_value is not None:
             return provider_value
     distribution = field.distribution or {}
-    typed_distribution = field.typed_distribution
+    typed_distribution = field.typed_distribution if resolved_distribution is False else resolved_distribution
     if isinstance(typed_distribution, CategoricalDistribution) and typed_distribution.categories:
         return weighted_choice(typed_distribution.categories, rng)
     numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None

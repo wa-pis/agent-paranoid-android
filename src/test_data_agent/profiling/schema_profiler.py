@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from test_data_agent.core.csv_reader import ScopedDictReader
+import csv
 import random
+from collections.abc import Iterator
+from contextlib import contextmanager
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -32,6 +35,7 @@ from test_data_agent.core.privacy import (
 from test_data_agent.csv_profiler import (
     _csv_sensitive_value_type,
     _numeric_storage_type,
+    bound_csv_reader,
     detect_csv_dialect,
     detect_csv_encoding,
     infer_data_type,
@@ -44,6 +48,7 @@ from test_data_agent.csv_profiler import (
     parse_int,
     validate_csv_headers,
 )
+from test_data_agent.io.csv_source import CsvSourceBinding
 from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_paths
 
 MAX_DISTINCT_TRACKED = 10_000
@@ -176,11 +181,27 @@ def _safe_condition_value(value: Any, mapping: dict[str, str]) -> str:
     return mapping[value]
 
 
+@contextmanager
+def _folder_csv_reader(
+    path: Path, budget: LocalProfileBudget, binding: CsvSourceBinding | None,
+) -> Iterator[csv.DictReader[str]]:
+    if binding is not None:
+        with bound_csv_reader(path, binding, check=lambda: budget.check_deadline("CSV streaming")) as reader:
+            yield reader
+        return
+    encoding = detect_csv_encoding(path)
+    with path.open(newline="", encoding=encoding) as handle:
+        sample = handle.read(8192)
+        handle.seek(0)
+        yield ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
+
+
 def _profile_schema_with_sample(
     input_folder: Path,
     *,
     max_rows_per_entity: int,
     budget: LocalProfileBudget,
+    source_binding: CsvSourceBinding | None = None,
 ) -> tuple[DatasetProfile, dict[str, list[dict[str, str]]]]:
     entities: list[EntityProfile] = []
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
@@ -192,11 +213,7 @@ def _profile_schema_with_sample(
     for path in csv_paths:
         budget.check_deadline("CSV file start")
         entity_name = path.stem
-        encoding = detect_csv_encoding(path)
-        with path.open(newline="", encoding=encoding) as handle:
-            sample = handle.read(8192)
-            handle.seek(0)
-            reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
+        with _folder_csv_reader(path, budget, source_binding) as reader:
             fieldnames = validate_csv_headers(reader.fieldnames)
             enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames

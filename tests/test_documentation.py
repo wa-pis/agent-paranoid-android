@@ -489,13 +489,14 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {
+    assert {
         "_template",
         "external-feedback-1-6",
         "trino-authenticated-profiling", "bounded-profile-statistics",
         "mcp-profile-parquet",
         "configurable-inference-heuristics",
-    }
+        "artifact-integrity-refactor",
+    } == active
 
     for change_id, capability in (
         ("dataset-scale-estimation-performance", "dataset-capacity"),

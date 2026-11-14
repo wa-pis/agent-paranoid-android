@@ -170,7 +170,7 @@ def test_cache_v7_is_reprofiled_for_numeric_storage_evidence(tmp_path):
     path.write_text(json.dumps(payload))
     fresh = profile_example_folder(source, cache_dir=cache)
     assert fresh.entity("events").field("quantity").numeric_storage_type == "float"
-    assert json.loads(path.read_text())["format_version"] == PROFILE_CACHE_FORMAT_VERSION == 8
+    assert json.loads(path.read_text())["format_version"] == PROFILE_CACHE_FORMAT_VERSION == 9
     assert "2468.125" not in path.read_text() and "3579.625" not in path.read_text()
 
 
