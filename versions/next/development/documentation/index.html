@@ -207,8 +207,8 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Development / not stable</strong> · Package 1.7.0
-  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
-  <br>Documentation daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Package source 45cdde92a699e3b52f1d55e8792cc61f9b32e24d
+  <br>Documentation 45cdde92a699e3b52f1d55e8792cc61f9b32e24d
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -305,7 +305,9 @@ its tag commit once available and otherwise to the candidate source. The label
 does not claim successful package publication or public acceptance.</p>
 <h2 id="publication-and-release-gates">Publication And Release Gates<a class="headerlink" href="#publication-and-release-gates" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Finish the existing exact-source package release gates and public verification.</li>
+<li>Finish the exact-source package release gates. Run Verify Published Release
+   on main with the release tag, its exact commit and <code>scope=artifacts</code>.
+   This verifies the published packages and containers before the stable site moves.</li>
 <li>Add its stable version, exact release commit and successful public-verification
    run ID to <code>docs/releases.json</code>; retain prior catalog entries. Advance <code>stable</code>
    only for the publicly verified stable package. RCs stay out of this pointer.</li>
@@ -315,7 +317,8 @@ does not claim successful package publication or public acceptance.</p>
    catalog, builds all formats and publishes the complete Pages artifact.</li>
 <li>Public verification compares exact metadata, the native stable alias/destination, entry-page hash and all four
    download hashes. <strong>Only after that succeeds</strong> does a separate write-scoped job
-   retain the native mike Git bundle in <code>gh-pages</code>, without force-pushing.</li>
+   retain the native mike Git bundle in <code>gh-pages</code>, without force-pushing.
+   Then run Verify Published Release with <code>scope=full</code> to include the live site.</li>
 </ol>
 <p>PR builds have read-only repository permissions and never push state. Complete
 main publications are serialized. Build/export failure leaves the deployed site
