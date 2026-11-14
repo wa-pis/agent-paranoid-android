@@ -47,16 +47,16 @@ python3 -m pip install agent-paranoid-android
 ```
 
 Add only the integrations the AI client needs. The exact pin below selects
-verified stable 1.6.0; see [release status](1.6.0-release-status.md).
+stable 1.7.0; see [publication status](1.7.0-release-status.md).
 
 ```bash
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.6.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.7.0"
 ```
 
 The experimental GigaChat adapter is included in stable `1.5.0` as an explicit
-opt-in and retained in stable `1.6.0`. OpenAI remains the default
+opt-in and retained in stable `1.7.0`. OpenAI remains the default
 provider. Follow
 [Use The GigaChat Advisor](how-to/gigachat.md) before configuring credentials.
 

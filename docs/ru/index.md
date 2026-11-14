@@ -17,7 +17,7 @@ Agent Paranoid Android создаёт воспроизводимые синте�
 | Trino | [Профилирование через Trino](how-to/trino.md) |
 | Безопасный профиль или DatasetSpec | [Профили и спецификации](concepts/profiles-and-specs.md) |
 
-Для первого знакомства: [установка и встроенное демо](getting-started/installation.md). Демо не требует базы, AI или копии репозитория. Примерам с `examples/` нужен checkout версии 1.6.0.
+Для первого знакомства: [установка и встроенное демо](getting-started/installation.md). Демо не требует базы, AI или копии репозитория. Примерам с `examples/` нужен checkout версии 1.7.0.
 
 ## Основной процесс
 

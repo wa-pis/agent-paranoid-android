@@ -44,7 +44,7 @@ Base поддерживает CSV, JSON и SQL export. Устанавливай�
 
 ## Когда нужна копия репозитория
 
-Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.6.0, например отдельный clone тега v1.6.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в [Contributing](https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md), сборка сайта — в [Publishing Documentation — English](../../development/documentation.md).
+Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.7.0, например отдельный clone тега v1.7.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в [Contributing](https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md), сборка сайта — в [Publishing Documentation — English](../../development/documentation.md).
 
 Перед обновлением существующих фикстур прочитайте [миграцию](../reference/generation-contract-migration.md). Package version и DatasetSpec schema_version различаются.
 
