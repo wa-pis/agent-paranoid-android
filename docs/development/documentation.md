@@ -16,11 +16,14 @@ canonical URLs. Changing the primary host does not rewrite frozen snapshots or
 claim a new package acceptance.
 
 ```bash
-uv sync --frozen --only-group docs --no-install-project
+uv sync --frozen --only-group docs --no-install-project --python 3.12
 uv run --no-sync mkdocs build --strict
 uv run --no-sync python -m scripts.build_documentation --output site --verify-release --state-bundle site.bundle
 python3 -m http.server --directory site 8000
 ```
+
+The documentation tools require Python 3.11.5 or later for patched Soup Sieve.
+The package runtime still supports Python 3.11.
 
 The complete build needs Chrome/Chromium. Pass `--browser PATH` if necessary.
 It uses a temporary browser profile and blocks DNS; HTML embedding can read only
