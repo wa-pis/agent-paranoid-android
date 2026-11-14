@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add generator MCP `profile_parquet` for local workspace files. It writes a
+  safe JSON profile for review-first planning and returns counts and a relative
+  path. Parquet support uses the existing optional extra.
+
 ## [1.7.0rc3] - 2026-11-08
 
 Python 3.15 compatibility and bounded parallel generation of related tables.

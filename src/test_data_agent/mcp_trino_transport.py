@@ -148,11 +148,17 @@ def _create_redacted_fast_mcp(
                 if (type(exc).__name__ == "UnexpectedToolError"
                         or (exc.__cause__ is not None and type(exc.__cause__) is not ToolError)):
                     # SDK 1 embeds arbitrary exceptions; SDK 2 logs unexpected
-                    # causes. Only explicit application ToolError text is trusted.
+                    # causes. Rebuild only diagnostics with known safe content.
                     # Detach native exception text before responses or SDK logs.
+                    from test_data_agent.adapters.parquet_dataset import ParquetDependencyError
                     from test_data_agent.trino_work_budget import QueryWorkDimension
 
                     cause = exc.__cause__
+                    if type(cause) is ParquetDependencyError:
+                        raise ToolError(
+                            "Parquet profiling requires the parquet extra. "
+                            "Install agent-paranoid-android[mcp,parquet] in the server environment."
+                        ) from None
                     if type(cause) is TransformationCleanupError:
                         raise ToolError(CLEANUP_INCOMPLETE_MESSAGE) from None
                     if type(cause) is TransformationLimitError:

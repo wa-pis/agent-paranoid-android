@@ -77,6 +77,22 @@ def test_atomic_write_rejects_destination_inode_change(tmp_path: Path) -> None:
     assert output.read_bytes() == b"attacker"
 
 
+def test_atomic_new_file_does_not_replace_concurrent_output(tmp_path, monkeypatch):
+    output = tmp_path / "result.json"
+    link = os.link
+
+    def create_competing_file(*args, **kwargs):
+        output.write_bytes(b"other writer")
+        link(*args, **kwargs)
+
+    monkeypatch.setattr(path_policy.os, "link", create_competing_file)
+    with pytest.raises(ValueError, match="unsafe filesystem path"):
+        with atomic_binary_writer(output, overwrite=False) as handle:
+            handle.write(b"candidate")
+    assert output.read_bytes() == b"other writer"
+    assert list(tmp_path.iterdir()) == [output]
+
+
 def test_directory_publication_rejects_symlink_destination(tmp_path: Path) -> None:
     outside = tmp_path / "outside"
     outside.mkdir()

@@ -127,22 +127,22 @@ those contracts.
 
 ## MCP Tool Surfaces
 
-`mcp-generator-tools.json` freezes these 14 tools in the running generator
+`mcp-generator-tools.json` freezes these 16 tools in the running generator
 server composition:
 
-- `approve_dataset_plan`, `export_dataset`, `generate_dataset`
+- `approve_dataset_plan`, `estimate_dataset_capacity`, `export_dataset`, `generate_dataset`
 - `review_transformation` (read-only local snapshot review; no execution or receipt)
 - `execute_transformation` (reviewed snapshot/receipt consumer; no receipt issuer)
 - `common_transformation` (bounded common-profile review/validate/execute consumer)
 - `configured_query_session` (configured capture, frozen review/validate/execute
   and close; no receipt issuer or row-returning response)
 - `infer_dataset_spec`, `inspect_dataset_plan`, `plan_dataset`
-- `plan_trino_dataset`, `profile_csv`,
+- `plan_trino_dataset`, `profile_csv`, `profile_parquet`,
   `recover_dataset_plan`, `validate_dataset`
 
 `mcp_generator_server:main` injects the workspace and session manager needed for
 the two common/configured consumers. The module-level SDK object retains the
-12 base tools and no SQL sessions; it is not the full running-server inventory.
+14 base tools and no SQL sessions; it is not the full running-server inventory.
 
 `mcp-trino-tools.json` freezes these default aggregate-only Trino tools:
 

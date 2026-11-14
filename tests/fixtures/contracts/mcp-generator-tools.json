@@ -886,6 +886,45 @@
     }
   },
   {
+    "description": "Profile one workspace Parquet file into a new JSON artifact. Returns a relative path and counts, never rows. Requires the parquet extra; use the saved profile with plan_dataset.",
+    "input_schema": {
+      "properties": {
+        "input_path": {
+          "title": "Input Path",
+          "type": "string"
+        },
+        "output_path": {
+          "title": "Output Path",
+          "type": "string"
+        },
+        "table_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Name"
+        }
+      },
+      "required": [
+        "input_path",
+        "output_path"
+      ],
+      "title": "profile_parquetArguments",
+      "type": "object"
+    },
+    "name": "profile_parquet",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_parquetDictOutput",
+      "type": "object"
+    }
+  },
+  {
     "description": "Recover an interrupted synthetic approval only when inspect_dataset_plan reports next_action recover. Pass the exact reviewed specification fingerprint. Retains published datasets without regenerating rows; inspect completed plans instead of retrying approval.",
     "input_schema": {
       "properties": {

@@ -115,8 +115,9 @@ def write_json_artifact_atomic(payload: Any, output: Path) -> None:
 
 def write_dataset_profile_artifact(
     profile: DatasetProfile, output: Path, *, budget: GenerationBudget | None = None,
+    overwrite: bool = True,
 ) -> None:
-    write_bounded_text(profile.model_dump_json(indent=2), output, budget=budget)
+    write_bounded_text(profile.model_dump_json(indent=2), output, budget=budget, overwrite=overwrite)
 
 
 def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:

@@ -14,6 +14,9 @@
 
 Generate_dataset и export_dataset — lower-level direct generation. Они не обеспечивают сами по себе human planning gate; клиент должен требовать рассмотрение spec до вызова.
 
+Для Parquet см. [пример профилирования](how-to/mcp.md#local-parquet-profiles):
+`profile_parquet` сохраняет JSON для `plan_dataset` (ещё не выпущен).
+
 ## Отдельные поверхности
 
 Review_transformation не выдаёт receipt. Execute_transformation/common_transformation потребляют exact digest и ранее выданный человеком local receipt, если preservation требуется. Configured_query_session захватывает данные один раз в owned snapshot, затем не reconnect; требует отдельной DB authority и cleanup/expiry.

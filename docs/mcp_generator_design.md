@@ -71,9 +71,9 @@ patterns. Source rows and raw sensitive values do not cross it.
 ## Tool Logic
 
 The [generator rights table](reference/mcp-permissions.md#generator-tool-rights)
-describes all 14 console-registered tools, their inputs, effects and approvals.
+describes all 16 console-registered tools, their inputs, effects and approvals.
 The console entrypoint owns the workspace and session lifetime; the module-level
-SDK object has only the 12 base tools. Transformation activation/release
+SDK object has only the 14 base tools. Transformation activation/release
 acceptance is separate from registration. The ordinary
 `approve_dataset_plan` receipt is not a source-preservation receipt and cannot
 authorize transformation preservation; MCP has no preservation approval issuer.
@@ -113,10 +113,9 @@ No local copy of the source table is required.
    shuffling. Editing the file requires another review and new consent; a
    summary or fingerprint alone is not human specification acceptance.
 
-The lower-level `profile_csv` and `infer_dataset_spec` tools remain available
-when a client needs explicit control over intermediate artifacts. These are
-lower-level operations, rather than the persisted review-first plan lifecycle.
-See [MCP usage](how-to/mcp.md) for the consent and resume procedure.
+Use `profile_csv` or `profile_parquet` to save an intermediate artifact and
+pass it to `plan_dataset` or `infer_dataset_spec`. See
+[MCP usage](how-to/mcp.md) for the consent and resume procedure.
 
 Direct CSV and example-folder workflows compare complete generated rows against
 the source before writing output. An exact match stops generation without

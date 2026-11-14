@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
 
-from test_data_agent.adapters import load_profile_or_spec
+from test_data_agent.adapters import load_profile_or_spec, parquet_file_to_dataset_profile
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
 from test_data_agent.agent import (
     AgentGenerationSummary,
@@ -36,9 +36,11 @@ from test_data_agent.core.execution_policy import GenerationExecutionPolicy
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
     enforce_profile_payload_size,
+    max_local_profile_seconds,
     read_limited_text,
     positive_float_env,
 )
+from test_data_agent.core.privacy import infer_sensitive_value_type
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io import (
     dataset_spec_fingerprint,
@@ -47,6 +49,7 @@ from test_data_agent.io import (
     load_dataset_spec,
     validate_dataset_artifacts,
     write_csv_profile_artifact,
+    write_dataset_profile_artifact,
 )
 from test_data_agent.mcp_generator_transport import (
     create_generator_mcp,
@@ -56,6 +59,7 @@ from test_data_agent.io.artifacts import (
     business_validation_manifest,
     validate_generation_bundle,
 )
+from test_data_agent.io.path_policy import open_regular_file
 from test_data_agent.rules.business_config import make_business_rules_applier
 from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.rules.models import (
@@ -69,6 +73,7 @@ from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
     QueryWorkBudget,
     QueryWorkLimits,
+    generation_budget_for_invocation,
     with_query_work_budget,
 )
 from test_data_agent.version import __version__
@@ -134,6 +139,33 @@ def profile_csv(input_path: str, output_path: str, table_name: str | None = None
         "profile_path": workspace_path_label(output),
         **profile_summary(profile),
     }
+
+
+def profile_parquet(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
+    """Profile one workspace Parquet file into a new JSON artifact. Returns a relative path and counts, never rows. Requires the parquet extra; use the saved profile with plan_dataset."""
+
+    budget = generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
+    source = resolve_workspace_path(input_path, must_exist=True, expect_file=True)
+    output = resolve_workspace_path(output_path, reject_symlink=True)
+    _require_suffix(source, {".parquet"}, "input Parquet")
+    _require_suffix(output, {".json"}, "profile output")
+    _require_new_output(output)
+    profile_path = workspace_path_label(output)
+
+    budget.check("Parquet profile preflight")
+    with open_regular_file(source) as handle:
+        profile = parquet_file_to_dataset_profile(source, table_name=table_name, source=handle)
+    entity = profile.entities[0]
+    if any(infer_sensitive_value_type(name) for name in (entity.name, *(field.name for field in entity.fields))):
+        raise ValueError("Parquet schema names contain recognizable sensitive values")
+    assert_profile_safe(profile)
+    summary = {
+        "operation": "profile_parquet",
+        "profile_path": profile_path,
+        **profile_summary(profile),
+    }
+    write_dataset_profile_artifact(profile, output, budget=budget, overwrite=False)
+    return summary
 
 
 def infer_dataset_spec(
@@ -537,6 +569,7 @@ def resolve_workspace_path(
     must_exist: bool = False,
     expect_file: bool = False,
     expect_directory: bool = False,
+    reject_symlink: bool = False,
 ) -> Path:
     if not raw_path or "\x00" in raw_path:
         raise WorkspacePathError("path must be a non-empty workspace path")
@@ -547,6 +580,8 @@ def resolve_workspace_path(
     resolved = candidate.resolve(strict=False)
     if not resolved.is_relative_to(root):
         raise WorkspacePathError(f"path escapes {WORKSPACE_ROOT_ENV}")
+    if reject_symlink and candidate.is_symlink():
+        raise WorkspacePathError("workspace output path must not be a symbolic link")
     if must_exist and not resolved.exists():
         raise WorkspacePathError("workspace input path does not exist")
     if expect_file and resolved.exists() and not resolved.is_file():
@@ -754,6 +789,7 @@ _GENERATOR_MCP_TOOLS = (
     execute_transformation,
     review_transformation,
     profile_csv,
+    profile_parquet,
     infer_dataset_spec,
     plan_dataset,
     plan_trino_dataset,
