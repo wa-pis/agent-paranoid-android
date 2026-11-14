@@ -4,7 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-## [1.7.0]
+## [1.7.0] - 2026-11-15
 
 Promotes the verified 1.7.0rc4 runtime. Changes since 1.6.0 include bounded
 scalable generation and capacity forecasts, CPython 3.15 support, configurable
@@ -1344,3 +1344,5 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 [0.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/wa-pis/agent-paranoid-android/releases/tag/v0.2.0
+
+[1.7.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.6.0...v1.7.0

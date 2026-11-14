@@ -50,7 +50,7 @@ package or a problem with deployment credentials.
 structured-response mapping and cleanup. It does not read
 `GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
 GigaChat. Install stable `1.7.0` with the `gigachat` extra.
-See [release status](../1.6.0-release-status.md).
+See [release status](../1.7.0-release-status.md).
 
 ## JDBC-Style URL Rejected
 
