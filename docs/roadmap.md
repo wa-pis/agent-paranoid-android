@@ -30,6 +30,11 @@ identities and global rules remain outside the scalable engine’s scope.
 
 ## Next
 
+- Plan configurable inference heuristics: declarative user rules for field
+  recognition, relationship candidates and confidence settings, shared across
+  supported sources and Python, CLI and MCP. See OpenSpec
+  `configurable-inference-heuristics`.
+
 - Keep GitHub Pages as the primary documentation host with native mike versions,
   bilingual navigation/search and four verified offline formats. The maintainer
   cancelled the Cloudflare migration on 2026-11-01: it served the same MkDocs site

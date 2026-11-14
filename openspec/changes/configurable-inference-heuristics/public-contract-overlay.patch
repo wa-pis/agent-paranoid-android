@@ -1,0 +1,298 @@
+diff --git a/schemas/dataset_spec.schema.json b/schemas/dataset_spec.schema.json
+index 9977667b..b9b07c93 100644
+--- a/schemas/dataset_spec.schema.json
++++ b/schemas/dataset_spec.schema.json
+@@ -459,6 +459,42 @@
+       "title": "EntitySpec",
+       "type": "object"
+     },
++    "FieldInferenceEffect": {
++      "properties": {
++        "action": {
++          "enum": [
++            "synthetic_identifier",
++            "keep_builtin"
++          ],
++          "title": "Action",
++          "type": "string"
++        },
++        "entity_index": {
++          "minimum": 0,
++          "title": "Entity Index",
++          "type": "integer"
++        },
++        "field_index": {
++          "minimum": 0,
++          "title": "Field Index",
++          "type": "integer"
++        },
++        "rule_index": {
++          "exclusiveMaximum": 128,
++          "minimum": 0,
++          "title": "Rule Index",
++          "type": "integer"
++        }
++      },
++      "required": [
++        "entity_index",
++        "field_index",
++        "rule_index",
++        "action"
++      ],
++      "title": "FieldInferenceEffect",
++      "type": "object"
++    },
+     "FieldRule": {
+       "additionalProperties": false,
+       "properties": {
+@@ -855,6 +891,55 @@
+       "title": "GenerationSettings",
+       "type": "object"
+     },
++    "InferenceEvidence": {
++      "properties": {
++        "constraints_filtered": {
++          "minimum": 0,
++          "title": "Constraints Filtered",
++          "type": "integer"
++        },
++        "field_effects": {
++          "items": {
++            "$ref": "#/$defs/FieldInferenceEffect"
++          },
++          "maxItems": 100000,
++          "title": "Field Effects",
++          "type": "array"
++        },
++        "min_constraint_confidence": {
++          "maximum": 1,
++          "minimum": 0,
++          "title": "Min Constraint Confidence",
++          "type": "number"
++        },
++        "min_relationship_confidence": {
++          "maximum": 1,
++          "minimum": 0,
++          "title": "Min Relationship Confidence",
++          "type": "number"
++        },
++        "options_sha256": {
++          "pattern": "^[a-f0-9]{64}$",
++          "title": "Options Sha256",
++          "type": "string"
++        },
++        "relationships_filtered": {
++          "minimum": 0,
++          "title": "Relationships Filtered",
++          "type": "integer"
++        }
++      },
++      "required": [
++        "options_sha256",
++        "field_effects",
++        "min_relationship_confidence",
++        "min_constraint_confidence",
++        "relationships_filtered",
++        "constraints_filtered"
++      ],
++      "title": "InferenceEvidence",
++      "type": "object"
++    },
+     "LocalCategoryField": {
+       "description": "Explicit field scope for local non-sensitive category preservation.",
+       "properties": {
+@@ -1256,6 +1341,17 @@
+     "generation_settings": {
+       "$ref": "#/$defs/GenerationSettings"
+     },
++    "inference_evidence": {
++      "anyOf": [
++        {
++          "$ref": "#/$defs/InferenceEvidence"
++        },
++        {
++          "type": "null"
++        }
++      ],
++      "default": null
++    },
+     "local_category_fields": {
+       "items": {
+         "$ref": "#/$defs/LocalCategoryField"
+diff --git a/src/test_data_agent/mcp_generator_server.py b/src/test_data_agent/mcp_generator_server.py
+index bb3c8a0e..29baf12c 100644
+--- a/src/test_data_agent/mcp_generator_server.py
++++ b/src/test_data_agent/mcp_generator_server.py
+@@ -32,6 +32,7 @@ from test_data_agent.agent import (
+ )
+ from test_data_agent.audit import audit_logger_from_env
+ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
++from test_data_agent.core.inference import parse_inference_options
+ from test_data_agent.core.execution_policy import GenerationExecutionPolicy
+ from test_data_agent.core.limits import (
+     enforce_business_rules_payload_size,
+@@ -188,6 +189,7 @@ def infer_dataset_spec(
+     profile_path: str | None = None,
+     profile_payload: dict[str, Any] | None = None,
+     count: int | None = None,
++    inference_options: dict[str, Any] | None = None,
+ ) -> dict[str, Any]:
+     """Infer and persist a versioned DatasetSpec from safe profile metadata."""
+ 
+@@ -206,7 +208,10 @@ def infer_dataset_spec(
+     else:
+         loaded = load_inline_profile_payload(profile_payload or {})
+     assert_profile_safe(loaded)
+-    spec = infer_dataset_spec_artifact(loaded, output_path=output, count=count)
++    spec = infer_dataset_spec_artifact(
++        loaded, output_path=output, count=count,
++        inference_options=parse_inference_options(inference_options) if inference_options is not None else None,
++    )
+     return {
+         "operation": "infer_dataset_spec",
+         "spec_path": workspace_path_label(output),
+diff --git a/tests/fixtures/contracts/advisor-exchange.json b/tests/fixtures/contracts/advisor-exchange.json
+index f4c68fa0..a8165960 100644
+--- a/tests/fixtures/contracts/advisor-exchange.json
++++ b/tests/fixtures/contracts/advisor-exchange.json
+@@ -633,6 +633,17 @@
+           "generation_settings": {
+             "$ref": "#/$defs/GenerationSettings"
+           },
++          "inference_evidence": {
++            "anyOf": [
++              {
++                "$ref": "#/$defs/InferenceEvidence"
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "default": null
++          },
+           "local_category_fields": {
+             "items": {
+               "$ref": "#/$defs/LocalCategoryField"
+@@ -720,6 +731,42 @@
+         "title": "EntitySpec",
+         "type": "object"
+       },
++      "FieldInferenceEffect": {
++        "properties": {
++          "action": {
++            "enum": [
++              "synthetic_identifier",
++              "keep_builtin"
++            ],
++            "title": "Action",
++            "type": "string"
++          },
++          "entity_index": {
++            "minimum": 0,
++            "title": "Entity Index",
++            "type": "integer"
++          },
++          "field_index": {
++            "minimum": 0,
++            "title": "Field Index",
++            "type": "integer"
++          },
++          "rule_index": {
++            "exclusiveMaximum": 128,
++            "minimum": 0,
++            "title": "Rule Index",
++            "type": "integer"
++          }
++        },
++        "required": [
++          "entity_index",
++          "field_index",
++          "rule_index",
++          "action"
++        ],
++        "title": "FieldInferenceEffect",
++        "type": "object"
++      },
+       "FieldRule": {
+         "additionalProperties": false,
+         "properties": {
+@@ -1116,6 +1163,55 @@
+         "title": "GenerationSettings",
+         "type": "object"
+       },
++      "InferenceEvidence": {
++        "properties": {
++          "constraints_filtered": {
++            "minimum": 0,
++            "title": "Constraints Filtered",
++            "type": "integer"
++          },
++          "field_effects": {
++            "items": {
++              "$ref": "#/$defs/FieldInferenceEffect"
++            },
++            "maxItems": 100000,
++            "title": "Field Effects",
++            "type": "array"
++          },
++          "min_constraint_confidence": {
++            "maximum": 1,
++            "minimum": 0,
++            "title": "Min Constraint Confidence",
++            "type": "number"
++          },
++          "min_relationship_confidence": {
++            "maximum": 1,
++            "minimum": 0,
++            "title": "Min Relationship Confidence",
++            "type": "number"
++          },
++          "options_sha256": {
++            "pattern": "^[a-f0-9]{64}$",
++            "title": "Options Sha256",
++            "type": "string"
++          },
++          "relationships_filtered": {
++            "minimum": 0,
++            "title": "Relationships Filtered",
++            "type": "integer"
++          }
++        },
++        "required": [
++          "options_sha256",
++          "field_effects",
++          "min_relationship_confidence",
++          "min_constraint_confidence",
++          "relationships_filtered",
++          "constraints_filtered"
++        ],
++        "title": "InferenceEvidence",
++        "type": "object"
++      },
+       "LocalCategoryField": {
+         "description": "Explicit field scope for local non-sensitive category preservation.",
+         "properties": {
+diff --git a/tests/fixtures/contracts/mcp-generator-tools.json b/tests/fixtures/contracts/mcp-generator-tools.json
+index fdd4af43..02657c5e 100644
+--- a/tests/fixtures/contracts/mcp-generator-tools.json
++++ b/tests/fixtures/contracts/mcp-generator-tools.json
+@@ -550,6 +550,19 @@
+           "default": null,
+           "title": "Count"
+         },
++        "inference_options": {
++          "anyOf": [
++            {
++              "additionalProperties": true,
++              "type": "object"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Inference Options"
++        },
+         "output_path": {
+           "title": "Output Path",
+           "type": "string"
