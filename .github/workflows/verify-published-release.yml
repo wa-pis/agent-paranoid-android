@@ -1,4 +1,5 @@
 name: Verify Published Release
+run-name: Verify ${{ inputs.tag }} ${{ inputs.expected_commit }} (${{ inputs.scope }})
 
 on:
   workflow_dispatch:
@@ -6,6 +7,14 @@ on:
       tag:
         description: Published release tag to verify
         required: true
+        type: string
+      scope:
+        description: Verify artifacts before promoting docs, or verify the full release
+        type: choice
+        options: [full, artifacts]
+        default: full
+      expected_commit:
+        description: Exact release commit (required for artifacts scope)
         type: string
 
 permissions: {}
@@ -38,6 +47,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_TAG: ${{ inputs.tag }}
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          VERIFICATION_SCOPE: ${{ inputs.scope }}
         run: |
           set -euo pipefail
           tag="${REQUESTED_TAG:-}"
@@ -56,6 +67,9 @@ jobs:
           test "${published_tag}" = "${tag}"
           commit="$(git rev-list -n 1 "${tag}")"
           test "${commit}" = "$(git rev-parse HEAD)"
+          if [[ "${VERIFICATION_SCOPE}" == artifacts || -n "${EXPECTED_COMMIT}" ]]; then
+            test "${commit}" = "${EXPECTED_COMMIT}"
+          fi
           mkdir -p /tmp/release-wheel
           gh release download "${tag}" \
             --repo "${GITHUB_REPOSITORY}" \
@@ -362,6 +376,7 @@ jobs:
             >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Verify published documentation
+        if: inputs.scope != 'artifacts'
         env:
           PYPI_VERSION: ${{ needs.prepare.outputs.version }}
         run: |

@@ -79,10 +79,16 @@ def verify_release(release: Release, root: Path) -> None:
             cwd=root,
         )
     )
+    artifact_run = (
+        run.get("event") == "workflow_dispatch"
+        and run.get("head_branch") == "main"
+        and run.get("display_title")
+        == f"Verify v{release.version} {release.commit} (artifacts)"
+    )
     if (
         run.get("conclusion") != "success"
         or run.get("status") != "completed"
-        or run.get("head_sha") != release.commit
+        or (run.get("head_sha") != release.commit and not artifact_run)
         or run.get("path") != ".github/workflows/verify-published-release.yml"
     ):
         raise ValueError(
