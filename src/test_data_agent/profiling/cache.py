@@ -20,7 +20,7 @@ from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_pat
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
 DEFAULT_RULE_SAMPLE_ROWS = 50_000
-PROFILE_CACHE_FORMAT_VERSION = 8
+PROFILE_CACHE_FORMAT_VERSION = 9
 
 
 def csv_folder_fingerprint(
@@ -31,15 +31,14 @@ def csv_folder_fingerprint(
     budget: LocalProfileBudget | None = None,
 ) -> str:
     digest = hashlib.sha256()
-    digest.update(str(rule_sample_rows).encode())
+    digest.update(json.dumps([str(input_folder.resolve()), rule_sample_rows]).encode())
     digest.update(json.dumps(_category_policy(local_category_fields), separators=(",", ":")).encode())
     budget = budget or LocalProfileBudget()
     for path in budget.check_input_files(bounded_csv_paths(input_folder, budget)):
         budget.check_deadline("cache fingerprint")
         stat = path.stat()
-        digest.update(path.name.encode())
-        digest.update(str(stat.st_size).encode())
-        digest.update(str(stat.st_mtime_ns).encode())
+        digest.update(json.dumps([path.name, stat.st_dev, stat.st_ino, stat.st_size,
+                                  stat.st_mtime_ns, stat.st_ctime_ns]).encode())
     return digest.hexdigest()
 
 

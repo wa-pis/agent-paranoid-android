@@ -38,6 +38,9 @@ operation and input size before changing a budget. Do not raise a ceiling only
 to make a single run pass. Platform-level RSS, disk, cancellation, and failure
 cleanup are covered by separate operational-readiness gates.
 
+For runnable CSV and Parquet examples with an explicit generation policy,
+see [Forecast And Generate Larger Synthetic Datasets](../how-to/dataset-capacity.md#recipe-750000-distinct-csv-rows).
+
 ## Database Source Budgets
 
 The development branch also has an explicit finite

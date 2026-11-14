@@ -15,7 +15,9 @@ explicitly creates a temporary fictional sample (default 2,000 rows per entity,
 at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
 It removes the sample and returns numeric summaries. Calibration never approves
 or publishes the requested dataset and does not advance its random stream.
-Related/rule-constrained calibration is currently unsupported and reports why.
+Calibration supports eligible linked tables with `scalable-relational-v1` in
+`1.7.0rc3`. Other related or rule-constrained specs report why calibration is
+unavailable.
 
 File forecasts describe the selected CSV, indented JSON or Snappy Parquet
 settings. Change `generation_settings.output_format` to compare formats.
@@ -107,6 +109,102 @@ bytes are identical; Parquet row-group/layout metadata can differ. Manifests
 record the policy/engine and include normal provenance/validation. Timing
 statistics and informational progress are not deterministic data artifacts.
 
+## Recipe: 750,000 Distinct CSV Rows
+
+Use the scalable engine with CLI version `1.7.0rc2` or later on Linux or
+macOS. Start in a fresh working directory. The synthetic integer primary
+key makes every complete row distinct.
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+fields = [{"name": "item_id", "data_type": "integer", "is_identifier": True}]
+fields += [
+    {"name": f"metric_{i:02}", "data_type": "integer",
+     "distribution": {"kind": "numeric", "min_value": 0, "max_value": 100}}
+    for i in range(24)
+]
+Path("large-csv.json").write_text(json.dumps({
+    "entities": [{"name": "items", "row_count": 750000,
+                  "primary_key": "item_id", "fields": fields}],
+    "generation_settings": {
+        "seed": 42,
+        "output_format": "csv",
+        "execution_policy": {
+            "engine": "scalable-v1",
+            "max_rows": 750000,
+            "max_cells": 18750000,
+            "max_memory_bytes": 402653184,
+            "max_output_bytes": 536870912,
+            "max_temporary_bytes": 536870912,
+            "max_seconds": 600,
+            "workers": 1,
+            "batch_size": 2000,
+            "require_distinct_rows": True
+        }
+    }
+}, indent=2), encoding="utf-8")
+PY
+
+test-data-agent generate large-csv.json --count 1000 --output out/smoke
+test-data-agent validate out/smoke/dataset_spec.yaml out/smoke
+```
+
+The full run requests 18,750,000 cells. The policy checks a 384 MiB process
+memory budget at batch boundaries. Actual memory depends on the runtime and
+schema. Run calibration on the target machine and check free space on the
+filesystem that will hold the output and staging directory.
+
+```bash
+test-data-agent estimate-capacity large-csv.json --calibrate --json
+test-data-agent generate large-csv.json --output out/large-csv
+test-data-agent validate out/large-csv/dataset_spec.yaml out/large-csv
+```
+
+Check that `generation_manifest.json` reports `items: 750000` in
+`row_counts` and that validation passes. The streamed validator verifies file
+hashes and the declared key domain without loading the entire dataset.
+Use `generation_statistics.json` for observed output bytes, elapsed time and
+the conservative process-tree RSS upper bound.
+
+## Recipe: Parquet For The Same Dataset
+
+Install the [Parquet extra](../getting-started/installation.md). Change the
+format in a copy of the reviewed spec and calibrate that copy. Parquet size
+depends on encoding and compression.
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+spec = json.loads(Path("large-csv.json").read_text(encoding="utf-8"))
+spec["generation_settings"]["output_format"] = "parquet"
+Path("large-parquet.json").write_text(json.dumps(spec, indent=2), encoding="utf-8")
+PY
+
+test-data-agent generate large-parquet.json --count 1000 --output out/parquet-smoke
+test-data-agent validate out/parquet-smoke/dataset_spec.yaml out/parquet-smoke
+test-data-agent estimate-capacity large-parquet.json --calibrate --json
+test-data-agent generate large-parquet.json --output out/large-parquet
+test-data-agent validate out/large-parquet/dataset_spec.yaml out/large-parquet
+```
+
+## Retry An Interrupted Run
+
+For standalone `generate`, diagnose the reported budget or filesystem failure
+and retry with the same spec and seed in a new output directory. Use a smaller
+batch if the process reaches its memory budget. Hard termination can leave
+staging files. Check that generation has stopped before removing them.
+
+For a review-first workspace, run `agent-status`. If it reports
+`recovery_required`, run `agent-recover` with the reviewed spec fingerprint
+to verify the published bundle and finish completion. See
+[Resource Budgets](../operations/resource-budgets.md#interrupted-publication)
+for the publication and cleanup contract.
+
 ## Review And Inspect In MCP
 
 Use `estimate_dataset_capacity(spec_path, calibrate=false)` for a saved workspace
@@ -154,6 +252,45 @@ accounting; memory checks and finite policy ceilings remain enabled.
 <a id="linked-tables-unreleased"></a>
 
 ## Linked Tables (1.7.0rc3)
+
+### Recipe: Customers And Orders
+
+Reuse the CSV recipe's execution policy with `scalable-relational-v1`.
+This example requests 150,000 customers and 600,000 orders, each with a
+synthetic primary key. Every order references one generated customer.
+
+```bash
+python3 - <<'PYCODE'
+import json
+from pathlib import Path
+
+spec = json.loads(Path("large-csv.json").read_text(encoding="utf-8"))
+spec["generation_settings"]["execution_policy"]["engine"] = "scalable-relational-v1"
+spec["entities"] = [
+    {"name": "customers", "row_count": 150000, "primary_key": "customer_id",
+     "fields": [{"name": "customer_id", "data_type": "integer", "is_identifier": True}]},
+    {"name": "orders", "row_count": 600000, "primary_key": "order_id",
+     "fields": [{"name": "order_id", "data_type": "integer", "is_identifier": True},
+                {"name": "customer_id", "data_type": "integer"}]},
+]
+spec["relationships"] = [
+    {"parent_entity": "customers", "parent_field": "customer_id",
+     "child_entity": "orders", "child_field": "customer_id",
+     "relationship_type": "many_to_one", "confidence": 1}
+]
+Path("large-linked.json").write_text(json.dumps(spec, indent=2), encoding="utf-8")
+PYCODE
+
+test-data-agent estimate-capacity large-linked.json --calibrate --json
+test-data-agent generate large-linked.json --output out/large-linked
+test-data-agent validate out/large-linked/dataset_spec.yaml out/large-linked
+```
+
+Check the two counts separately in `generation_manifest.json` and inspect
+the relationship checks in `validation_report.json`. Keep the counts in the
+spec when tables have different sizes. The CLI `--count` applies to every table.
+
+### Linked-Table Limits
 
 Set `generation_settings.execution_policy.engine: scalable-relational-v1` to
 stream related synthetic tables. Use the same finite policy fields shown above.

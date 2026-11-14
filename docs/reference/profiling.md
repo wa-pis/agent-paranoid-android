@@ -44,7 +44,7 @@ columns require review; local category permission is not declassification.
 
 NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-Folder cache format 8 recomputes older cached profiles. Reprofile saved standalone
+Folder cache format 9 recomputes older cached profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.
 
@@ -115,7 +115,7 @@ the reviewed field into `dataset_spec.yaml`, preserve the planned generation
 settings, run `agent-review`, and approve the newly reported fingerprint.
 Do not overwrite the workspace spec with default inference settings.
 
-Folder cache format 8 recomputes older profiles. An old ambiguous profile without
+Folder cache format 9 recomputes older profiles. An old ambiguous profile without
 storage evidence requires fresh profiling; saved profiles/plans are not silently
 upgraded. Evidence changes the profile fingerprint, and edited synthetic bounds
 change the spec fingerprint. Obtain new review/approval after either change.

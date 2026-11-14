@@ -224,6 +224,7 @@ class AgentCompletionCheckpoint(BaseModel):
     plan_id: str = Field(pattern=r"^[0-9a-f]{32}$")
     profile_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     reviewed_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    manifest_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     source_type: str
     row_counts: dict[str, int]
     seed: int = Field(ge=0)

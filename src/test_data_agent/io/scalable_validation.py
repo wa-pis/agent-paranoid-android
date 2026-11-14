@@ -1,6 +1,7 @@
 """Revalidate opt-in generated bundles without source/profiling allocation limits."""
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 from collections.abc import Callable, Iterator
@@ -10,7 +11,7 @@ from typing import Any
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.execution_policy import MAX_SCALABLE_JSON_ROW_CHARS
 from test_data_agent.core.csv_reader import ScopedDictReader
-from test_data_agent.core.limits import GenerationLimitError, output_folder_size
+from test_data_agent.core.limits import GenerationLimitError, output_folder_size, read_limited_text
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.entity_generator import synthetic_identifier
 from test_data_agent.generation.scalable import check_scalable_spec, resident_high_water_bytes
@@ -92,7 +93,8 @@ def _rows(path: Path, fmt: OutputFormat, columns: list[str], batch_size: int) ->
 
 
 def validate_scalable_bundle(spec: DatasetSpec, folder: Path, *,
-                             check_batch: Callable[[dict[str, list[dict[str, Any]]]], None] | None = None) -> DatasetValidationReport:
+                             check_batch: Callable[[dict[str, list[dict[str, Any]]]], None] | None = None,
+) -> DatasetValidationReport:
     policy = spec.generation_settings.execution_policy
     assert policy is not None
     budget = generation_budget_for_invocation(max_seconds=policy.max_seconds)
@@ -110,6 +112,14 @@ def validate_scalable_bundle(spec: DatasetSpec, folder: Path, *,
     if manifest.reproducibility is None or not required <= set(manifest.reproducibility.output_sha256):
         raise ValueError('scalable bundle omits required integrity hashes')
     allowed = set(manifest.reproducibility.output_sha256) | {'generation_manifest.json'}
+    checkpoint_path = folder / 'agent_completion.json'
+    if checkpoint_path.is_file() and checkpoint_path.name not in allowed:
+        from test_data_agent.agent_contracts import AgentCompletionCheckpoint
+        checkpoint = AgentCompletionCheckpoint.model_validate_json(read_limited_text(checkpoint_path))
+        manifest_digest = hashlib.sha256(read_limited_text(folder / 'generation_manifest.json').encode()).hexdigest()
+        if checkpoint.manifest_sha256 != manifest_digest:
+            raise ValueError('scalable checkpoint does not match the manifest')
+        allowed.add(checkpoint_path.name)
     if any(path.is_symlink() or not path.is_file() or path.name not in allowed for path in folder.iterdir()):
         raise ValueError('scalable bundle contains untracked artifacts')
     domains = {key: index for index, key in enumerate(sorted(

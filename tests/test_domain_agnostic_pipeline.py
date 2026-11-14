@@ -668,3 +668,17 @@ def test_folder_cache_policy_order_and_legacy_format(tmp_path):
     payload["format_version"] = 4
     path.write_text(json.dumps(payload))
     assert load_cached_profile(source, cache_dir=cache, local_category_fields=scopes) is None
+
+
+def test_folder_cache_distinguishes_sources_with_matching_sizes_and_mtimes(tmp_path):
+    import os
+
+    cache = tmp_path / "cache"
+    for name, low in (("first", 10), ("second", 90)):
+        source = tmp_path / name
+        source.mkdir()
+        path = source / "orders.csv"
+        path.write_text(f"amount\n{low}\n{low + 1}\n")
+        os.utime(path, ns=(1_700_000_000_000_000_000,) * 2)
+        profile = profile_example_folder(source, cache_dir=cache)
+        assert profile.entity("orders").field("amount").distribution["min_value"] == low

@@ -110,6 +110,7 @@ def generate_task(task: RowTask, *, budget: GenerationBudget | None = None, refe
     faker = create_faker(spec.generation_settings.locale)
     seeded_faker = any(field.sensitive for field in entity.fields)
     rows = []
+    distributions = [field.typed_distribution for field in entity.fields]
     for index in range(task.start, task.start+task.count):
         budget.check("scalable row generation")
         # Row-local integer streams: independent of process scheduling and batch boundaries.
@@ -119,7 +120,7 @@ def generate_task(task: RowTask, *, budget: GenerationBudget | None = None, refe
             faker.seed_instance(row_seed)
         row = generate_row(entity, index, rng, faker, task.seed,
             mode=spec.generation_settings.mode, invalid_ratio=0,
-            identifier_domains=domains)
+            identifier_domains=domains, distributions=distributions)
         assign_references(row, links, index, task.seed)
         rows.append(row)
     generated = time.monotonic()

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.privacy import LocalCategoryField
+from test_data_agent.io.csv_source import CsvSourceBinding
 from test_data_agent.profiling.cache import DEFAULT_PROFILE_CACHE_DIR, load_cached_profile, write_cached_profile
 from test_data_agent.profiling.budget import (
     LocalProfileBudget,
@@ -31,12 +32,14 @@ def profile_example_folder(
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
     budget: LocalProfileBudget | None = None,
     local_category_fields: tuple[LocalCategoryField, ...] = (),
+    *,
+    source_binding: CsvSourceBinding | None = None,
 ) -> DatasetProfile:
     work_budget = budget or LocalProfileBudget()
     work_budget.check_sample_rows(rule_sample_rows)
     work_budget.check_input_files(bounded_csv_paths(input_folder, work_budget))
     work_budget.check_deadline("cache lookup")
-    if use_cache and cache_dir is not None:
+    if use_cache and cache_dir is not None and source_binding is None:
         cached = load_cached_profile(
             input_folder,
             cache_dir=cache_dir,
@@ -52,6 +55,7 @@ def profile_example_folder(
         input_folder,
         max_rows_per_entity=rule_sample_rows,
         budget=work_budget,
+        source_binding=source_binding,
     )
     work_budget.check_deadline("relationship inference")
     profile.relationships = infer_relationships(profile, rows_by_entity, budget=work_budget)

@@ -5,10 +5,12 @@ from __future__ import annotations
 from test_data_agent.core.csv_reader import ScopedDictReader
 import json
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Iterator, Mapping
+from contextlib import contextmanager
+import csv
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.decimal_units import MAX_DECIMAL_DIGITS, value_matches_decimal
@@ -30,6 +32,7 @@ from test_data_agent.core.privacy import (
 )
 from test_data_agent.csv_profiler import (
     CSVSourceRowDigests,
+    bound_csv_reader,
     csv_row_digest,
     parse_int,
     parse_float,
@@ -37,6 +40,10 @@ from test_data_agent.csv_profiler import (
     detect_csv_encoding,
     validate_csv_headers,
 )
+
+
+if TYPE_CHECKING:
+    from test_data_agent.io.csv_source import CsvSourceBinding
 
 
 class ProfileSafetyError(ValueError):
@@ -211,23 +218,37 @@ def assert_profile_safe(profile: DatasetProfile) -> None:
                 _validate_masked_patterns(entity.name, field.name, field.distribution.get("patterns", []))
 
 
+@contextmanager
+def _source_row_reader(
+    path: Path, binding: CsvSourceBinding | None,
+) -> Iterator[csv.DictReader[str]]:
+    if binding is not None:
+        from test_data_agent.profiling.budget import LocalProfileBudget
+        budget = LocalProfileBudget()
+        with bound_csv_reader(path, binding, check=lambda: budget.check_deadline("CSV row reuse")) as reader:
+            yield reader
+        return
+    encoding = detect_csv_encoding(path)
+    with path.open(newline="", encoding=encoding) as handle:
+        sample = handle.read(8192)
+        handle.seek(0)
+        yield ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
+
+
 def assert_no_csv_source_rows(
     source_path: Path,
     generated_rows: Iterable[Mapping[str, Any]],
     *,
     entity_name: str | None = None,
+    source_binding: CsvSourceBinding | None = None,
 ) -> None:
     """Stream a CSV and fail without exposing values when any full row is reused."""
 
     generated = list(generated_rows)
-    if not generated:
+    if not generated and source_binding is None:
         return
     enforce_input_files([source_path])
-    encoding = detect_csv_encoding(source_path)
-    with source_path.open(newline="", encoding=encoding) as handle:
-        sample = handle.read(8192)
-        handle.seek(0)
-        reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
+    with _source_row_reader(source_path, source_binding) as reader:
         fieldnames = validate_csv_headers(
             list(reader.fieldnames) if reader.fieldnames is not None else None
         )

@@ -26,7 +26,7 @@ from test_data_agent.core.limits import max_generation_count, read_limited_text
 from test_data_agent.generation import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import validate_generation_bundle, write_dataset_profile_artifact, write_json_artifact
-from test_data_agent.io.path_policy import discard_staging_directory, inspect_file_output
+from test_data_agent.io.path_policy import inspect_file_output
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     ensure_empty_output_folder,
@@ -35,13 +35,11 @@ from test_data_agent.io.workflows import (
     ensure_paths_distinct,
     ensure_rules_distinct_from_single_entity_output,
     require_output_suffix,
-    commit_temp_output_folder,
     generate_dataset_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
-    make_temp_output_folder,
     write_csv_profile_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
@@ -551,24 +549,17 @@ def generate_dataset_from_example_artifacts(
         rule_sample_rows=rule_sample_rows,
         local_category_fields=local_category_fields,
     )
-    temp_folder = make_temp_output_folder(output_folder)
-    try:
-        spec = infer_dataset_spec(profile, count=count)
-        if business_rules_path is not None:
-            spec.business_rules = load_business_rules(business_rules_path)
-        result = generate_dataset_review_artifacts(
-            profile,
-            spec,
-            output_folder=temp_folder,
-            output_format=output_format,
-            seed=seed,
-            source_folder=input_folder,
-        )
-        commit_temp_output_folder(temp_folder, output_folder)
-        return result
-    except Exception:
-        discard_staging_directory(temp_folder)
-        raise
+    spec = infer_dataset_spec(profile, count=count)
+    if business_rules_path is not None:
+        spec.business_rules = load_business_rules(business_rules_path)
+    return generate_dataset_review_artifacts(
+        profile,
+        spec,
+        output_folder=output_folder,
+        output_format=output_format,
+        seed=seed,
+        source_folder=input_folder,
+    )
 
 
 def generate_dataset_from_example_command(args: argparse.Namespace) -> int:

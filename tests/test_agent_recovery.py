@@ -12,16 +12,20 @@ from test_data_agent.agent import (
 )
 from test_data_agent.agent_contracts import AgentRequest, AgentSourceType
 from test_data_agent.agent_recovery import AgentRecoveryService
+from test_data_agent.core.execution_policy import GenerationExecutionPolicy
+from test_data_agent.core.settings import OutputFormat
 
 
 FIXTURE_DATASET = Path("tests/fixtures/example_dataset")
 
 
+@pytest.mark.parametrize("output_format", [OutputFormat.CSV, OutputFormat.SQL])
 def test_recovery_service_publishes_without_regenerating(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
+    output_format: OutputFormat,
 ) -> None:
-    workspace, reviewed_sha256 = _interrupt_approval(monkeypatch, tmp_path)
+    workspace, reviewed_sha256 = _interrupt_approval(monkeypatch, tmp_path, output_format=output_format)
     generated_before = _bundle_bytes(workspace / "generated")
 
     result = AgentRecoveryService(
@@ -69,12 +73,21 @@ def test_recovery_boundary_has_no_runtime_transport_or_compatibility_imports() -
 def _interrupt_approval(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
+    *,
+    output_format: OutputFormat = OutputFormat.CSV,
+    scalable: bool = False,
 ) -> tuple[Path, str]:
     workspace = tmp_path / "agent"
+    source = FIXTURE_DATASET
+    if scalable:
+        source = tmp_path / "items.csv"
+        source.write_text("item_id,quantity\n1,10\n2,20\n")
     planned = plan_agent_request(
         AgentRequest(
-            source_type=AgentSourceType.CSV_FOLDER,
-            source_path=FIXTURE_DATASET,
+            source_type=AgentSourceType.CSV if scalable else AgentSourceType.CSV_FOLDER,
+            source_path=source,
+            execution_policy=GenerationExecutionPolicy() if scalable else None,
+            output_format=output_format,
             workspace=workspace,
             count=3,
             seed=91,
@@ -122,3 +135,28 @@ def _top_level_imports(module: ModuleType) -> set[str]:
         elif isinstance(node, ast.Import):
             imports.update(alias.name for alias in node.names)
     return imports
+
+
+def test_recovery_rejects_changed_bytes_with_valid_schema(tmp_path, monkeypatch):
+    workspace, reviewed_sha256 = _interrupt_approval(monkeypatch, tmp_path)
+    path = workspace / "generated" / "orders.csv"
+    content = path.read_text()
+    original = path.read_bytes()
+    path.write_text(content)
+    assert path.read_bytes() != original
+    with pytest.raises(ValueError, match="artifacts are inconsistent"):
+        AgentRecoveryService(validate_agent_completion_checkpoint).recover_workspace(
+            workspace, reviewed_spec_sha256=reviewed_sha256,
+        )
+    assert not (workspace / "agent_result.json").exists()
+
+
+def test_scalable_recovery_verifies_bound_manifest(tmp_path, monkeypatch):
+    workspace, reviewed_sha256 = _interrupt_approval(monkeypatch, tmp_path, scalable=True)
+    generated = workspace / "generated"
+    before = _bundle_bytes(generated)
+    result = AgentRecoveryService(validate_agent_completion_checkpoint).recover_workspace(
+        workspace, reviewed_spec_sha256=reviewed_sha256,
+    )
+    assert result.phase == "completed"
+    assert _bundle_bytes(generated) == before

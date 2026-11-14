@@ -317,13 +317,17 @@ def artifact_hashes(output_folder: Path) -> dict[str, str]:
     return hashes
 
 
-def validate_generation_bundle(output_folder: Path) -> GenerationManifest:
+def validate_generation_bundle(
+    output_folder: Path, *, manifest_sha256: str | None = None,
+) -> GenerationManifest:
     manifest_path = output_folder / "generation_manifest.json"
     try:
         with open_regular_file(manifest_path) as handle:
             limit = max_input_file_bytes()
             payload = handle.read(limit + 1)
         if len(payload) > limit:
+            raise ValueError
+        if manifest_sha256 is not None and hashlib.sha256(payload).hexdigest() != manifest_sha256:
             raise ValueError
         manifest = GenerationManifest.model_validate_json(payload)
         reproducibility = manifest.reproducibility

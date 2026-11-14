@@ -14,6 +14,10 @@
 
 Release ceilings — regression guard, а не обещание производительности на любом hardware. Shared-hardened Trino требует finite cumulative estimated-scan ceiling. Metadata wildcard разворачивается в один проверенный snapshot явных столбцов до агрегатов и расходует те же бюджеты.
 
+## Генерация больших наборов
+
+В [руководстве по масштабированию](../../how-to/dataset-capacity.md#recipe-750000-distinct-csv-rows) есть команды для CSV, Parquet и связанных таблиц. Начните с пробного запуска, затем оцените время и размер файлов на целевой машине. После генерации проверьте опубликованный набор по его `dataset_spec.yaml`.
+
 ## Сбои и публикация
 
 Staging, same-filesystem rename и rollback защищают normal/handled failure transitions. Single-entity update нескольких файлов не является общей atomic transaction. Receipt/result markers могут записываться отдельно; agent recovery проверяет checkpoint, spec, manifest и rows без регенерации.

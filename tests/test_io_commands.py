@@ -786,3 +786,45 @@ def test_generate_dataset_from_example_command_routes_args_to_artifact_helper(tm
 
     assert exit_code == 0
     assert report["valid"] is True
+
+
+@pytest.mark.parametrize("first_format", ["csv", "json", "parquet"])
+def test_parquet_counts_toward_dataset_cell_budget(tmp_path, monkeypatch, first_format):
+    from test_data_agent.io.readers import load_dataset_rows
+
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    table = pa.table({"x": [1] * 3, "y": [2] * 3})
+    if first_format == "csv":
+        (tmp_path / "a.csv").write_text("x,y\n" + "1,2\n" * 3)
+    elif first_format == "json":
+        (tmp_path / "a.json").write_text(json.dumps(table.to_pylist()))
+    else:
+        pq.write_table(table, tmp_path / "a.parquet")
+    pq.write_table(table, tmp_path / "b.parquet")
+    original_read = pq.ParquetFile.iter_batches
+
+    def read(file, *args, **kwargs):
+        assert first_format == "parquet"
+        monkeypatch.setattr(pq.ParquetFile, "iter_batches", lambda *_a, **_kw: pytest.fail("decoded over-budget file"))
+        return original_read(file, *args, **kwargs)
+
+    monkeypatch.setattr(pq.ParquetFile, "iter_batches", read)
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELLS", "10")
+    with pytest.raises(InputLimitError, match="dataset must contain <= 10 cells"):
+        load_dataset_rows(tmp_path)
+
+
+def test_parquet_counts_expanded_bytes_across_files(tmp_path, monkeypatch):
+    from test_data_agent.io.readers import load_dataset_rows
+
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    table = pa.table({"x": [1] * 3})
+    for name in ("a", "b"):
+        pq.write_table(table, tmp_path / f"{name}.parquet")
+    metadata = pq.read_metadata(tmp_path / "a.parquet")
+    expanded = metadata.row_group(0).column(0).total_uncompressed_size
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES", str(expanded))
+    with pytest.raises(InputLimitError, match="dataset Parquet input expanded size"):
+        load_dataset_rows(tmp_path)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import hmac
 from pathlib import Path
 from typing import Any
@@ -77,7 +78,7 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import enforce_output_folder_size, read_limited_text
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.io.artifacts import (
-    GenerationManifest,
+    validate_generation_bundle,
     dataset_profile_fingerprint,
     dataset_spec_fingerprint,
     write_dataset_review_artifacts,
@@ -85,15 +86,17 @@ from test_data_agent.io.artifacts import (
     write_json_artifact,
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
-from test_data_agent.io.path_policy import discard_staging_directory
+from test_data_agent.io.path_policy import path_identity
+from test_data_agent.io.csv_source import CsvSourceBinding
+from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_paths
 from test_data_agent.io.workflows import (
+    cleanup_failed_folder_publication,
     commit_temp_output_folder,
     make_temp_output_folder,
     prepare_generation_budget,
 )
 from test_data_agent.io.writers import write_dataset_rows
 from test_data_agent.safety import (
-    assert_no_csv_folder_source_rows,
     assert_no_csv_source_rows,
     assert_profile_safe,
 )
@@ -199,6 +202,9 @@ def generate_agent_dataset(
             row_counts={e.name: e.row_count for e in spec.entities}, seed=request.seed,
             output_format=request.output_format, validation_valid=True)
         def before_publish(stage: Path, report: Any) -> None:
+            nonlocal checkpoint
+            validate_agent_source_fingerprint(request, review.source_sha256)
+            checkpoint = checkpoint.model_copy(update={"manifest_sha256": _manifest_digest(stage)})
             write_json_artifact(checkpoint, stage / COMPLETION_CHECKPOINT_FILE)
         generate_scalable_bundle(spec, output_folder=output_folder, seed=request.seed, profile=profile,
             check_batch=lambda rows: assert_agent_source_not_copied(request, spec, rows, source_sha256=review.source_sha256),
@@ -207,6 +213,7 @@ def generate_agent_dataset(
         return checkpoint
     budget = prepare_generation_budget(spec, output_folder)
     temp_folder = make_temp_output_folder(output_folder)
+    temp_identity = path_identity(temp_folder)
     try:
         from test_data_agent.rules.validation import BusinessValidationReport
         business_reports: list[BusinessValidationReport] = []
@@ -237,6 +244,7 @@ def generate_agent_dataset(
         )
         checkpoint = AgentCompletionCheckpoint(
             plan_id=review.plan_id,
+            manifest_sha256=_manifest_digest(temp_folder),
             profile_sha256=review.profile_sha256,
             reviewed_spec_sha256=review.current_spec_sha256,
             source_type=agent_source_label(request, profile),
@@ -247,12 +255,18 @@ def generate_agent_dataset(
         )
         write_json_artifact(checkpoint, temp_folder / COMPLETION_CHECKPOINT_FILE)
         enforce_output_folder_size(temp_folder)
+        validate_agent_source_fingerprint(request, review.source_sha256)
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
-    except Exception:
-        discard_staging_directory(temp_folder)
+    except BaseException:
+        cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
         raise
     return checkpoint
+
+
+def _manifest_digest(folder: Path) -> str:
+    payload = read_limited_text(folder / "generation_manifest.json")
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 DEFAULT_AGENT_APPROVAL_SERVICE = AgentApprovalService(
@@ -331,7 +345,20 @@ def validate_agent_completion_checkpoint(
     ):
         raise ValueError("generated dataset_spec.yaml does not match the reviewed DatasetSpec")
 
-    manifest = GenerationManifest.model_validate_json(read_limited_text(manifest_path))
+    if checkpoint.manifest_sha256 is None:
+        raise ValueError("agent checkpoint predates manifest-bound recovery; create a new plan")
+    try:
+        manifest = validate_generation_bundle(
+            generated_folder, manifest_sha256=checkpoint.manifest_sha256,
+        )
+    except ValueError:
+        raise ValueError("generated manifest or artifacts are inconsistent") from None
+    assert manifest.reproducibility is not None
+    expected_files = set(manifest.reproducibility.output_sha256)
+    if {path.name for path in generated_folder.iterdir()} != expected_files | {
+        manifest_path.name, checkpoint_path.name,
+    }:
+        raise ValueError("generated artifact inventory is inconsistent")
     report = DatasetValidationReport.model_validate_json(read_limited_text(report_path))
     if spec.generation_settings.execution_policy is not None:
         from test_data_agent.io.scalable_validation import validate_scalable_bundle
@@ -396,11 +423,17 @@ def assert_agent_source_not_copied(
     *,
     source_sha256: str | None,
 ) -> None:
-    validate_agent_source_fingerprint(request, source_sha256)
+    if request.source_type == AgentSourceType.PROFILE:
+        return
+    budget = LocalProfileBudget()
+    binding = CsvSourceBinding(max_bytes=budget.limits.max_input_bytes)
     if request.source_type == AgentSourceType.CSV:
         if len(spec.entities) != 1:
             raise ValueError("csv agent source expects exactly one generated entity")
         entity_name = spec.entities[0].name
-        assert_no_csv_source_rows(request.source_path, rows_by_entity[entity_name])
-    elif request.source_type == AgentSourceType.CSV_FOLDER:
-        assert_no_csv_folder_source_rows(request.source_path, rows_by_entity)
+        assert_no_csv_source_rows(request.source_path, rows_by_entity[entity_name], source_binding=binding)
+    else:
+        for path in bounded_csv_paths(request.source_path, budget):
+            assert_no_csv_source_rows(path, rows_by_entity.get(path.stem, ()), source_binding=binding)
+    if source_sha256 is None or not hmac.compare_digest(binding.fingerprint(), source_sha256):
+        raise ValueError("agent source changed since planning; create a new plan")

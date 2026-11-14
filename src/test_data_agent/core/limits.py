@@ -381,13 +381,15 @@ def enforce_business_rule_evaluations(count: int) -> None:
         )
 
 
-def enforce_parquet_metadata_limits(metadata: Any, *, label: str) -> None:
+def enforce_parquet_metadata_limits(
+    metadata: Any, *, label: str, prior_expanded_bytes: int = 0,
+) -> int:
     if metadata is None:
-        return
+        raise InputLimitError(f"{label} metadata is required")
     enforce_input_row_count(int(metadata.num_rows), label=label)
     enforce_input_column_count(int(metadata.num_columns), label=label)
     enforce_input_cell_count(int(metadata.num_rows) * int(metadata.num_columns), label=label)
-    expanded_size = sum(
+    expanded_size = prior_expanded_bytes + sum(
         int(metadata.row_group(row_group).column(column).total_uncompressed_size)
         for row_group in range(metadata.num_row_groups)
         for column in range(metadata.num_columns)
@@ -395,6 +397,7 @@ def enforce_parquet_metadata_limits(metadata: Any, *, label: str) -> None:
     expanded_limit = max_parquet_expanded_bytes()
     if expanded_size > expanded_limit:
         raise InputLimitError(f"{label} expanded size must be <= {expanded_limit} bytes")
+    return expanded_size
 
 
 def enforce_output_capacity(path: Path) -> None:

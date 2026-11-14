@@ -7,7 +7,7 @@ import hmac
 import secrets
 from pathlib import Path
 
-from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
+from test_data_agent.adapters import csv_profile_to_dataset_profile, load_profile_or_spec
 from test_data_agent.agent_contracts import (
     AgentEntitySummary,
     AgentFieldReference,
@@ -25,6 +25,8 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
     InputLimitError, enforce_input_files, max_input_file_bytes, max_total_input_bytes,
 )
+from test_data_agent.csv_profiler import profile_csv
+from test_data_agent.io.csv_source import CsvSourceBinding
 from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     dataset_profile_fingerprint,
@@ -56,11 +58,16 @@ class AgentPlanningService:
     def plan_request(self, request: AgentRequest) -> AgentResult:
         normalized = normalize_agent_request(request)
         with self._workspace_store.begin_plan(normalized.workspace) as transition:
-            source_sha256 = agent_source_fingerprint(normalized)
+            binding = None
+            if normalized.source_type != AgentSourceType.PROFILE:
+                binding = CsvSourceBinding(max_bytes=LocalProfileBudget().limits.max_input_bytes)
             profile = build_agent_profile(
                 normalized,
                 cache_workspace=transition.staging_workspace,
+                source_binding=binding,
             )
+            source_sha256 = binding.fingerprint() if binding is not None else None
+            validate_agent_source_fingerprint(normalized, source_sha256)
             return self._persist_plan(
                 normalized,
                 profile,
@@ -256,13 +263,15 @@ def build_agent_profile(
     request: AgentRequest,
     *,
     cache_workspace: Path | None = None,
+    source_binding: CsvSourceBinding | None = None,
 ) -> DatasetProfile:
     if request.source_type == AgentSourceType.CSV:
-        profile = csv_file_to_dataset_profile(
+        profile = csv_profile_to_dataset_profile(profile_csv(
             request.source_path,
             table_name=request.table_name,
             local_category_fields=request.local_category_fields,
-        )
+            source_binding=source_binding,
+        ))
     elif request.source_type == AgentSourceType.CSV_FOLDER:
         profile = profile_example_folder(
             request.source_path,
@@ -272,6 +281,7 @@ def build_agent_profile(
             use_cache=request.use_cache,
             rule_sample_rows=request.rule_sample_rows,
             local_category_fields=tuple(request.local_category_fields),
+            source_binding=source_binding,
         )
     else:
         loaded = load_profile_or_spec(request.source_path)

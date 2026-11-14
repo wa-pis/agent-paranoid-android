@@ -227,10 +227,10 @@ def generate_scalable_bundle(
             'task_count': task_count,
             'elapsed_seconds': time.monotonic()-started, 'dataset_bytes': actual_bytes,
             'process_tree_peak_upper_bound_bytes': resident_high_water_bytes()+peak_workers}, stage/'generation_statistics.json')
-        if before_publish is not None:
-            before_publish(stage, report)
         write_generation_manifest(spec, seed=seed, output_format=spec.generation_settings.output_format,
             row_counts=counts, validation_valid=True, output_folder=stage)
+        if before_publish is not None:
+            before_publish(stage, report)
         enforce_output_folder_size(stage)
         size = sum(p.stat().st_size for p in stage.iterdir() if p.is_file())
         if size > min(policy.max_output_bytes, policy.max_temporary_bytes):
