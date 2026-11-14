@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -254,6 +257,40 @@ without overriding them. A later <code>generate --count</code> or <code>load_tes
 changes the requested volume and requires a new size review. Existing generation
 row, byte and work limits still apply. Neither option changes DatasetSpec schema
 1.1 or source access.</p>
+<p>To adjust inference, pass <code>--inference-options options.yaml</code>:</p>
+<pre><code class="language-yaml">version: &quot;1&quot;
+identifier_rules:
+  - entity: widgets
+    field_suffix: &quot;_code&quot;
+field_rules:
+  - entity: parts
+    field_suffix: &quot;_code&quot;
+    action: keep_builtin
+    priority: 10
+min_relationship_confidence: 0.8
+min_constraint_confidence: 0.7
+</code></pre>
+<p>Suffixes and optional entity names match case-sensitively. Matches mark eligible
+string fields as synthetic identifiers and drop their inferred distributions.
+Sensitive fields, existing identifiers and explicitly preserved categories are
+untouched. The two thresholds filter only
+relationships or constraints marked <code>inferred</code>; they keep declared or reviewed
+items. The highest matching priority wins. Opposing actions at the same highest
+priority stop inference; <code>identifier_rules</code> entries have priority zero.
+Supported field actions are <code>synthetic_identifier</code> and <code>keep_builtin</code>. Omit the options to retain baseline inference.
+Review the resulting spec before generating. Generation business rules remain
+separate and still apply to the reviewed spec.</p>
+<p>Python callers can pass <code>inference_options=parse_inference_options(payload)</code> to
+<code>infer_dataset_spec</code> using the parser in <code>test_data_agent.core.inference</code>. For
+the MCP <code>infer_dataset_spec</code> tool, pass the same configuration as an inline
+<code>inference_options</code> object.</p>
+<p>When options are provided, the specification includes <code>inference_evidence</code>:
+a configuration digest, winning field rules and counts filtered at each
+confidence threshold. Indices are zero-based: field and entity positions refer
+to the emitted spec, and rule positions refer to <code>identifier_rules</code> followed
+by <code>field_rules</code>. Evidence includes neither selector text nor source values.
+It is advisory metadata and participates in the exact spec fingerprint; it
+does not confer approval or change generation behavior.</p>
 <p><code>infer-spec</code> expects a profiling-command artifact, not an existing DatasetSpec.
 JSON keys <code>schema_version</code>, <code>privacy_rules</code>, <code>privacy_settings</code>,
 <code>generation_settings</code> and <code>validation_settings</code> select spec parsing even if

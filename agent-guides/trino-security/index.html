@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Historical / maintainer material</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -335,10 +338,10 @@ SQL-dependency inference and must not be advertised as preserving query formulas
 <li>Do not log SQL parameters, source values, credentials, prompts, or secrets.</li>
 <li>Replace FastMCP/Pydantic argument-validation failures with a fixed detached
   error before returning a tool result; never reflect rejected values.</li>
-<li>MCP 2 unexpected errors remain generic and detached. Only exact typed
-  transformation-limit and query-work-budget failures retain reconstructed,
-  value-free dimensions, counters and supported recovery settings; never forward
-  arbitrary exception messages or backend causes.</li>
+<li>MCP 2 unexpected errors remain generic and detached. Reconstruct only
+  recognized diagnostics: value-free transformation and request budget failures,
+  and the fixed missing-Parquet-extra hint. Never forward arbitrary exception
+  messages or backend causes.</li>
 <li>Reject malformed typed MCP requests and notifications before SDK dispatch;
   never pass their caller-controlled values into SDK logs or exceptions.</li>
 <li>Audit-log capacity must reject a new invocation before its <code>started</code> record

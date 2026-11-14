@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -217,7 +220,7 @@ provider adapters the project supports. It complements the
 <a href="../stability/">Public Stability</a> contract map; it does not make internal
 modules public.</p>
 <h2 id="python-versions">Python Versions<a class="headerlink" href="#python-versions" title="Permanent link">&para;</a></h2>
-<p>The package supports CPython 3.11, 3.12, 3.13, and 3.14. Each supported
+<p>The package supports CPython 3.11, 3.12, 3.13, 3.14, and 3.15. Each supported
 version runs the test suite and builds, installs, and checks an isolated base
 wheel before release. Alternative Python implementations may work, but are not
 release-gated.</p>
@@ -232,6 +235,10 @@ release-gated.</p>
 <li>Security fixes may shorten that notice when the older runtime cannot be
   supported safely; the release notes must explain the exception.</li>
 </ul>
+<p>On Python 3.15, PyYAML 6.0.3 currently installs from source on macOS arm64;
+a working compiler may be required. PyArrow 26.0.1 and Pydantic 2.14.3 provide
+the native wheels used by the reviewed latest dependency profile. See
+<a href="../dependency-compatibility/">dependency compatibility</a> for tested versions.</p>
 <h2 id="optional-extras">Optional Extras<a class="headerlink" href="#optional-extras" title="Permanent link">&para;</a></h2>
 <p>The base installation is the supported deterministic CSV and JSON core.
 Optional extras are supported capabilities, but users install and operate only
@@ -287,7 +294,7 @@ extra unexpectedly require another is a breaking packaging change. Adding an
 extra or adding an optional dependency inside an existing extra is additive
 when its documented behavior and security boundary remain unchanged.</p>
 <p>The database-source additions available in stable <code>1.5.0</code> are retained in
-stable <code>1.6.0</code>; see <a href="../../1.6.0-release-status/">release status</a>.
+stable <code>1.7.0</code>; see <a href="../../1.7.0-release-status/">release status</a>.
 They use the existing <code>postgres</code> and <code>trino</code> extras and add no JVM or JDBC
 driver. JDBC-style URL support is endpoint syntax only, qualified wildcards
 expand into explicit columns, and

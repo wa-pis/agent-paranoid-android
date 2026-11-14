@@ -191,8 +191,9 @@
 <div lang="ru">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -213,7 +214,8 @@
 <p>FK coverage не доказывает бизнес-смысл связи. Round-robin назначение не сохраняет fan-out, частоты или корреляции источника. Uniform numeric sampling не является полным моделированием распределения. Arbitrary interacting rules не решаются универсальным solver.</p>
 <p>Если active aggregate mapping зависит от rejected связи, исправьте spec: молчаливое игнорирование не разрешено. При нехватке parent capacity, конфликте уникальности, правил или temporal changes генерация останавливается, а не выдаёт частичный доверенный набор.</p>
 <p>Проверьте имена parent/child полей, статус связей, cardinality, nullable и число строк до генерации. После неё прочитайте relationships и constraints в validation_report, затем business_validation_report. Практика: <a href="../../getting-started/related-tables/">связанные таблицы</a>.</p>
-<h2 id="unreleased">Явные сценарии связей (Unreleased)<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<p><a id="explicit-relational-scenarios-unreleased"></a></p>
+<h2 id="170rc1">Явные сценарии связей (1.7.0rc1)<a class="headerlink" href="#170rc1" title="Permanent link">&para;</a></h2>
 <p>В проверенную спецификацию DatasetSpec можно добавить <code>relational_scenarios</code>.
 Декларация задаёт <code>parent_entity</code>, <code>parent_field</code>, <code>child_entity</code>, <code>child_field</code>,
 точное <code>orphan_count</code> (по умолчанию 0) и необязательное <code>fanout_counts</code>.
@@ -259,7 +261,8 @@
 <p>CSV, JSON и Parquet допускают такие явно заданные невалидные наборы. Экспорт SQL
 PostgreSQL по-прежнему требует валидности и отклоняет отсутствующие ссылки до
 публикации DDL с внешними ключами. Валидное распределение допускает SQL-экспорт.
-Эти изменения Unreleased не означают выпуск новой версии пакета.</p>
+Эти изменения входят в кандидат 1.7.0rc1; статус публикации и приёмки
+записан отдельно в <a href="../../../1.7.0rc1-release-status/">статусе кандидата</a>.</p>
               
 </div>
 

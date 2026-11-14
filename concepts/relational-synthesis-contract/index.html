@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -387,7 +390,7 @@ not add a second scan of generated rows or change seeded generation.</p>
 references. They do not provide an exact orphan-count selector, configurable
 fan-out allocation or measured source fan-out fidelity. Reviewed DatasetSpec
 <a href="#explicit-relational-scenarios-unreleased">explicit scenarios</a> now provide
-exact synthetic orphan counts and generated-parent allocations in Unreleased
+exact synthetic orphan counts and generated-parent allocations in candidate 1.7.0rc1
 source. They do not infer source histograms or reproduce source row mappings.
 Their executable acceptance is recorded in the
 <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/archive/2026-10-23-controlled-relational-scenarios">controlled relational scenario change</a>.</p>
@@ -397,7 +400,8 @@ checks. See <a href="../../how-to/business-rules/#conditional-formulas-and-synth
 and the source-free EAV example. Scenario weights remain probabilistic assignments,
 not predicates. EAV source rows are not automatically pivoted or retained;
 explicit target modeling and independently generated key domains remain necessary.</p>
-<h2 id="explicit-relational-scenarios-unreleased">Explicit relational scenarios (Unreleased)<a class="headerlink" href="#explicit-relational-scenarios-unreleased" title="Permanent link">&para;</a></h2>
+<p><a id="explicit-relational-scenarios-unreleased"></a></p>
+<h2 id="explicit-relational-scenarios-170rc1">Explicit relational scenarios (1.7.0rc1)<a class="headerlink" href="#explicit-relational-scenarios-170rc1" title="Permanent link">&para;</a></h2>
 <p>A reviewed DatasetSpec may include <code>relational_scenarios</code>. Each declaration names
 <code>parent_entity</code>, <code>parent_field</code>, <code>child_entity</code>, <code>child_field</code>, an exact
 <code>orphan_count</code> (default 0), and optional <code>fanout_counts</code>. Counts describe independently
@@ -446,7 +450,9 @@ exit status. The report and spec bind identity; they are not dataset approvals.<
 PostgreSQL SQL export retains its valid-dataset requirement and rejects missing
 references before publishing DDL with foreign-key constraints. Valid fan-out
 allocations remain eligible for SQL export. No package release is implied by
-these Unreleased source changes.</p>
+these 1.7.0rc1 source changes.</p>
+<p>Rejected relationship hypotheses do not select scenario cardinality; allocation
+uses the reviewed active relationship even when endpoint names match.</p>
               
 </div>
 

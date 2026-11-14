@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Historical / maintainer material</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Historical / maintainer material</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -250,7 +253,21 @@ verified</strong>, and <strong>historical documentation needs reconciliation</st
 <p>No approval is requested as part of this documentation task. In particular,
 Q-02/Q-04 must not be used to stall already-agreed work. If Q-01 or Q-03 is needed
 for a concrete route, identify that route and ask the narrow question then.</p>
-<h2 id="accepted-decisions-with-remaining-engineering-evidence">Accepted decisions with remaining engineering evidence<a class="headerlink" href="#accepted-decisions-with-remaining-engineering-evidence" title="Permanent link">&para;</a></h2>
+<h2 id="current-implementation-reconciliation-2026-10-29">Current implementation reconciliation — 2026-10-29<a class="headerlink" href="#current-implementation-reconciliation-2026-10-29" title="Permanent link">&para;</a></h2>
+<p>The I-01–I-05 table below preserves the 2026-09-29 checklist. It is not the
+current implementation status. Common/configured public consumers and finite
+key/domain/native-type acceptance shipped in stable 1.6.0 (I-01/I-03), with
+<a href="../../release-evidence-1.6.0/">recorded limits</a>. Original findings and accessible
+fictional script replay are now <a href="../../feedback-acceptance-1.7.0rc1/">reconciled</a>
+(I-04). Final exact-source gates and public verification passed for stable and
+<a href="../../release-evidence-1.7.0rc1/">candidate 1.7.0rc1</a> (I-05).
+I-02's target-size final-public/configured-route evidence remains incomplete.
+Q-01–Q-04 remain separate decisions; these release results settle none of them.
+The remaining trust-boundary amendment task also stays open. Documentary D-05
+is reconciled by the current bilingual roadmap; historical chronology under
+D-06 retains its dated source identity. See the
+<a href="../../documentation-consistency-2026-10-29/">documentation audit</a>.</p>
+<h2 id="historical-accepted-decisions-with-remaining-engineering-evidence">Historical accepted decisions with remaining engineering evidence<a class="headerlink" href="#historical-accepted-decisions-with-remaining-engineering-evidence" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -287,7 +304,7 @@ for a concrete route, identify that route and ask the narrow question then.</p>
 </tr>
 </tbody>
 </table>
-<p>The uncommitted query-limit implementation on <code>codex/1-6-query-limits</code> is a WIP
+<p>At the 2026-09-29 checkpoint, the uncommitted query-limit implementation on <code>codex/1-6-query-limits</code> is a WIP
 checkpoint with focused evidence in progress.md, not a new approved public
 adapter contract. No new hard-RSS/wire guarantee or platform restriction is added
 by I-02. Public API details not yet accepted remain design work behind the gate,

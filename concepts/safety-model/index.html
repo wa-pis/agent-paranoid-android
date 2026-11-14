@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -234,8 +236,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -258,6 +261,13 @@ Sensitivity conflicts, unknown fields and default DECIMAL preservation remain
 blocked. Receipt integrity does not prove personhood or anonymity. Existing
 generation, profiling and default responses retain their source-free contracts.
 Private implementation review does not activate public registration.</p>
+<p>Under <a href="../../adr/0029-unified-replacement-contract/">ADR-0029</a>, explicit
+<code>substitute</code> and <code>replace_text</code> mappings may produce another source value,
+including a sensitive mapped permutation. Actual mapped-cell evidence selects
+this replacement contract only in the local mixed-origin artifact. Sensitivity
+notes stay value-free; direct preserve, preserve fallback and source-free
+generation retain their existing rules. New or changed activation requires
+matching policy, executable checks and independent review of the exact source.</p>
 <p>Treat all of these as untrusted:</p>
 <ul>
 <li>CSV, JSON, YAML, and Parquet files;</li>

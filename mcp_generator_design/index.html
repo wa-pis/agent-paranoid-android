@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -270,9 +273,9 @@ null ratios, cardinalities, ranges, non-sensitive categories, and masked
 patterns. Source rows and raw sensitive values do not cross it.</p>
 <h2 id="tool-logic">Tool Logic<a class="headerlink" href="#tool-logic" title="Permanent link">&para;</a></h2>
 <p>The <a href="../reference/mcp-permissions/#generator-tool-rights">generator rights table</a>
-describes all 14 console-registered tools, their inputs, effects and approvals.
+describes all 16 console-registered tools, their inputs, effects and approvals.
 The console entrypoint owns the workspace and session lifetime; the module-level
-SDK object has only the 12 base tools. Transformation activation/release
+SDK object has only the 14 base tools. Transformation activation/release
 acceptance is separate from registration. The ordinary
 <code>approve_dataset_plan</code> receipt is not a source-preservation receipt and cannot
 authorize transformation preservation; MCP has no preservation approval issuer.</p>
@@ -308,10 +311,9 @@ to export production data.</p>
    shuffling. Editing the file requires another review and new consent; a
    summary or fingerprint alone is not human specification acceptance.</li>
 </ol>
-<p>The lower-level <code>profile_csv</code> and <code>infer_dataset_spec</code> tools remain available
-when a client needs explicit control over intermediate artifacts. These are
-lower-level operations, rather than the persisted review-first plan lifecycle.
-See <a href="../how-to/mcp/">MCP usage</a> for the consent and resume procedure.</p>
+<p>Use <code>profile_csv</code> or <code>profile_parquet</code> to save an intermediate artifact and
+pass it to <code>plan_dataset</code> or <code>infer_dataset_spec</code>. See
+<a href="../how-to/mcp/">MCP usage</a> for the consent and resume procedure.</p>
 <p>Direct CSV and example-folder workflows compare complete generated rows against
 the source before writing output. An exact match stops generation without
 including the matched values in the error.</p>

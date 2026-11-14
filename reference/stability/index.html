@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -294,7 +297,7 @@ reference explicitly documents them.</p>
 <p>Credential-free JDBC-style endpoint input, qualified column wildcards,
 <code>profile-query</code>, and the top-level <code>SqlQueryProfileRequest</code> query-profiling
 exports are supported in stable <code>1.5.0</code> and retained in stable
-<code>1.6.0</code>; see <a href="../../1.6.0-release-status/">release status</a>.
+<code>1.7.0</code>; see <a href="../../1.7.0-release-status/">release status</a>.
 Existing component configuration, exact allowlists, PostgreSQL profiling and
 Trino safety boundaries remain supported under their documented policies.</p>
 <h2 id="artifact-persistence-boundary">Artifact Persistence Boundary<a class="headerlink" href="#artifact-persistence-boundary" title="Permanent link">&para;</a></h2>
@@ -313,7 +316,7 @@ Trino safety boundaries remain supported under their documented policies.</p>
 </tr>
 <tr>
 <td>Process-interruption recovery</td>
-<td>Catchable failures and interactive cancellation remove staging data or roll back moved files. Single-entity generation publishes its manifest last, validates format/suffix agreement, and permits replacement only of the same complete manifest-owned bundle. Agent completion can stop between its separately atomic receipt and result markers; <code>agent-status</code> and <code>agent-recover</code> revalidate the unchanged generated bundle before completing metadata publication.</td>
+<td>Catchable failures and interactive cancellation remove staging data or roll back moved files. Single-entity generation publishes its manifest last, validates format/suffix agreement, and permits replacement only of the same complete manifest-owned bundle. Agent completion can stop between its separately atomic receipt and result markers; <code>agent-status</code> identifies interrupted completion. <code>agent-recover</code> verifies the checkpoint-bound manifest, artifact inventory and generated rows before completing metadata publication. Workspaces interrupted before manifest binding was introduced require a fresh plan.</td>
 </tr>
 <tr>
 <td>Crash or power-loss durability</td>

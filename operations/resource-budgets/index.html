@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -253,10 +256,18 @@ dataset, profile, or spec can be returned.</p>
 operation and input size before changing a budget. Do not raise a ceiling only
 to make a single run pass. Platform-level RSS, disk, cancellation, and failure
 cleanup are covered by separate operational-readiness gates.</p>
+<p>For runnable CSV and Parquet examples with an explicit generation policy,
+see <a href="../../how-to/dataset-capacity/#recipe-750000-distinct-csv-rows">Forecast And Generate Larger Synthetic Datasets</a>.</p>
 <h2 id="database-source-budgets">Database Source Budgets<a class="headerlink" href="#database-source-budgets" title="Permanent link">&para;</a></h2>
+<p>The development branch also has an explicit finite
+<a href="../../how-to/dataset-capacity/">large synthetic-generation policy</a>. It controls
+generation rows/cells, workers/batches, time, memory and output/temporary bytes;
+it does not change the source-file or database read limits below. The legacy
+100,000-row generation default remains without that opt-in. Memory checks are
+cooperative conservative bounds, not an OS-level peak-RSS guarantee.</p>
 <p>The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
 this section apply to stable <code>1.5.0</code> and are retained in stable
-<code>1.6.0</code>; see <a href="../../1.6.0-release-status/">release status</a>.</p>
+<code>1.7.0</code>; see <a href="../../1.7.0-release-status/">release status</a>.</p>
 <p>Database-source configuration and profiling have independent limits before
 generation begins:</p>
 <ul>

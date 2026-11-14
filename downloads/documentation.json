@@ -1,7 +1,7 @@
 {
-  "package_version": "1.6.0",
-  "package_commit": "258c035c22408becf17ab090635710a50dda8ccc",
-  "documentation_revision": "5344b390920a55aebbba6946740bb755c199ad6a",
+  "package_version": "1.7.0",
+  "package_commit": "daf3ec87c404ca76b81ca81b3aba635125060240",
+  "documentation_revision": "fd84e65aad26274e8f5e605b1e47538f575c1a70",
   "status": "Maintained stable guidance",
   "chapters": [
     "index.md",
@@ -13,6 +13,7 @@
     "how-to/postgresql.md",
     "how-to/trino.md",
     "how-to/transformation.md",
+    "how-to/dataset-capacity.md",
     "how-to/mcp.md",
     "ai_integration.md",
     "operations/containers.md",
@@ -41,11 +42,11 @@
     "ru/operations/troubleshooting.md",
     "ru/known-issues.md"
   ],
-  "index_sha256": "2fcd7d949c6c05ccdb3782ba0c962860329993c20fb8aeec12531d958d85be44",
+  "index_sha256": "af5e67f45e50d9e2c17ce7580d1332adf83114af8fd00a37bb4effae2f2f2bc4",
   "sha256": {
-    "handbook.pdf": "7e8ee5d37bf81e965d92c2a067351e2bc923ab28732477e3b27da96110ffa6e4",
-    "handbook.html": "00bacfb6acd4554020a2ca92826cd5fba3e8dbfc0828b7a7c818df9ad07bb91b",
-    "handbook.md.zip": "a6c60dcd8377a4bec1a39f57a7998f36656b83ae28ca0ccfeef54bbf8a0bb917",
-    "site.zip": "ad14b0dc3d97dbc2ac8c76d81e9cce89c81eece9e3860cb47ce7fba82577eaf5"
+    "handbook.pdf": "0c99ba715f538eb80152afbbc6060cbdad2213ae3738b2a56c30d9cda65a13c1",
+    "handbook.html": "4625934f6e7e8b7845a795b821a81de30856057b18c150b826c89b9d90e16ffd",
+    "handbook.md.zip": "76e603305b581035aecd62470d96abb24ab0e533495e2632791220087690114b",
+    "site.zip": "3d74e23db3f209831c770279a39fc41382cae9f8657d5a45bd07fad453a21f29"
   }
 }

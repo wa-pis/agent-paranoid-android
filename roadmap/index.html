@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -212,8 +214,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -224,36 +227,63 @@
 <p>These are directions, not committed dates. Priorities follow user feedback and
 confirmed defects. Stable <code>1.6.0</code> is already published and publicly verified;
 completed work belongs in <a href="../history/">release history</a>, not this list.</p>
+<p>Candidate <a href="../release-evidence-1.7.0rc3/">1.7.0rc3</a> now includes Python 3.15
+and bounded source-free acyclic linked-table generation. Cycles, shared PK/FK
+identities and global rules remain outside the scalable engine’s scope.</p>
 <h2 id="now">Now<a class="headerlink" href="#now" title="Permanent link">&para;</a></h2>
 <ul>
-<li>
-<p>Process external stable <code>1.6.0</code> feedback through the
+<li>Follow up on the remaining external <code>1.6.0</code> evidence gaps through the
   <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6">OpenSpec work plan</a>:
-  reviewed numeric CSV profiling, authenticated Trino access, relational planning
-  and utility evidence, bounded statistics and actionable CLI diagnostics.
-  Preserve conservative privacy defaults and read-only database budgets. Start
-  with reproduced failures; do not reopen corrected historical harness findings.</p>
-</li>
-<li>
-<p>Improve onboarding and task-oriented documentation, including versioned and
-  downloadable guides.</p>
-</li>
+  historical Trino application authentication settings and external profile
+  provenance. The numeric profiling, relational planning/utility, bounded
+  statistics and CLI fixes shipped in the published
+  <a href="../feedback-acceptance-1.7.0rc1/">1.7.0rc1 candidate</a>; its finite installed
+  checks do not reproduce missing private inputs or the historical 401.</li>
+<li>Complete remaining transformation evidence: target-size coverage of the final
+  public/configured routes and the separately tracked trust-boundary amendment
+  review. Prior approvals and private scale runs retain their original scope.</li>
+<li>Improve onboarding from pilot feedback. Versioned guides and four downloadable
+  formats are already published; see <a href="../versions/">documentation versions</a>.</li>
 <li>Run product-validation pilots on development and analytics workflows.</li>
 <li>Address confirmed client defects, migration feedback and dependency maintenance.</li>
 <li>Monitor source/output consistency, portable business rules and MCP permissions.</li>
 </ul>
 <h2 id="next">Next<a class="headerlink" href="#next" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Design batch-based validation of CSV, JSON and Parquet so complete datasets
-  need not remain in memory. Bound cross-table key and uniqueness checks,
-  preserve deterministic results and measure memory on synthetic fixtures.
-  A separate OpenSpec change is required before implementation.</li>
+<li>
+<p>Plan configurable inference heuristics: declarative user rules for field
+  recognition, relationship candidates and confidence settings, shared across
+  supported sources and Python, CLI and MCP. See OpenSpec
+  <code>configurable-inference-heuristics</code>.</p>
+</li>
+<li>
+<p>Keep GitHub Pages as the primary documentation host with native mike versions,
+  bilingual navigation/search and four verified offline formats. The maintainer
+  cancelled the Cloudflare migration on 2026-11-01: it served the same MkDocs site
+  rather than adding managed documentation features. Cloudflare publication and
+  preview workflows are disabled; successful experiment evidence remains in the
+  <a href="../development/cloudflare-pages/">operator record</a>. RTD is superseded and its
+  project-build retirement is owner-managed. The GitHub Pages return passed main
+  Documentation 41336088977, including public verification and retained versions.
+  Cancelled/superseded hosting proposals are archived without accepting their deltas.</p>
+</li>
+<li>Extend bounded batch generation/validation to related tables and global rules
+  after the independent-table implementation has measured acceptance evidence.
+  Cross-table key/uniqueness state needs separate bounded planning and review.</li>
 <li>Simplify CSV and database workflows using pilot feedback.</li>
 <li>Publish runnable examples and short case studies using synthetic fixtures.</li>
 <li>Improve diagnostics where users repeatedly need help.</li>
 </ul>
 <h2 id="later">Later<a class="headerlink" href="#later" title="Permanent link">&para;</a></h2>
 <ul>
+<li>Source-row EAV pivot/unpivot remains deferred. Conditional formulas and
+  source-free EAV modeling shipped in the 1.7.0rc1 candidate; transforming existing
+  EAV rows requires a separate proposal for row cardinality, duplicate/null
+  semantics, typed values, provenance and explicitly authorized source I/O.
+  Neither source-free generation nor one-to-one transformation authorizes it.</li>
+<li>Consider monthly-date category inference and a separately reviewed configurable
+  local-category ceiling. Neither is implemented; source-preservation defaults
+  remain 20 non-sensitive values of at most 64 characters, with content checks.</li>
 <li>Add integrations only after demonstrated demand.</li>
 <li>Consider reporting and validation adapters for concrete workflows.</li>
 <li>Evolve public contracts through the compatibility and deprecation policy.</li>

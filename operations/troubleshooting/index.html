@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -246,8 +248,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -291,11 +294,11 @@ package or a problem with deployment credentials.</p>
 <p><code>doctor --require-extra gigachat</code> uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 <code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>, obtain a token, or contact
-GigaChat. Install stable <code>1.6.0</code> with the <code>gigachat</code> extra.
-See <a href="../../1.6.0-release-status/">release status</a>.</p>
+GigaChat. Install stable <code>1.7.0</code> with the <code>gigachat</code> extra.
+See <a href="../../1.7.0-release-status/">release status</a>.</p>
 <h2 id="jdbc-style-url-rejected">JDBC-Style URL Rejected<a class="headerlink" href="#jdbc-style-url-rejected" title="Permanent link">&para;</a></h2>
 <p>JDBC-style endpoint input, qualified column wildcards, and <code>profile-query</code> are
-available in stable <code>1.5.0</code> and retained in stable <code>1.6.0</code>.</p>
+available in stable <code>1.5.0</code> and retained in stable <code>1.7.0</code>.</p>
 <p>Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,
 allowlists, and budgets in their existing settings. Remove duplicate or
@@ -334,7 +337,7 @@ profile. Errors intentionally omit SQL text, literals, endpoints, and backend
 messages; inspect the local reviewed file and allowlists instead.</p>
 <p><a id="transformation-candidate-rejected"></a></p>
 <h2 id="transformation-rejected">Transformation Rejected<a class="headerlink" href="#transformation-rejected" title="Permanent link">&para;</a></h2>
-<p>Stable <code>1.6.0</code> provides the common-profile CLI/MCP workflow. See the <a href="../../reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
+<p>Stable <code>1.7.0</code> provides the common-profile CLI/MCP workflow. See the <a href="../../reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
 Published <code>1.5.0</code> does not include this command. Registration grants no dataset
 permission. The finite fictional transformation/session campaign is recorded in
 <a href="../../release-evidence-1.6.0/">stable evidence</a>; it grants no blanket dataset consent.</p>

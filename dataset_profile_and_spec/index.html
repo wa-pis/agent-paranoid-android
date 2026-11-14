@@ -80,6 +80,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
 </ul>
 
   
@@ -203,8 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 5344b390920a55aebbba6946740bb755c199ad6a
+  <strong>Maintained stable guidance</strong> · Package 1.7.0
+  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
+  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -222,11 +225,15 @@
 not a complete description of the domain and must not imply that unobserved
 rules are known.</p>
 <h2 id="evidence-envelope">Evidence Envelope<a class="headerlink" href="#evidence-envelope" title="Permanent link">&para;</a></h2>
-<p>The evidence-bounded contract records how each important observation was
-obtained. Relationships and constraints already expose confidence and status;
-the release contract extends that record with provenance and coverage rather
-than treating inference as fact.</p>
-<p>Target shape for an observed rule or relationship:</p>
+<h3 id="planned-evidence-envelope-not-a-serialized-contract">Planned evidence envelope (not a serialized contract)<a class="headerlink" href="#planned-evidence-envelope-not-a-serialized-contract" title="Permanent link">&para;</a></h3>
+<p>Relationships and constraints currently expose numeric <code>confidence</code> in [0, 1]
+and <code>status</code>. The following richer provenance envelope is a design target;
+it is not emitted by the current profile models and must not be supplied as
+supported relationship/constraint fields. In particular, <code>confidence: medium</code>
+below is illustrative, not a valid current numeric confidence value.
+The separate relationship-discovery and validation-utility reports have their
+own shipped schemas; they do not add this envelope to DatasetProfile.</p>
+<p>Proposed shape for a future observed rule or relationship:</p>
 <pre><code class="language-yaml">origin: observed
 status: candidate
 confidence: medium
@@ -332,7 +339,7 @@ the compact profile JSON, not a downloaded copy of the source table.</p>
 <h3 id="sql-query-source-profile">SQL Query Source Profile<a class="headerlink" href="#sql-query-source-profile" title="Permanent link">&para;</a></h3>
 <p>The query-source workflow introduced in stable <code>1.5.0</code> profiles one reviewed
 PostgreSQL or Trino query as a virtual entity. Its <code>source_type</code> is <code>postgres_query</code> or
-<code>trino_query</code>. It is retained in stable <code>1.6.0</code>; see <a href="../1.6.0-release-status/">release status</a>. Since RC5, the profile
+<code>trino_query</code>. It is retained in stable <code>1.7.0</code>; see <a href="../1.7.0-release-status/">release status</a>. Since RC5, the profile
 records a stable <code>source_fingerprint</code>,
 <code>source_policy_version: "1.1"</code>, and ordinary safe entity metadata and aggregates.
 This source-policy version is separate from DatasetSpec's schema version;
