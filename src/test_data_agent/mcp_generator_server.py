@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
 
-from test_data_agent.adapters import load_profile_or_spec, parquet_file_to_dataset_profile
+from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
 from test_data_agent.agent import (
     AgentGenerationSummary,
@@ -36,11 +36,9 @@ from test_data_agent.core.execution_policy import GenerationExecutionPolicy
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
     enforce_profile_payload_size,
-    max_local_profile_seconds,
     read_limited_text,
     positive_float_env,
 )
-from test_data_agent.core.privacy import infer_sensitive_value_type
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io import (
     dataset_spec_fingerprint,
@@ -49,7 +47,6 @@ from test_data_agent.io import (
     load_dataset_spec,
     validate_dataset_artifacts,
     write_csv_profile_artifact,
-    write_dataset_profile_artifact,
 )
 from test_data_agent.mcp_generator_transport import (
     create_generator_mcp,
@@ -59,7 +56,6 @@ from test_data_agent.io.artifacts import (
     business_validation_manifest,
     validate_generation_bundle,
 )
-from test_data_agent.io.path_policy import open_regular_file
 from test_data_agent.rules.business_config import make_business_rules_applier
 from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.rules.models import (
@@ -73,7 +69,6 @@ from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
     QueryWorkBudget,
     QueryWorkLimits,
-    generation_budget_for_invocation,
     with_query_work_budget,
 )
 from test_data_agent.version import __version__
@@ -143,6 +138,16 @@ def profile_csv(input_path: str, output_path: str, table_name: str | None = None
 
 def profile_parquet(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
     """Profile one workspace Parquet file into a new JSON artifact. Returns a relative path and counts, never rows. Requires the parquet extra; use the saved profile with plan_dataset."""
+    from importlib import import_module
+
+    from test_data_agent.adapters.parquet_dataset import (
+        ParquetDependencyError, parquet_file_to_dataset_profile,
+    )
+    from test_data_agent.core.limits import max_local_profile_seconds
+    from test_data_agent.core.privacy import infer_sensitive_value_type
+    from test_data_agent.io import write_dataset_profile_artifact
+    from test_data_agent.io.path_policy import open_regular_file
+    from test_data_agent.trino_work_budget import generation_budget_for_invocation
 
     budget = generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
     source = resolve_workspace_path(input_path, must_exist=True, expect_file=True)
@@ -153,8 +158,18 @@ def profile_parquet(input_path: str, output_path: str, table_name: str | None = 
     profile_path = workspace_path_label(output)
 
     budget.check("Parquet profile preflight")
-    with open_regular_file(source) as handle:
-        profile = parquet_file_to_dataset_profile(source, table_name=table_name, source=handle)
+    try:
+        with open_regular_file(source) as handle:
+            profile = parquet_file_to_dataset_profile(source, table_name=table_name, source=handle)
+    except ParquetDependencyError:
+        try:
+            tool_error = import_module("mcp.server.fastmcp.exceptions").ToolError
+        except ImportError:
+            tool_error = import_module("mcp.server.mcpserver.exceptions").ToolError
+        raise tool_error(
+            "Parquet profiling requires the parquet extra. "
+            "Install agent-paranoid-android[mcp,parquet] in the server environment."
+        ) from None
     entity = profile.entities[0]
     if any(infer_sensitive_value_type(name) for name in (entity.name, *(field.name for field in entity.fields))):
         raise ValueError("Parquet schema names contain recognizable sensitive values")
@@ -789,7 +804,6 @@ _GENERATOR_MCP_TOOLS = (
     execute_transformation,
     review_transformation,
     profile_csv,
-    profile_parquet,
     infer_dataset_spec,
     plan_dataset,
     plan_trino_dataset,
@@ -799,6 +813,7 @@ _GENERATOR_MCP_TOOLS = (
     generate_dataset,
     validate_dataset,
     export_dataset,
+    profile_parquet,
 )
 
 

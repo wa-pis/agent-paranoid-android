@@ -23,6 +23,11 @@ not release or desktop client acceptance.
   non-preservation cases; the older preservation variants failed at the
   controlling-terminal step. The same failure was reproduced on unchanged
   `main` before reaching MCP.
+- The PR follow-up passed the activation patch round trip and architecture
+  checks (35 tests). Only the archived documentation projection was refreshed;
+  the executable and contract hunks are unchanged. Both SDK versions also
+  passed the installed-wheel Parquet planning and missing-extra checks after
+  moving the optional dependency diagnostic to the generator.
 
 Reproduce the client test after installing the candidate wheel with
 `[mcp,parquet,dev]` in a test environment:
