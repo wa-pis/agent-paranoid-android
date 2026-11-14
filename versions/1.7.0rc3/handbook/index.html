@@ -213,7 +213,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation cce5115dafbbba2c61067b186505b7d8952bdd30
+  <br>Documentation 3b554c7b771be63bcedc2bb377fb76f3defcb228
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -1405,7 +1405,9 @@ explicitly creates a temporary fictional sample (default 2,000 rows per entity,
 at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
 It removes the sample and returns numeric summaries. Calibration never approves
 or publishes the requested dataset and does not advance its random stream.
-Related/rule-constrained calibration is currently unsupported and reports why.</p>
+Calibration supports eligible linked tables with <code>scalable-relational-v1</code> in
+<code>1.7.0rc3</code>. Other related or rule-constrained specs report why calibration is
+unavailable.</p>
 <p>File forecasts describe the selected CSV, indented JSON or Snappy Parquet
 settings. Change <code>generation_settings.output_format</code> to compare formats.
 Results include per-table and total low/expected/high bytes, separate control
@@ -1483,6 +1485,87 @@ logical rows and ordering across worker counts and batch sizes. CSV/JSON data
 bytes are identical; Parquet row-group/layout metadata can differ. Manifests
 record the policy/engine and include normal provenance/validation. Timing
 statistics and informational progress are not deterministic data artifacts.</p>
+<h2 id="how-to-dataset-capacity-recipe-750000-distinct-csv-rows">Recipe: 750,000 Distinct CSV Rows<a class="headerlink" href="#how-to-dataset-capacity-recipe-750000-distinct-csv-rows" title="Permanent link">&para;</a></h2>
+<p>Use the scalable engine with CLI version <code>1.7.0rc2</code> or later on Linux or
+macOS. Start in a fresh working directory. The synthetic integer primary
+key makes every complete row distinct.</p>
+<pre><code class="language-bash">python3 - &lt;&lt;'PY'
+import json
+from pathlib import Path
+
+fields = [{&quot;name&quot;: &quot;item_id&quot;, &quot;data_type&quot;: &quot;integer&quot;, &quot;is_identifier&quot;: True}]
+fields += [
+    {&quot;name&quot;: f&quot;metric_{i:02}&quot;, &quot;data_type&quot;: &quot;integer&quot;,
+     &quot;distribution&quot;: {&quot;kind&quot;: &quot;numeric&quot;, &quot;min_value&quot;: 0, &quot;max_value&quot;: 100}}
+    for i in range(24)
+]
+Path(&quot;large-csv.json&quot;).write_text(json.dumps({
+    &quot;entities&quot;: [{&quot;name&quot;: &quot;items&quot;, &quot;row_count&quot;: 750000,
+                  &quot;primary_key&quot;: &quot;item_id&quot;, &quot;fields&quot;: fields}],
+    &quot;generation_settings&quot;: {
+        &quot;seed&quot;: 42,
+        &quot;output_format&quot;: &quot;csv&quot;,
+        &quot;execution_policy&quot;: {
+            &quot;engine&quot;: &quot;scalable-v1&quot;,
+            &quot;max_rows&quot;: 750000,
+            &quot;max_cells&quot;: 18750000,
+            &quot;max_memory_bytes&quot;: 402653184,
+            &quot;max_output_bytes&quot;: 536870912,
+            &quot;max_temporary_bytes&quot;: 536870912,
+            &quot;max_seconds&quot;: 600,
+            &quot;workers&quot;: 1,
+            &quot;batch_size&quot;: 2000,
+            &quot;require_distinct_rows&quot;: True
+        }
+    }
+}, indent=2), encoding=&quot;utf-8&quot;)
+PY
+
+test-data-agent generate large-csv.json --count 1000 --output out/smoke
+test-data-agent validate out/smoke/dataset_spec.yaml out/smoke
+</code></pre>
+<p>The full run requests 18,750,000 cells. The policy checks a 384 MiB process
+memory budget at batch boundaries. Actual memory depends on the runtime and
+schema. Run calibration on the target machine and check free space on the
+filesystem that will hold the output and staging directory.</p>
+<pre><code class="language-bash">test-data-agent estimate-capacity large-csv.json --calibrate --json
+test-data-agent generate large-csv.json --output out/large-csv
+test-data-agent validate out/large-csv/dataset_spec.yaml out/large-csv
+</code></pre>
+<p>Check that <code>generation_manifest.json</code> reports <code>items: 750000</code> in
+<code>row_counts</code> and that validation passes. The streamed validator verifies file
+hashes and the declared key domain without loading the entire dataset.
+Use <code>generation_statistics.json</code> for observed output bytes, elapsed time and
+the conservative process-tree RSS upper bound.</p>
+<h2 id="how-to-dataset-capacity-recipe-parquet-for-the-same-dataset">Recipe: Parquet For The Same Dataset<a class="headerlink" href="#how-to-dataset-capacity-recipe-parquet-for-the-same-dataset" title="Permanent link">&para;</a></h2>
+<p>Install the <a href="#getting-started-installation">Parquet extra</a>. Change the
+format in a copy of the reviewed spec and calibrate that copy. Parquet size
+depends on encoding and compression.</p>
+<pre><code class="language-bash">python3 - &lt;&lt;'PY'
+import json
+from pathlib import Path
+
+spec = json.loads(Path(&quot;large-csv.json&quot;).read_text(encoding=&quot;utf-8&quot;))
+spec[&quot;generation_settings&quot;][&quot;output_format&quot;] = &quot;parquet&quot;
+Path(&quot;large-parquet.json&quot;).write_text(json.dumps(spec, indent=2), encoding=&quot;utf-8&quot;)
+PY
+
+test-data-agent generate large-parquet.json --count 1000 --output out/parquet-smoke
+test-data-agent validate out/parquet-smoke/dataset_spec.yaml out/parquet-smoke
+test-data-agent estimate-capacity large-parquet.json --calibrate --json
+test-data-agent generate large-parquet.json --output out/large-parquet
+test-data-agent validate out/large-parquet/dataset_spec.yaml out/large-parquet
+</code></pre>
+<h2 id="how-to-dataset-capacity-retry-an-interrupted-run">Retry An Interrupted Run<a class="headerlink" href="#how-to-dataset-capacity-retry-an-interrupted-run" title="Permanent link">&para;</a></h2>
+<p>For standalone <code>generate</code>, diagnose the reported budget or filesystem failure
+and retry with the same spec and seed in a new output directory. Use a smaller
+batch if the process reaches its memory budget. Hard termination can leave
+staging files. Check that generation has stopped before removing them.</p>
+<p>For a review-first workspace, run <code>agent-status</code>. If it reports
+<code>recovery_required</code>, run <code>agent-recover</code> with the reviewed spec fingerprint
+to verify the published bundle and finish completion. See
+<a href="#operations-resource-budgets-interrupted-publication">Resource Budgets</a>
+for the publication and cleanup contract.</p>
 <h2 id="how-to-dataset-capacity-review-and-inspect-in-mcp">Review And Inspect In MCP<a class="headerlink" href="#how-to-dataset-capacity-review-and-inspect-in-mcp" title="Permanent link">&para;</a></h2>
 <p>Use <code>estimate_dataset_capacity(spec_path, calibrate=false)</code> for a saved workspace
 spec. The same optional bounded calibration is available with <code>calibrate=true</code>.
@@ -1520,6 +1603,39 @@ process image, avoiding the parent memory history retained by <code>getrusage</c
 accounting; memory checks and finite policy ceilings remain enabled.</p>
 <p><a id="linked-tables-unreleased"></a></p>
 <h2 id="how-to-dataset-capacity-linked-tables-170rc3">Linked Tables (1.7.0rc3)<a class="headerlink" href="#how-to-dataset-capacity-linked-tables-170rc3" title="Permanent link">&para;</a></h2>
+<h3 id="how-to-dataset-capacity-recipe-customers-and-orders">Recipe: Customers And Orders<a class="headerlink" href="#how-to-dataset-capacity-recipe-customers-and-orders" title="Permanent link">&para;</a></h3>
+<p>Reuse the CSV recipe's execution policy with <code>scalable-relational-v1</code>.
+This example requests 150,000 customers and 600,000 orders, each with a
+synthetic primary key. Every order references one generated customer.</p>
+<pre><code class="language-bash">python3 - &lt;&lt;'PYCODE'
+import json
+from pathlib import Path
+
+spec = json.loads(Path(&quot;large-csv.json&quot;).read_text(encoding=&quot;utf-8&quot;))
+spec[&quot;generation_settings&quot;][&quot;execution_policy&quot;][&quot;engine&quot;] = &quot;scalable-relational-v1&quot;
+spec[&quot;entities&quot;] = [
+    {&quot;name&quot;: &quot;customers&quot;, &quot;row_count&quot;: 150000, &quot;primary_key&quot;: &quot;customer_id&quot;,
+     &quot;fields&quot;: [{&quot;name&quot;: &quot;customer_id&quot;, &quot;data_type&quot;: &quot;integer&quot;, &quot;is_identifier&quot;: True}]},
+    {&quot;name&quot;: &quot;orders&quot;, &quot;row_count&quot;: 600000, &quot;primary_key&quot;: &quot;order_id&quot;,
+     &quot;fields&quot;: [{&quot;name&quot;: &quot;order_id&quot;, &quot;data_type&quot;: &quot;integer&quot;, &quot;is_identifier&quot;: True},
+                {&quot;name&quot;: &quot;customer_id&quot;, &quot;data_type&quot;: &quot;integer&quot;}]},
+]
+spec[&quot;relationships&quot;] = [
+    {&quot;parent_entity&quot;: &quot;customers&quot;, &quot;parent_field&quot;: &quot;customer_id&quot;,
+     &quot;child_entity&quot;: &quot;orders&quot;, &quot;child_field&quot;: &quot;customer_id&quot;,
+     &quot;relationship_type&quot;: &quot;many_to_one&quot;, &quot;confidence&quot;: 1}
+]
+Path(&quot;large-linked.json&quot;).write_text(json.dumps(spec, indent=2), encoding=&quot;utf-8&quot;)
+PYCODE
+
+test-data-agent estimate-capacity large-linked.json --calibrate --json
+test-data-agent generate large-linked.json --output out/large-linked
+test-data-agent validate out/large-linked/dataset_spec.yaml out/large-linked
+</code></pre>
+<p>Check the two counts separately in <code>generation_manifest.json</code> and inspect
+the relationship checks in <code>validation_report.json</code>. Keep the counts in the
+spec when tables have different sizes. The CLI <code>--count</code> applies to every table.</p>
+<h3 id="how-to-dataset-capacity-linked-table-limits">Linked-Table Limits<a class="headerlink" href="#how-to-dataset-capacity-linked-table-limits" title="Permanent link">&para;</a></h3>
 <p>Set <code>generation_settings.execution_policy.engine: scalable-relational-v1</code> to
 stream related synthetic tables. Use the same finite policy fields shown above.
 <code>scalable-v1</code> keeps its existing independent-table behavior.</p>

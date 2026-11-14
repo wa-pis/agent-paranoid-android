@@ -194,7 +194,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation cce5115dafbbba2c61067b186505b7d8952bdd30
+  <br>Documentation 3b554c7b771be63bcedc2bb377fb76f3defcb228
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -234,7 +234,9 @@
 </tbody>
 </table>
 <p>Release ceilings — regression guard, а не обещание производительности на любом hardware. Shared-hardened Trino требует finite cumulative estimated-scan ceiling. Metadata wildcard разворачивается в один проверенный snapshot явных столбцов до агрегатов и расходует те же бюджеты.</p>
-<h2 id="_2">Сбои и публикация<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="_2">Генерация больших наборов<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>В <a href="../../../how-to/dataset-capacity/#recipe-750000-distinct-csv-rows">руководстве по масштабированию</a> есть команды для CSV, Parquet и связанных таблиц. Начните с пробного запуска, затем оцените время и размер файлов на целевой машине. После генерации проверьте опубликованный набор по его <code>dataset_spec.yaml</code>.</p>
+<h2 id="_3">Сбои и публикация<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>Staging, same-filesystem rename и rollback защищают normal/handled failure transitions. Single-entity update нескольких файлов не является общей atomic transaction. Receipt/result markers могут записываться отдельно; agent recovery проверяет checkpoint, spec, manifest и rows без регенерации.</p>
 <p>Fsync отдельных writers не создаёт полную гарантию crash/power-loss durability. SIGKILL, storage failure и отключение питания могут оставить staging; это не завершённый bundle. При ENOSPC или deadline во время обработки staging удаляется, final destination и success metadata не публикуются, если процесс может завершить cleanup.</p>
 <p>Освободите место или уменьшите согласованный объём; перед увеличением timeout проверьте сложность rules. Не принимайте abandoned staging за результат и не удаляйте rollback без локальной проверки. Точные переменные: <a href="../../reference/configuration/">конфигурация</a>.</p>
