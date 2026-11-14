@@ -142,7 +142,7 @@ manifest flag alone. SQL reload must never execute SQL.
 ## Permission, failure and recovery campaign
 
 Use the [MCP rights inventory](reference/mcp-permissions.md) as the per-tool list:
-all 14 console generator tools, 13 default Trino tools and the optional row tool.
+all 16 console generator tools, 13 default Trino tools and the optional row tool.
 Exercise each operation variant and optional argument, default versus opted-in
 discovery, and console versus embedded-runtime ownership where supported.
 

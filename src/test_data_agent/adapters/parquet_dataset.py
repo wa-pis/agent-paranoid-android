@@ -5,13 +5,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import hashlib
 import math
+import os
 from pathlib import Path
 from decimal import Decimal
-from typing import Any
+from typing import Any, BinaryIO
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
-    InputLimitError, enforce_input_files, enforce_parquet_metadata_limits,
+    InputLimitError, enforce_input_files, enforce_input_file_size,
+    enforce_parquet_metadata_limits, max_total_input_bytes,
 )
 from test_data_agent.core.parquet_limits import inspect_parquet_batch
 from test_data_agent.core.privacy import infer_sensitive_from_name, infer_sensitive_value_type
@@ -21,8 +23,8 @@ from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.profiling.budget import LocalProfileBudget
 
 
-def parquet_file_to_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
-    return _parquet_dataset_profile(path, table_name=table_name)
+class ParquetDependencyError(RuntimeError):
+    """The optional Parquet reader could not be imported."""
 
 
 def parquet_file_to_dataset_spec(
@@ -57,16 +59,26 @@ def dataset_spec_from_parquet(
     )
 
 
-def _parquet_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
+def parquet_file_to_dataset_profile(
+    path: Path, table_name: str | None = None, *, source: BinaryIO | None = None,
+) -> DatasetProfile:
+    """Profile Parquet from a path or an already opened regular file."""
     budget = LocalProfileBudget()
     budget.check_deadline("Parquet profiling preflight")
     try:
         import pyarrow.parquet as pq
-    except ImportError as exc:  # pragma: no cover - optional dependency guard
-        raise RuntimeError("Parquet adapters require pyarrow") from exc
+    except ImportError as exc:
+        raise ParquetDependencyError("Parquet adapters require pyarrow") from exc
 
-    enforce_input_files([path])
-    parquet_file = pq.ParquetFile(path)
+    if source is None:
+        enforce_input_files([path])
+    else:
+        size = os.fstat(source.fileno()).st_size
+        enforce_input_file_size(path, size=size)
+        if size > max_total_input_bytes():
+            raise InputLimitError("Parquet input exceeds the total input byte limit")
+    budget.check_deadline("Parquet input preflight")
+    parquet_file = pq.ParquetFile(path if source is None else source)
     enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
     arrow_schema = parquet_file.schema_arrow
     row_count = parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0

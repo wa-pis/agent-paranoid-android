@@ -31,6 +31,9 @@ sequence: edit the planned spec, then inspect and obtain human approval of its
 new fingerprint. Direct generation tools additionally accept an external rules
 file or inline rule payload; do not combine those with embedded rules.
 
+For Parquet, see [local Parquet profiles](how-to/mcp.md#local-parquet-profiles)
+to save a safe profile and use it with `plan_dataset` (unreleased).
+
 Expected final report:
 
 ```text

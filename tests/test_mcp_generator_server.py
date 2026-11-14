@@ -25,7 +25,11 @@ from test_data_agent.mcp_generator_server import (
     validate_dataset,
 )
 from test_data_agent.safety import ProfileSafetyError, SpecSafetyError
-from test_data_agent.trino_work_budget import DEFAULT_QUERY_WORK_LIMITS, QueryWorkBudget
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
+    QueryWorkBudgetExceeded,
+)
 
 
 def configure_workspace(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
@@ -637,6 +641,34 @@ def test_profile_csv_does_not_overwrite_input(
 
     with pytest.raises(WorkspacePathError, match="profile output"):
         profile_csv("customers.csv", "customers.csv")
+
+
+def test_profile_parquet_rolls_back_if_request_expires_at_publication(tmp_path, monkeypatch):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io import path_policy
+
+    configure_workspace(monkeypatch, tmp_path)
+    source = tmp_path / "source.parquet"
+    pq.write_table(pa.table({"quantity": [1, 2]}), source)
+    clock = [0.0]
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, max_invocation_seconds=1.0)
+    budget = QueryWorkBudget(limits, monotonic_clock=lambda: clock[0])
+    fsync = path_policy.os.fsync
+    output = tmp_path / "profile.json"
+
+    def expire_after_link(descriptor):
+        fsync(descriptor)
+        if output.exists():
+            clock[0] = 2.0
+
+    monkeypatch.setattr(path_policy.os, "fsync", expire_after_link)
+    service = next(tool for tool in server.generator_mcp_services(
+        work_limits=limits, budget_provider=lambda: budget,
+    ) if tool.__name__ == "profile_parquet")
+    with pytest.raises(QueryWorkBudgetExceeded, match="invocation seconds"):
+        service("source.parquet", "profile.json")
+    assert list(tmp_path.iterdir()) == [source]
 
 
 def test_mcp_tools_do_not_overwrite_existing_outputs(

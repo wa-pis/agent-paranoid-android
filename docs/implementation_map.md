@@ -349,7 +349,7 @@ does not own path, payload, profile, or generation safety policy.
 
 `src/test_data_agent/mcp_generator_server.py`
 
-Workspace-bounded tools profile CSV metadata, infer a DatasetSpec from a safe
+Workspace-bounded tools profile CSV and Parquet metadata, infer a DatasetSpec from a safe
 file or inline MCP payload, generate/export fresh synthetic datasets, and
 validate generated bundles. Generation and export accept strict, bounded
 business-rule files or inline payloads. Tool responses contain summaries and
@@ -363,9 +363,9 @@ CSV file, CSV folder, or safe profile. It delegates to the same agent state
 machine used by the CLI; `plan_trino_dataset` provides the parallel handoff for
 safe inline Trino profiles.
 
-The running `main` composition exposes 14 generator tools, including
+The running `main` composition exposes 16 generator tools, including
 `common_transformation` and `configured_query_session`, by injecting an owned
-workspace and SQL session manager. The module-level SDK object exposes the 12
+workspace and SQL session manager. The module-level SDK object exposes the 14
 base tools and owns no configured SQL sessions. The full running inventory is
 protected by `tests/fixtures/contracts/mcp-generator-tools.json`.
 

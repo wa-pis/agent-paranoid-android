@@ -3,8 +3,8 @@
 Use this reference to decide which MCP tools a client may call and which local
 resources each server process needs. Start with the
 [generator-only quickstart](../how-to/mcp.md#generator-only-quickstart).
-The tables describe stable `1.6.0`; installed versions can
-expose fewer tools. Check the installed version and its `tools/list` response.
+The tables include unreleased tools where marked. Check the installed version
+and its `tools/list` response.
 Discovery is an inventory, not authorization to use a dataset or activate a
 gated transformation extension.
 
@@ -77,6 +77,7 @@ including otherwise read-only tools.
 | --- | --- | --- | --- |
 | `estimate_dataset_capacity` | Workspace DatasetSpec and optional aggregate calibration cache | Metadata-only by default; explicit calibration uses bounded temporary synthetic output and a value-free one-hour cache | Does not approve generation; calibration requires the explicit argument. |
 | `profile_csv` | Selected CSV | New safe aggregate profile JSON | No generation approval; authorize profiling of the selected input. |
+| `profile_parquet` | One selected regular Parquet file; requires the `parquet` extra (unreleased tool) | New safe aggregate profile JSON, no overwrite | Same local profiling authority as CSV. Returns a relative path and counts; no generation or database access. |
 | `infer_dataset_spec` | Safe profile file or bounded inline profile | New specification | Proposal only; no generation. |
 | `plan_dataset` | CSV, CSV folder, or safe profile | New planning directory, profile, spec and plan artifacts | Stops before generation for human review. |
 | `plan_trino_dataset` | Bounded safe Trino profile payload | New planning directory and spec/plan artifacts | Stops for review; this tool makes no database connection. |
@@ -92,7 +93,7 @@ including otherwise read-only tools.
 | `configured_query_session` | Batch profile, bounded SQL references and configured database on `open`; frozen captures afterward | Owned temporary captures; `execute` publishes selected output; `close`, expiry and shutdown clean up | `open` needs separate database authority. Validate/execute bind the digest; preservation consumes local approval. Review/validate/execute never reconnect. |
 
 The generator **console entrypoint** injects a workspace and session owner and
-registers all 15 tools above. The module-level SDK object has only the 13 base
+registers all 16 tools above. The module-level SDK object has only the 14 base
 tools; `common_transformation` and `configured_query_session` need explicit
 runtime ownership when embedded. Do not use a shorter SDK inventory as the
 console server's permission list. The two extensions retain their separate
@@ -195,7 +196,7 @@ For the review-first synthetic workflow, enable `plan_dataset` (or
 `plan_trino_dataset`) and `inspect_dataset_plan`; require explicit human review
 before `approve_dataset_plan`. Allow `recover_dataset_plan` only with that same
 reviewed fingerprint and the recovery state reported by inspection. Add
-`profile_csv`, `infer_dataset_spec`, `validate_dataset` and direct generation
+`profile_csv`, `profile_parquet`, `infer_dataset_spec`, `validate_dataset` and direct generation
 only as the workflow needs them. Keep transformation and optional row tools
 outside a synthetic-only client's callable set. Apply these choices using the
 client's supported settings; the table is not a server configuration format.

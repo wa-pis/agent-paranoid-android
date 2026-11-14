@@ -114,9 +114,13 @@ def ensure_directory(path: Path) -> tuple[PathIdentity, bool]:
 
 
 @contextmanager
-def atomic_binary_writer(path: Path, *, check_publication: Callable[[], None] | None = None) -> Iterator[BinaryIO]:
+def atomic_binary_writer(
+    path: Path, *, check_publication: Callable[[], None] | None = None, overwrite: bool = True,
+) -> Iterator[BinaryIO]:
     with _parent_descriptor(path, create=True) as (parent, name):
         original = _stat_at(parent, name)
+        if not overwrite and original is not None:
+            raise FileExistsError("output path already exists")
         if original is not None and not stat.S_ISREG(original.st_mode):
             raise ValueError("output path must be a regular file")
         temporary_name = f".{name}.{secrets.token_hex(8)}.tmp"
@@ -161,9 +165,13 @@ def atomic_binary_writer(path: Path, *, check_publication: Callable[[], None] | 
                     if ((expected is None and current is not None)
                             or (expected is not None and (current is None or _file_version(current) != _file_version(expected)))):
                         raise ValueError("output path changed during publication")
-                os.replace(temporary_name, name, src_dir_fd=parent, dst_dir_fd=parent)
+                if overwrite:
+                    os.replace(temporary_name, name, src_dir_fd=parent, dst_dir_fd=parent)
+                else:
+                    # Publish atomically only if the destination is still absent.
+                    os.link(temporary_name, name, src_dir_fd=parent, dst_dir_fd=parent, follow_symlinks=False)
                 published = True
-                replacement = _stat_at(parent, name)
+                replacement = _stat_at(parent, name if overwrite else temporary_name)
                 os.fsync(parent)
                 if check_publication is not None:
                     check_publication()

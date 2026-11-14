@@ -277,6 +277,7 @@ jobs:
               tests/test_mcp_generator_transport.py
               tests/test_mcp_trino_transport.py
               tests/test_mcp_sdk_roundtrip.py
+              tests/test_acceptance_mcp_permissions.py::test_generator_stdio_without_parquet_extra
           - profile: trino
             project-spec: ".[dev,trino]"
             constraint-file: dependency-minimum.txt

@@ -1254,7 +1254,8 @@ def test_closed_common_mcp_stdio_consumer(tmp_path, preservation, retained):
                 tools = await session.list_tools()
                 names = [tool.name for tool in tools.tools]
                 if actual_mcp:
-                    assert len(names) == 13 and {"profile_csv", "generate_dataset", "execute_transformation"} <= set(names)
+                    contract = Path(__file__).parent / "fixtures/contracts/mcp-generator-tools.json"
+                    assert set(names) == {tool["name"] for tool in json.loads(contract.read_text())}
                     rejected = await session.call_tool("profile_csv", {"fictional-private-marker": True})
                     assert rejected.model_dump(by_alias=True)["isError"]
                     assert "fictional-private-marker" not in rejected.model_dump_json()

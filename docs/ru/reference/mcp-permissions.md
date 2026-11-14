@@ -31,6 +31,7 @@ Secrets хранятся вне client-accessible workspace. Root, sudo, вес�
 | Tool | Эффект и review |
 | --- | --- |
 | profile_csv | Прочитать выбранный CSV, создать безопасный profile |
+| profile_parquet (ещё не выпущен) | Прочитать один файл Parquet; нужен пакет с дополнением `parquet`. Записать новый JSON-профиль без перезаписи. Ответ содержит относительный путь и счётчики. |
 | infer_dataset_spec | Создать spec из безопасного profile; без generation |
 | plan_dataset | Создать planning directory; остановиться для human review |
 | plan_trino_dataset | То же по bounded safe Trino profile; подключения к БД нет |
@@ -45,7 +46,7 @@ Secrets хранятся вне client-accessible workspace. Root, sudo, вес�
 | common_transformation | Batch review/temporary validate/execute; local receipt потребляется, не выдаётся |
 | configured_query_session | Open один раз захватывает разрешённые queries; дальнейшие review/validate/execute используют frozen capture без reconnect; expiry/close/shutdown очищают owned state |
 
-Console composition регистрирует 14 tools. Module-level SDK object содержит 12 base tools; common/session extensions требуют явно внедрённого workspace/session owner и close при shutdown. Ответы содержат metadata, reports и paths, а не source/generated rows или mapping literals. Audit добавляет started/terminal events даже к read-only calls.
+Текущая версия разработки регистрирует 16 инструментов через консольную команду и 14 через объект SDK уровня модуля. Дополнительные инструменты для пакетов и SQL-сессий требуют отдельного управления рабочей папкой и сессией. Ответы содержат метаданные, отчёты и пути. Строки данных и значения из правил замены в ответы не входят. При включённом аудите регистрируются начало и итог вызова.
 
 Synthetic approval проверяет hash, но не может доказать фактическое чтение spec человеком. Клиент обязан получить review перед approve; direct generation не должна обходить эту политику. Возобновление старого чата не расширяет scope: проверьте сохранённый plan и полный текущий spec перед новым consent.
 

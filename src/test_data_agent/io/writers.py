@@ -29,7 +29,7 @@ from test_data_agent.core.limits import (
     enforce_output_payload_size,
 )
 from test_data_agent.core.settings import OutputFormat as DatasetOutputFormat
-from test_data_agent.io.path_policy import atomic_binary_writer, atomic_write_bytes
+from test_data_agent.io.path_policy import atomic_binary_writer
 
 
 SAFE_ARTIFACT_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
@@ -363,15 +363,18 @@ def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str
     return path
 
 
-def write_bounded_text(text: str, output: Path, *, budget: GenerationBudget | None = None) -> None:
+def write_bounded_text(
+    text: str, output: Path, *, budget: GenerationBudget | None = None, overwrite: bool = True,
+) -> None:
     payload = text.encode("utf-8")
     enforce_output_payload_size(len(payload), label=f"output file {output.name!r}")
-    if budget is None:
-        atomic_write_bytes(output, payload)
-    else:
+    if budget is not None:
         budget.check("profile serialization")
-        with atomic_binary_writer(output, check_publication=lambda: budget.check("profile publication")) as handle:
-            handle.write(payload)
+    with atomic_binary_writer(
+        output, overwrite=overwrite,
+        check_publication=(lambda: budget.check("profile publication")) if budget is not None else None,
+    ) as handle:
+        handle.write(payload)
 
 
 def write_single_entity_rows(

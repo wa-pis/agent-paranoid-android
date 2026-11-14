@@ -136,6 +136,53 @@ def profile_csv(input_path: str, output_path: str, table_name: str | None = None
     }
 
 
+def profile_parquet(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
+    """Profile one workspace Parquet file into a new JSON artifact. Returns a relative path and counts, never rows. Requires the parquet extra; use the saved profile with plan_dataset."""
+    from importlib import import_module
+
+    from test_data_agent.adapters.parquet_dataset import (
+        ParquetDependencyError, parquet_file_to_dataset_profile,
+    )
+    from test_data_agent.core.limits import max_local_profile_seconds
+    from test_data_agent.core.privacy import infer_sensitive_value_type
+    from test_data_agent.io import write_dataset_profile_artifact
+    from test_data_agent.io.path_policy import open_regular_file
+    from test_data_agent.trino_work_budget import generation_budget_for_invocation
+
+    budget = generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
+    source = resolve_workspace_path(input_path, must_exist=True, expect_file=True)
+    output = resolve_workspace_path(output_path, reject_symlink=True)
+    _require_suffix(source, {".parquet"}, "input Parquet")
+    _require_suffix(output, {".json"}, "profile output")
+    _require_new_output(output)
+    profile_path = workspace_path_label(output)
+
+    budget.check("Parquet profile preflight")
+    try:
+        with open_regular_file(source) as handle:
+            profile = parquet_file_to_dataset_profile(source, table_name=table_name, source=handle)
+    except ParquetDependencyError:
+        try:
+            tool_error = import_module("mcp.server.fastmcp.exceptions").ToolError
+        except ImportError:
+            tool_error = import_module("mcp.server.mcpserver.exceptions").ToolError
+        raise tool_error(
+            "Parquet profiling requires the parquet extra. "
+            "Install agent-paranoid-android[mcp,parquet] in the server environment."
+        ) from None
+    entity = profile.entities[0]
+    if any(infer_sensitive_value_type(name) for name in (entity.name, *(field.name for field in entity.fields))):
+        raise ValueError("Parquet schema names contain recognizable sensitive values")
+    assert_profile_safe(profile)
+    summary = {
+        "operation": "profile_parquet",
+        "profile_path": profile_path,
+        **profile_summary(profile),
+    }
+    write_dataset_profile_artifact(profile, output, budget=budget, overwrite=False)
+    return summary
+
+
 def infer_dataset_spec(
     output_path: str,
     profile_path: str | None = None,
@@ -537,6 +584,7 @@ def resolve_workspace_path(
     must_exist: bool = False,
     expect_file: bool = False,
     expect_directory: bool = False,
+    reject_symlink: bool = False,
 ) -> Path:
     if not raw_path or "\x00" in raw_path:
         raise WorkspacePathError("path must be a non-empty workspace path")
@@ -547,6 +595,8 @@ def resolve_workspace_path(
     resolved = candidate.resolve(strict=False)
     if not resolved.is_relative_to(root):
         raise WorkspacePathError(f"path escapes {WORKSPACE_ROOT_ENV}")
+    if reject_symlink and candidate.is_symlink():
+        raise WorkspacePathError("workspace output path must not be a symbolic link")
     if must_exist and not resolved.exists():
         raise WorkspacePathError("workspace input path does not exist")
     if expect_file and resolved.exists() and not resolved.is_file():
@@ -763,6 +813,7 @@ _GENERATOR_MCP_TOOLS = (
     generate_dataset,
     validate_dataset,
     export_dataset,
+    profile_parquet,
 )
 
 

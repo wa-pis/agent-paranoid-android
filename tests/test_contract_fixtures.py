@@ -99,6 +99,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         "plan_dataset",
         "plan_trino_dataset",
         "profile_csv",
+        "profile_parquet",
         "recover_dataset_plan",
         "review_transformation",
         "execute_transformation",
