@@ -204,7 +204,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.7.0rc3
   <br>Package source 09b6fb207b22364ff41f70d7b51abe30d1a458fa
-  <br>Documentation 4a29f0364b80d2d9382423dd7e87f630bcaed9a6
+  <br>Documentation b5299c67f91157f01a2184bb249e9ca5cebe80f9
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -227,14 +227,21 @@ PK/FK и глобальные бизнес-правила остаются вн�
 </ul>
 <h2 id="_3">Далее<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Сохранить GitHub Pages основным хостингом документации с версиями mike,
+<li>
+<p>Запланировать расширение эвристик вывода пользовательскими правилами
+  распознавания полей, поиска связей и настройками уверенности. См. OpenSpec
+  <code>configurable-inference-heuristics</code>.</p>
+</li>
+<li>
+<p>Сохранить GitHub Pages основным хостингом документации с версиями mike,
   двумя языками, поиском и четырьмя проверенными форматами скачивания. Владелец
   отменил перенос в Cloudflare 2026-11-01: он публиковал тот же MkDocs и не добавлял
   управляемые возможности документации. Издатели Cloudflare и PR-превью отключены;
   результаты эксперимента сохранены в <a href="../../development/cloudflare-pages/">журнале</a>.
   RTD заменён этим решением; владелец отключает сборки проекта вручную.
   Возврат на GitHub Pages проверен сборкой 41336088977, включая публичные файлы
-  и сохранение версий. Отменённые предложения архивированы без принятия их требований.</li>
+  и сохранение версий. Отменённые предложения архивированы без принятия их требований.</p>
+</li>
 <li>Спроектировать batch validation CSV/JSON/Parquet без удержания всего набора в памяти. Ограничить cross-table key/uniqueness checks, сохранить deterministic results и измерить память на вымышленных fixtures. До реализации нужен отдельный OpenSpec change.</li>
 <li>Упростить CSV/DB workflow по итогам пилотов.</li>
 <li>Публиковать runnable examples и короткие кейсы с синтетическими входами.</li>
