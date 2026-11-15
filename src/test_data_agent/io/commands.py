@@ -49,7 +49,7 @@ from test_data_agent.postgres_profiler import PostgresProfileError, dataset_prof
 from test_data_agent.postgres_sql_export import write_postgres_sql
 from test_data_agent.core.field import FieldSpec
 from test_data_agent.core.inference import parse_inference_options
-from test_data_agent.core.serialization import load_limited_yaml
+from test_data_agent.core.serialization import load_limited_json, load_limited_yaml
 from test_data_agent.rules.business_config import load_business_rules
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.sql_query_adapters import (
@@ -330,9 +330,9 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
     if options_path is not None:
         ensure_paths_distinct(options_path, args.output)
         try:
-            inference_options = parse_inference_options(
-                load_limited_yaml(read_limited_text(options_path, max_bytes=65_536))
-            )
+            text = read_limited_text(options_path, max_bytes=512 * 1024)
+            payload = load_limited_json(text) if options_path.suffix.lower() == ".json" else load_limited_yaml(text)
+            inference_options = parse_inference_options(payload)
         except (ValueError, YAMLError):
             raise ValueError("invalid inference options file") from None
     spec = infer_dataset_spec_artifact(

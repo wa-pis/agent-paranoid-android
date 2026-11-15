@@ -28,9 +28,9 @@ stronger planning and recovery integrity. See the [release history](history.md).
 
 ## Next
 
-- Finish checking configurable inference with equivalent metadata across sources,
-  outputs and Python, CLI and MCP. The rules and evidence already shipped;
-  track the remaining acceptance work in OpenSpec `configurable-inference-heuristics`.
+- Keep the configurable inference matrix green as sources, formats and interfaces
+  evolve. OpenSpec `configurable-inference-heuristics` records coverage for equivalent
+  safe profiles across Python, CLI and MCP.
 
 - Keep GitHub Pages as the primary documentation host with native mike versions,
   bilingual navigation/search and four verified offline formats. The maintainer

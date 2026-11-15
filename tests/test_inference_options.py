@@ -133,3 +133,18 @@ def test_constraint_floor_preserves_confirmed_constraints():
     assert spec.constraints[0].status == "confirmed"
     assert spec.inference_evidence is not None
     assert spec.inference_evidence.constraints_filtered == 1
+
+
+def test_inference_stops_before_evaluating_more_than_the_rule_budget():
+    original = profile()
+    template = original.entities[0].fields[0]
+    original.entities[0].fields.extend(
+        template.model_copy(update={"name": f"item_{index}_code"}) for index in range(800)
+    )
+    options = parse_inference_options({
+        "version": "1",
+        "identifier_rules": [{"field_suffix": "_code"}] * 64,
+        "field_rules": [{"field_suffix": "_code", "action": "keep_builtin"}] * 64,
+    })
+    with pytest.raises(ValueError, match="^inference rule evaluation limit exceeded$"):
+        infer_dataset_spec(original, inference_options=options)

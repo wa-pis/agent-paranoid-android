@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Accept valid inference options in CLI files even when long Unicode selectors
+  are escaped in JSON, within the bounded configuration size.
+- Show safe recovery guidance when MCP spec inference lacks required profile
+  metadata, without exposing profile values or SQL.
+
 ## [1.7.0] - 2026-11-15
 
 Promotes the verified 1.7.0rc4 runtime. Changes since 1.6.0 include bounded

@@ -92,7 +92,9 @@ separate and still apply to the reviewed spec.
 Python callers can pass `inference_options=parse_inference_options(payload)` to
 `infer_dataset_spec` using the parser in `test_data_agent.core.inference`. For
 the MCP `infer_dataset_spec` tool, pass the same configuration as an inline
-`inference_options` object.
+`inference_options` object. Each rule list accepts up to 64 entries, and each
+selector accepts up to 128 characters. The CLI options file limit is 512 KiB
+(or the configured global input limit, if lower).
 
 When options are provided, the specification includes `inference_evidence`:
 a configuration digest, winning field rules and counts filtered at each
