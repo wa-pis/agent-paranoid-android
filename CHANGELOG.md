@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.1rc1]
+
 ### Fixed
 
 - Accept valid inference options in CLI files even when long Unicode selectors

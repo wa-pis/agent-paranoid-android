@@ -24,6 +24,17 @@ regenerating existing fixtures.
 
 The stable release is `1.7.0`. Check [publication status](../1.7.0-release-status.md) before installing.
 
+To test the corrective candidate after [publication](../1.7.1rc1-release-status.md), select it explicitly:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.7.1rc1"
+python3 -m pip install "agent-paranoid-android[parquet]==1.7.1rc1"
+python3 -m pip install "agent-paranoid-android[mcp]==1.7.1rc1"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.7.1rc1"
+python3 -m pip install "agent-paranoid-android[openai]==1.7.1rc1"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.7.1rc1"
+```
+
 Create an isolated environment:
 
 ### macOS and Linux
