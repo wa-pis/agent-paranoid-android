@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.7.1]
+
+Corrective release for valid CLI inference configuration files and safe MCP
+recovery guidance when profiling metadata is unavailable.
+
 ## [1.7.1rc1]
 
 ### Fixed
