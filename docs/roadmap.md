@@ -2,7 +2,8 @@
 
 English · [Русский](ru/roadmap.md)
 
-These are directions, not committed dates. Stable [1.7.0](release-evidence-1.7.0.md)
+These are directions, not committed dates. The [1.7.1 corrective release](release-evidence-1.7.1.md)
+shipped the CLI and MCP inference fixes. Stable [1.7.0](release-evidence-1.7.0.md)
 is published and publicly verified. It includes capacity forecasts, bounded
 generation for independent and eligible linked tables, CPython 3.15,
 configurable inference with evidence, generator MCP Parquet profiling, and
