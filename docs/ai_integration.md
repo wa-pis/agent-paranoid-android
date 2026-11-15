@@ -47,7 +47,7 @@ python3 -m pip install agent-paranoid-android
 ```
 
 Add only the integrations the AI client needs. The exact pin below selects
-stable 1.7.0; see [publication status](1.7.1-release-status.md).
+stable 1.7.1; see [publication status](1.7.1-release-status.md).
 
 ```bash
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
