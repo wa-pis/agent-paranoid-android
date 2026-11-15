@@ -1,0 +1,85 @@
+@startuml
+title Review-First Synthetic Generation Workflow
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam defaultTextAlignment center
+
+actor "User" as User
+participant "AI Client\n(advice only)" as Ai
+participant "CLI agent-plan /\nMCP plan_dataset" as PlanCli
+participant "agent.py\nplan_agent_request" as PlanAgent
+participant "Safe Profiling\nCSV / folder / profile" as Profiling
+participant "Spec Planner\nDatasetProfile -> DatasetSpec" as SpecPlanner
+database "Agent Workspace\nagent_request.json\nagent_plan.json\nprofile.json\ndataset_spec.yaml" as Workspace
+participant "CLI agent-review / agent-advise\nMCP inspect_dataset_plan" as ReviewCli
+participant "CLI agent-approve / agent-recover\nMCP approve_dataset_plan / recover_dataset_plan" as ApproveCli
+participant "agent.py\napprove / recover" as ApproveAgent
+participant "Synthetic Generator\nseeded deterministic" as Generator
+participant "Safety Checks\nPII + source-row reuse" as Safety
+participant "Validation Core\nschema / relationships /\nconstraints" as Validation
+database "Generated Bundle\ngenerated/*\ngeneration_manifest.json\nvalidation_report.json\nagent_completion.json" as Bundle
+
+User -> Ai : asks for synthetic data
+Ai -> PlanCli : source, source type,\nworkspace, count, seed, format
+PlanCli -> PlanAgent : AgentRequest
+PlanAgent -> Profiling : build safe profile
+Profiling --> PlanAgent : DatasetProfile\nsafe metadata only
+PlanAgent -> SpecPlanner : infer reviewable spec
+SpecPlanner --> PlanAgent : DatasetSpec
+PlanAgent -> Workspace : write request, plan,\nprofile, spec
+PlanAgent --> Ai : awaiting_approval\nartifact paths
+Ai -> ReviewCli : inspect current plan and fingerprint
+ReviewCli -> Workspace : load current DatasetSpec
+ReviewCli --> Ai : metadata checklist + exact fingerprint
+Ai --> User : show complete current spec\nand request explicit review/consent
+
+User -> Workspace : review or edit\ndataset_spec.yaml
+opt provider advice requested
+  User -> ReviewCli : request structured advice
+  ReviewCli -> Workspace : load safe profile +\nreviewed baseline spec
+  ReviewCli -> Ai : trusted policy +\nuntrusted safe metadata
+  Ai --> ReviewCli : structured DatasetSpec proposal
+  ReviewCli -> Workspace : validate + persist proposal
+  ReviewCli --> User : review required again\nnew fingerprint
+end
+opt specification changed during review
+  Ai -> ReviewCli : inspect the saved current plan again
+  ReviewCli -> Workspace : reload exact current DatasetSpec
+  ReviewCli --> Ai : updated fingerprint
+  Ai --> User : present full current spec again\nand request fresh consent
+end
+User -> ApproveCli : explicit current-spec approval\n+ reviewed fingerprint
+ApproveCli -> ApproveAgent : workspace path +\nreviewed_spec_sha256
+ApproveAgent -> Workspace : load reviewed request,\nprofile, DatasetSpec
+ApproveAgent -> Generator : verify unchanged fingerprint; generate\nfrom spec + seed + embedded business rules
+Generator --> ApproveAgent : synthetic rows
+ApproveAgent -> Safety : verify no source rows copied\nwhen CSV source exists
+Safety --> ApproveAgent : safety ok
+ApproveAgent -> Validation : validate generated bundle
+Validation --> ApproveAgent : validation report
+ApproveAgent -> Bundle : write synthetic files,\nmanifest, reports
+ApproveAgent --> User : completed result\npaths, seed, row counts
+
+alt completion metadata publication was interrupted
+  User -> ApproveCli : recover workspace\nwith reviewed fingerprint
+  ApproveCli -> ApproveAgent : recovery request
+  ApproveAgent -> Bundle : revalidate unchanged\ncheckpoint and rows
+  ApproveAgent --> User : publish missing result\nwithout regeneration
+end
+
+note right of Ai
+The AI client proposes and explains.
+It does not generate rows, validate by
+free-form reasoning, or expose raw PII.
+end note
+
+note bottom of Workspace
+The workspace is the handoff contract:
+reviewable spec first, generation only
+after explicit approval.
+This generation approval is not a preservation
+receipt for the separate transformation workflow.
+end note
+
+@enduml
