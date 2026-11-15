@@ -205,9 +205,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.0
-  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
-  <br>Documentation 6520a4418c88386d44392e4b2ca57f423fcd4013
+  <strong>Maintained stable guidance</strong> · Package 1.7.1
+  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
+  <br>Documentation 49d12c515c3aa7d012b038c5d1c96b50195fbcc1
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -217,7 +217,7 @@
 <p>English · <a href="../../ru/reference/configuration/">Русский</a></p>
 <p>Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.</p>
-<p>These settings describe stable <code>1.7.0</code>. Historical anchors remain available.
+<p>These settings describe stable <code>1.7.1</code>. Historical anchors remain available.
 Configuration and tool registration do not grant dataset permission or local
 preservation approval. Existing component settings and exact allowlists remain
 supported.</p>
@@ -231,7 +231,7 @@ does not read provider credentials or test remote reachability.</p>
 <p><a id="closed-common-transformation-profile"></a></p>
 <p><a id="common-transformation-profile-16-rc"></a></p>
 <h2 id="common-transformation-profile">Common Transformation Profile<a class="headerlink" href="#common-transformation-profile" title="Permanent link">&para;</a></h2>
-<p>Stable <code>1.7.0</code> provides the common CLI/MCP workflow. Its versioned reference profile combines two or more inputs
+<p>Stable <code>1.7.1</code> provides the common CLI/MCP workflow. Its versioned reference profile combines two or more inputs
 with one independently reviewed DatasetSpec for final linked validation:</p>
 <pre><code class="language-yaml">schema_version: &quot;0.1&quot;
 validation: validation.yaml
@@ -389,7 +389,7 @@ does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
 <p><a id="transformation-input-limits-16-rc"></a></p>
 <h2 id="transformation-input-limits">Transformation Input Limits<a class="headerlink" href="#transformation-input-limits" title="Permanent link">&para;</a></h2>
 <p>These settings apply to transformation acquisition, decoding and policy-aware
-review preflight in stable <code>1.7.0</code>, plus CSV profiling/trace shape checks.
+review preflight in stable <code>1.7.1</code>, plus CSV profiling/trace shape checks.
 They do not change source-free profiling/MCP budgets or themselves establish
 end-to-end capacity. Remaining pipeline caps still apply. The fictional private replacement-only CSV scenario
 passed 300,000 rows × 50 columns; see
@@ -887,7 +887,7 @@ or the <a href="../../ru/how-to/trino/#trino-mcp-basic">Russian guide</a>.</p>
 <tr>
 <td><code>TRINO_AUTH_METHOD</code></td>
 <td><code>none</code></td>
-<td>Optional methods in stable <code>1.7.0</code>: <code>basic</code>, <code>jwt</code>, <code>kerberos</code>, <code>gssapi</code>, <code>oauth2</code>, <code>certificate</code>; authenticated connections require HTTPS and certificate verification</td>
+<td>Optional methods in stable <code>1.7.1</code>: <code>basic</code>, <code>jwt</code>, <code>kerberos</code>, <code>gssapi</code>, <code>oauth2</code>, <code>certificate</code>; authenticated connections require HTTPS and certificate verification</td>
 </tr>
 <tr>
 <td><code>TRINO_AUTH_SECRET_ENV</code></td>
