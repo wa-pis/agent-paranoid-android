@@ -208,7 +208,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.7.0
   <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
-  <br>Documentation fd84e65aad26274e8f5e605b1e47538f575c1a70
+  <br>Documentation 6520a4418c88386d44392e4b2ca57f423fcd4013
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -284,7 +284,9 @@ separate and still apply to the reviewed spec.</p>
 <p>Python callers can pass <code>inference_options=parse_inference_options(payload)</code> to
 <code>infer_dataset_spec</code> using the parser in <code>test_data_agent.core.inference</code>. For
 the MCP <code>infer_dataset_spec</code> tool, pass the same configuration as an inline
-<code>inference_options</code> object.</p>
+<code>inference_options</code> object. Each rule list accepts up to 64 entries, and each
+selector accepts up to 128 characters. The CLI options file limit is 512 KiB
+(or the configured global input limit, if lower).</p>
 <p>When options are provided, the specification includes <code>inference_evidence</code>:
 a configuration digest, winning field rules and counts filtered at each
 confidence threshold. Indices are zero-based: field and entity positions refer
