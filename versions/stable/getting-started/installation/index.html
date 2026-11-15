@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.0/getting-started/installation/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/getting-started/installation/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Installation - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Installation";
         var mkdocs_page_input_path = "getting-started/installation.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.0/getting-started/installation/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/getting-started/installation/";
       </script>
     
     <!--[if lt IE 9]>
@@ -223,9 +223,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.0
-  <br>Package source daf3ec87c404ca76b81ca81b3aba635125060240
-  <br>Documentation 6520a4418c88386d44392e4b2ca57f423fcd4013
+  <strong>Maintained stable guidance</strong> · Package 1.7.1
+  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
+  <br>Documentation 49d12c515c3aa7d012b038c5d1c96b50195fbcc1
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -233,7 +233,7 @@
 
                 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <p>English · <a href="../../ru/getting-started/installation/">Русский</a></p>
-<p>Stable <code>1.7.0</code> is the recommended release after publication.</p>
+<p>Stable <code>1.7.1</code> is the recommended release after publication.</p>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Python 3.11 or newer</li>
@@ -249,40 +249,40 @@ changing this matrix are defined in
 <a href="../../reference/generation-contract-migration/">migration notes</a> before
 regenerating existing fixtures.</p>
 <h2 id="install-from-pypi">Install From PyPI<a class="headerlink" href="#install-from-pypi" title="Permanent link">&para;</a></h2>
-<p>The stable release is <code>1.7.0</code>. Check <a href="../../1.7.0-release-status/">publication status</a> before installing.</p>
+<p>The stable release is <code>1.7.1</code>. Check <a href="../../1.7.1-release-status/">publication status</a> before installing.</p>
 <p>Create an isolated environment:</p>
 <h3 id="macos-and-linux">macOS and Linux<a class="headerlink" href="#macos-and-linux" title="Permanent link">&para;</a></h3>
 <pre><code class="language-bash">python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install &quot;agent-paranoid-android==1.7.0&quot;
+python3 -m pip install &quot;agent-paranoid-android==1.7.1&quot;
 </code></pre>
 <p>The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:</p>
-<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[parquet]==1.7.0&quot;
-python3 -m pip install &quot;agent-paranoid-android[mcp]==1.7.0&quot;
-python3 -m pip install &quot;agent-paranoid-android[mcp,trino]==1.7.0&quot;
-python3 -m pip install &quot;agent-paranoid-android[postgres]==1.7.0&quot;
-python3 -m pip install &quot;agent-paranoid-android[openai]==1.7.0&quot;
-python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.7.0&quot;
+<pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android[parquet]==1.7.1&quot;
+python3 -m pip install &quot;agent-paranoid-android[mcp]==1.7.1&quot;
+python3 -m pip install &quot;agent-paranoid-android[mcp,trino]==1.7.1&quot;
+python3 -m pip install &quot;agent-paranoid-android[postgres]==1.7.1&quot;
+python3 -m pip install &quot;agent-paranoid-android[openai]==1.7.1&quot;
+python3 -m pip install &quot;agent-paranoid-android[gigachat]==1.7.1&quot;
 </code></pre>
 <p>Dependency footprint budgets live in <a href="../../reference/dependency-compatibility/#installation-footprint">Dependency Compatibility</a>.</p>
 <p>The <code>all</code> extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 <code>test-data-agent doctor --require-extra all</code> to verify that full environment.</p>
-<p>The experimental GigaChat adapter is retained in <code>1.7.0</code> through its
+<p>The experimental GigaChat adapter is retained in <code>1.7.1</code> through its
 explicit <code>gigachat</code> extra. Follow
 <a href="../../how-to/gigachat/">Use The GigaChat Advisor</a> for authentication, mandatory
 TLS verification, and the review-first workflow. The default provider remains
 OpenAI.</p>
 <p><a id="accepted-candidate-baseline"></a></p>
-<p>Stable <code>1.7.0</code> is the recommended default. Add an optional extra to the same
+<p>Stable <code>1.7.1</code> is the recommended default. Add an optional extra to the same
 exact stable pin only when needed.</p>
 <h3 id="windows-powershell">Windows PowerShell<a class="headerlink" href="#windows-powershell" title="Permanent link">&para;</a></h3>
 <pre><code class="language-powershell">py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install &quot;agent-paranoid-android==1.7.0&quot;
+python -m pip install &quot;agent-paranoid-android==1.7.1&quot;
 </code></pre>
 <p>Run the self-contained environment check:</p>
 <pre><code class="language-bash">test-data-agent doctor
