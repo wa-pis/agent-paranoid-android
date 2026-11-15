@@ -52,7 +52,7 @@ cooperative conservative bounds, not an OS-level peak-RSS guarantee.
 
 The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
 this section apply to stable `1.5.0` and are retained in stable
-`1.7.0`; see [release status](../1.7.0-release-status.md).
+`1.7.1`; see [release status](../1.7.1-release-status.md).
 
 Database-source configuration and profiling have independent limits before
 generation begins:

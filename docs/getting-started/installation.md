@@ -2,7 +2,7 @@
 
 English · [Русский](../ru/getting-started/installation.md)
 
-Stable `1.7.0` is the recommended release after publication.
+Stable `1.7.1` is the recommended release after publication.
 
 ## Requirements
 
@@ -22,18 +22,7 @@ regenerating existing fixtures.
 
 ## Install From PyPI
 
-The stable release is `1.7.0`. Check [publication status](../1.7.0-release-status.md) before installing.
-
-To test the corrective candidate after [publication](../1.7.1rc1-release-status.md), select it explicitly:
-
-```bash
-python3 -m pip install "agent-paranoid-android==1.7.1rc1"
-python3 -m pip install "agent-paranoid-android[parquet]==1.7.1rc1"
-python3 -m pip install "agent-paranoid-android[mcp]==1.7.1rc1"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.7.1rc1"
-python3 -m pip install "agent-paranoid-android[openai]==1.7.1rc1"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.7.1rc1"
-```
+The stable release is `1.7.1`. Check [publication status](../1.7.1-release-status.md) before installing.
 
 Create an isolated environment:
 
@@ -43,19 +32,19 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.7.0"
+python3 -m pip install "agent-paranoid-android==1.7.1"
 ```
 
 The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.7.0"
-python3 -m pip install "agent-paranoid-android[mcp]==1.7.0"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.7.0"
-python3 -m pip install "agent-paranoid-android[postgres]==1.7.0"
-python3 -m pip install "agent-paranoid-android[openai]==1.7.0"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.7.0"
+python3 -m pip install "agent-paranoid-android[parquet]==1.7.1"
+python3 -m pip install "agent-paranoid-android[mcp]==1.7.1"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.7.1"
+python3 -m pip install "agent-paranoid-android[postgres]==1.7.1"
+python3 -m pip install "agent-paranoid-android[openai]==1.7.1"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.7.1"
 ```
 
 Dependency footprint budgets live in [Dependency Compatibility](../reference/dependency-compatibility.md#installation-footprint).
@@ -64,7 +53,7 @@ The `all` extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 `test-data-agent doctor --require-extra all` to verify that full environment.
 
-The experimental GigaChat adapter is retained in `1.7.0` through its
+The experimental GigaChat adapter is retained in `1.7.1` through its
 explicit `gigachat` extra. Follow
 [Use The GigaChat Advisor](../how-to/gigachat.md) for authentication, mandatory
 TLS verification, and the review-first workflow. The default provider remains
@@ -72,7 +61,7 @@ OpenAI.
 
 <a id="accepted-candidate-baseline"></a>
 
-Stable `1.7.0` is the recommended default. Add an optional extra to the same
+Stable `1.7.1` is the recommended default. Add an optional extra to the same
 exact stable pin only when needed.
 
 ### Windows PowerShell
@@ -81,7 +70,7 @@ exact stable pin only when needed.
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "agent-paranoid-android==1.7.0"
+python -m pip install "agent-paranoid-android==1.7.1"
 ```
 
 Run the self-contained environment check:
