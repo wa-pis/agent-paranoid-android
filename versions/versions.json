@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.7.1rc1",
+    "title": "1.7.1rc1 (release candidate)",
+    "aliases": [
+      "next"
+    ]
+  },
+  {
     "version": "1.7.0",
     "title": "1.7.0",
     "aliases": [
