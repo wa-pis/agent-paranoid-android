@@ -8,8 +8,9 @@ import sys
 from collections.abc import Callable
 from dataclasses import replace
 from functools import partial
+from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 if TYPE_CHECKING:
     from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
@@ -41,6 +42,7 @@ from test_data_agent.core.limits import (
     positive_float_env,
 )
 from test_data_agent.core.settings import GenerationMode, OutputFormat
+from test_data_agent.generation.planner import InferenceMetadataError
 from test_data_agent.io import (
     dataset_spec_fingerprint,
     generate_dataset_bundle,
@@ -137,10 +139,16 @@ def profile_csv(input_path: str, output_path: str, table_name: str | None = None
     }
 
 
+def _safe_tool_error(message: str) -> Exception:
+    try:
+        tool_error = import_module("mcp.server.fastmcp.exceptions").ToolError
+    except ImportError:
+        tool_error = import_module("mcp.server.mcpserver.exceptions").ToolError
+    return cast(Exception, tool_error(message))
+
+
 def profile_parquet(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
     """Profile one workspace Parquet file into a new JSON artifact. Returns a relative path and counts, never rows. Requires the parquet extra; use the saved profile with plan_dataset."""
-    from importlib import import_module
-
     from test_data_agent.adapters.parquet_dataset import (
         ParquetDependencyError, parquet_file_to_dataset_profile,
     )
@@ -163,11 +171,7 @@ def profile_parquet(input_path: str, output_path: str, table_name: str | None = 
         with open_regular_file(source) as handle:
             profile = parquet_file_to_dataset_profile(source, table_name=table_name, source=handle)
     except ParquetDependencyError:
-        try:
-            tool_error = import_module("mcp.server.fastmcp.exceptions").ToolError
-        except ImportError:
-            tool_error = import_module("mcp.server.mcpserver.exceptions").ToolError
-        raise tool_error(
+        raise _safe_tool_error(
             "Parquet profiling requires the parquet extra. "
             "Install agent-paranoid-android[mcp,parquet] in the server environment."
         ) from None
@@ -208,10 +212,13 @@ def infer_dataset_spec(
     else:
         loaded = load_inline_profile_payload(profile_payload or {})
     assert_profile_safe(loaded)
-    spec = infer_dataset_spec_artifact(
-        loaded, output_path=output, count=count,
-        inference_options=parse_inference_options(inference_options) if inference_options is not None else None,
-    )
+    try:
+        spec = infer_dataset_spec_artifact(
+            loaded, output_path=output, count=count,
+            inference_options=parse_inference_options(inference_options) if inference_options is not None else None,
+        )
+    except InferenceMetadataError as exc:
+        raise _safe_tool_error(str(exc)) from None
     return {
         "operation": "infer_dataset_spec",
         "spec_path": workspace_path_label(output),

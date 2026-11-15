@@ -42,3 +42,10 @@ authority or replace generation business-rule enforcement.
 - **WHEN** configuration is loaded
 - **THEN** it is rejected before inference with a redacted diagnostic
 - **AND** no access, preservation or approval authority is granted
+
+#### Scenario: Valid configuration using escaped selectors
+
+- **GIVEN** a valid version 1 configuration with maximum-length Unicode selectors
+- **WHEN** the configuration is supplied inline or in a normally encoded CLI options file
+- **THEN** the CLI file limit SHALL accommodate that encoding under default input limits
+- **AND** inference SHALL produce equivalent evidence across Python, CLI and MCP

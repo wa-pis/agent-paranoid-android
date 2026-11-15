@@ -2,13 +2,11 @@
 
 English · [Русский](ru/roadmap.md)
 
-These are directions, not committed dates. Priorities follow user feedback and
-confirmed defects. Stable `1.6.0` is already published and publicly verified;
-completed work belongs in [release history](history.md), not this list.
-
-Candidate [1.7.0rc3](release-evidence-1.7.0rc3.md) now includes Python 3.15
-and bounded source-free acyclic linked-table generation. Cycles, shared PK/FK
-identities and global rules remain outside the scalable engine’s scope.
+These are directions, not committed dates. Stable [1.7.0](release-evidence-1.7.0.md)
+is published and publicly verified. It includes capacity forecasts, bounded
+generation for independent and eligible linked tables, CPython 3.15,
+configurable inference with evidence, generator MCP Parquet profiling, and
+stronger planning and recovery integrity. See the [release history](history.md).
 
 ## Now
 
@@ -16,12 +14,12 @@ identities and global rules remain outside the scalable engine’s scope.
   [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):
   historical Trino application authentication settings and external profile
   provenance. The numeric profiling, relational planning/utility, bounded
-  statistics and CLI fixes shipped in the published
-  [1.7.0rc1 candidate](feedback-acceptance-1.7.0rc1.md); its finite installed
+  statistics and CLI fixes are in 1.7.0. The [RC1 evidence](feedback-acceptance-1.7.0rc1.md)
+  records where they were first accepted; its finite installed
   checks do not reproduce missing private inputs or the historical 401.
-- Complete remaining transformation evidence: target-size coverage of the final
-  public/configured routes and the separately tracked trust-boundary amendment
-  review. Prior approvals and private scale runs retain their original scope.
+- Keep transformation evidence scoped to the measured routes and artifact.
+  The archived OpenSpec records 36 target-size format combinations, three
+  refusal checks and the trust-boundary review; this grants no data permission.
 - Improve onboarding from pilot feedback. Versioned guides and four downloadable
   formats are already published; see [documentation versions](versions.md).
 - Run product-validation pilots on development and analytics workflows.
@@ -30,10 +28,9 @@ identities and global rules remain outside the scalable engine’s scope.
 
 ## Next
 
-- Plan configurable inference heuristics: declarative user rules for field
-  recognition, relationship candidates and confidence settings, shared across
-  supported sources and Python, CLI and MCP. See OpenSpec
-  `configurable-inference-heuristics`.
+- Keep the configurable inference matrix green as sources, formats and interfaces
+  evolve. OpenSpec `configurable-inference-heuristics` records coverage for equivalent
+  safe profiles across Python, CLI and MCP.
 
 - Keep GitHub Pages as the primary documentation host with native mike versions,
   bilingual navigation/search and four verified offline formats. The maintainer
@@ -44,9 +41,9 @@ identities and global rules remain outside the scalable engine’s scope.
   project-build retirement is owner-managed. The GitHub Pages return passed main
   Documentation 41336088977, including public verification and retained versions.
   Cancelled/superseded hosting proposals are archived without accepting their deltas.
-- Extend bounded batch generation/validation to related tables and global rules
-  after the independent-table implementation has measured acceptance evidence.
-  Cross-table key/uniqueness state needs separate bounded planning and review.
+- Evaluate support beyond the shipped acyclic linked-table engine. Cycles,
+  shared PK/FK identities and global rules are outside its supported scope;
+  any extension needs separate bounded planning and review.
 - Simplify CSV and database workflows using pilot feedback.
 - Publish runnable examples and short case studies using synthetic fixtures.
 - Improve diagnostics where users repeatedly need help.
@@ -54,7 +51,7 @@ identities and global rules remain outside the scalable engine’s scope.
 ## Later
 
 - Source-row EAV pivot/unpivot remains deferred. Conditional formulas and
-  source-free EAV modeling shipped in the 1.7.0rc1 candidate; transforming existing
+  source-free EAV modeling shipped in 1.7.0 (first delivered in rc1); transforming existing
   EAV rows requires a separate proposal for row cardinality, duplicate/null
   semantics, typed values, provenance and explicitly authorized source I/O.
   Neither source-free generation nor one-to-one transformation authorizes it.

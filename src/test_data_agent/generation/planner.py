@@ -13,6 +13,10 @@ from test_data_agent.core.privacy import is_sensitive_field, validate_local_cate
 from test_data_agent.safety import assert_profile_safe, assert_spec_safe
 
 
+class InferenceMetadataError(ValueError):
+    """Fixed recovery diagnostic for unavailable profile evidence."""
+
+
 def infer_dataset_spec(
     profile: DatasetProfile, count: int | None = None, *,
     decimal_fields: Mapping[str, FieldSpec] | None = None,
@@ -22,9 +26,9 @@ def infer_dataset_spec(
 ) -> DatasetSpec:
     assert_profile_safe(profile)
     if profile.source_type in {"postgres_query", "trino_query"} and profile.has_unmodeled_expressions is None:
-        raise ValueError("SQL query profile requires reprofiling for expression dependency checks")
+        raise InferenceMetadataError("SQL query profile requires reprofiling for expression dependency checks")
     if profile.has_unmodeled_expressions:
-        raise ValueError("SQL expression dependencies are unsupported for inferred generation")
+        raise InferenceMetadataError("SQL expression dependencies are unsupported for inferred generation")
     counts = dict(entity_counts or {})
     if set(counts) - {entity.name for entity in profile.entities}:
         raise ValueError("entity counts must reference existing profile entities")
@@ -71,7 +75,7 @@ def infer_dataset_spec(
     entities: list[EntitySpec] = []
     for entity_index, entity in enumerate(profile.entities):
         if any(field.null_ratio is None for field in entity.fields):
-            raise ValueError("unknown null statistics require an explicit reviewed generation spec")
+            raise InferenceMetadataError("unknown null statistics require an explicit reviewed generation spec")
         primary_key = entity.primary_key_candidates[0] if entity.primary_key_candidates else None
         fields: list[FieldSpec] = []
         for field_index, field in enumerate(entity.fields):
