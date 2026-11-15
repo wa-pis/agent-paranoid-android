@@ -38,3 +38,9 @@ python -m pytest -q tests/test_acceptance_mcp_permissions.py::test_generator_std
 
 For an environment with `[mcp,dev]` and no PyArrow, use
 `test_generator_stdio_without_parquet_extra` in the same module.
+
+## Release status
+
+PR #703 shipped in v1.7.0. The release passed public package verification
+(run 43649260328). The specific Parquet tool evidence above remains scoped
+to the recorded development wheel and MCP SDK clients.

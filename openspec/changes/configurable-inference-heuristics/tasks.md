@@ -18,3 +18,9 @@
       report unavailable metadata explicitly and preserve business-rule enforcement.
 - [ ] Document runnable examples and run focused tests, strict OpenSpec validation
       and documentation checks before releasing the capability.
+
+The implementation shipped in v1.7.0 via PR #704. The focused
+`tests/test_inference_options.py` suite covers defaults, safety, conflicts,
+redacted invalid settings and Python/CLI/MCP parity for the tested profile.
+The release gate passed; this does not close the broader source/output matrix
+or the remaining documentation and acceptance checklist.
