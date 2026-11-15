@@ -265,10 +265,17 @@ def build(
             raise ValueError(
                 "publish stable documentation before building a next-version preview"
             )
-        # mike updates one version and preserves all other already-rendered versions.
+        # The mutable preview can be a development version or a candidate alias.
+        mike = str(Path(sys.executable).parent / "mike")
+        if preview:
+            versions = json.loads(command([mike, "list", "--json"], cwd=repository))
+            has_next_version = any(entry["version"] == "next" for entry in versions)
+            has_next_alias = any("next" in entry.get("aliases", []) for entry in versions)
+            if (candidate and has_next_version) or (not candidate and has_next_alias):
+                command([mike, "delete", "--ignore-remote-status", "next"], cwd=repository)
         target = version if candidate else ("next" if preview else stable)
         arguments = [
-            str(Path(sys.executable).parent / "mike"),
+            mike,
             "deploy",
             "--ignore-remote-status",
             "--update-aliases",

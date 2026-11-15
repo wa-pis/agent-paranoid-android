@@ -319,6 +319,10 @@ nav:
         ["git", "fetch", str(bundle), "gh-pages:refs/remotes/origin/gh-pages"],
         cwd=source,
     )
+    if target != "next":
+        (source / "pyproject.toml").write_text('[project]\nversion = "1.7.0.dev1"\n')
+        docs.build(source, output, str(browser), bundle=bundle)
+        docs.command(["git", "fetch", str(bundle), "gh-pages:refs/remotes/origin/gh-pages"], cwd=source)
     (source / "pyproject.toml").write_text(f'[project]\nversion = "{version}"\n')
     (source / "docs/index.md").write_text("# NEXT VERSION ONLY\n")
     # A host change affects new editions, never the retained stable bytes.
@@ -365,6 +369,14 @@ nav:
         assert second["package_commit"] == tag_commit
         assert second["package_version"] == "1.7.0rc2"
         assert "SECOND CANDIDATE ONLY" in (output / "versions/next/index.html").read_text()
+
+        docs.build(source, output, str(browser), bundle=bundle)
+        docs.command(["git", "fetch", str(bundle), "gh-pages:refs/remotes/origin/gh-pages"], cwd=source)
+        (source / "pyproject.toml").write_text('[project]\nversion = "1.7.0.dev2"\n')
+        docs.build(source, output, str(browser))
+        versions = json.loads((output / "versions/versions.json").read_text())
+        assert {entry["version"] for entry in versions} == {"1.6.0", target, "1.7.0rc2", "next"}
+        assert (output / "index.html").read_bytes() == before
 
 
 def test_russian_search_and_navigation_keep_the_language(tmp_path, monkeypatch):

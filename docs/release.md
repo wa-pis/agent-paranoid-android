@@ -11,6 +11,13 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.7.1 Corrective Release
+
+Qualify the CLI and MCP corrections from PR #714 in
+[1.7.1rc1](1.7.1rc1-release-status.md) before promoting the accepted runtime
+to stable 1.7.1. Both versions require fresh exact-main gates, independent
+review, Ubuntu artifact hashes, a signed manifest, and public verification.
+
 ## 1.7.0 Stable Promotion
 
 Promote the [publicly verified 1.7.0rc4 candidate](release-evidence-1.7.0rc4.md).

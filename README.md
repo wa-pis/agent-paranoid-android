@@ -18,6 +18,10 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
+Prospective candidate `1.7.1rc1` is not yet published. See
+[candidate status](docs/1.7.1rc1-release-status.md). After publication:
+`python3 -m pip install "agent-paranoid-android==1.7.1rc1"`.
+
 ## Install And Try It
 
 Python 3.11 or newer is required.

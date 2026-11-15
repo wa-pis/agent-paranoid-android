@@ -14,6 +14,8 @@ Use the CLI below or the runnable
 
 See [publication status](1.7.0-release-status.md) before installing.
 
+For the corrective candidate, see [1.7.1rc1 status](1.7.1rc1-release-status.md).
+
 ## Five-Minute Check
 
 ```bash
