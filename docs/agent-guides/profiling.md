@@ -117,8 +117,10 @@ the existing profiling deadline. These controls do not bound total process
 RSS, Arrow allocations or the initial Python sets. Other input/file/cell and
 sampling limits still apply.
 
-`unique_ratio_kind="exact"` identifies complete CSV distinct evidence; ratios
-use non-null normalized values and are rounded to six decimal places. Existing
+`unique_ratio_kind="exact"` identifies complete CSV distinct evidence. Folder
+CSV ratios use non-null normalized values and round to six decimal places;
+single-file CSV normalization retains its released distinct/total-row ratio.
+The exact marker describes complete distinct-count evidence. Existing
 `lower_bound` evidence, including bounded Parquet counts, must still display
 “at least X%”; its ratio is truncated downward. It cannot nominate a primary
 key or exact identifier pool. Relationship discovery excludes lower-bound
@@ -127,7 +129,10 @@ profiles and other producers retain `unspecified` rather than being silently
 promoted to exact. This statistic is unrelated to the planned percentage of
 unchanged values after transformation.
 
-Cache format 10 invalidates older folder caches and recomputes their evidence,
+Computed folder CSV numeric summaries use the same content-sensitive policy as
+other source adapters; protected summaries mark the field sensitive and are
+omitted before publication or caching.
+Cache format 11 invalidates older folder caches and recomputes their evidence,
 including shared semantic/privacy counters, finite numeric statistics,
 numeric-storage proof and repeated-identifier pool sizes. Caches contain no
 distinct digests, DuckDB state, raw rows or sensitive source values.
@@ -244,7 +249,7 @@ This structural check does not establish a native CSV parser peak-memory bound.
 CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
-format 10 invalidates older inferred bindings; reprofile saved artifacts.
+format 11 invalidates older inferred bindings; reprofile saved artifacts.
 
 
 Parquet distinctness reuses the scalar sensitivity scan and retains at most
@@ -271,7 +276,7 @@ eligible CSV measure in the generation spec. Protected names, identifiers and
 key/relationship bindings veto replacement. Unknown semantics alone cannot
 authorize replacement: the profile must retain complete finite phone-only
 numeric-storage evidence and a physical integer/float type. Weak SSN/card/secret
-signals, even in a late row, invalidate that proof. Cache format 10 invalidates older
+signals, even in a late row, invalidate that proof. Cache format 11 invalidates older
 folder evidence; changed profile/spec fingerprints require fresh review.
 
 Folder cache identity includes the source directory and file identities and change

@@ -27,6 +27,7 @@ from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.privacy import (
     LocalCategoryField,
+    has_sensitive_numeric_summary,
     infer_sensitive_from_name,
     mask_pattern,
     PrivacySettings,
@@ -443,7 +444,12 @@ class FieldAccumulator:
             ),
             is_identifier=is_identifier,
         )
-        profile.distribution = self.distribution(profile)
+        distribution = self.distribution(profile)
+        if distribution.get("kind") == "numeric" and has_sensitive_numeric_summary(distribution):
+            # Derived quantiles must follow the same policy as source summaries.
+            profile.sensitive = True
+            distribution = {}
+        profile.distribution = distribution
         return profile
 
     def infer_field_type(self, semantic_type: str | None) -> FieldType:

@@ -18,6 +18,13 @@ separately rather than represented as an unchanged-output optimization.
 - **THEN** its engine and released type, validation and privacy guarantees remain
 - **AND** repeatability and unchanged seeded behavior are verified against 1.7.1.
 
+#### Scenario: A native decimal scalar is validated against a FLOAT field
+
+- **GIVEN** a fictional finite decimal scalar whose text parses as a finite FLOAT
+- **WHEN** shared schema validation sees Python, CSV, JSON or Parquet values
+- **THEN** it retains the released scalar coercion without mutating input values
+- **AND** non-finite FLOAT values remain rejected and privacy checks still run.
+
 ### Requirement: Apply shared source privacy without broadening access
 
 Column semantics SHALL use bounded counters and contextual evidence while any
@@ -34,6 +41,13 @@ SHALL retain their existing safety gates.
 - **THEN** phone semantics is not forced and sensitivity remains conservative
 - **AND** any SSN, card, secret or sensitive null-marker evidence blocks the
   phone-only numeric replacement exception.
+
+#### Scenario: Derived numeric summaries contain a sensitive signal
+
+- **GIVEN** a fictional numeric column whose computed summaries trigger shared privacy policy
+- **WHEN** a folder CSV profile is published or cached
+- **THEN** it marks the field sensitive and suppresses the numeric distribution
+- **AND** cache format 11 rejects earlier profiles rather than reusing stale summaries.
 
 ### Requirement: Count complete CSV distinctness with private bounded spill
 

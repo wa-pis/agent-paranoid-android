@@ -34,11 +34,10 @@ def _original_type_match(value: Any, data_type: FieldType) -> bool:
     if data_type == FieldType.INTEGER:
         return isinstance(value, int) and not isinstance(value, bool) or parse_int(str(value)) is not None
     if data_type == FieldType.FLOAT:
-        if type(value) is int:
-            return True
-        if isinstance(value, str):
-            value = parse_float(value)
-        return isinstance(value, float) and math.isfinite(value)
+        # Retain released scalar coercion and the finite-float safety gate.
+        if isinstance(value, int | float) and not isinstance(value, bool):
+            return not isinstance(value, float) or math.isfinite(value)
+        return parse_float(str(value)) is not None
     if data_type == FieldType.BOOLEAN:
         return isinstance(value, bool) or parse_bool(str(value)) is not None
     if data_type == FieldType.DATE:
@@ -165,6 +164,7 @@ def _values() -> list[Any]:
         _FloatSubclass(1.5), Decimal("7"), Decimal("1.5"), Decimal("NaN"),
         Decimal("7.00"), Decimal("1.234"), Decimal("9999.99"), Decimal("10000.00"),
         Decimal("-9999.99"), Decimal("Infinity"), "7.01", "1.234", "9999.99", "10000.00",
+        Decimal("1E-400"), Decimal("1E400"), Decimal("-Infinity"),
         "0", "7", "-7", " 7 ", "+7", "007", "7.0", "7e0", "١", "７", "1_0",
         "nan", "Infinity", "true", "TRUE", "t", "yes", " false ", "no", "0x10",
         "2024-02-29", "2024-02-30", "20240229", "2024-W09-4", "2024-02-29suffix",

@@ -113,11 +113,9 @@ def _matches_integer(value: Any) -> bool:
 
 
 def _matches_float(value: Any) -> bool:
-    if type(value) is int:
-        return True
-    if isinstance(value, str):
-        value = parse_float(value)
-    return isinstance(value, float) and math.isfinite(value)
+    if isinstance(value, int | float) and not isinstance(value, bool):
+        return not isinstance(value, float) or math.isfinite(value)
+    return parse_float(str(value)) is not None
 
 
 def _matches_boolean(value: Any) -> bool:

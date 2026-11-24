@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+import json
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+from test_data_agent.adapters.csv_file import csv_file_to_dataset_profile
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core import privacy
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.postgres_config import PostgresConfig
 from test_data_agent.postgres_profiler import PostgresProfiler
+from test_data_agent.profiling import profile_example_folder
+from test_data_agent.profiling.cache import write_cached_profile
 from test_data_agent.safety import ProfileSafetyError, SpecSafetyError, assert_profile_safe, assert_spec_safe
 from test_data_agent.sql_query_profiling import QueryResultColumn, SqlQueryProfileError, profile_validated_query
 from test_data_agent.sql_query_source import (
@@ -255,6 +260,61 @@ def test_native_sensitive_numeric_summaries_are_protected_for_every_legacy_sourc
     with pytest.raises(ProfileSafetyError, match="sensitive") as caught:
         assert_profile_safe(untrusted)
     assert str(candidate) not in str(caught.value)
+
+
+@pytest.mark.parametrize("use_cache", [False, True])
+@pytest.mark.parametrize("reverse", [False, True])
+def test_csv_folder_suppresses_sensitive_derived_quantiles_like_single_csv(
+    tmp_path: Path, use_cache: bool, reverse: bool,
+) -> None:
+    values = ["123.45", "456.78"]
+    assert all(privacy.infer_source_value_signal(value) is None for value in values)
+    source = tmp_path / "source"
+    source.mkdir()
+    path = source / "items.csv"
+    path.write_text("quantity\n" + "\n".join(reversed(values) if reverse else values) + "\n")
+    cache_dir = tmp_path / "cache"
+
+    single = csv_file_to_dataset_profile(path)
+    folder = profile_example_folder(source, cache_dir=cache_dir, use_cache=use_cache)
+    if use_cache:
+        cached = profile_example_folder(source, cache_dir=cache_dir)
+        assert cached == folder
+    single_field = single.entity("items").field("quantity")
+    folder_field = folder.entity("items").field("quantity")
+
+    assert single_field.sensitive and folder_field.sensitive
+    assert single_field.semantic_type is folder_field.semantic_type is None
+    assert single_field.distribution == folder_field.distribution == {}
+    assert all(value not in folder.model_dump_json() for value in values)
+    assert_profile_safe(folder)
+    assert_spec_safe(infer_dataset_spec(folder, count=2))
+
+
+def test_csv_folder_rebuilds_previous_cache_with_sensitive_derived_quantiles(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "items.csv").write_text("quantity\n123.45\n456.78\n")
+    cache_dir = tmp_path / "cache"
+    previous = profile_example_folder(source, use_cache=False)
+    previous_field = previous.entity("items").field("quantity")
+    previous_field.sensitive = False
+    previous_field.distribution = {
+        "kind": "numeric", "min_value": 123.45, "max_value": 456.78,
+        "p05": 140.1165, "p95": 440.1135,
+    }
+    cache_path = write_cached_profile(source, previous, cache_dir=cache_dir)
+    cached_payload = json.loads(cache_path.read_text())
+    cached_payload["format_version"] = 10
+    cache_path.write_text(json.dumps(cached_payload))
+
+    rebuilt = profile_example_folder(source, cache_dir=cache_dir)
+
+    assert rebuilt.entity("items").field("quantity").sensitive
+    assert rebuilt.entity("items").field("quantity").distribution == {}
+    assert_profile_safe(rebuilt)
+    assert_spec_safe(infer_dataset_spec(rebuilt, count=2))
+    assert json.loads(cache_path.read_text())["format_version"] == 11
 
 
 @pytest.mark.parametrize("family", ["ssn", "card"])

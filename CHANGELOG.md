@@ -19,12 +19,14 @@ All notable changes to this project are documented here.
 - Infer column semantics from full-population counters and word-based name
   context. Weak SSN/card/token evidence stays sensitive while leaving semantics
   unknown without supporting context; row order does not affect inference.
-- Advance folder caches to format 10 and authorized SQL query-source policy to
+- Advance folder caches to format 11 and authorized SQL query-source policy to
   1.2. Reprofile affected artifacts before review; query language and database
   access/work budgets are unchanged.
 
 ### Fixed
 
+- Retain released FLOAT validation for native decimal scalars, including Parquet
+  inputs, while rejecting non-finite values and preserving privacy checks.
 - Reuse normalized values and completed validation checks during eligible CSV
   export, preserving all safety gates, typed CSV/DECIMAL encoding and atomic
   publication.
@@ -34,6 +36,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Apply shared sensitivity checks to computed folder CSV numeric summaries and
+  suppress protected distributions before publication or caching.
 - Apply sensitive numeric-summary and categorical-content guards across source
   variants. Keep alias provenance sensitive, strict source limits, bounded
   private distinct scratch and reviewed `numeric_measure`/transformation scopes.

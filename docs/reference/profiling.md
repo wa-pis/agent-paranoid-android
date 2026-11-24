@@ -47,7 +47,7 @@ columns require review; local category permission is not declassification.
 
 NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-The unreleased checkout uses folder cache format 10 and recomputes older cached
+The unreleased checkout uses folder cache format 11 and recomputes older cached
 profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.

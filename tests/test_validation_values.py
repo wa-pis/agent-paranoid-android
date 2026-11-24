@@ -2,6 +2,7 @@
 
 import copy
 import json
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -89,3 +90,21 @@ def test_malformed_rows_respect_fail_fast(fail_fast: bool) -> None:
 def test_nonfinite_floats_are_not_valid_schema_values(value: Any) -> None:
     spec = conditional_spec("float", 1)
     assert not validate_dataset({"items": [{"flag": value, "note": None}]}, spec).valid
+
+
+@pytest.mark.parametrize("storage", ["python", "csv", "json", "parquet"])
+def test_decimal_scalar_in_float_schema_is_format_independent(tmp_path: Path, storage: str) -> None:
+    spec = conditional_spec("float", 1)
+    rows = {"items": [{"flag": Decimal("1.25"), "note": None}]}
+    original = copy.deepcopy(rows)
+    if storage == "csv":
+        (tmp_path / "items.csv").write_text(rows_to_csv(rows["items"]))
+    elif storage == "json":
+        (tmp_path / "items.json").write_text(json.dumps(rows["items"], default=str))
+    elif storage == "parquet":
+        pa = pytest.importorskip("pyarrow")
+        pq = pytest.importorskip("pyarrow.parquet")
+        pq.write_table(pa.Table.from_pylist(rows["items"]), tmp_path / "items.parquet")
+    loaded = rows if storage == "python" else load_dataset_rows(tmp_path)
+    assert validate_dataset(loaded, spec).valid
+    assert rows == original
