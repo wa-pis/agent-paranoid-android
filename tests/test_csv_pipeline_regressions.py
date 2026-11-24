@@ -140,12 +140,12 @@ def test_negative_fractional_amounts_remain_numeric_in_both_paths(tmp_path: Path
         assert column.min_value == -358377000001.25
 
 
-def test_distinct_budget_cannot_claim_uniqueness(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("test_data_agent.csv_profiler.MAX_DISTINCT_DIGESTS", 10)
+def test_exact_distinct_count_is_not_censored_at_an_old_cap(tmp_path: Path) -> None:
     path = source(tmp_path, "items", ["id"], [[i] for i in range(10)])
     profile = profile_csv(path)
-    assert profile.columns[0].approx_distinct_count < profile.row_count
-    assert not legacy_profile_to_dataset_profile(profile.model_dump()).entities[0].primary_key_candidates
+    assert profile.columns[0].approx_distinct_count == profile.row_count
+    assert profile.columns[0].unique_ratio_kind == "exact"
+    assert legacy_profile_to_dataset_profile(profile.model_dump()).entities[0].primary_key_candidates == ["id"]
 
 
 def test_sensitive_string_identifier_passes_final_privacy_validation() -> None:

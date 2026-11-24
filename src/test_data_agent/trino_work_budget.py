@@ -13,8 +13,7 @@ from functools import wraps
 from time import monotonic
 from typing import Any, ParamSpec, TypeVar
 
-from test_data_agent.core.limits import GenerationBudget
-
+from test_data_agent.core.limits import GenerationBudget, positive_float_env, positive_int_env
 from test_data_agent.trino_config import (
     TrinoDeploymentProfile,
     deployment_profile_from_env,
@@ -144,15 +143,15 @@ def query_work_limits_from_env(
         )
     return replace(
         DEFAULT_QUERY_WORK_LIMITS,
-        max_profiled_columns=_positive_int_env(
+        max_profiled_columns=positive_int_env(
             MAX_INVOCATION_PROFILED_COLUMNS_ENV,
             DEFAULT_QUERY_WORK_LIMITS.max_profiled_columns,
         ),
-        statements=_positive_int_env(
+        statements=positive_int_env(
             MAX_INVOCATION_STATEMENTS_ENV,
             DEFAULT_QUERY_WORK_LIMITS.statements,
         ),
-        max_invocation_seconds=_positive_float_env(
+        max_invocation_seconds=positive_float_env(
             MAX_INVOCATION_SECONDS_ENV,
             DEFAULT_QUERY_WORK_LIMITS.max_invocation_seconds,
         ),
@@ -160,36 +159,10 @@ def query_work_limits_from_env(
     )
 
 
-def _positive_int_env(name: str, default: int) -> int:
-    raw_value = os.environ.get(name)
-    if raw_value is None:
-        return default
-    try:
-        value = int(raw_value)
-    except ValueError as exc:
-        raise ValueError(f"{name} must be an integer") from exc
-    if value <= 0:
-        raise ValueError(f"{name} must be positive")
-    return value
-
-
 def _optional_positive_int_env(name: str) -> int | None:
     if name not in os.environ:
         return None
-    return _positive_int_env(name, 1)
-
-
-def _positive_float_env(name: str, default: float) -> float:
-    raw_value = os.environ.get(name)
-    if raw_value is None:
-        return default
-    try:
-        value = float(raw_value)
-    except ValueError as exc:
-        raise ValueError(f"{name} must be a number") from exc
-    if not value > 0 or value == float("inf"):
-        raise ValueError(f"{name} must be a finite positive number")
-    return value
+    return positive_int_env(name, 1)
 
 
 @dataclass(frozen=True, slots=True)

@@ -259,6 +259,14 @@ def register_dataset_commands(
     generate_parser.add_argument("--output", "-o", type=Path, help="Output folder for DatasetSpec generation, or output file for --profile.")
     generate_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
     generate_parser.add_argument("--overwrite", action="store_true", help="Replace the complete output folder or an existing single-entity file bundle.")
+    generate_parser.add_argument(
+        "--stream-csv", action="store_true",
+        help="Stream eligible CSV with tiled-v1 seeds; up to 1,000,000 rows and 25,000,000 cells. Rules and relationships retain the ordinary path.",
+    )
+    generate_parser.add_argument(
+        "--workers", type=int, choices=range(1, 5),
+        help="Generation processes for --stream-csv (default: 4).",
+    )
 
     postgres_sql_parser = subparsers.add_parser(
         "export-postgres-sql",
@@ -593,6 +601,7 @@ def register_utility_commands(
         action="append",
         choices=[
             "parquet",
+            "profiling",
             "mcp",
             "trino",
             "postgres",

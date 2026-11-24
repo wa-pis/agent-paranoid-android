@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-23",
+  "python": "3.11.2 (v3.11.2:878ead1ac1, Feb  7 2023, 10:02:41) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "old_sha256": "0f125b1187c483f38ca47ad700a751d688ae6da7f28023e29fde57be2da89e93",
+  "new_sha256": "795bac3f7307f244a1520a2a63569aafb6704560f6c2f75b10351b6313c966c4",
+  "rows": 10000,
+  "fields": 25,
+  "seed": 42,
+  "repeats": 9,
+  "protocol": "same generated fictional rows, nine interleaved alternating-order passes per workload, no concurrent heavy verification; parity checks outside timings",
+  "independent_parity_datasets": 1000,
+  "independent_parity_mismatches": 0,
+  "identity_and_input_spec_nonmutation_checked": true,
+  "workloads": {
+    "native": {
+      "runs": [
+        {
+          "old": 0.024818249978125095,
+          "new": 0.012153625022619963
+        },
+        {
+          "new": 0.012051624711602926,
+          "old": 0.024059500079602003
+        },
+        {
+          "old": 0.02368516568094492,
+          "new": 0.011794207617640495
+        },
+        {
+          "new": 0.011833583004772663,
+          "old": 0.023928333073854446
+        },
+        {
+          "old": 0.02381404209882021,
+          "new": 0.011862833052873611
+        },
+        {
+          "new": 0.011829250026494265,
+          "old": 0.02392991678789258
+        },
+        {
+          "old": 0.023702584207057953,
+          "new": 0.011739459354430437
+        },
+        {
+          "new": 0.011775916907936335,
+          "old": 0.02343979198485613
+        },
+        {
+          "old": 0.024340708274394274,
+          "new": 0.011961875017732382
+        }
+      ],
+      "old_median_seconds": 0.023928333073854446,
+      "new_median_seconds": 0.011833583004772663,
+      "speedup": 2.022069990484183,
+      "less_time_percent": 50.545727659973295,
+      "original_outer_identity_retained": true
+    },
+    "csv_strings": {
+      "runs": [
+        {
+          "old": 0.042359874583780766,
+          "new": 0.03178166691213846
+        },
+        {
+          "new": 0.03146991599351168,
+          "old": 0.042883040849119425
+        },
+        {
+          "old": 0.04272033413872123,
+          "new": 0.03132545901462436
+        },
+        {
+          "new": 0.031553749926388264,
+          "old": 0.04141587484627962
+        },
+        {
+          "old": 0.042380332946777344,
+          "new": 0.03118216712027788
+        },
+        {
+          "new": 0.03113237489014864,
+          "old": 0.04171425011008978
+        },
+        {
+          "old": 0.04160137474536896,
+          "new": 0.03147216700017452
+        },
+        {
+          "new": 0.03157512517645955,
+          "old": 0.04215624975040555
+        },
+        {
+          "old": 0.04295291705057025,
+          "new": 0.030837458092719316
+        }
+      ],
+      "old_median_seconds": 0.042359874583780766,
+      "new_median_seconds": 0.03146991599351168,
+      "speedup": 1.346043459172701,
+      "less_time_percent": 25.708193655603406,
+      "original_outer_identity_retained": false
+    }
+  }
+}

@@ -42,15 +42,17 @@ EXPECTED_EXTRAS = {
     "mcp",
     "openai",
     "parquet",
+    "profiling",
     "postgres",
     "trino",
 }
 EXPECTED_RUNTIME_EXTRA_DEPENDENCIES = {
-    "all": {"gigachat", "mcp", "openai", "psycopg", "pyarrow", "sqlglot", "trino"},
+    "all": {"duckdb", "gigachat", "mcp", "openai", "psycopg", "pyarrow", "sqlglot", "trino"},
     "gigachat": {"gigachat"},
     "mcp": {"mcp"},
     "openai": {"openai"},
     "parquet": {"pyarrow"},
+    "profiling": {"duckdb", "pyarrow"},
     "postgres": {"psycopg", "sqlglot"},
     "trino": {"sqlglot", "trino"},
 }
@@ -59,6 +61,7 @@ OPTIONAL_MODULES = {
     "mcp": {"mcp"},
     "openai": {"openai"},
     "parquet": {"pyarrow"},
+    "profiling": {"duckdb", "pyarrow"},
     "postgres": {"psycopg", "sqlglot"},
     "trino": {"sqlglot", "trino"},
 }
@@ -69,6 +72,7 @@ MAX_DISTRIBUTIONS = {
     "mcp": 35,
     "openai": 20,
     "parquet": 11,
+    "profiling": 12,
     "postgres": 12,
     "trino": 25,
 }

@@ -1,0 +1,72 @@
+{
+  "default_in_memory_distinct_handoff": 1000000,
+  "full_suite": {
+    "coverage_percent": 91.93992118373113,
+    "passed": 2704,
+    "seconds": 74.92,
+    "skipped": 10
+  },
+  "independent_audit": {
+    "csv_normalizer_string_cases": 6011,
+    "csv_normalizer_tag_or_exception_mismatches": 0,
+    "name_cases": 6000,
+    "name_sensitivity_downgrades": 0,
+    "new_sensitive_names": 897,
+    "old_sensitive_names_retained": 2967,
+    "real_duckdb_profile_and_row_digest_checks": 24,
+    "remaining_findings": 0
+  },
+  "not_run": [
+    "live_database_integration",
+    "performance_benchmarks"
+  ],
+  "profile_cache_format": 9,
+  "query_source_policy": "1.1",
+  "scope": "Shared source policy over existing authorized evidence; no live data, new row access or performance claim.",
+  "source_regressions": {
+    "parquet": 5,
+    "query": 34,
+    "single_csv": 9,
+    "source_name": 57,
+    "source_numeric": 92,
+    "source_profile": 93
+  },
+  "source_sha256": {
+    "AGENTS.md": "12cb17fca23a052a8aaf0ecaef47f8d2dad215a98a9fbdfee0bde5c9cde5267d",
+    "src/test_data_agent/adapters/legacy_profile.py": "091348148aa31d31b4a0ddc89378061cb3807deecee06c7404ce697c8738514d",
+    "src/test_data_agent/adapters/parquet_dataset.py": "90ca31c15d9e8cbc2722582fb77096de59f6e74296a5e96b501b037c8e73c157",
+    "src/test_data_agent/core/limits.py": "c223f31866a0c22fb37e9e9092e2d55438f1d33c8f550bfe1c896c073972ecf4",
+    "src/test_data_agent/core/privacy.py": "c6992ce76a8a3350c71bbe89827bc3ec46e66ab5de9bc966f5c0b3a68dccf065",
+    "src/test_data_agent/core/semantics.py": "190ab94452243decb26f95e4015f5fa1bcd64fd762c858d625c573c1bf8c655f",
+    "src/test_data_agent/csv_profiler.py": "bee858a3d5e64de857b954faa5b2fe3b35a40124707b18b0bc6a68e212543709",
+    "src/test_data_agent/postgres_profiler.py": "4d24f44380c34f87fee0ee1328d8f69029a3df19892f51ab16c78e0692831365",
+    "src/test_data_agent/profiling/cache.py": "07344d62c90e9df3c7f8237c14931d262a50de50a02697e101387cddb2d74ed0",
+    "src/test_data_agent/profiling/duckdb_distinct.py": "44627b199269f4187f8977d8e4c1467dbb8742fb762154a1c8d1724aeaa5d08f",
+    "src/test_data_agent/profiling/schema_profiler.py": "579329dfebd1eb925a6983d94e45cc3a72ff4ae5d78c8079fdf7cfdf6fd80a5f",
+    "src/test_data_agent/safety.py": "47f45d3a2868bfe43150881b0d0b61447cf5f360c006ea9b366e38280328747f",
+    "src/test_data_agent/sql_query_profiling.py": "18105b9e7808c4596f8219c1432b862230f8bdfa5dbc53694ef9279dd581a166",
+    "src/test_data_agent/sql_query_source.py": "f36ed1d1a90fcab50f6af8f6fad55aa2f736c92a5a7f438491fb4daebae4919a",
+    "src/test_data_agent/trino_masking.py": "da9bdd3a5f2e7611a92c65246ee796c97f852b95c9bd713b6c6dfa1f43c9decf",
+    "tests/integration/test_postgres_query_example.py": "8b37b3758d87354af2f3ded3f643b15faf52d05e281204658a3bcb2096ff5df3",
+    "tests/integration/test_trino_integration.py": "97719b82fde7efd09a0d4252424f6a34d2fd038e7a665dbb7400b9a63ad57bb7",
+    "tests/test_advisor.py": "d3dbf5b1e21696cb885fb0d48f24c85347c63b94ed853281f3b97699ef16293e",
+    "tests/test_csv_pipeline_regressions.py": "203b833dae843c6562bac8c70e573d6e44ed7c6f24f8ed15e4717df0e21cd6b1",
+    "tests/test_identifier_pool.py": "a4f560c426c2b0e97b22c534fb9026cde812e83fc4b7fb22386f758d8e90358d",
+    "tests/test_numeric_phone_inference.py": "eb26a0b77a11cb04c3bb7ee81b2bb738c8f49d6f6d645b6f7399cac58d99ec5c",
+    "tests/test_parquet_source_policy.py": "48c6946a290e1c437a5844d2506e40575c4282348d058034ad99f999371eb3e1",
+    "tests/test_query_source_privacy_provenance.py": "a76df97692de97daa14761ee6cd91fbeeef05dff1ea602a3198f93bee0545df5",
+    "tests/test_safety.py": "494302953aa4c69a74ef779a8a75de776945875a2772cfac11d340f2740372a9",
+    "tests/test_single_csv_distinct.py": "88e7d46c872515fc103caaf3fbe298765ded144df228117e6669c654c7fe5080",
+    "tests/test_source_name_privacy.py": "5190937d3ab4aa576e0ad7f6c8a393f38a0338df2741d097253add7c34678ae1",
+    "tests/test_source_numeric_privacy.py": "b478f3046ecf958f7b3f2fb90081f955ce65d51f0291f15f191b22b6e9484c43",
+    "tests/test_source_profile_safety.py": "a1232a35f6a7d52af68a068646e503aa1b7b5f1d85383b075843396d59b350b3",
+    "tests/test_sql_query_profiling.py": "c0adc5f93ee9917225e45dcad04f9e91be7fc015e11ff71dbadcb4ccc68b6fa3"
+  },
+  "tooling": {
+    "mypy": "passed",
+    "ruff": "passed",
+    "strict_mkdocs": "passed",
+    "strict_openspec": "passed"
+  },
+  "verified_date": "2026-11-22"
+}

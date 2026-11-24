@@ -13,6 +13,7 @@ from test_data_agent.version import __version__
 CORE_DEPENDENCY_MODULES = ("faker", "pydantic", "yaml")
 OPTIONAL_EXTRA_MODULES: dict[str, tuple[str, ...]] = {
     "parquet": ("pyarrow",),
+    "profiling": ("duckdb", "pyarrow"),
     "mcp": ("mcp",),
     "trino": ("sqlglot", "trino"),
     "postgres": ("psycopg", "sqlglot"),

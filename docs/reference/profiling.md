@@ -29,11 +29,14 @@ or source row mappings. Smaller output counts and nulls can leave pool members
 unused. Independent identifier domains remain separate; reviewed foreign keys
 bind generated child values to generated parent keys.
 
-Distinct counting retains at most 100,000 SHA-256 fingerprints per column,
-separately from the bounded raw frequency sample. Below that limit it detects
-duplicates even beyond 1,000 categories. At the limit it reports a conservative
-lower bound and does not certify a primary key. Review inferred keys for larger
-files. Fingerprints are internal and are not written to the profile.
+The unreleased development checkout counts every non-null CSV value within the
+existing input and invocation budgets. Small profiles use private in-memory
+digest sets. Above 1,000,000 retained distinct digests it switches to bounded
+DuckDB/Arrow storage; install it from the checkout with
+`pip install -e '.[profiling]'`. Published 1.7.1 does not include this extra.
+Missing dependencies or native resource exhaustion fail the profile rather than
+returning a trusted partial count. Bounded raw frequency samples remain
+independent. Digests and temporary storage never appear in profile artifacts.
 
 Negative decimal amounts with a nonzero fractional part do not acquire phone
 semantics solely from punctuation. Positive phone-shaped decimals and integral
@@ -44,7 +47,8 @@ columns require review; local category permission is not declassification.
 
 NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-Folder cache format 9 recomputes older cached profiles. Reprofile saved standalone
+The unreleased checkout uses folder cache format 10 and recomputes older cached
+profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.
 
@@ -53,6 +57,12 @@ seeded identifier output relative to earlier releases, without changing the
 profile or specification schema version.
 Short string patterns reserve random suffix space instead of filling the entire
 requested length with a prefix.
+
+Column semantics use evidence from the whole column, with order-independent
+counts and names split into words. Weak phone, SSN, card or secret-like evidence
+can retain `sensitive: true` while leaving `semantic_type` unknown. Unknown
+semantics do not authorize source-value reuse. Schema-only and aggregate-only
+sources use their existing metadata; they do not read source rows to fill gaps.
 
 
 Parquet reuses its sensitivity inspection for distinct counting: at most 10,000

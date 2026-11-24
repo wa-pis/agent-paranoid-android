@@ -115,6 +115,12 @@ are not dataset authorization or proof of completed review.
   CLI or transport boundary.
 - Prefer the smallest clear change and avoid dependencies that do not simplify
   safe, testable behavior.
+- Shared semantics, privacy, generation and validation policy must apply across
+  every supported source adapter. Add regression coverage across source variants
+  when changing that policy; source labels must not bypass safety checks.
+- Use the evidence each source already provides. Schema-only and aggregate-only
+  sources must retain unknown semantics when evidence is absent; parity must not
+  introduce source-row reads, broader SQL access or weaker resource budgets.
 
 ## Task-specific guides
 

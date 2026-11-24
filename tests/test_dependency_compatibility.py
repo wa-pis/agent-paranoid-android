@@ -21,6 +21,7 @@ def test_dependency_compatibility_policy_matches_repository() -> None:
     reviewed = check_repository(ROOT)
 
     assert reviewed["faker"] == "40.35.0"
+    assert reviewed["duckdb"] == "2.0.1"
     assert reviewed["mcp"] == "2.2.0"
     assert reviewed["openai"] == "3.18.0"
     assert reviewed["psycopg"] == "3.3.4"
@@ -62,3 +63,19 @@ def test_manifest_dependency_discovery_includes_installed_psycopg(
     monkeypatch.setattr(artifacts_module.importlib.metadata, "version", lambda name: name)
 
     assert artifacts_module.normalized_dependency_versions()["psycopg"] == "psycopg"
+
+
+@pytest.mark.parametrize("algorithm", ["tiled-v1", "unknown-engine", None])
+def test_manifest_algorithm_is_an_explicit_known_engine(tmp_path: Path, algorithm: str | None) -> None:
+    dependencies = {"faker": "40.35.0"}
+    digest = hashlib.sha256(json.dumps(dependencies, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    manifest = tmp_path / "generation_manifest.json"
+    manifest.write_text(json.dumps({"package_version": "1.7.1", "reproducibility": {
+        "generator_algorithm_version": algorithm,
+        "normalized_dependencies": dependencies, "normalized_dependencies_sha256": digest,
+    }}))
+    if algorithm == "tiled-v1":
+        check_manifest(manifest, dependencies)
+    else:
+        with pytest.raises(CompatibilityError, match="generator version"):
+            check_manifest(manifest, dependencies)

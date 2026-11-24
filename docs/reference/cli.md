@@ -51,6 +51,12 @@ forecasts file/database bytes and optionally local generation time. The same
 guide describes opt-in `scalable-v1` policy settings. These additions are
 unreleased and absent from published `1.7.0rc1`.
 
+The current development checkout additionally provides explicit
+`generate --stream-csv [--workers 1..4]` and `doctor --require-extra profiling`.
+These new options are absent from published 1.7.1; see
+[Parallel Generation And Streaming CSV](../how-to/parallel-generation.md) for
+eligibility, fallback, limits and the separate deterministic `tiled-v1` stream.
+
 ## Selective Transformation (Review And Policy Decisions)
 
 `transform-review SOURCE POLICY.yaml` reads a fixed local source snapshot and

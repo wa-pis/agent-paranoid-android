@@ -88,7 +88,9 @@ Fewer output rows or nulls can leave some pool members unused. Source frequencie
 are not reproduced, and declared relationship constraints still take precedence.
 Repeated-key pools are not nominated as primary keys; an explicit primary key
 cannot have a pool smaller than its requested row count.
-Folder overflow and censored single-CSV counts cannot infer a fixed pool.
+Legacy lower-bound and censored CSV counts cannot infer a fixed pool. New CSV
+profiles continue exact distinct counting through the optional bounded DuckDB
+handoff described in the [profiling guide](profiling.md).
 Other aggregate profiles may supply approximate counts: these define the requested
 synthetic pool, not proof of exact source cardinality. Reprofile older artifacts
 to obtain pool metadata; no source-preservation permission is implied.
@@ -165,3 +167,46 @@ remain invalid even when expectations match. Scenario specs require mandatory
 schema/privacy/native/business/scenario reconciliation at generation and writer
 boundaries, regardless of optional reporting settings. Omitted declarations
 serialize as absent. See the relational synthesis contract for conflicts/limits.
+
+## Development generation and CSV optimizations
+
+The unreleased port onto 1.7.1 adds an explicit `tiled-v1` process API and
+`generate --stream-csv [--workers 1..4]`. These coexist with ordinary generation
+and the released `scalable-v1`/`scalable-relational-v1` execution policies; no
+engine is selected automatically by row count. See
+[parallel generation and streaming CSV](../how-to/parallel-generation.md) for
+the exact public options, bounds and seeded compatibility.
+
+The public streaming option admits one nonempty entity in valid mode, without
+relationships, native constraints, embedded business rules or relational
+scenarios. Callback rules, source-folder reuse checks and other unsupported
+specifications retain the ordinary path and its ordinary limits. A reviewed
+execution policy cannot be combined with this separate option. The pure
+Python CSV path does not require Arrow or DuckDB.
+
+Each tile passes the same schema/type, normalization, native and privacy
+checks; global row counts and declared primary-key uniqueness are checked
+before publication. The manifest records `tiled-v1`, and ordinary bundles
+retain their existing algorithm identity. Fixed tile seeds make tiled output
+independent of the worker count, but do not reproduce the ordinary or scalable
+engine's random stream. Whole-row distinctness is not promised without a
+suitable declared key. Primary-key tracking still grows with output size;
+bounded tiles are not a fixed peak-memory guarantee.
+
+Eligible ordinary CSV export combines mandatory checks and report construction
+over one normalized view rather than repeating equivalent full passes. Schema
+checks prepare field policy once per invocation. Normalization copies only
+rows requiring conversion, does not mutate caller input, and preserves string
+field contents and exact DECIMAL text. These changes retain optional report
+settings and the unconditional schema/privacy gates. Typed CSV continues to
+use `backslash-null-v1`, including null/empty distinction, reversible formula
+protection and exact bounded fixed-point DECIMAL encoding. Final output uses
+the existing private staging, byte/disk limits and atomic bundle publication.
+
+Integer comparisons, sums and integral aggregate results preserve exact
+integers beyond binary FLOAT precision; nonfinite approximate values are not
+numeric evidence. Native formulas, aggregate mappings, temporal repairs and
+conditional-required repairs execute in a shared dependency order, so readers
+see finalized inputs. Duplicate calculated targets and cycles reject before
+publication. Existing expression/literal privacy rules, DECIMAL arithmetic,
+constraint validation and cumulative operation/deadline budgets still apply.

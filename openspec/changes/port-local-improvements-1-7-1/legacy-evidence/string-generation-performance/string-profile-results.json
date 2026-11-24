@@ -1,0 +1,530 @@
+{
+  "candidate": "list comprehension with PEP479-compatible StopIteration translation; range outside try; join consumes character list before prefix concatenation",
+  "rows": 10000,
+  "fields": 25,
+  "seed": 42,
+  "pairs": 9,
+  "runs": [
+    {
+      "pair": 1,
+      "arm": "before",
+      "seconds": 0.3519104588776827,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 1,
+      "arm": "after",
+      "seconds": 0.34030862525105476,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 2,
+      "arm": "after",
+      "seconds": 0.34435070818290114,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 2,
+      "arm": "before",
+      "seconds": 0.34875029092654586,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 3,
+      "arm": "before",
+      "seconds": 0.3508490831591189,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 3,
+      "arm": "after",
+      "seconds": 0.34960862528532743,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 4,
+      "arm": "after",
+      "seconds": 0.3505362500436604,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 4,
+      "arm": "before",
+      "seconds": 0.35299270786345005,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 5,
+      "arm": "before",
+      "seconds": 0.35250099981203675,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 5,
+      "arm": "after",
+      "seconds": 0.34300583275035024,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 6,
+      "arm": "after",
+      "seconds": 0.34326083306223154,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 6,
+      "arm": "before",
+      "seconds": 0.34993483312428,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 7,
+      "arm": "before",
+      "seconds": 0.35166345862671733,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 7,
+      "arm": "after",
+      "seconds": 0.34553175000473857,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 8,
+      "arm": "after",
+      "seconds": 0.3470648340880871,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 8,
+      "arm": "before",
+      "seconds": 0.35570345912128687,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 9,
+      "arm": "before",
+      "seconds": 0.3573795002885163,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    },
+    {
+      "pair": 9,
+      "arm": "after",
+      "seconds": 0.34804945811629295,
+      "sha256": "29d9544499487bd916dbf4c9e93a468a2745a4122c243f4d7fe95e1659dcb247"
+    }
+  ],
+  "median_before_seconds": 0.3519104588776827,
+  "median_after_seconds": 0.34553175000473857,
+  "median_paired_percent_change": -1.907212266484526,
+  "individual_paired_percent_changes": [
+    -3.2968140997083895,
+    -1.2615280497561998,
+    -0.35355881868697203,
+    -0.695894777730055,
+    -2.6936567745196704,
+    -1.907212266484526,
+    -1.7436297322228844,
+    -2.4286030432597583,
+    -2.6106819682413462
+  ],
+  "faster_pairs": 9,
+  "state_checks": [
+    {
+      "mode": "valid",
+      "seed": 0,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "valid",
+      "seed": 42,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "valid",
+      "seed": 2134567,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "mixed",
+      "seed": 0,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "mixed",
+      "seed": 42,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "mixed",
+      "seed": 2134567,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "negative",
+      "seed": 0,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "negative",
+      "seed": 42,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "negative",
+      "seed": 2134567,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "edge",
+      "seed": 0,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "edge",
+      "seed": 42,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "edge",
+      "seed": 2134567,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "load_test",
+      "seed": 0,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "load_test",
+      "seed": 42,
+      "rows_rng_faker_identical": true
+    },
+    {
+      "mode": "load_test",
+      "seed": 2134567,
+      "rows_rng_faker_identical": true
+    }
+  ],
+  "candidate_function_sha256": "29ba5064e3a286f14535f90a5230d010b62c430106374f3bc64b3c41d6b99e5e",
+  "baseline_generator_sha256": "a8b6bea1fa60e16ef079e193c659b67c987e4a23551757547d22d7c2216697a3",
+  "profile": {
+    "rows": 10000,
+    "fields": 25,
+    "total_profiled_seconds": 1.2173132370000002,
+    "total_calls": 7185255,
+    "functions": [
+      {
+        "name": "_generate_dataset_candidates",
+        "line": 57,
+        "calls": 1,
+        "self_seconds": 0.006479381,
+        "cumulative_seconds": 1.221711625
+      },
+      {
+        "name": "generate_row",
+        "line": 115,
+        "calls": 10000,
+        "self_seconds": 0.002873867,
+        "cumulative_seconds": 1.185136745
+      },
+      {
+        "name": "<dictcomp>",
+        "line": 128,
+        "calls": 10000,
+        "self_seconds": 0.13512400500000002,
+        "cumulative_seconds": 1.1822628780000002
+      },
+      {
+        "name": "generate_field_value",
+        "line": 148,
+        "calls": 250000,
+        "self_seconds": 0.208646042,
+        "cumulative_seconds": 1.011091224
+      },
+      {
+        "name": "synthetic_string",
+        "line": 348,
+        "calls": 40000,
+        "self_seconds": 0.033243204000000005,
+        "cumulative_seconds": 0.406964574
+      },
+      {
+        "name": "<genexpr>",
+        "line": 363,
+        "calls": 440729,
+        "self_seconds": 0.06664033600000001,
+        "cumulative_seconds": 0.298652026
+      },
+      {
+        "name": "ranged_datetime",
+        "line": 315,
+        "calls": 40000,
+        "self_seconds": 0.047994562000000004,
+        "cumulative_seconds": 0.13639003400000002
+      },
+      {
+        "name": "weighted_choice",
+        "line": 255,
+        "calls": 40000,
+        "self_seconds": 0.031527615,
+        "cumulative_seconds": 0.11464523500000001
+      },
+      {
+        "name": "ranged_number",
+        "line": 276,
+        "calls": 80000,
+        "self_seconds": 0.031710478,
+        "cumulative_seconds": 0.046836161
+      },
+      {
+        "name": "should_generate_invalid_value",
+        "line": 366,
+        "calls": 250000,
+        "self_seconds": 0.044512419000000004,
+        "cumulative_seconds": 0.044512419000000004
+      },
+      {
+        "name": "<genexpr>",
+        "line": 266,
+        "calls": 160000,
+        "self_seconds": 0.019389867,
+        "cumulative_seconds": 0.042933486
+      },
+      {
+        "name": "category_count",
+        "line": 256,
+        "calls": 186520,
+        "self_seconds": 0.026850329000000003,
+        "cumulative_seconds": 0.035806725000000005
+      },
+      {
+        "name": "create_faker",
+        "line": 108,
+        "calls": 1,
+        "self_seconds": 3.3750000000000003e-06,
+        "cumulative_seconds": 0.026038125000000002
+      },
+      {
+        "name": "parse_datetime",
+        "line": 336,
+        "calls": 80000,
+        "self_seconds": 0.019203612000000002,
+        "cumulative_seconds": 0.023845833
+      },
+      {
+        "name": "boolean_value",
+        "line": 306,
+        "calls": 40000,
+        "self_seconds": 0.007693471,
+        "cumulative_seconds": 0.009162753000000001
+      },
+      {
+        "name": "category_value",
+        "line": 261,
+        "calls": 40000,
+        "self_seconds": 0.005515231000000001,
+        "cumulative_seconds": 0.007275237
+      },
+      {
+        "name": "synthetic_identifier",
+        "line": 230,
+        "calls": 10000,
+        "self_seconds": 0.0036606620000000003,
+        "cumulative_seconds": 0.004544593
+      },
+      {
+        "name": "<dictcomp>",
+        "line": 82,
+        "calls": 1,
+        "self_seconds": 4.876e-06,
+        "cumulative_seconds": 7.833300000000001e-05
+      },
+      {
+        "name": "<genexpr>",
+        "line": 73,
+        "calls": 2,
+        "self_seconds": 2.459e-06,
+        "cumulative_seconds": 2.459e-06
+      },
+      {
+        "name": "<dictcomp>",
+        "line": 72,
+        "calls": 1,
+        "self_seconds": 4.16e-07,
+        "cumulative_seconds": 4.16e-07
+      }
+    ]
+  },
+  "edge_checks": {
+    "edge_cases": 40,
+    "edges_equal": true,
+    "dynamic_choice_and_alphabet_equal": true,
+    "exception_checks": [
+      {
+        "exception": "ValueError",
+        "equal": true,
+        "before": [
+          "error",
+          "ValueError",
+          [
+            "synthetic failure"
+          ],
+          null
+        ],
+        "after": [
+          "error",
+          "ValueError",
+          [
+            "synthetic failure"
+          ],
+          null
+        ]
+      },
+      {
+        "exception": "IndexError",
+        "equal": true,
+        "before": [
+          "error",
+          "IndexError",
+          [
+            "synthetic failure"
+          ],
+          null
+        ],
+        "after": [
+          "error",
+          "IndexError",
+          [
+            "synthetic failure"
+          ],
+          null
+        ]
+      },
+      {
+        "exception": "TypeError",
+        "equal": true,
+        "before": [
+          "error",
+          "TypeError",
+          [
+            "synthetic failure"
+          ],
+          null
+        ],
+        "after": [
+          "error",
+          "TypeError",
+          [
+            "synthetic failure"
+          ],
+          null
+        ]
+      },
+      {
+        "exception": "StopIteration",
+        "equal": true,
+        "before": [
+          "error",
+          "RuntimeError",
+          [
+            "generator raised StopIteration"
+          ],
+          "StopIteration"
+        ],
+        "after": [
+          "error",
+          "RuntimeError",
+          [
+            "generator raised StopIteration"
+          ],
+          "StopIteration"
+        ]
+      },
+      {
+        "exception": "GeneratorExit",
+        "equal": true,
+        "before": [
+          "error",
+          "GeneratorExit",
+          [
+            "synthetic failure"
+          ],
+          null
+        ],
+        "after": [
+          "error",
+          "GeneratorExit",
+          [
+            "synthetic failure"
+          ],
+          null
+        ]
+      },
+      {
+        "exception": "KeyboardInterrupt",
+        "equal": true,
+        "before": [
+          "error",
+          "KeyboardInterrupt",
+          [
+            "synthetic failure"
+          ],
+          null
+        ],
+        "after": [
+          "error",
+          "KeyboardInterrupt",
+          [
+            "synthetic failure"
+          ],
+          null
+        ]
+      }
+    ],
+    "post_draw_exception_and_boundary_checks": [
+      {
+        "kind": "choice_after_draws",
+        "exception": "StopIteration",
+        "equal": true
+      },
+      {
+        "kind": "choice_after_draws",
+        "exception": "ValueError",
+        "equal": true
+      },
+      {
+        "kind": "choice_after_draws",
+        "exception": "IndexError",
+        "equal": true
+      },
+      {
+        "kind": "choice_after_draws",
+        "exception": "TypeError",
+        "equal": true
+      },
+      {
+        "kind": "choice_after_draws",
+        "exception": "KeyboardInterrupt",
+        "equal": true
+      },
+      {
+        "kind": "choice_after_draws",
+        "exception": "GeneratorExit",
+        "equal": true
+      },
+      {
+        "kind": "RangeStop",
+        "equal": true
+      },
+      {
+        "kind": "LengthStop",
+        "equal": true
+      }
+    ]
+  },
+  "candidate_ast_matches_applied_function": true,
+  "before_generator_sha256": "a8b6bea1fa60e16ef079e193c659b67c987e4a23551757547d22d7c2216697a3",
+  "applied_generator_sha256": "6be6560fdcce994497b0b05bba276a49fd380f95a00386bf756fece3b6f06a1a",
+  "scope": "bounded generation diagnostic; selected compatible list comprehension; not public CSV performance"
+}

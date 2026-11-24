@@ -29,7 +29,7 @@ def test_reviewed_numeric_replacement_retains_source_sensitivity(route):
         for value in values:
             accumulator.add(value)
         field = accumulator.to_profile(2)
-    assert field.sensitive and field.semantic_type == "phone"
+    assert field.sensitive and field.semantic_type is None
     assert field.numeric_storage_type == "float"
     if route in {"folder", "schema_column"}:
         profile = DatasetProfile(entities=[EntityProfile(name="events", row_count=2, fields=[field])])
@@ -49,6 +49,7 @@ def test_reviewed_numeric_replacement_retains_source_sensitivity(route):
     ["2468.125", "+1 (555) 010-0117"],
     ["2468.125", "api_key=fictional_not_a_real_credential"],
     ["2468.125", "4111111111111111"],
+    ["2468.125", "000123456"],
     ["2468.125", "NaN"], ["2468.125", "Infinity"],
     ["2468.125", "1e1000000000"], ["2468.125", "not-a-number"],
 ])
@@ -84,6 +85,20 @@ def test_old_profile_without_storage_evidence_requires_reprofiling():
         fields=[FieldProfile(name="quantity", data_type="string", sensitive=True, semantic_type="phone")])])
     with pytest.raises(ValueError, match="reprofile"):
         infer_dataset_spec(profile, decimal_fields={"events.quantity": reviewed()})
+
+
+@pytest.mark.parametrize("source_type", ["csv", "csv_folder"])
+def test_unknown_sensitive_numeric_json_without_phone_only_evidence_stays_blocked(source_type):
+    from test_data_agent.core.field import FieldProfile
+
+    profile = DatasetProfile(source_type=source_type, entities=[EntityProfile(
+        name="events", row_count=2, fields=[FieldProfile(
+            name="quantity", data_type="float", sensitive=True,
+        )],
+    )])
+    restored = DatasetProfile.model_validate_json(profile.model_dump_json())
+    with pytest.raises(ValueError):
+        infer_dataset_spec(restored, decimal_fields={"events.quantity": reviewed()})
 
 
 def test_plain_decimal_range_without_numeric_measure_is_not_a_csv_replacement():
@@ -134,7 +149,7 @@ def test_storage_evidence_changes_profile_fingerprint_but_does_not_declassify_ad
         DatasetProfile.model_validate_json(profile.model_dump_json()))
     request = build_advisor_request(profile)
     assert request.baseline_spec.entity("events").field("quantity").sensitive
-    assert request.baseline_spec.entity("events").field("quantity").semantic_type == "phone"
+    assert request.baseline_spec.entity("events").field("quantity").semantic_type is None
     assert all(value not in request.model_dump_json() for value in ["2468.125", "3579.625"])
 
 
@@ -152,7 +167,7 @@ def test_reviewed_numeric_replacement_cannot_replace_existing_key_bindings(prote
         infer_dataset_spec(profile, decimal_fields={"events.quantity": reviewed()})
 
 
-def test_cache_v7_is_reprofiled_for_numeric_storage_evidence(tmp_path):
+def test_cache_v9_is_reprofiled_for_new_semantics_and_numeric_storage_evidence(tmp_path):
     import json
     from test_data_agent.profiling import profile_example_folder
     from test_data_agent.profiling.cache import PROFILE_CACHE_FORMAT_VERSION
@@ -165,12 +180,12 @@ def test_cache_v7_is_reprofiled_for_numeric_storage_evidence(tmp_path):
     assert first.entity("events").field("quantity").numeric_storage_type == "float"
     path = next(cache.glob("*.json"))
     payload = json.loads(path.read_text())
-    payload["format_version"] = 7
+    payload["format_version"] = 9
     payload["profile"]["entities"][0]["fields"][0].pop("numeric_storage_type")
     path.write_text(json.dumps(payload))
     fresh = profile_example_folder(source, cache_dir=cache)
     assert fresh.entity("events").field("quantity").numeric_storage_type == "float"
-    assert json.loads(path.read_text())["format_version"] == PROFILE_CACHE_FORMAT_VERSION == 9
+    assert json.loads(path.read_text())["format_version"] == PROFILE_CACHE_FORMAT_VERSION == 10
     assert "2468.125" not in path.read_text() and "3579.625" not in path.read_text()
 
 
@@ -210,7 +225,7 @@ def test_reviewed_csv_numeric_agent_flow_requires_changed_spec_approval(tmp_path
     assert (workspace / "approval_receipt.json").is_file()
 
 
-def test_provider_projection_keeps_phone_and_rejects_unreviewed_declassification():
+def test_provider_projection_keeps_sensitivity_and_rejects_unreviewed_declassification():
     import json
     from test_data_agent.advisor import AdvisorContractError, build_advisor_request
     from test_data_agent.providers.category_privacy import _provider_safe_request
@@ -219,7 +234,7 @@ def test_provider_projection_keeps_phone_and_rejects_unreviewed_declassification
     profile = csv_profile_to_dataset_profile(CSVProfile(table="events", row_count=2, columns=[field]))
     payload, _ = _provider_safe_request(build_advisor_request(profile))
     exported_field = payload["profile"]["entities"][0]["fields"][0]
-    assert exported_field["sensitive"] and exported_field["semantic_type"] == "phone"
+    assert exported_field["sensitive"] and exported_field["semantic_type"] is None
     assert exported_field["numeric_storage_type"] == "float"
     assert "2468.125" not in json.dumps(payload) and "3579.625" not in json.dumps(payload)
     numeric_spec = infer_dataset_spec(profile, decimal_fields={"events.quantity": reviewed()})

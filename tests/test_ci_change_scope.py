@@ -146,6 +146,7 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
     assert {profile["profile"] for profile in profiles} == {
         "base",
         "parquet",
+        "profiling",
         "mcp",
         "trino",
         "openai",

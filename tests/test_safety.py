@@ -48,10 +48,14 @@ def test_safe_profile_accepts_masked_sensitive_patterns() -> None:
     assert_profile_safe(profile)
 
 
-def test_safe_profile_rejects_exact_sensitive_trino_numeric_summaries() -> None:
+@pytest.mark.parametrize("source_type", [
+    "csv", "csv_folder", "parquet", "postgres", "postgres_query", "trino",
+    "trino_query", "json_profile", "legacy_profile", "custom",
+])
+def test_safe_profile_rejects_exact_sensitive_numeric_summaries(source_type: str) -> None:
     profile = DatasetProfile.model_validate(
         {
-            "source_type": "trino",
+            "source_type": source_type,
             "entities": [
                 {
                     "name": "customers",
@@ -76,8 +80,9 @@ def test_safe_profile_rejects_exact_sensitive_trino_numeric_summaries() -> None:
         }
     )
 
-    with pytest.raises(ProfileSafetyError, match="exact numeric summaries"):
+    with pytest.raises(ProfileSafetyError, match="exact numeric summaries") as error:
         assert_profile_safe(profile)
+    assert "912345678" not in str(error.value)
 
 
 def test_safe_profile_rejects_raw_sensitive_categories_without_echoing_value() -> None:

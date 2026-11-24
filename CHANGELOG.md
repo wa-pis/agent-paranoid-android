@@ -4,6 +4,40 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add explicit `generate --stream-csv [--workers 1..4]` and Python `tiled-v1`
+  generation for eligible synthetic CSV exports, alongside the released
+  execution-policy engines. See the [development guide](docs/how-to/parallel-generation.md)
+  for fallback, limits and the separate seeded stream.
+- Add an optional checkout `profiling` extra for streaming DuckDB/Arrow distinct
+  counting when CSV digest sets exceed 1,000,000 entries. Small profiles retain
+  Python sets; CSV counts no longer stop at the former distinct-value censor.
+
+### Changed
+
+- Infer column semantics from full-population counters and word-based name
+  context. Weak SSN/card/token evidence stays sensitive while leaving semantics
+  unknown without supporting context; row order does not affect inference.
+- Advance folder caches to format 10 and authorized SQL query-source policy to
+  1.2. Reprofile affected artifacts before review; query language and database
+  access/work budgets are unchanged.
+
+### Fixed
+
+- Reuse normalized values and completed validation checks during eligible CSV
+  export, preserving all safety gates, typed CSV/DECIMAL encoding and atomic
+  publication.
+- Preserve exact integer comparisons and aggregate results beyond FLOAT
+  precision, and order native formulas, aggregates and repairs by their shared
+  dependencies. Cycles fail before publication.
+
+### Security
+
+- Apply sensitive numeric-summary and categorical-content guards across source
+  variants. Keep alias provenance sensitive, strict source limits, bounded
+  private distinct scratch and reviewed `numeric_measure`/transformation scopes.
+
 ## [1.7.1]
 
 Corrective release for valid CLI inference configuration files and safe MCP

@@ -1,0 +1,17 @@
+--- a/src/test_data_agent/generation/entity_generator.py
++++ b/src/test_data_agent/generation/entity_generator.py
+@@ -360,7 +360,13 @@
+     length = rng.randint(max(1, min_length), max_length)
+     # Keep at least six random characters when the requested length permits.
+     prefix = SYNTHETIC_PREFIX if length >= len(SYNTHETIC_PREFIX) + 6 else ("syn_" if length >= 10 else "")
+-    return prefix + "".join(rng.choice(string.ascii_lowercase) for _ in range(length - len(prefix)))
++    character_range = range(length - len(prefix))
++    try:
++        suffix = "".join([rng.choice(string.ascii_lowercase) for _ in character_range])
++    except StopIteration as error:
++        # Retain the previous generator expression's exception behavior.
++        raise RuntimeError("generator raised StopIteration") from error
++    return prefix + suffix
+ 
+ 
+ def should_generate_invalid_value(

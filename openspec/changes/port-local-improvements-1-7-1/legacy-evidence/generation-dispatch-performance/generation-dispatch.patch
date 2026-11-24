@@ -1,0 +1,51 @@
+--- a/src/test_data_agent/generation/entity_generator.py
++++ b/src/test_data_agent/generation/entity_generator.py
+@@ -195,23 +195,36 @@
+     typed_distribution = distributions[field.name] if distributions is not None else field.typed_distribution
+     if isinstance(typed_distribution, CategoricalDistribution) and typed_distribution.categories:
+         return weighted_choice(typed_distribution.categories, rng)
+-    numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None
+-    numeric_shape = typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None
+-    boolean_distribution = typed_distribution if isinstance(typed_distribution, BooleanDistribution) else None
+-    date_distribution = typed_distribution if isinstance(typed_distribution, DateRangeDistribution) else None
+-    datetime_distribution = typed_distribution if isinstance(typed_distribution, DateTimeRangeDistribution) else None
+-    string_distribution = typed_distribution if isinstance(typed_distribution, StringPatternDistribution) else None
+     if field.data_type == FieldType.INTEGER:
+-        return int(round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0, default_max=1000)))
++        return int(round(ranged_number(
++            typed_distribution if isinstance(typed_distribution, NumericDistribution) else None,
++            typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None,
++            distribution, rng, default_min=0, default_max=1000,
++        )))
+     if field.data_type == FieldType.FLOAT:
+-        return round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0), 6)
++        return round(ranged_number(
++            typed_distribution if isinstance(typed_distribution, NumericDistribution) else None,
++            typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None,
++            distribution, rng, default_min=0.0, default_max=1000.0,
++        ), 6)
+     if field.data_type == FieldType.BOOLEAN:
+-        return boolean_value(boolean_distribution, distribution, rng)
++        return boolean_value(
++            typed_distribution if isinstance(typed_distribution, BooleanDistribution) else None,
++            distribution, rng,
++        )
+     if field.data_type == FieldType.DATE:
+-        return ranged_datetime(date_distribution, distribution, rng, date_only=True)
++        return ranged_datetime(
++            typed_distribution if isinstance(typed_distribution, DateRangeDistribution) else None,
++            distribution, rng, date_only=True,
++        )
+     if field.data_type == FieldType.DATETIME:
+-        return ranged_datetime(datetime_distribution, distribution, rng, date_only=False)
+-    return synthetic_string(field, string_distribution, rng)
++        return ranged_datetime(
++            typed_distribution if isinstance(typed_distribution, DateTimeRangeDistribution) else None,
++            distribution, rng, date_only=False,
++        )
++    return synthetic_string(
++        field, typed_distribution if isinstance(typed_distribution, StringPatternDistribution) else None, rng,
++    )
+ 
+ 
+ def synthetic_identifier(

@@ -35,6 +35,7 @@ def solve_constraints(
     budget.check("deterministic rule entry")
     enforce_dataset_rule_work(spec, budget=budget,
         row_counts={name: len(rows) for name, rows in rows_by_entity.items()})
+    ordered = ordered_constraints(spec, budget=budget)
     if spec.relational_scenarios:
         from test_data_agent.generation.relational_scenarios import apply_prepared_relational_scenarios
         from test_data_agent.rules.relational_scenarios import prepare_relational_scenarios
@@ -42,10 +43,84 @@ def solve_constraints(
         apply_prepared_relational_scenarios(rows_by_entity, spec, plan, seed=seed, budget=budget)
     else:
         apply_relationships(rows_by_entity, spec, budget=budget)
-    apply_formula_constraints(rows_by_entity, spec, budget=budget)
-    apply_temporal_constraints(rows_by_entity, spec, budget=budget)
-    apply_conditional_required_constraints(rows_by_entity, spec, budget=budget)
-    apply_aggregate_mapping_constraints(rows_by_entity, spec, budget=budget)
+    for constraint in budget.iter_rule_work(ordered):
+        if constraint.type == ConstraintType.FORMULA:
+            apply_formula_constraints(rows_by_entity, spec, budget=budget, constraints=[constraint])
+        elif constraint.type == ConstraintType.TEMPORAL:
+            apply_temporal_constraints(rows_by_entity, spec, budget=budget, constraints=[constraint])
+        elif constraint.type == ConstraintType.CONDITIONAL_REQUIRED:
+            apply_conditional_required_constraints(rows_by_entity, spec, budget=budget, constraints=[constraint])
+        elif constraint.type == ConstraintType.AGGREGATE_MAPPING:
+            apply_aggregate_mapping_constraints(rows_by_entity, spec, budget=budget, constraints=[constraint])
+
+
+def ordered_constraints(spec: DatasetSpec, *, budget: GenerationBudget) -> list[Constraint]:
+    active = [constraint for constraint in budget.iter_rule_work(spec.constraints)
+              if constraint.status != ConstraintStatus.REJECTED]
+    calculations: dict[tuple[str, str], int] = {}
+    repairs: dict[tuple[str, str], list[int]] = defaultdict(list)
+    inputs: dict[int, set[tuple[str, str]]] = {}
+    outputs: dict[int, set[tuple[str, str]]] = {}
+    for index, constraint in budget.iter_rule_work(enumerate(active)):
+        reads: set[tuple[str, str]] = set()
+        if constraint.type in {ConstraintType.FORMULA, ConstraintType.AGGREGATE_MAPPING}:
+            key = (constraint.entity, constraint.fields[0])
+            if key in calculations:
+                if constraint.type == active[calculations[key]].type == ConstraintType.FORMULA:
+                    raise ValueError("duplicate formula target")
+                raise ValueError("duplicate calculated target")
+            calculations[key] = index
+            outputs[index] = {key}
+        elif constraint.type == ConstraintType.TEMPORAL:
+            outputs[index] = {(constraint.entity, constraint.fields[1])}
+            reads.add((constraint.entity, constraint.fields[0]))
+        else:
+            outputs[index] = {(constraint.entity, name) for name in budget.iter_rule_work(constraint.fields)}
+            assert constraint.condition is not None
+            reads.add((constraint.entity, constraint.condition["field"]))
+        if constraint.type in {ConstraintType.TEMPORAL, ConstraintType.CONDITIONAL_REQUIRED}:
+            for key in budget.iter_rule_work(outputs[index]):
+                repairs[key].append(index)
+        if constraint.type == ConstraintType.FORMULA:
+            try:
+                names, _, _ = expression_references(constraint.expression or "")
+            except ValueError:
+                raise ValueError("formula expression is invalid") from None
+            reads.update((constraint.entity, name) for name in budget.iter_rule_work(names))
+        elif constraint.type == ConstraintType.AGGREGATE_MAPPING:
+            relationship = next((item for item in budget.iter_rule_work(spec.relationships)
+                                 if item.status != "rejected" and item.parent_entity == constraint.entity
+                                 and item.child_entity == constraint.target_entity), None)
+            if relationship is not None:
+                reads.update({(relationship.parent_entity, relationship.parent_field),
+                              (relationship.child_entity, relationship.child_field)})
+                if constraint.aggregate != "count" and constraint.target_field is not None:
+                    reads.add((relationship.child_entity, constraint.target_field))
+        inputs[index] = reads
+    dependencies: dict[int, set[int]] = {index: set() for index in budget.iter_rule_work(inputs)}
+    final_writers: dict[tuple[str, str], int] = {}
+    for key in budget.iter_rule_work(sorted(calculations.keys() | repairs.keys())):
+        writers = ([calculations[key]] if key in calculations else []) + sorted(
+            repairs.get(key, []), key=lambda index: (active[index].type != ConstraintType.TEMPORAL, index),
+        )
+        for previous, following in budget.iter_rule_work(zip(writers, writers[1:])):
+            dependencies[following].add(previous)
+        final_writers[key] = writers[-1]
+    for index, reads in budget.iter_rule_work(inputs.items()):
+        for key in budget.iter_rule_work(reads):
+            if key not in final_writers:
+                continue
+            if active[index].type in {ConstraintType.TEMPORAL, ConstraintType.CONDITIONAL_REQUIRED} and key in outputs[index]:
+                continue
+            dependencies[index].add(final_writers[key])
+    try:
+        order = list(TopologicalSorter(dependencies).static_order())
+    except CycleError:
+        if all(constraint.type == ConstraintType.FORMULA for constraint in active):
+            raise ValueError("cyclic formula dependencies") from None
+        raise ValueError("cyclic formula/aggregate/repair dependencies") from None
+    budget.check("calculation dependency order")
+    return [active[index] for index in budget.iter_rule_work(order)]
 
 
 def apply_relationships(
@@ -147,11 +222,12 @@ def apply_formula_constraints(
     spec: DatasetSpec,
     *,
     budget: GenerationBudget | None = None,
+    constraints: list[Constraint] | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
     allow_invalid_values = spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
-    for constraint in budget.iter_rule_work(ordered_formula_constraints(spec, budget=budget)):
+    for constraint in budget.iter_rule_work(ordered_formula_constraints(spec, budget=budget) if constraints is None else constraints):
         assert constraint.expression is not None
         target = constraint.fields[0]
         for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
@@ -174,10 +250,11 @@ def apply_temporal_constraints(
     spec: DatasetSpec,
     *,
     budget: GenerationBudget | None = None,
+    constraints: list[Constraint] | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
-    for constraint in budget.iter_rule_work(spec.constraints):
+    for constraint in budget.iter_rule_work(spec.constraints if constraints is None else constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type != ConstraintType.TEMPORAL or len(constraint.fields) < 2:
@@ -195,10 +272,11 @@ def apply_conditional_required_constraints(
     spec: DatasetSpec,
     *,
     budget: GenerationBudget | None = None,
+    constraints: list[Constraint] | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
-    for constraint in budget.iter_rule_work(spec.constraints):
+    for constraint in budget.iter_rule_work(spec.constraints if constraints is None else constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type != ConstraintType.CONDITIONAL_REQUIRED or not constraint.condition:
@@ -217,10 +295,11 @@ def apply_aggregate_mapping_constraints(
     spec: DatasetSpec,
     *,
     budget: GenerationBudget | None = None,
+    constraints: list[Constraint] | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
-    for constraint in budget.iter_rule_work(spec.constraints):
+    for constraint in budget.iter_rule_work(spec.constraints if constraints is None else constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type != ConstraintType.AGGREGATE_MAPPING or not constraint.target_entity:

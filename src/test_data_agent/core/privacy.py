@@ -5,12 +5,15 @@ from __future__ import annotations
 import math
 import re
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import date
+from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
+
+from test_data_agent.core.limits import InputLimitError, max_input_cell_chars
 
 
 SYNTHETIC_PREFIX = "synthetic_"
@@ -73,6 +76,9 @@ PRIVATE_KEY_RE = re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----")
 BEARER_TOKEN_RE = re.compile(r"^Bearer\s+\S+$", re.IGNORECASE)
 TOKEN_ALPHABET_RE = re.compile(r"^[A-Za-z0-9_+/=-]+$")
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_SYNTHETIC_CATEGORY_LABEL_RE = re.compile(
+    r"category_(?:[1-9]|[1-4][0-9]|50)(?:_(?:[1-9]|1[0-9]|20))?"
+)
 
 
 class PrivacyClassification(StrEnum):
@@ -86,6 +92,47 @@ class PrivacyAction(StrEnum):
     SYNTHETIC = "synthetic"
     MASK = "mask"
     SUPPRESS = "suppress"
+
+
+class SensitiveValueSignal(StrEnum):
+    PRIVATE_KEY = "private_key_format"
+    BEARER_TOKEN = "bearer_context"
+    KNOWN_SECRET = "known_secret_format"
+    SECRET_ASSIGNMENT = "secret_assignment_context"
+    JWT_SHAPE = "jwt_shape"
+    HIGH_ENTROPY = "high_entropy"
+    EMAIL = "email_format"
+    SSN_FORMAT = "ssn_format"
+    SSN_DIGITS = "ssn_digits"
+    LUHN = "luhn_checksum"
+    PHONE = "phone_shape"
+
+    @property
+    def value_type(self) -> str:
+        if self is SensitiveValueSignal.EMAIL:
+            return "email"
+        if self in (SensitiveValueSignal.SSN_FORMAT, SensitiveValueSignal.SSN_DIGITS):
+            return "ssn"
+        if self is SensitiveValueSignal.PHONE:
+            return "phone"
+        return "secret"
+
+    @property
+    def required_context(self) -> str | None:
+        if self is SensitiveValueSignal.SSN_DIGITS:
+            return "ssn"
+        if self is SensitiveValueSignal.LUHN:
+            return "card"
+        if self in (SensitiveValueSignal.JWT_SHAPE, SensitiveValueSignal.HIGH_ENTROPY):
+            return "secret"
+        return None
+
+    @property
+    def strong_secret(self) -> bool:
+        return self in (
+            SensitiveValueSignal.PRIVATE_KEY, SensitiveValueSignal.BEARER_TOKEN,
+            SensitiveValueSignal.KNOWN_SECRET, SensitiveValueSignal.SECRET_ASSIGNMENT,
+        )
 
 
 class LocalCategoryField(BaseModel):
@@ -189,9 +236,7 @@ def validate_local_category_values(
             raise ValueError("local category value length exceeds its limit")
         if isinstance(value, str) and _looks_like_local_free_text(value):
             raise ValueError("local category values contain free text")
-    if infer_sensitive_type_from_values(
-        str(value) if type(value) is int else value for value in candidates
-    ) is not None:
+    if any(infer_source_value_signal(value) is not None for value in candidates):
         raise ValueError("local category values contain sensitive content")
 
 
@@ -199,12 +244,24 @@ def normalize_field_name(name: str) -> str:
     return name.lower().replace("-", "_").replace(" ", "_")
 
 
+def field_name_words(name: str) -> tuple[str, ...]:
+    expanded = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
+    expanded = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", expanded)
+    return tuple(word.casefold() for word in re.findall(r"[^\W_]+", expanded))
+
+
 def infer_sensitive_from_name(name: str) -> bool:
     """Conservatively mark likely PII/secrets as sensitive by default."""
     normalized = normalize_field_name(name)
-    return any(
+    if any(
         part in normalized if part != "cc" else part in normalized.split("_")
         for part in SENSITIVE_NAME_PARTS
+    ):
+        return True
+    words = field_name_words(name)
+    return bool(set(words) & {"cc", "pan", "passwd"}) or any(
+        phrase in zip(words, words[1:])
+        for phrase in (("tax", "id"), ("api", "key"), ("access", "key"), ("private", "key"))
     )
 
 
@@ -220,6 +277,12 @@ def is_sensitive_field(name: str, semantic_type: str | None = None) -> bool:
 
 def infer_sensitive_value_type(value: Any) -> str | None:
     """Classify recognizable PII and credentials without retaining the value."""
+    signal = infer_sensitive_value_signal(value)
+    return signal.value_type if signal is not None else None
+
+
+def infer_sensitive_value_signal(value: Any) -> SensitiveValueSignal | None:
+    """Return a fixed reason code while preserving conservative recognition."""
     if not isinstance(value, str):
         return None
     text = value.strip()
@@ -227,21 +290,111 @@ def infer_sensitive_value_type(value: Any) -> str | None:
         return None
     if is_iso_date(text):
         return None
-    if PRIVATE_KEY_RE.search(text) or BEARER_TOKEN_RE.fullmatch(text):
-        return "secret"
-    if KNOWN_SECRET_RE.fullmatch(text) or SECRET_ASSIGNMENT_RE.search(text):
-        return "secret"
-    if JWT_RE.fullmatch(text) or looks_high_entropy_token(text):
-        return "secret"
-    if EMAIL_RE.fullmatch(text):
-        return "email"
+    if PRIVATE_KEY_RE.search(text):
+        return SensitiveValueSignal.PRIVATE_KEY
+    if BEARER_TOKEN_RE.fullmatch(text):
+        return SensitiveValueSignal.BEARER_TOKEN
+    # Builtin membership preserves regex semantics for custom str subclasses.
+    if KNOWN_SECRET_RE.fullmatch(text):
+        return SensitiveValueSignal.KNOWN_SECRET
+    if (
+        (str.__contains__(text, ":") or str.__contains__(text, "="))
+        and SECRET_ASSIGNMENT_RE.search(text)
+    ):
+        return SensitiveValueSignal.SECRET_ASSIGNMENT
+    if JWT_RE.fullmatch(text):
+        return SensitiveValueSignal.JWT_SHAPE
+    if looks_high_entropy_token(text):
+        return SensitiveValueSignal.HIGH_ENTROPY
+    if str.__contains__(text, "@") and EMAIL_RE.fullmatch(text):
+        return SensitiveValueSignal.EMAIL
     if SSN_RE.fullmatch(text):
-        return "ssn"
+        return (
+            SensitiveValueSignal.SSN_FORMAT if str.count(text, "-") == 2
+            else SensitiveValueSignal.SSN_DIGITS
+        )
     if PAYMENT_CARD_RE.fullmatch(text) and passes_luhn_check(text):
-        return "secret"
+        return SensitiveValueSignal.LUHN
     if PHONE_RE.fullmatch(text) and 7 <= sum(char.isdigit() for char in text) <= 15:
-        return "phone"
+        return SensitiveValueSignal.PHONE
     return None
+
+
+def infer_profile_string_signal(
+    value: str, *, max_chars: int | None = None,
+) -> SensitiveValueSignal | None:
+    """Retain the bounded numeric-evidence policy used by CSV profiles."""
+    if len(value) > (max_input_cell_chars() if max_chars is None else max_chars):
+        raise InputLimitError("source value exceeds character limit")
+    detected = infer_sensitive_value_signal(value)
+    detected_type = detected.value_type if detected is not None else None
+    if detected_type not in {None, "phone"}:
+        return detected
+    try:
+        number = Decimal(value)
+    except InvalidOperation:
+        return detected
+    if not number.is_finite():
+        return detected
+    # Statistics retain binary floats. Inspect that representation as well as
+    # the exact decimal; rounding must not turn an unclassified value into PII.
+    # Bound magnitude before conversion or expansion of exponent notation.
+    if not -64 <= number.adjusted() <= 18:
+        return detected
+    retained = Decimal(str(float(number)))
+    # Only negative fractional measures are unambiguous here. Positive dotted
+    # numbers and integral decimal identifiers remain potentially sensitive.
+    if (
+        detected_type == "phone" and re.fullmatch(r"-\d+\.\d+", value)
+        and number != number.to_integral_value()
+        and retained != retained.to_integral_value()
+    ):
+        return None
+    for candidate in (number, retained):
+        exponent = candidate.as_tuple().exponent
+        if not isinstance(exponent, int) or exponent < -64:
+            continue
+        canonical = format(candidate.copy_abs(), "f")
+        if "." in canonical:
+            canonical = canonical.rstrip("0").rstrip(".")
+        normalized_signal = infer_sensitive_value_signal(canonical)
+        if normalized_signal is not None and normalized_signal.value_type == "secret":
+            return normalized_signal
+        detected = detected or normalized_signal
+    return detected
+
+
+def infer_source_value_signal(
+    value: Any, *, max_chars: int | None = None,
+) -> SensitiveValueSignal | None:
+    """Normalize source scalars without relaxing strict string protection."""
+    if not isinstance(value, str):
+        if type(value) not in {int, float, Decimal}:
+            return None
+        try:
+            value = str(value)
+        except ValueError:
+            raise InputLimitError("source numeric value exceeds character limit") from None
+        return infer_profile_string_signal(value, max_chars=max_chars)
+    return infer_profile_string_signal(value, max_chars=max_chars) or infer_sensitive_value_signal(value)
+
+
+def infer_category_value_signal(
+    value: Any, *, max_chars: int | None = None,
+) -> SensitiveValueSignal | None:
+    """Generated rank labels are bounded metadata, rather than source cells."""
+    if type(value) is str and _SYNTHETIC_CATEGORY_LABEL_RE.fullmatch(value):
+        max_chars = max(len(value), max_input_cell_chars() if max_chars is None else max_chars)
+    return infer_source_value_signal(value, max_chars=max_chars)
+
+
+def has_sensitive_numeric_summary(
+    summary: Mapping[str, Any], *, max_chars: int | None = None,
+) -> bool:
+    return any(
+        infer_source_value_signal(summary.get(key), max_chars=max_chars) is not None
+        for key in ("min_value", "max_value", "p05", "p95")
+    )
 
 
 def infer_sensitive_type_from_values(values: Iterable[Any]) -> str | None:

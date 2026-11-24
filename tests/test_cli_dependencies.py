@@ -43,6 +43,26 @@ def test_dependency_resolver_tracks_gigachat_as_optional() -> None:
     ) == ("gigachat",)
 
 
+@pytest.mark.parametrize(
+    "available,missing",
+    [
+        (set(), ("duckdb", "pyarrow")),
+        ({"pyarrow"}, ("duckdb",)),
+        ({"duckdb"}, ("pyarrow",)),
+        ({"duckdb", "pyarrow"}, ()),
+    ],
+)
+def test_dependency_resolver_tracks_profiling_as_optional(
+    available: set[str], missing: tuple[str, ...],
+) -> None:
+    def import_profiling(name: str) -> ModuleType:
+        if name not in available:
+            raise ModuleNotFoundError("not installed", name=name)
+        return ModuleType(name)
+
+    assert CliDependencyResolver(import_profiling).missing_modules("profiling") == missing
+
+
 def test_dependency_resolver_normalizes_required_extra_error() -> None:
     cause = ImportError("secret-local-path")
 

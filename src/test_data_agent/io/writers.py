@@ -69,6 +69,8 @@ def neutralize_csv_cell(value: Any) -> Any:
     """Prevent string cells from being interpreted as spreadsheet formulas."""
     if not isinstance(value, str) or not value:
         return value
+    if type(value) is str and value[0] not in " \t\r\n=+-@":
+        return value
     if is_formula_cell(value):
         return "'" + value
     return value

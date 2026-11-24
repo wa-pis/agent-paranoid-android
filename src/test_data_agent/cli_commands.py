@@ -68,6 +68,7 @@ def run_dataset_command(
 ) -> int | None:
     """Run one dataset command, or return ``None`` when it is not dataset-owned."""
 
+    has_business_rules = business_rules_applier is not None or getattr(args, "business_rules", None) is not None
     business_rules_applier = business_rules_applier or apply_business_rules_from_args
     rules_path = getattr(args, "business_rules", None)
     output = getattr(args, "output", None)
@@ -93,7 +94,7 @@ def run_dataset_command(
     configured_applier = (
         make_business_rules_applier(load_business_rules(args.business_rules))
         if args.command in {"generate", "generate-from-csv"} and getattr(args, "business_rules", None) is not None
-        else apply_rules if rules_path is not None else None
+        else apply_rules if has_business_rules else None
     )
 
     if args.command == "estimate-capacity":
@@ -106,6 +107,13 @@ def run_dataset_command(
         return 0
 
     if args.command == "generate":
+        streaming = getattr(args, "stream_csv", False)
+        if getattr(args, "workers", None) is not None and not streaming:
+            raise ValueError("--workers requires --stream-csv")
+        if streaming and args.profile is not None:
+            raise ValueError("--stream-csv requires a DatasetSpec, not --profile")
+        if streaming and args.output_format not in (None, "csv"):
+            raise ValueError("--stream-csv requires CSV output")
         if args.profile is not None:
             return generate_dataset_from_profile_command(
                 args,

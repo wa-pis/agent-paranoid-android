@@ -69,6 +69,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     }
     assert set(metadata["optional-dependencies"]) == {
         "parquet",
+        "profiling",
         "mcp",
         "openai",
         "gigachat",
@@ -82,6 +83,10 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["optional-dependencies"]["gigachat"] == [
         "gigachat>=0.2.3,<0.2.5"
     ]
+    assert metadata["optional-dependencies"]["profiling"] == [
+        "duckdb>=2.0.1,<3.0.0", "pyarrow>=15.0.0",
+    ]
+    assert "duckdb>=2.0.1,<3.0.0" in metadata["optional-dependencies"]["all"]
     assert metadata["urls"] == {
         "Homepage": "https://github.com/wa-pis/agent-paranoid-android",
         "Repository": "https://github.com/wa-pis/agent-paranoid-android",
@@ -170,6 +175,7 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     jobs = yaml.safe_load(workflow)["jobs"]
     assert jobs["package-optional"]["strategy"]["matrix"]["profile"] == [
         "parquet",
+        "profiling",
         "mcp",
         "openai",
         "gigachat",
@@ -584,6 +590,7 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
         "agent-paranoid-android[mcp]",
         "agent-paranoid-android[mcp,trino]",
         "agent-paranoid-android[parquet]",
+        "agent-paranoid-android[profiling]",
         "agent-paranoid-android[openai]",
         "agent-paranoid-android[all]",
     ):

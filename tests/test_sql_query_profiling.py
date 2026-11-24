@@ -162,7 +162,7 @@ def test_profile_is_source_free_and_keeps_exact_local_category_values() -> None:
 
     assert profile.source_type == "postgres_query"
     assert profile.source_fingerprint == "a" * 64
-    assert profile.source_policy_version == "1.1"
+    assert profile.source_policy_version == "1.2"
     assert profile.entities[0].name == "warehouse.paid_orders"
     assert profile.entities[0].row_count == 3
     state = profile.entities[0].field("state")

@@ -66,9 +66,7 @@ class CliDoctorService:
         states: dict[str, DoctorCheck] = {}
         required = set(required_extras or ())
         if "all" in required:
-            required.update(
-                {"parquet", "mcp", "trino", "postgres", "openai", "gigachat"}
-            )
+            required.update(OPTIONAL_EXTRA_MODULES)
 
         if sys.version_info >= (3, 11):
             checks.append(

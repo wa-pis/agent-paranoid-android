@@ -15,8 +15,12 @@ from test_data_agent.adapters.legacy_profile import (
 )
 
 
-def csv_profile_to_dataset_profile(profile: CSVProfile) -> DatasetProfile:
-    return legacy_profile_to_dataset_profile(profile.model_dump(mode="json"), source_type="csv")
+def csv_profile_to_dataset_profile(
+    profile: CSVProfile, *, max_chars: int | None = None,
+) -> DatasetProfile:
+    return legacy_profile_to_dataset_profile(
+        profile.model_dump(mode="json"), source_type="csv", max_chars=max_chars,
+    )
 
 
 def csv_file_to_dataset_profile(

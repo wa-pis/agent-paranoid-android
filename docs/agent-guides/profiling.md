@@ -32,6 +32,40 @@ virtual schema, and safe aggregates, and never retain SQL text, literals,
 backend messages, endpoints, or query rows. Database wildcard selectors must
 first resolve to a deterministic explicit-column snapshot.
 
+The development port onto the 1.7.1 baseline uses query-source policy `1.2`.
+Sensitivity follows projected source-column names through aliases, so renaming
+a protected column cannot authorize exact categories or temporal bounds. The
+existing query language, grouped-aggregate restrictions, batched summaries,
+allowlists and database work budgets remain unchanged. Policy fingerprints
+change; reprofile query sources before a new review.
+
+## Shared semantic and privacy evidence
+
+Column semantics use counters over the complete available population, with
+word-based name context including separators, camel case and acronyms. At
+least 80% of non-null values must support one semantic type. Aggregate top
+lists use their original counts against an exact full-column non-null count;
+a short top list is not normalized into artificial certainty. Missing or
+inconsistent coverage leaves semantics unknown, except that any recognized
+strong credential format still yields `secret`.
+
+Formatted SSNs and contextual credentials remain strong recognition signals.
+Digit-only SSNs, Luhn matches, JWT shapes and high-entropy strings retain
+`sensitive` but require matching name context for semantic inference. Numeric
+phone-shaped values require phone context; a measure name such as `quantity`
+does not become a phone merely because its digits match that shape. An unknown
+semantic type never clears sensitivity or permits exact source values.
+Changing row order does not change these counters or the inferred semantics.
+
+The shared scalar and name policy also guards legacy/JSON profiles, PostgreSQL,
+authorized query sources, Trino and Parquet. Use each source's existing evidence:
+schema-only or insufficient aggregate evidence stays unknown, with no added row
+reads or broader SQL. Explicit saved semantics remain metadata, subject to
+privacy checks. Sensitive numeric extrema are suppressed independently of the
+source label, and exact local-category checks inspect native integer content.
+Parquet keeps its existing bounded inspection and conservative composite/binary
+handling; it does not gain speculative semantic inference.
+
 ## Allowed evidence
 
 - column names and inferred data types;
@@ -55,18 +89,48 @@ prevalence and orders, never exact decimal bounds. Higher declared
 precision fails closed. Unbounded SQL `numeric` retains its legacy approximate
 FLOAT path and must not be presented as exact financial evidence.
 
-Folder CSV profiles label `unique_ratio_kind` as `exact` (rounded to six decimal
-places) or `lower_bound` when the 10,000-value distinct tracker overflows.
-For `lower_bound`, display “at least X%”, not exact uniqueness. The ratio uses
-non-null normalized values and is truncated downward to six decimal places.
-Overflow evidence cannot nominate a primary key, even when its lower bound
-exceeds the usual threshold. Relationship discovery excludes lower-bound parent
-keys and omits lower-bound child distinct ratios from numeric evidence. Older
-profiles and other producers default to `unspecified`, not proven exact; reprofile
-old folder artifacts to obtain the new uncertainty metadata. This statistic is
-unrelated to the planned percentage of unchanged values after transformation.
-Cache format 9 invalidates older folder caches and recomputes their evidence,
-including finite numeric statistics and repeated-identifier pool sizes.
+Single-file and folder CSV profiles now retain exact non-null distinct counts
+over normalized values, using private SHA-256 digests rather than source text.
+Small profiles use Python sets. When the sum of retained per-column digest-set
+entries exceeds 1,000,000 within a CSV file, counting hands the existing sets
+and the remaining iterator to a streaming DuckDB/Arrow backend. This is an
+entry threshold across columns, not a row limit; the input is not reread.
+The former CSV distinct-count censor no longer stops counting at 10,000 values.
+
+DuckDB and Arrow are an optional `profiling` extra in this unreleased checkout:
+
+```bash
+python -m pip install -e ".[profiling]"
+```
+
+The published 1.7.1 package does not contain this development extra; install
+the checkout as shown above. Small CSV
+profiles need neither dependency. Crossing the threshold without them fails
+with installation guidance instead of returning a truncated trusted count.
+
+The backend receives ephemeral keyed digests in batches of 50,000, never raw
+source values. Its private scratch directory is removed after success or
+failure; cleanup failures reject the profile. External access, replacement
+scans, extension installation/loading and logging are disabled. DuckDB uses
+one thread, a 128 MiB engine memory limit, a 2 GiB temporary-storage limit and
+the existing profiling deadline. These controls do not bound total process
+RSS, Arrow allocations or the initial Python sets. Other input/file/cell and
+sampling limits still apply.
+
+`unique_ratio_kind="exact"` identifies complete CSV distinct evidence; ratios
+use non-null normalized values and are rounded to six decimal places. Existing
+`lower_bound` evidence, including bounded Parquet counts, must still display
+“at least X%”; its ratio is truncated downward. It cannot nominate a primary
+key or exact identifier pool. Relationship discovery excludes lower-bound
+parent keys and omits lower-bound child ratios from numeric evidence. Older
+profiles and other producers retain `unspecified` rather than being silently
+promoted to exact. This statistic is unrelated to the planned percentage of
+unchanged values after transformation.
+
+Cache format 10 invalidates older folder caches and recomputes their evidence,
+including shared semantic/privacy counters, finite numeric statistics,
+numeric-storage proof and repeated-identifier pool sizes. Caches contain no
+distinct digests, DuckDB state, raw rows or sensitive source values.
 Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
 
@@ -180,7 +244,7 @@ This structural check does not establish a native CSV parser peak-memory bound.
 CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
-format 9 invalidates older inferred bindings; reprofile saved artifacts.
+format 10 invalidates older inferred bindings; reprofile saved artifacts.
 
 
 Parquet distinctness reuses the scalar sensitivity scan and retains at most
@@ -204,7 +268,10 @@ column, not a declassification or precision claim. Keep source sensitivity and
 masked distributions. Only an independently authored `numeric_measure`
 `decimal_range` supplied through `infer-spec --decimal-fields` may replace an
 eligible CSV measure in the generation spec. Protected names, identifiers and
-key/relationship bindings veto replacement. Cache format 9 invalidates older
+key/relationship bindings veto replacement. Unknown semantics alone cannot
+authorize replacement: the profile must retain complete finite phone-only
+numeric-storage evidence and a physical integer/float type. Weak SSN/card/secret
+signals, even in a late row, invalidate that proof. Cache format 10 invalidates older
 folder evidence; changed profile/spec fingerprints require fresh review.
 
 Folder cache identity includes the source directory and file identities and change

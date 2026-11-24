@@ -1,0 +1,217 @@
+{
+  "after": {
+    "benign": {
+      "cases": 5,
+      "fn": 0,
+      "fp": 0,
+      "precision": null,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": null,
+      "tn": 5,
+      "tp": 0
+    },
+    "card": {
+      "cases": 21,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 12,
+      "tp": 9
+    },
+    "email": {
+      "cases": 1,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 0,
+      "tp": 1
+    },
+    "entropy": {
+      "cases": 14,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 7,
+      "tp": 7
+    },
+    "phone": {
+      "cases": 1,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 0,
+      "tp": 1
+    },
+    "ssn": {
+      "cases": 15,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 8,
+      "tp": 7
+    },
+    "strong": {
+      "cases": 10,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 3,
+      "tp": 7
+    }
+  },
+  "after_source_sha256": {
+    "src/test_data_agent/adapters/legacy_profile.py": "1a95dc78c8f3986a8ec22a0ae2281184e2d8f18ef957904e5f67100e0fe06cbc",
+    "src/test_data_agent/core/privacy.py": "ba47455ac01975fa001f369b541599ff8a72a27e5bfa81e3733fa9d5264c1f21",
+    "src/test_data_agent/core/semantics.py": "a64467a6f15b8c6bd13981fc8d4784ba8168c557b48bc5407073ea9546cf1bdf",
+    "src/test_data_agent/csv_profiler.py": "5a1d77d000c34cafb39cb17f2ad3b6c0f54d1d0f2478b3b07e19201873a5b7f6",
+    "src/test_data_agent/profiling/cache.py": "7f1b0b46b77e13b1f2baa9752abf4fcdb03ef628e1cc177fd80d064ccd64232d",
+    "src/test_data_agent/profiling/schema_profiler.py": "dce920531b3c47b6e4b95fe4751a19fbb20d0036795df337f75cbed1eb56cbd9",
+    "src/test_data_agent/trino_masking.py": "08b38705c3e5dcaf106e519a3628e81b5479f0f4de561d8baade67432fba2772",
+    "tests/test_aggregate_signal_strength.py": "8402459b914473b2ba40b4060ead14037ca6b47e956f6492563c6837ce139593",
+    "tests/test_privacy_detector_equivalence.py": "33ea3e2e5129ddf76c3cb6ca628da86ea25b67ea1a6d292769c65ad3478eb626",
+    "tests/test_privacy_semantic_accuracy.py": "f571f8b0ca248999e6ecb797e98866f462b6d4eb4a1a777f4178e6c8491140f4",
+    "tests/test_privacy_signal_strength.py": "85b910212bbb75a174d1fb637a294d8003018d596e1a49a7bb9bfb57f21d5103",
+    "tests/test_privacy_validation_equivalence.py": "54bb583438b7aaca679218be48a384f0ae4c14e3ef6010849eceaa9ffd2f3097"
+  },
+  "aggregate_audit": {
+    "adapter_and_order_checks": 68,
+    "added_database_queries": 0,
+    "independent_synthetic_scenarios": 17,
+    "persisted_regression_cases": 83
+  },
+  "before": {
+    "benign": {
+      "cases": 5,
+      "fn": 0,
+      "fp": 0,
+      "precision": null,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": null,
+      "tn": 5,
+      "tp": 0
+    },
+    "card": {
+      "cases": 21,
+      "fn": 0,
+      "fp": 11,
+      "precision": 0.45,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 1,
+      "tp": 9
+    },
+    "email": {
+      "cases": 1,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 0,
+      "tp": 1
+    },
+    "entropy": {
+      "cases": 14,
+      "fn": 0,
+      "fp": 7,
+      "precision": 0.5,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 0,
+      "tp": 7
+    },
+    "phone": {
+      "cases": 1,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 0,
+      "tp": 1
+    },
+    "ssn": {
+      "cases": 15,
+      "fn": 0,
+      "fp": 6,
+      "precision": 0.5384615384615384,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 2,
+      "tp": 7
+    },
+    "strong": {
+      "cases": 10,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "privacy_fn": 0,
+      "privacy_fp": 0,
+      "recall": 1.0,
+      "tn": 3,
+      "tp": 7
+    }
+  },
+  "before_source_sha256": {
+    "src/test_data_agent/adapters/legacy_profile.py": "9aea85d9d07b5dd216e6bfe23258a39088b10fc1f10153fcf9d70f3d18134d82",
+    "src/test_data_agent/core/privacy.py": "642dfde5ce68f256bc2a0bcd833f97d603104f509e82008a6c5c00c87af0c23f",
+    "src/test_data_agent/core/semantics.py": "8124a8e7e59157667a6cf52f798331953e46c6f356e0b3ef9f9e717aefdc3e80",
+    "src/test_data_agent/csv_profiler.py": "27051282ef22c8e6a20a166214e9d813fadcd6afaeafc15320d4a3d0e9cf6edc",
+    "src/test_data_agent/profiling/cache.py": "875419c3b4f62539b34e6208439f86f3875f50fb4b026c8eadc6a3ef4a0a7f9a",
+    "src/test_data_agent/profiling/schema_profiler.py": "78d3ab8d786070ed3c1cc318c69d2da68d3da951e6eb822d0d6fd67c32fa970a",
+    "src/test_data_agent/trino_masking.py": "8645792b35eec27e690ae88b79945dea9cf6618ffaa16548dcb55260523866e6"
+  },
+  "cases": 67,
+  "description": "Bounded independent synthetic semantic-corpus comparison; policy labels are not real-world prevalence estimates.",
+  "differential": {
+    "csv_tag_or_exception_mismatches": 0,
+    "non_string_cases": 15,
+    "raw_tag_or_exception_mismatches": 0,
+    "semantic_type_sensitivity_permutation_mismatches": 0,
+    "sensitive_bound_or_category_leaks": 0,
+    "sensitivity_downgrades": 0,
+    "string_cases": 14054,
+    "synthetic_groups": 700
+  },
+  "fixture_sha256": "15e811438d8f8d32fdbf4ac2fa8558ac574a0faaf0af19db5847565930129efb",
+  "measured_date": "2026-11-22",
+  "measurement_scope": "Semantic corpus metrics use single-file CSV profiling; all four CSV views and three row orders are checked against the same independent labels. Aggregate-adapter behavior is checked separately.",
+  "verification": {
+    "coverage_percent": 91.87271233286023,
+    "focused_passed": 370,
+    "full_passed": 2402,
+    "full_seconds": 72.41,
+    "full_skipped": 10,
+    "live_database_integration_run": false,
+    "mypy": "passed",
+    "performance_benchmarks_run": false,
+    "ruff": "passed",
+    "strict_mkdocs": "passed",
+    "strict_openspec": "passed"
+  }
+}

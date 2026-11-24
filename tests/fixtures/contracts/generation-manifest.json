@@ -34,6 +34,7 @@
     "guarantee": "same_environment_logical",
     "locale": "en_US",
     "normalized_dependencies": {
+      "duckdb": "<dependency-version>",
       "faker": "<dependency-version>",
       "gigachat": "<dependency-version>",
       "mcp": "<dependency-version>",

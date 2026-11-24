@@ -157,15 +157,19 @@ def _infer_field(
 
 def _reviewed_csv_numeric_field(field: FieldProfile, reviewed: FieldSpec) -> FieldSpec:
     """Use an independently authored synthetic range, never source numeric bounds."""
+    phone_numeric_evidence = field.semantic_type == "phone" or (
+        field.semantic_type is None and field.numeric_storage_type is not None
+        and field.data_type in {FieldType.INTEGER, FieldType.FLOAT}
+    )
     try:
         validate_local_category_field(
             field_name=field.name,
-            semantic_type=None if field.semantic_type == "phone" else field.semantic_type,
-            sensitive=field.sensitive and field.semantic_type != "phone",
+            semantic_type=None if phone_numeric_evidence else field.semantic_type,
+            sensitive=field.sensitive and not phone_numeric_evidence,
         )
     except ValueError:
         raise ValueError("reviewed CSV numeric replacement cannot override protected field names") from None
-    if field.is_identifier or (field.sensitive and field.semantic_type != "phone"):
+    if field.is_identifier or (field.sensitive and not phone_numeric_evidence):
         raise ValueError("reviewed CSV numeric replacement cannot override sensitive or identifier fields")
     if field.data_type not in {FieldType.INTEGER, FieldType.FLOAT} and field.numeric_storage_type is None:
         raise ValueError("reviewed CSV numeric replacement requires finite numeric storage evidence; reprofile the CSV")

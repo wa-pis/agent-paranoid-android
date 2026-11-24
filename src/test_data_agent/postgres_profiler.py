@@ -303,6 +303,8 @@ class PostgresProfiler:
             "name": name,
             "data_type": data_type,
             "nullable": _as_bool(column.get("is_nullable")),
+            "non_null_count": non_null_count,
+            "null_count": row_count - non_null_count,
             "null_ratio": (row_count - non_null_count) / row_count if row_count else 0.0,
             "approx_distinct_count": distinct_count,
         }

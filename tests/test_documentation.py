@@ -200,6 +200,7 @@ def test_documentation_navigation_leads_with_database_workflows() -> None:
         "Profile Through Trino",
         "Transform Local Data",
         "Forecast And Scale Datasets",
+        "Parallel And Streaming CSV",
     ]
     assert [next(iter(item)) for item in navigation["Integrations"]] == [
         "Connect An MCP Client",
@@ -496,6 +497,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "mcp-profile-parquet",
         "configurable-inference-heuristics",
         "artifact-integrity-refactor",
+        "port-local-improvements-1-7-1",
     } == active
 
     for change_id, capability in (

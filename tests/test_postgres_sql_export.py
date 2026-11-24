@@ -137,7 +137,7 @@ def test_unsupported_value_keeps_existing_target_unchanged(tmp_path: Path) -> No
     rows = generated_rows()
     rows["order"][0]["amount"] = math.nan
 
-    with pytest.raises(PostgresSqlExportError, match="float value"):
+    with pytest.raises(PostgresSqlExportError, match="requires a valid dataset"):
         write_postgres_sql(relational_spec(), rows, output)
 
     assert output.read_text(encoding="utf-8") == "previous complete file\n"

@@ -135,7 +135,7 @@ def test_folder_profile_replaces_source_categories_without_losing_conditions(
     assert metric.sensitive
     assert metric.distribution == {
         "kind": "masked_patterns",
-        "patterns": [{"pattern": "ssn", "count": 5}],
+        "patterns": [{"pattern": "text_len_12", "count": 5}],
     }
     assert "912345678" not in serialized
     assert "9.12345678e8" not in serialized

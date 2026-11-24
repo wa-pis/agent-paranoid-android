@@ -52,6 +52,8 @@ def _profile_transformation_csv(
     limits = {dimension: resolve_input_limit(dimension, policy.resource_limits, os.environ)
               for dimension in (InputDimension.ROWS, InputDimension.COLUMNS, InputDimension.CELLS)
               } if policy is not None else {}
+    max_chars = resolve_input_limit(InputDimension.CELL_CHARS, policy.resource_limits, os.environ).value \
+        if policy is not None else None
 
     def check_shape(rows: int, columns: int) -> None:
         limits[InputDimension.ROWS].check(rows)
@@ -63,8 +65,7 @@ def _profile_transformation_csv(
         source.name, (), None, budget,
         literal_empty=True, null_token=null_token,
         check_shape=check_shape if policy is not None else None,
-        max_chars=resolve_input_limit(InputDimension.CELL_CHARS, policy.resource_limits, os.environ).value
-        if policy is not None else None))
+        max_chars=max_chars), max_chars=max_chars)
 
 
 
@@ -89,7 +90,7 @@ def _profile_transformation_source(
             accumulator.add(None if value is None else str(value), literal_empty=value is not None)
     profile = csv_profile_to_dataset_profile(CSVProfile(table=source.name, row_count=count,
         columns=[accumulator.to_profile(count, preserve_categories=False)
-                 for accumulator in accumulators.values()]))
+                 for accumulator in accumulators.values()]), max_chars=max_chars)
     profile.source_type = policy.input_format
     for entity in profile.entities:
         entity.primary_key_candidates = []

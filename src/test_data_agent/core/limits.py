@@ -53,6 +53,7 @@ DEFAULT_MIN_FREE_DISK_BYTES = 128 * 1024 * 1024
 DEFAULT_MAX_GENERATION_SECONDS = 300.0
 DEFAULT_MAX_LOCAL_PROFILE_SECONDS = 120.0
 DEFAULT_MAX_LOCAL_PROFILE_SAMPLE_ROWS = 1_000_000
+DEFAULT_MAX_IN_MEMORY_DISTINCT = 1_000_000
 
 
 class InputLimitError(ValueError):
@@ -91,8 +92,12 @@ class GenerationBudget:
 
     def remaining_seconds(self) -> float:
         """Remaining time in this invocation; child work must not reset it."""
-        self.check("remaining deadline")
-        return max(0.0, self.max_seconds - (self._clock() - self._started_at))
+        remaining = self.max_seconds - (self._clock() - self._started_at)
+        if remaining <= 0:
+            raise GenerationLimitError(
+                f"generation exceeded the {self.max_seconds:g} second budget during native work configuration"
+            )
+        return remaining
 
     def consume_rule_work(self, count: int = 1) -> None:
         """Charge cumulative deterministic rule work before the operation."""

@@ -1,0 +1,2275 @@
+{
+  "source_head": "26af69043cfd8d46df48ed43e18d5e168d223d3a",
+  "target_tag": "v1.7.1",
+  "target_commit": "8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e",
+  "snapshot_manifest_sha256": "7b8fa2de570727a28c56af97d973ccc282d726ea6ec218b783f368aca075926a",
+  "files": {
+    "docs/01-introduction/capabilities.md": {
+      "status": "added",
+      "sha256": "e4f89a18b9a4fdad4fe3dc99c8f527a3f55048087846810dabba8cf581846a6e",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/01-introduction/overview.md": {
+      "status": "added",
+      "sha256": "3544f9d598d1819f044c72825c77d502cd1266fa23a19f114e01a310557ee895",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/01-introduction/terminology.md": {
+      "status": "added",
+      "sha256": "c551212d0008025b56f602fbe7948dd3bdb4f5016f6f6d4a7b7b2cd1c082444e",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/02-getting-started/first-run.md": {
+      "status": "added",
+      "sha256": "065799c918456e9959784d091c135e4cf3b962c6cb6ad36dfd0e52a3a53259c7",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/02-getting-started/installation.md": {
+      "status": "added",
+      "sha256": "d12f58798b21951b5e5c89c6c0bdfb4615ab8036fef6cfb1078ae716cae4189d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/02-getting-started/quickstart.md": {
+      "status": "added",
+      "sha256": "06a24fdaac23f0add9188ea8c9335b9f4c22f3c20012fb3518673a5e22a36390",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/02-getting-started/requirements.md": {
+      "status": "added",
+      "sha256": "ca81d65ff29f06d9e8ef3ab928298a026a8fb5a414534a15d8e649e98952c46d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/03-user-guide/basic-workflow.md": {
+      "status": "added",
+      "sha256": "0f3003383e83e36878dd2693aa79b5f3f3272424b7af2b2d72299914b5ee8e5b",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/03-user-guide/configuration.md": {
+      "status": "added",
+      "sha256": "f44ed50b15b78c224ce8bb92431a6f9651650ac51558d574d2f16835869d7b5d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/03-user-guide/csv-generation.md": {
+      "status": "added",
+      "sha256": "f3a4282f7ae53a4911291d575e77a0da24e0611812f0e9af0412391160cdf947",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/03-user-guide/output-formats.md": {
+      "status": "added",
+      "sha256": "cd61d249cd640cc675abe8039a4b79873c9d7e3a0128a539fc7e2440e609be40",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/03-user-guide/result-validation.md": {
+      "status": "added",
+      "sha256": "2713c7f7d014282fc63484929b1fa155a2cf8b014fa9b012f900b0b6d247522d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/04-advanced/ai-integration.md": {
+      "status": "added",
+      "sha256": "658aae3aebc9549f07a176ef38c86a52b611104463e8c8144f0a84cbfa972717",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/04-advanced/business-rules.md": {
+      "status": "added",
+      "sha256": "f5f4e14150992934819b3ab89ac31c9cf2e3d6909040a5227875cd9781b85150",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/04-advanced/database-integration.md": {
+      "status": "added",
+      "sha256": "615e7e90de03ad8b7f894c6a6f9c1e1f686ea2784176f5636f3c67e1e9aac650",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/04-advanced/mcp-integration.md": {
+      "status": "added",
+      "sha256": "ae5bb3164fa8f644e964195bb5ad5f5133fd96e2a17740b16337c868d6d2a14e",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/05-reference/architecture.md": {
+      "status": "added",
+      "sha256": "9fbdb7c8746cdbc55f02da1abaea7b0fa72506609fbf94719b5ac5345bf3ab7f",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/05-reference/cli-reference.md": {
+      "status": "added",
+      "sha256": "e19d4f68a5918a7033152991d6db3ed8c83f9932750d2fc0635ea03208b4b649",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/05-reference/configuration-reference.md": {
+      "status": "added",
+      "sha256": "d8002ff45d0acc6286d7c9520422c59d43f1b6962e35a42b32dbc9fec0ec6eb9",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/06-troubleshooting/common-errors.md": {
+      "status": "added",
+      "sha256": "ba6a4ea8d00e4b5cfa8385a0a6b36f4362ea2536826bd5f6ca8ca2039219adf6",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/06-troubleshooting/diagnostics.md": {
+      "status": "added",
+      "sha256": "c32e4af307024470190ba7a24e5871e7eaddf9a3d46b600eff7701033cf26537",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/06-troubleshooting/faq.md": {
+      "status": "added",
+      "sha256": "5ec8b56e23a3ea3eeef71ba0a67ddadd43457cb2597a39c384d4e9876db2455d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/07-security/data-safety.md": {
+      "status": "added",
+      "sha256": "3b5d2085e81b6bb545be3c4b4384d4bf04f7cb2873c3c934c3ea4d1e41cd6fc4",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/07-security/limitations.md": {
+      "status": "added",
+      "sha256": "e3a2e0ca295968d9f9e21c14c1bf3d333e01bf6740c49776b735ec0c0b782cbb",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/08-agent-guides/agent-instructions.md": {
+      "status": "added",
+      "sha256": "2e0f6f7c2dbd317234c9e9ba2172caed5665ce121b56c2049d47c073b2c93f06",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/08-agent-guides/agent-safety-rules.md": {
+      "status": "added",
+      "sha256": "1de2692308f258327102d7a5bef9dde3dc4496424d4d9fc2d36c4445548e96c0",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/08-agent-guides/agent-workflows.md": {
+      "status": "added",
+      "sha256": "a33a836ea75b012b6beb96c4d69c1b8b60937958ba15e9bbd1fe1eb14da44fe5",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/README.md": {
+      "status": "added",
+      "sha256": "87b5748104c63e94767e8b24026396ac19fc2eefeae03bdae6315b140386d889",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/odin-ravens.svg": {
+      "status": "added",
+      "sha256": "f41e34181c60a356aa0ccb744ac8cd8392077014e964a9779dc2f5cc67e9bca6",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/project-workflow-ru.png": {
+      "status": "added",
+      "sha256": "92e518a0559819fee1b5ae50f22f4b8041619dca499c378a69b975e0f3664e1c",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v2-preview.png": {
+      "status": "added",
+      "sha256": "febdd1a72de6b9742cd7bd0339f6fa3eb7e65c3260edfb9ac8b5f35afef94e24",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v2.png": {
+      "status": "added",
+      "sha256": "9a04010cd3ddafab070d1e58a52ff3b873d7a4512fc1fdc39f3753fa89604993",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v2.svg": {
+      "status": "added",
+      "sha256": "3befb51c77ffa33ea5510a3a5362418dcc3f318ff007de8469b8d122d9eaea11",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v3-preview.png": {
+      "status": "added",
+      "sha256": "50f5e2f8dd81c1ff99b35b1fbd45e2d20bd7e979e9a1b1db86f0ff873f0f485e",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v3.png": {
+      "status": "added",
+      "sha256": "39e41af0bd5f6d3066503be871d364062c1a556fd4d4a68ec39ff7ee62c2d7b7",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v3.svg": {
+      "status": "added",
+      "sha256": "d0def33a345463ce1db3d76a7fe94aef86692a02db89dbb0251379798eb810ee",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v4-preview.png": {
+      "status": "added",
+      "sha256": "8e804ea8343aca03f201c262c52b70788c4ae657b8f7ffe69a5acc66b90ef6ab",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v4.png": {
+      "status": "added",
+      "sha256": "4bad4e0a8cbbf0e3b78cb17a925a8fa21b860ac46f7c7f0e4b1c881e05eae470",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v4.svg": {
+      "status": "added",
+      "sha256": "78df61b782428a4f60fcafbd29778629f91f18cbd1fd439478cded6dbd633572",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v5-preview.png": {
+      "status": "added",
+      "sha256": "b49d71bbe702f9e6a76233de6d6247feddeb2e030782b252d7ba96116e2562da",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v5.png": {
+      "status": "added",
+      "sha256": "c63126e2c83831d05d684a46a7a609dc6f23ee5c5e209d036bf503e9c870b3d8",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v5.svg": {
+      "status": "added",
+      "sha256": "a93e05cf87be82839e091430a7969e6cd418ed2cdcf4f7372598161789b2ae2d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v6-preview.png": {
+      "status": "added",
+      "sha256": "be821ed298ee56f80c87227d55628ef5466f57834d7cd89d96160b2364219c86",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v6.png": {
+      "status": "added",
+      "sha256": "9163d08ccbb24bb9876795262db2befb2ce133b2c9cba9863cf2849556191b38",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v6.svg": {
+      "status": "added",
+      "sha256": "96c468b0d572b4574667935ebe7dc9d71f7f0f2bf94a30ddc15ad2ae3f440f4b",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v7-preview.png": {
+      "status": "added",
+      "sha256": "fdb9c3841c8745d29755538b9f60cb09d99283af1b2b960238839234144d542c",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v7.png": {
+      "status": "added",
+      "sha256": "038f7b8b5c72ec221ea1365a4ad60466865829b27945ad31f9b05f765784c76e",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v7.svg": {
+      "status": "added",
+      "sha256": "394254ab068d4e42b350e30fc4eb36f33a671c7920cd2555aebc945f1fad38de",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v8-preview.png": {
+      "status": "added",
+      "sha256": "8523b09964fb9671078745351bdae26ea06e61e62095e71e2a7dd4737f0aa02d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v8.png": {
+      "status": "added",
+      "sha256": "98661ddf7d9a7f289547cdf7072669b414b200d332f9583db562ed5b146b025a",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-cycle-v8.svg": {
+      "status": "added",
+      "sha256": "ae5a9625a5c60e1606ce7f5f5fa5bf50595a12946d052c2c5eccb76b264c974c",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-heart-v1-preview.png": {
+      "status": "added",
+      "sha256": "1a5ecf35252658f53ff8745a144699928f6e264aaa0f0d637e36d34b15da93ed",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-heart-v1.png": {
+      "status": "added",
+      "sha256": "cba988cbec34dc91f2f2f2f674f590c39dd4107581a7a7f5705dba23d65827b9",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-heart-v1.svg": {
+      "status": "added",
+      "sha256": "f194a15fa937c9c5d3af8c9f804a3fe94a6f9a6ef0d068f1b5406a57e87a7d4b",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-perched-v1-preview.png": {
+      "status": "added",
+      "sha256": "e62e64b9a7a5868e8e56d5044af672437986983a31d38d3d112ee2678ec2d823",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-perched-v1.png": {
+      "status": "added",
+      "sha256": "b4821da6ad27e903bb9cc78cedf6994e43f65a9b83a80beffd71d3a2d75b6d9b",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-perched-v1.svg": {
+      "status": "added",
+      "sha256": "b28ccf057fe0b7fff2e415b5b41594bb8768f1e084b3251676d33a016e6a0ee3",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-perched-v2-preview.png": {
+      "status": "added",
+      "sha256": "ce320fdce1cedd140b1f05a38e5431d36ce36d23b317f578da6d231ae6761f75",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-perched-v2.png": {
+      "status": "added",
+      "sha256": "38aff3731e429c96633cafec091e79a7c3763ed3e9b697fc6c847bcaaba59076",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-perched-v2.svg": {
+      "status": "added",
+      "sha256": "e619e0481219aae2416aab937142e70f51e28d12432d7f2d2c8b633f52fc0f12",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-yin-yang.png": {
+      "status": "added",
+      "sha256": "4e97715b69db0c980ce560f7e2bb8312f8a937923b06da00b572a07b2acf6e63",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/assets/ravens-yin-yang.svg": {
+      "status": "added",
+      "sha256": "8d96f92d1ad7e0e443db522786be72c4ae71a002deb49ef736dc4d2c090be449",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/how-to/parallel-generation.md": {
+      "status": "added",
+      "sha256": "de9f7578ffa63cd4ddee94e34c01a72845d2c2f9148bd2b3ccf0d79125fce06b",
+      "disposition": "adapted",
+      "target": "docs/how-to/parallel-generation.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "docs/quality-report.md": {
+      "status": "added",
+      "sha256": "40b7b553a7ae73d0fed4e69ba7a1c443836968e7302e9fcc20231646a86d9d65",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/ru.md": {
+      "status": "added",
+      "sha256": "34b0d02469b1f0f629498453fcd15b08ace38e883faa2ff2974a4dfbb2fd85df",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "openspec/changes/csv-encoding-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "e5eeb0e8489f9508cc69188fa7367a052909e4ba7baa5f3b7696641f940d2530",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/design.md": {
+      "status": "added",
+      "sha256": "dde1340c178cd6a3a85dde24326feff2f16a73278f8507a4481b511d4c7d768f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/encoding-profile-results.json": {
+      "status": "added",
+      "sha256": "0d8888696c6b3d500cb502dd8bb1f8af123700116e904ccf2344a78a5d20ae8c",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/encoding-profile-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/paired-benchmark.md": {
+      "status": "added",
+      "sha256": "31a58c5384852d5046cfbd08e5f30f7f3dd07ff73fc1145081ead86f864ad55b",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/paired-benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/paired-results.json": {
+      "status": "added",
+      "sha256": "a49dc561b99be67cae219c06f109b23a2f475432be0ab9dd89bf27bb20f1c95f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/paired-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/proposal.md": {
+      "status": "added",
+      "sha256": "90586f2498cb4ccf401a3d42da310cd8fe90832edfa69149f1984f87c9b4029c",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/public-csv-results.json": {
+      "status": "added",
+      "sha256": "3bcb174e80561d2fa26b06f52786a62a6b04656f95017b36caff80ecf280d937",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/specs/artifact-contract/spec.md": {
+      "status": "added",
+      "sha256": "0316ef313f480739d84ec2b01e523856b55a457e2663e39592c684e2dea6fb3e",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/specs/artifact-contract/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/tasks.md": {
+      "status": "added",
+      "sha256": "9d5b7b87e87abfac7bf85bbdaa63291036f89541713191b636955b563fddaab1",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-encoding-performance/validation.md": {
+      "status": "added",
+      "sha256": "5560e649631f3b9163f6f11b2fadb750bcf42965b5059da6b778c81256ec2ebc",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-folder-distinct-tracking/proposal.md": {
+      "status": "added",
+      "sha256": "56ecfe08aa945424e5dbb6a3b10b345c2b75d4f95938ddbfe633a0a6335fdb60",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-folder-distinct-tracking/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-folder-distinct-tracking/specs/safe-csv-profiling/spec.md": {
+      "status": "added",
+      "sha256": "4198a44b299771bbd95113ce89e5b0cd31e42112a76c766e152812bdcec8f477",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-folder-distinct-tracking/specs/safe-csv-profiling/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/csv-folder-distinct-tracking/tasks.md": {
+      "status": "added",
+      "sha256": "6eed5e5f06976c5d6f4012d3ceaf983aa89d85ff0e4eeec1e18c38c1659bad03",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-folder-distinct-tracking/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/design.md": {
+      "status": "added",
+      "sha256": "2fee94fce2acb10e1818880a72df4d15e1ea9af90d1c318c5f78f162323c081f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/distinct-benchmark-evidence.md": {
+      "status": "added",
+      "sha256": "719f530aed8788321cfc0b810b6cab1e70aed3d9b7bb7b4609d2d23de2e7fe3d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/distinct-benchmark-evidence.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/distinct-benchmark-results.json": {
+      "status": "added",
+      "sha256": "b0bb268ce03dbe3e61180ff2295384ff49c50aadd68b325c075c0ba60657efd5",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/distinct-benchmark-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/distinct-benchmark-stream-results.json": {
+      "status": "added",
+      "sha256": "fcbec87bb82c713329bb21d71d7feb897087d1f938ee23c20ed69a045989d864",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/distinct-benchmark-stream-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/generation-distribution-evidence.md": {
+      "status": "added",
+      "sha256": "5295fb9b01578b79e4ce6c10ea2944ff50c256c9c96cb0cbd963ea1ade460170",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/generation-distribution-evidence.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/generation-distribution-results.json": {
+      "status": "added",
+      "sha256": "18d51581ee84529bf0bcbe105591eedffee4aee86ecf8a5725dccdfebf1f0287",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/generation-distribution-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/parallel-generation-evidence.md": {
+      "status": "added",
+      "sha256": "858edc5f127d3f6ef69b888e6954eeb7eba726fb00807883ae12b75aedb8b122",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/parallel-generation-evidence.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/parallel-generation-results.json": {
+      "status": "added",
+      "sha256": "046c03f8a6e5ae3335185c185f91a03372af3d3e654af3f21e0a6605b1fbee4d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/parallel-generation-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/proposal.md": {
+      "status": "added",
+      "sha256": "5344bc6e14ba3e5a73471fdcd76d392458c448a50c99a153084db5db0c64b195",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/specs/dataset-capacity/spec.md": {
+      "status": "added",
+      "sha256": "9940e4ab8fcff14fbac873aa89229296fc4e35a8edabd468b133ba00239a81bb",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/specs/dataset-capacity/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/streaming-generation-evidence.md": {
+      "status": "added",
+      "sha256": "9aab7742cbc45df056d3109cb1ae0947585628a8d0320eede4f801feed338ddd",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/streaming-generation-evidence.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/streaming-generation-results.json": {
+      "status": "added",
+      "sha256": "e2e783220ae186cbc3d8d4aa203decab2b6e443b9e8e9ceb550d3d877588c7d3",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/streaming-generation-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/dataset-scale-estimation-performance/tasks.md": {
+      "status": "added",
+      "sha256": "b00df917b19fbac3fbb8dd1c8622824e949293bcbd59a11e864d0ebeef3fab4b",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "10789b0fdef2a7050d32960b851cf7119d53d112257739481df32508c6fc1742",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/design.md": {
+      "status": "added",
+      "sha256": "9a5a9067b57987164ae01bd6032ddba16e1f850af0abe52de540eaaec7f107c1",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/dispatch-profile-results.json": {
+      "status": "added",
+      "sha256": "9a3bcb41ac6ed80f4013ed5ba3939563a94b8c984a4d120d4621903edef7d79a",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/dispatch-profile-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/generation-dispatch.patch": {
+      "status": "added",
+      "sha256": "1b227d271fe5584d3c4bc55367c92dce852c89e53dfdbeaf8fd6f1b0f5657ada",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/generation-dispatch.patch",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/paired-results.json": {
+      "status": "added",
+      "sha256": "ee1ccb8a738271d34fe7158af13e2454e6891244c5de12482aa5725fa19a4b1c",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/paired-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/proposal.md": {
+      "status": "added",
+      "sha256": "494c9811eaa5eda54b833561cd95071e71f8ccd61a7144579bbca1a2a6f4c3bf",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/specs/synthetic-generation/spec.md": {
+      "status": "added",
+      "sha256": "00948eeae380e25e87f2796424d3c3a9bd6a806696453fa520c8dfa14962d31f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/specs/synthetic-generation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/tasks.md": {
+      "status": "added",
+      "sha256": "04d78bf72b790e70e119d1078629f7e05d0837b599ee9f4cdf299d2b1b081a11",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/generation-dispatch-performance/validation.md": {
+      "status": "added",
+      "sha256": "40168da07e1dec90389d590d6cab2f1d3577989bae3b152180cf344db5bf8cca",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/design.md": {
+      "status": "added",
+      "sha256": "1b901690ac3b6a57e291e39b01fa9bab41bc5df604dc0e45e5f345344f1c2c86",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/progress.md": {
+      "status": "added",
+      "sha256": "9c0aa7da41ccd7d058b6ebb2ecfecbcf1f215e62f4eb4896940ab6435ab9b91d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/progress.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/proposal.md": {
+      "status": "added",
+      "sha256": "5bc8b71920e25eb2d9feba8ea1d5d2445068e85fcf9d91dabd18a18675c18f30",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/specs/safe-mcp-workflow/spec.md": {
+      "status": "added",
+      "sha256": "96e5c8467797d9ca510ccaa1d2ec7607ed16b82b37d4c983773a34120c673c1f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/specs/safe-mcp-workflow/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/tasks.md": {
+      "status": "added",
+      "sha256": "373a032f37f7c97164a11a51efc10c8423283cbe4c77b2ba011c60300816f4a5",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/numeric-phone-inference/design.md": {
+      "status": "added",
+      "sha256": "f6e7b7344d983840fdbf0c1e2855d2b6d25d76a8202acc36957b197d5e827804",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/numeric-phone-inference/proposal.md": {
+      "status": "added",
+      "sha256": "f23bc06258205783e0ac41986e5f0710ced6ebb82c89788ea12c033429a2c61c",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/numeric-phone-inference/specs/safe-csv-profiling/spec.md": {
+      "status": "added",
+      "sha256": "15c97f54775c41c90aa0f97b661e9b83a45c0d8186ed2537e1a6a2350263354d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/specs/safe-csv-profiling/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/numeric-phone-inference/tasks.md": {
+      "status": "added",
+      "sha256": "c324e924265aba2969eafa333eb04c00bc49b5ae3207cd97f406abc7e15d4775",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/numeric-phone-inference/validation.md": {
+      "status": "added",
+      "sha256": "f1b203dad9bc331670d3d25c948c23f851fc8808c85f704a8de015a475b7e89f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "6989907db1deb945791fc4c5bf8c537817726a18670e0ad849c1b88efd35001e",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/design.md": {
+      "status": "added",
+      "sha256": "669786ed231ba9c24d5bab5774ce8773e139c2aaf7e8ffbbac56b2b4deee6924",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/proposal.md": {
+      "status": "added",
+      "sha256": "506310859c8d1fb7418dd42b974f7637e0c82b965d318e4fe9fecf3de514f686",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/public-csv-results.json": {
+      "status": "added",
+      "sha256": "31d9d79ab3f9ff0fd1cdee5f2195e259f13ab38155cc301d790be5bdcfd047c2",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/specs/dataset-validation/spec.md": {
+      "status": "added",
+      "sha256": "d8c6db85a0d8dc00a5daa2a666a07cd8c61b8662034c3b819cf1c0d5eea41732",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/specs/dataset-validation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/tasks.md": {
+      "status": "added",
+      "sha256": "5ae21f46937e58c19359ea1a505b66eac368be128e3a7d9004ff675bd6041429",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-detector-performance/validation.md": {
+      "status": "added",
+      "sha256": "8b809f10a10cb24b45c9b7082d3f7f38a8ebf6d46e554c9e33b3a334d1188080",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-signal-strength/accuracy-results.json": {
+      "status": "added",
+      "sha256": "ee33dd81469d5aeb9f331bbae299195ec981e4fc906cf901caee99dd298343d0",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/accuracy-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-signal-strength/design.md": {
+      "status": "added",
+      "sha256": "43beb5cdddd5c45f5336ee976e2def07199ca311c101058ed6f77ef370ee84f0",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-signal-strength/proposal.md": {
+      "status": "added",
+      "sha256": "d1785a6a57105ca56174c720bc74b5c05e76a5f22b3ca51520302c63fbebe3f0",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-signal-strength/specs/safe-csv-profiling/spec.md": {
+      "status": "added",
+      "sha256": "47fe81d4486ae58d350ac9357dcc47a0f0a94d48a9b4a542a2a3be50ce01e93f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/specs/safe-csv-profiling/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-signal-strength/tasks.md": {
+      "status": "added",
+      "sha256": "2d21cb60fb7934796509d6b58b8d4022e974b64be40438bdd6ace3886afe1d86",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-signal-strength/validation.md": {
+      "status": "added",
+      "sha256": "368f8b0cf8d4077152a5e9c559a42c335c011a0708ff9381151142bde8702798",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "f1887d98e04c0c74592b616ac7768223fbb5be624ef0f50ea88b9b1fd70ae09e",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/design.md": {
+      "status": "added",
+      "sha256": "21a252e43ce4e9560a0f72d840856f1ae60655755539d5fdb12bd2a3034ae2c1",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/proposal.md": {
+      "status": "added",
+      "sha256": "3e4bdb9cedde8d977744cd19499ffdb33a6319173d5e8ee60b2d24d7b543f959",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/public-csv-results.json": {
+      "status": "added",
+      "sha256": "ed54cd83c855384c4e2a70486604a939f7aec7aec11e238fde3dc6b0723cf88c",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/specs/dataset-validation/spec.md": {
+      "status": "added",
+      "sha256": "4691ecd52eb863101575131320e950ce8fad7af508a535c0e3c218579bebf8c9",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/specs/dataset-validation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/tasks.md": {
+      "status": "added",
+      "sha256": "b42663dbd24218e63bc8399a614e626f85a399124a9f5ebf81299a446da52dce",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/privacy-validation-performance/validation.md": {
+      "status": "added",
+      "sha256": "d45fbffbb1961ec8630867e459f9701081901889a4289e6a2df8e5c11167741c",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/design.md": {
+      "status": "added",
+      "sha256": "25ef9aa1a5fbf6bb3e85cb27871e1d54447d9a8c723aa6e459299931ef9f3394",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/installed-cli-results.json": {
+      "status": "added",
+      "sha256": "67a7ddaf2b5540b6a16cd0ce7f8dcb8a114f9f6cd95256b724547a10e75c018d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/installed-cli-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/proposal.md": {
+      "status": "added",
+      "sha256": "e21d3f4be99ae363b8af84c34f3cf23a90bae6227c5f8745d28c062cfdada8d7",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/public-csv-benchmark.md": {
+      "status": "added",
+      "sha256": "673cc70d11ae5d50ec341f0d555c0bf0c78a488426f3e59339fe3f890a92fc52",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/public-csv-benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/public-csv-results.json": {
+      "status": "added",
+      "sha256": "2fe32ce83b36684aa561848f04cdc8e97bdc1bc829e963fc997876b953777cf5",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/specs/streaming-csv-export/spec.md": {
+      "status": "added",
+      "sha256": "55c6b8a80f2ac28dd7b63b43e8128caafea8d3b048b183ed4eb58c667fcffb78",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/specs/streaming-csv-export/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/tasks.md": {
+      "status": "added",
+      "sha256": "644ac5b3ea1ebda343266444d4af31c495c5116026afbac3e26e3aa7190e3511",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/public-streaming-csv/validation.md": {
+      "status": "added",
+      "sha256": "11e65a768433669a3cdbf4236fcd6ff82f14660786920a9e9d9179d21aa6be04",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "1997ca27f04b60d549b23d6ef095f66caed2602777314f7c54a5988840488ea0",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/design.md": {
+      "status": "added",
+      "sha256": "18d06dc22dc1b8041bd6af89c4bc13541afdf9abb0ff0a63ba8b97af834872d6",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/proposal.md": {
+      "status": "added",
+      "sha256": "8c3cd6d06eb168ce59f5ab02fc0f8af13d83591e6ec704593b6456abf820f4a4",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/public-csv-results.json": {
+      "status": "added",
+      "sha256": "8001de3b876dfbef3dc51dff012a61044df8c1492dec4fed6e902d864eb05da4",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/schema-profile-results.json": {
+      "status": "added",
+      "sha256": "a4f816c0b44563d42ff6fe959424dc6e0cab5a5643647f3dfc1614a4c98b6306",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/schema-profile-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/specs/dataset-validation/spec.md": {
+      "status": "added",
+      "sha256": "4d4779c01f08bea2711b918754fd9aec6116bf1f3f853aac637c3a3deda847a3",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/specs/dataset-validation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/tasks.md": {
+      "status": "added",
+      "sha256": "0eb5e79a7c1d13d68be1329de1c8a0cae2a63a18b74a70bf5c6c5ab3a8d83eb2",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/schema-validation-performance/validation.md": {
+      "status": "added",
+      "sha256": "20b0c09d0ce1a8c27179fabd3fc0cf48ad9c8bd0ec9173055656af3181144880",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/benchmark.md": {
+      "status": "added",
+      "sha256": "d427475f9fd6108db0660407f13d0a59f156c2efb3bce4985a89d94fe3c10586",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/design.md": {
+      "status": "added",
+      "sha256": "30a27ec8479df2410265714576b0c331a00400f5dc918d136d74c9aac27bc29d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/proposal.md": {
+      "status": "added",
+      "sha256": "1700821db389b2b600837f13d6bf408f1e53e2cf0a08ec35e7765b3b83c450dd",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/public-csv-results.json": {
+      "status": "added",
+      "sha256": "423108624a2edadecc4d432314520fd5dd3a45ec1c60dc4170e24b387228a1d7",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/specs/dataset-validation/spec.md": {
+      "status": "added",
+      "sha256": "a8dbf9fa062062ea4e9488dbb7c9e61e9ed1d9e438376faa9b357434f96c2bc0",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/specs/dataset-validation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/tasks.md": {
+      "status": "added",
+      "sha256": "29f01b4f7d64c2c2d104c587dc7917167dec791c304025bf4b7db6e870cd0e6a",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/shared-generation-validation/validation.md": {
+      "status": "added",
+      "sha256": "9dfcf47be3400430a0c0a3acf1930ab1f6a325677305caf3c6ae53e065cf42fe",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/benchmark.md": {
+      "status": "added",
+      "sha256": "812a8ccdbae8783dbe75973e5cca443e729bdb400396f0dc6031027de59270f3",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/design.md": {
+      "status": "added",
+      "sha256": "a5d0d2bbe5ef686e2afb0eea9d33c802c710a1cfa4b91cfcace6993b9e5c5cb4",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/proposal.md": {
+      "status": "added",
+      "sha256": "f789fdbe038472eab324346642a101c264f8756591e5c66ac3a9607f3d51ee01",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/public-csv-results.json": {
+      "status": "added",
+      "sha256": "e2a84aed6a266c85d59295f8f19eb2d4d3882712391f9f896f59bbb4add84330",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/specs/safe-source-profiling/spec.md": {
+      "status": "added",
+      "sha256": "873e26ee478f9d71d2096abf9d10909ac0cb2632fd3a68ab9abd959139f8cc44",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/specs/safe-source-profiling/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/tasks.md": {
+      "status": "added",
+      "sha256": "bf21b3185958dbed8089aaa627e9f1c706bcbd1ab9ad453db7c6493db0dcc58f",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/validation.md": {
+      "status": "added",
+      "sha256": "5d1a3d774d0de62e51a323020a7123b6f06ee22c1f37d949205ddee2a877a0e6",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/source-independent-profiling/verification.json": {
+      "status": "added",
+      "sha256": "0a6eae9c9097a43eb1cd05b99a114deac9727df0bc5116f5da3d5a4e3f5d7e37",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/verification.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/design.md": {
+      "status": "added",
+      "sha256": "15623d073d5b6d80fc9afd61ebd86aaf08241afc6957dadd213ea5a56fbc5d79",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/full-profile-default-sample-results.json": {
+      "status": "added",
+      "sha256": "894932df901c693980980924086364718df46eb55840cc41f9b5646d078be510",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/full-profile-default-sample-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/full-profile-large-results.json": {
+      "status": "added",
+      "sha256": "d58e03609f3d3718e750e761bb6bd6538a27f1bfb46615e7afd3faee92ccf09b",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/full-profile-large-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/full-profile-results.json": {
+      "status": "added",
+      "sha256": "43206155e71a089c98353b746320f28a8220f591aaaf217f8a573c4ffc75c056",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/full-profile-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/proposal.md": {
+      "status": "added",
+      "sha256": "7f9494233287a6aba4f8093c42892f967270136aa80732e5959b9b4a31f7cb0b",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/specs/safe-csv-profiling/spec.md": {
+      "status": "added",
+      "sha256": "1acbb307ac146e4161fc815af2cf0964b79b5d294205d2edf8dd2c3b1d8fe845",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/specs/safe-csv-profiling/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/tasks.md": {
+      "status": "added",
+      "sha256": "fb1a0ba77abdc469dfe34e0d6e81bea9121b1ea461848265a885b315deb8bd26",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/streaming-duckdb-profiling/validation.md": {
+      "status": "added",
+      "sha256": "1d4b2336d9387c8edbb6f3ff663378f497cb37eb36980a2aa50dd03b31210049",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "c84fbf7ee3594e222cc03d1908475d29e2a4ca2415aefa5951f50c8c97a3f316",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/design.md": {
+      "status": "added",
+      "sha256": "b03ab98f2e192690266f06f2e5d8a17ebe50c17dacf1ea0f3eb70d289f5f9aae",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/paired-results.json": {
+      "status": "added",
+      "sha256": "e60c24be5cd63dae48e55e8200ec9fe10b5d9152531759f0cb634e176f0afab5",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/paired-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/proposal.md": {
+      "status": "added",
+      "sha256": "2a59717bb4564e416a642bfda55ce9213894a20a868c89a7e648cd35fc637b1e",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/specs/synthetic-generation/spec.md": {
+      "status": "added",
+      "sha256": "413b059800bf45d4413c5128869ae7d2b26cc9e695afa46459e93b650e63cf66",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/specs/synthetic-generation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/string-generation.patch": {
+      "status": "added",
+      "sha256": "b26654622552ebf30de3ce46b6ac92291b9dcff0f18a6cd28153182ed7d99791",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/string-generation.patch",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/string-profile-results.json": {
+      "status": "added",
+      "sha256": "3d48b3083f6618ddfdf9520f4026f5fc6891ae024e0e01570031f149e5471dcd",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/string-profile-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/tasks.md": {
+      "status": "added",
+      "sha256": "a7ca7081baf255ebf161271154932517ef8e853de78c52f13f151efbe1d0fc88",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/string-generation-performance/validation.md": {
+      "status": "added",
+      "sha256": "20e40af1450601bd0fe01304ce6e9d1ce70206c5986475a14eb0051f921b06d8",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/validation-consistency-hardening/design.md": {
+      "status": "added",
+      "sha256": "1a5f44f6bec08db20d22c19ea871f75ba97938e2a13cc442fc42e0ca7809b0dc",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/validation-consistency-hardening/proposal.md": {
+      "status": "added",
+      "sha256": "4d9ced5d3a2b4ff727abd99290d90743ef95811ea9f0a33e49367f334d24dcd2",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/validation-consistency-hardening/specs/dataset-validation/spec.md": {
+      "status": "added",
+      "sha256": "0fd8016177b5e54c451960fea9e9c6882b37d58f96fa6bd3a9bd5ad5d02aead7",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/specs/dataset-validation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/validation-consistency-hardening/tasks.md": {
+      "status": "added",
+      "sha256": "4c5b4502f7bb63dc10548b2851239d46f335b1d84405fcdb6c1aa6d6dac2532d",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/benchmark.md": {
+      "status": "added",
+      "sha256": "c0d2cbde0f34886ec4b7b779292a09d4a43d076092ea64a4bae84a91104ba3bb",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/benchmark.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/design.md": {
+      "status": "added",
+      "sha256": "c66ad5a0eb9605e98eb015e877c1ff5bdeb6496466971a73ea698189ec710e46",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/normalization-profile-results.json": {
+      "status": "added",
+      "sha256": "5c3411d20740900ff2018899a057968b9494b376c3ebcb8635904116d354ba8e",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/normalization-profile-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/proposal.md": {
+      "status": "added",
+      "sha256": "6c816eb565fb1bbf61b0451ba9b3794e397129b6831b3e1dae4f69560f74f5fd",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/public-csv-results.json": {
+      "status": "added",
+      "sha256": "65e588a7784c6591e7e7d30517ef4ba3c3f93cdd081cc7701d79d6ee7520eb24",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/public-csv-results.json",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/specs/dataset-validation/spec.md": {
+      "status": "added",
+      "sha256": "2eedec1fc978eb5e5e134d87b7f313a5ee204fb838b8612ae58b16ca4c900348",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/specs/dataset-validation/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/tasks.md": {
+      "status": "added",
+      "sha256": "de5d08fd67b23a350c4985e2d3c5f4672f334ad5b7634259cff477ad4eabb1b1",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/value-normalization-performance/validation.md": {
+      "status": "added",
+      "sha256": "40008a6a5d35f5dac2be8c28c211b879833589d751e9fa9011b27d7e6b8d4767",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/whole-column-semantics/design.md": {
+      "status": "added",
+      "sha256": "f45efd62bf597600a373806641cff7c19c508cf9331d940b44921a6f63b59456",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/design.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/whole-column-semantics/proposal.md": {
+      "status": "added",
+      "sha256": "a2a0c7a0b47f4f8f1b2191a4038b1a9cf3715e68f6b25b4d1cb3cf2c24660dab",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/proposal.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/whole-column-semantics/specs/safe-csv-profiling/spec.md": {
+      "status": "added",
+      "sha256": "2b71606075e87683e2b68e661fe91329f13e0c9c1598001dee8fb252b9d99fab",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/specs/safe-csv-profiling/spec.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/whole-column-semantics/tasks.md": {
+      "status": "added",
+      "sha256": "6c1bf926b9a8d1997a6e70847b683479ad64c95b991586f5aa1047e8b9d4f4b7",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/tasks.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "openspec/changes/whole-column-semantics/validation.md": {
+      "status": "added",
+      "sha256": "9aa90e6b07d6a7d509b5c55732160369bdf638f2fda8d2a0fab59a743777e19b",
+      "disposition": "historical_evidence",
+      "target": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/validation.md",
+      "reason": "Byte-identical original proposal, tests/benchmark evidence or rejected experiment; provenance retained without overwriting released specifications."
+    },
+    "scripts/benchmark_distinct_tracking.py": {
+      "status": "added",
+      "sha256": "7945905dee98628385b073c2b44b4ece8f700f1f86fb8c24ab297fd3d6469496",
+      "disposition": "adapted",
+      "target": "scripts/benchmark_distinct_tracking.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/benchmark_generation_dispatch.py": {
+      "status": "added",
+      "sha256": "5a4dbbab58052a690ece326176571cdd6461aaca83e0b8ec903fb7de41744a99",
+      "disposition": "adapted",
+      "target": "scripts/benchmark_generation_dispatch.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/benchmark_paired_csv.py": {
+      "status": "added",
+      "sha256": "f525002f47cd2ff2466fecbd67e13f8551e4690761be87624e063b8641174044",
+      "disposition": "adapted",
+      "target": "scripts/benchmark_paired_csv.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/benchmark_parallel_generation.py": {
+      "status": "added",
+      "sha256": "07b5fd3ac63d84b98f21076328866a97115b0241da99678520170bea011a0204",
+      "disposition": "adapted",
+      "target": "scripts/benchmark_parallel_generation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/benchmark_public_csv.py": {
+      "status": "added",
+      "sha256": "0d7dd4a458bf37ae1d381447319ac6ff31c453f90e3e2deb151b41879d4ea83e",
+      "disposition": "adapted",
+      "target": "scripts/benchmark_public_csv.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/benchmark_streaming_generation.py": {
+      "status": "added",
+      "sha256": "25762ce178cd68b7444a11353c10e916569643be7330e2e0f039347191ebaae1",
+      "disposition": "adapted",
+      "target": "scripts/benchmark_streaming_generation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/check_duckdb_profiling.py": {
+      "status": "added",
+      "sha256": "1fe07041e48a0adfdb640ea320c6ee6a07b4c083f53ec1742218279a1cddce97",
+      "disposition": "adapted",
+      "target": "scripts/check_duckdb_profiling.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/check_generation_distributions.py": {
+      "status": "added",
+      "sha256": "63a75104a94958fb4c743696f67e2637421243ed782dcab0d9bba6992f9b0733",
+      "disposition": "adapted",
+      "target": "scripts/check_generation_distributions.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/streaming_generation.py": {
+      "status": "added",
+      "sha256": "fb04d4c596e8ae5c1ebf40048cfb73167ce4d7740776bd47204e3b7fecf298b0",
+      "disposition": "adapted",
+      "target": "scripts/streaming_generation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/adapters/parallel_generation.py": {
+      "status": "added",
+      "sha256": "1a8a87239bfe081eaa9c63c8a20dddd88ec4eae36f2b68c22988facb2fbac126",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/adapters/parallel_generation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/core/semantics.py": {
+      "status": "added",
+      "sha256": "190ab94452243decb26f95e4015f5fa1bcd64fd762c858d625c573c1bf8c655f",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/core/semantics.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/generation/tiled_generator.py": {
+      "status": "added",
+      "sha256": "f0a9ad63a54b037c07f81b3d6cadfc502bb41ded7208018417bca06ffedf6bec",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/generation/tiled_generator.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/io/streaming_csv.py": {
+      "status": "added",
+      "sha256": "14e6b1d24908034e009803254a08413f7c7a4ecd9975ae1030253059d41b218a",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/io/streaming_csv.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/profiling/duckdb_distinct.py": {
+      "status": "added",
+      "sha256": "44627b199269f4187f8977d8e4c1467dbb8742fb762154a1c8d1724aeaa5d08f",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/profiling/duckdb_distinct.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/validation/values.py": {
+      "status": "added",
+      "sha256": "795bac3f7307f244a1520a2a63569aafb6704560f6c2f75b10351b6313c966c4",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/validation/values.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/fixtures/privacy_semantic_accuracy.json": {
+      "status": "added",
+      "sha256": "15e811438d8f8d32fdbf4ac2fa8558ac574a0faaf0af19db5847565930129efb",
+      "disposition": "adapted",
+      "target": "tests/fixtures/privacy_semantic_accuracy.json",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_aggregate_signal_strength.py": {
+      "status": "added",
+      "sha256": "8402459b914473b2ba40b4060ead14037ca6b47e956f6492563c6837ce139593",
+      "disposition": "adapted",
+      "target": "tests/test_aggregate_signal_strength.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_calculation_dependencies.py": {
+      "status": "added",
+      "sha256": "2776749338f8f58c220bb0dd631df75369677a0ce2977a62ba739c89aa49d142",
+      "disposition": "adapted",
+      "target": "tests/test_calculation_dependencies.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_column_semantics.py": {
+      "status": "added",
+      "sha256": "4240b3d9ecb626f9b83338a0cc19453cd8c79baede4fb80aa8eefda54b565538",
+      "disposition": "adapted",
+      "target": "tests/test_column_semantics.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_combined_generation_validation.py": {
+      "status": "added",
+      "sha256": "b890fd3ca3bbfa6073a9e9792e3c4929ddd906bc4abceeac02cd3370febf746a",
+      "disposition": "adapted",
+      "target": "tests/test_combined_generation_validation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_csv_encoding_equivalence.py": {
+      "status": "added",
+      "sha256": "13d972d939551fbf882c0a2a4acfce5e4059c876377020cb629dd021cca2a620",
+      "disposition": "adapted",
+      "target": "tests/test_csv_encoding_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_csv_validation_reuse.py": {
+      "status": "added",
+      "sha256": "ddec958b99bf538a26b240d227c7dc54c18c52d629ff08acaf6b828e01fabfb5",
+      "disposition": "adapted",
+      "target": "tests/test_csv_validation_reuse.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_distinct_benchmark.py": {
+      "status": "added",
+      "sha256": "03dd655c931af4504622a5fe8fede3930a8507d5fea951d5f8232488ed0e0b23",
+      "disposition": "adapted",
+      "target": "tests/test_distinct_benchmark.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_duckdb_distinct_security.py": {
+      "status": "added",
+      "sha256": "d26bc098747527e3289f260c17975d7221530867f212948d151e720c781d6507",
+      "disposition": "adapted",
+      "target": "tests/test_duckdb_distinct_security.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_duckdb_optional.py": {
+      "status": "added",
+      "sha256": "86615b73a2734df387338d0055b0b864e1c1d9ec67ec9e7abb940913fcb7f47e",
+      "disposition": "adapted",
+      "target": "tests/test_duckdb_optional.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_duckdb_profiling.py": {
+      "status": "added",
+      "sha256": "d4b443e5ff823a243d70eb716034530f1faca6899ac540dc5c0c7c7a4c4b9d18",
+      "disposition": "adapted",
+      "target": "tests/test_duckdb_profiling.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_generation_dispatch_benchmark.py": {
+      "status": "added",
+      "sha256": "35ffa532875c0fc8cef25f128d601e077afefe5d395b2a8487afbb2dc76b5492",
+      "disposition": "adapted",
+      "target": "tests/test_generation_dispatch_benchmark.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_generation_dispatch_equivalence.py": {
+      "status": "added",
+      "sha256": "c47a30d6296699cae302835dbaad04ea63b57aa536982496df39d7ed5f7fae4a",
+      "disposition": "adapted",
+      "target": "tests/test_generation_dispatch_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_normalization_equivalence.py": {
+      "status": "added",
+      "sha256": "5c724d1d5b4cdae5d4b7f512584250341c55f8b1a77e3f5e1ed82b50eff0f7e6",
+      "disposition": "adapted",
+      "target": "tests/test_normalization_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_numeric_phone_inference.py": {
+      "status": "added",
+      "sha256": "eb26a0b77a11cb04c3bb7ee81b2bb738c8f49d6f6d645b6f7399cac58d99ec5c",
+      "disposition": "adapted",
+      "target": "tests/test_numeric_phone_inference.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_numeric_validation.py": {
+      "status": "added",
+      "sha256": "746f97918eb2b4e0a5ccb86e542a7bef56df9e6512ee21113994a0e5241c91d0",
+      "disposition": "adapted",
+      "target": "tests/test_numeric_validation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_paired_csv_benchmark.py": {
+      "status": "added",
+      "sha256": "b558487ac6c0d6d3a9ef09ed0442c1ff2b931974c7f1c433842bd3b4c6fe8e64",
+      "disposition": "adapted",
+      "target": "tests/test_paired_csv_benchmark.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_parallel_generation.py": {
+      "status": "added",
+      "sha256": "f5c4be1081ae318e6a4c16d51fee5c6f846890a2ee31142df4c6486395d5f5b2",
+      "disposition": "adapted",
+      "target": "tests/test_parallel_generation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_parquet_source_policy.py": {
+      "status": "added",
+      "sha256": "48c6946a290e1c437a5844d2506e40575c4282348d058034ad99f999371eb3e1",
+      "disposition": "adapted",
+      "target": "tests/test_parquet_source_policy.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_prepared_distributions.py": {
+      "status": "added",
+      "sha256": "de8621c89f9e0d205b819d91e70af3b99bb3e33e144e10d408c6407203acd759",
+      "disposition": "adapted",
+      "target": "tests/test_prepared_distributions.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_privacy_detector_equivalence.py": {
+      "status": "added",
+      "sha256": "33ea3e2e5129ddf76c3cb6ca628da86ea25b67ea1a6d292769c65ad3478eb626",
+      "disposition": "adapted",
+      "target": "tests/test_privacy_detector_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_privacy_semantic_accuracy.py": {
+      "status": "added",
+      "sha256": "f571f8b0ca248999e6ecb797e98866f462b6d4eb4a1a777f4178e6c8491140f4",
+      "disposition": "adapted",
+      "target": "tests/test_privacy_semantic_accuracy.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_privacy_signal_strength.py": {
+      "status": "added",
+      "sha256": "85b910212bbb75a174d1fb637a294d8003018d596e1a49a7bb9bfb57f21d5103",
+      "disposition": "adapted",
+      "target": "tests/test_privacy_signal_strength.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_privacy_validation_equivalence.py": {
+      "status": "added",
+      "sha256": "54bb583438b7aaca679218be48a384f0ae4c14e3ef6010849eceaa9ffd2f3097",
+      "disposition": "adapted",
+      "target": "tests/test_privacy_validation_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_public_csv_benchmark.py": {
+      "status": "added",
+      "sha256": "6f148c821818841006af71204cb482aef7b237d97803c9d314033a2dcb2d9463",
+      "disposition": "adapted",
+      "target": "tests/test_public_csv_benchmark.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_query_source_privacy_provenance.py": {
+      "status": "added",
+      "sha256": "a76df97692de97daa14761ee6cd91fbeeef05dff1ea602a3198f93bee0545df5",
+      "disposition": "adapted",
+      "target": "tests/test_query_source_privacy_provenance.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_schema_validation_equivalence.py": {
+      "status": "added",
+      "sha256": "d36a608c833f37a199d878e2697f03fbb70702d196a2a1846fa39750b58e366b",
+      "disposition": "adapted",
+      "target": "tests/test_schema_validation_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_single_csv_distinct.py": {
+      "status": "added",
+      "sha256": "88e7d46c872515fc103caaf3fbe298765ded144df228117e6669c654c7fe5080",
+      "disposition": "adapted",
+      "target": "tests/test_single_csv_distinct.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_source_name_privacy.py": {
+      "status": "added",
+      "sha256": "5190937d3ab4aa576e0ad7f6c8a393f38a0338df2741d097253add7c34678ae1",
+      "disposition": "adapted",
+      "target": "tests/test_source_name_privacy.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_source_numeric_privacy.py": {
+      "status": "added",
+      "sha256": "b478f3046ecf958f7b3f2fb90081f955ce65d51f0291f15f191b22b6e9484c43",
+      "disposition": "adapted",
+      "target": "tests/test_source_numeric_privacy.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_source_profile_safety.py": {
+      "status": "added",
+      "sha256": "a1232a35f6a7d52af68a068646e503aa1b7b5f1d85383b075843396d59b350b3",
+      "disposition": "adapted",
+      "target": "tests/test_source_profile_safety.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_streaming_csv_bundle.py": {
+      "status": "added",
+      "sha256": "ec8c8905f486d564b51648217171fd46148c43672f9c3fd911286d425fafaaed",
+      "disposition": "adapted",
+      "target": "tests/test_streaming_csv_bundle.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_streaming_csv_cli.py": {
+      "status": "added",
+      "sha256": "f815f5f4823ea84ba949fe052525ddb936d3f03580e4db7a2686ed972ee10317",
+      "disposition": "adapted",
+      "target": "tests/test_streaming_csv_cli.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_streaming_csv_export.py": {
+      "status": "added",
+      "sha256": "8a307813ebddc581bd4c5b3e8230f78eb9116af8f7d8d2565fc5446b64984e3c",
+      "disposition": "adapted",
+      "target": "tests/test_streaming_csv_export.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_streaming_generation.py": {
+      "status": "added",
+      "sha256": "3ba698322d24201f4610faa45295ba588bf8c6ec027910cc8909b6130eaaeb08",
+      "disposition": "adapted",
+      "target": "tests/test_streaming_generation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_string_generation_equivalence.py": {
+      "status": "added",
+      "sha256": "362f2570d5a3c9291a698487b9040f1aa0462b66b02ff3867cc70931684d9c49",
+      "disposition": "adapted",
+      "target": "tests/test_string_generation_equivalence.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_validation_values.py": {
+      "status": "added",
+      "sha256": "dfbab9028b1f5110f73209163c00d096221fc2f4587e74f52c220f15ebb99f09",
+      "disposition": "adapted",
+      "target": "tests/test_validation_values.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    ".github/constraints/dependency-minimum.txt": {
+      "status": "modified",
+      "sha256": "8369fb5a4618393aabf51503b7dd135097f3bf2b627854ca58a0f36ef705b580",
+      "disposition": "adapted",
+      "target": ".github/constraints/dependency-minimum.txt",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    ".github/dependency-compatibility.toml": {
+      "status": "modified",
+      "sha256": "f68e5e0c7c4cac2286e760104c6397fd4c9e24dbefb7439e69a00d9cd94c544e",
+      "disposition": "adapted",
+      "target": ".github/dependency-compatibility.toml",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    ".github/workflows/ci.yml": {
+      "status": "modified",
+      "sha256": "6a23dcd130e3fb7b5b51c112bdb1b70d919e8e5c034d306df396e5af4aa7d2ab",
+      "disposition": "adapted",
+      "target": ".github/workflows/ci.yml",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    ".github/workflows/verify-published-release.yml": {
+      "status": "modified",
+      "sha256": "48d4fb3ddd13e5fdfe5f6d0b803b705db3c29f87035097542a01a73b69f41031",
+      "disposition": "adapted",
+      "target": ".github/workflows/verify-published-release.yml",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "AGENTS.md": {
+      "status": "modified",
+      "sha256": "12cb17fca23a052a8aaf0ecaef47f8d2dad215a98a9fbdfee0bde5c9cde5267d",
+      "disposition": "adapted",
+      "target": "AGENTS.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "CHANGELOG.md": {
+      "status": "modified",
+      "sha256": "8b06c7339c4b8a759166db767340589dcce8e93199704c8cee78c0abd55311b7",
+      "disposition": "adapted",
+      "target": "CHANGELOG.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "README.md": {
+      "status": "modified",
+      "sha256": "65abd018c96c88d9039908386ced083d91b7a65fc1b8b84845adf3a1dab66c87",
+      "disposition": "covered_by_release",
+      "target": "README.md",
+      "reason": "Retain released 1.7.1 README and its current Russian documentation entry point rather than the old documentation path/version."
+    },
+    "docs/agent-guides/advisors.md": {
+      "status": "modified",
+      "sha256": "e85cc1074e2ad63fe4e8a0ecf72c3740520750cbc23e096d50023082d43c43fa",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/agent-guides/generation-and-rules.md": {
+      "status": "modified",
+      "sha256": "dc439b3ac95dae617dd3001c8eb0bb97b2fd494e094429ec6bcd081896448c5c",
+      "disposition": "adapted",
+      "target": "docs/agent-guides/generation-and-rules.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "docs/agent-guides/profiling.md": {
+      "status": "modified",
+      "sha256": "185f363fefe2ed2334113bb3b0a479ea783b19391fc9f569ecae9ee75d8c98ac",
+      "disposition": "adapted",
+      "target": "docs/agent-guides/profiling.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "docs/agent-guides/trino-security.md": {
+      "status": "modified",
+      "sha256": "6d3ffa461322f168f543c925474689de261e3464e4de42daf698ccf5c750a134",
+      "disposition": "adapted",
+      "target": "docs/agent-guides/trino-security.md",
+      "reason": "Current runtime guidance reconciled with the released 1.7.1 documentation rather than replacing it with the old layout."
+    },
+    "docs/dataset_profile_and_spec.md": {
+      "status": "modified",
+      "sha256": "176a0ea6d5d52fdd16ae035429a7a66e07ff1c7a24f5a42006cb60426d889e36",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/getting-started/first-csv.md": {
+      "status": "modified",
+      "sha256": "254ede4cfd00c6b2e7500109988f5b3ce084408df419a627fcab34b7bcdbf67d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/getting-started/installation.md": {
+      "status": "modified",
+      "sha256": "a9fabfc70e448a89ae3c1aafd370a7caa117bccb444be89eb73bea95a8d36f0b",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/how-to/postgresql.md": {
+      "status": "modified",
+      "sha256": "6b6b7202fde516b3ff4006381a518117c8378a082a1b8e7d22fa227c7d59f44e",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/implementation_map.md": {
+      "status": "modified",
+      "sha256": "20ac142edb9c2d2cb6d9838919309c2c1976fc44c78fbc67830a3b719ddaf3f2",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/index.md": {
+      "status": "modified",
+      "sha256": "b4cb73020906b0409e2dee095ae124169ccfe09f634e0177e9dfc3d21356fd45",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/known-issues.md": {
+      "status": "modified",
+      "sha256": "943b11b76de80ed8f29cf01e35a18544a29a593e7cae7afe3ea5a4ddc7aabd8d",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/reference/application-boundaries.md": {
+      "status": "modified",
+      "sha256": "142d88bef3e7795216e65a3960997ac8a2391f9e49e600d0305dcc916491b1b5",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/reference/dependency-compatibility.md": {
+      "status": "modified",
+      "sha256": "6abdd1f2cfcf4108b04b9116f1003497149d34358c330954219a954be46f2f7f",
+      "disposition": "adapted",
+      "target": "docs/reference/dependency-compatibility.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "docs/reference/generation-contract-migration.md": {
+      "status": "modified",
+      "sha256": "e703dc9f0a8de4e20d50cbd08f1186d5ad34fa440f5237d36ed320ccf55849bc",
+      "disposition": "superseded_documentation",
+      "target": null,
+      "reason": "Keep released 1.7.1 versioned English/Russian documentation, assets and acceptance history. Current runtime guidance is integrated into agent guides and the new parallel-generation how-to; original file remains in the unchanged source checkout."
+    },
+    "docs/roadmap.md": {
+      "status": "modified",
+      "sha256": "03237cbd6a9ee85f506c89090476dba95f59a6c5287816b3feee9fb62282c361",
+      "disposition": "adapted",
+      "target": "docs/roadmap.md",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "mkdocs.yml": {
+      "status": "modified",
+      "sha256": "9083c00bd1454f7586880a49a2ae8d4c07862f86b82185c11964ba3bd4c2b31f",
+      "disposition": "adapted",
+      "target": "mkdocs.yml",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "pyproject.toml": {
+      "status": "modified",
+      "sha256": "bf1b0c3c5480deaccdf14eb53553b2a680f2ff8961f7fa8eec155657694e052c",
+      "disposition": "adapted",
+      "target": "pyproject.toml",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/check_dependency_compatibility.py": {
+      "status": "modified",
+      "sha256": "80b286accb98319f580676abb1de6cb94a283a6de402467278e4626625fbfba2",
+      "disposition": "adapted",
+      "target": "scripts/check_dependency_compatibility.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "scripts/check_installed_package.py": {
+      "status": "modified",
+      "sha256": "60db55cf920aa325dbfc30161df6a090d7ee7cc442c21ce7b46f076f3f6c4bbe",
+      "disposition": "adapted",
+      "target": "scripts/check_installed_package.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/adapters/legacy_profile.py": {
+      "status": "modified",
+      "sha256": "091348148aa31d31b4a0ddc89378061cb3807deecee06c7404ce697c8738514d",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/adapters/legacy_profile.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/adapters/parquet_dataset.py": {
+      "status": "modified",
+      "sha256": "90ca31c15d9e8cbc2722582fb77096de59f6e74296a5e96b501b037c8e73c157",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/adapters/parquet_dataset.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/cli.py": {
+      "status": "modified",
+      "sha256": "7f852bba2d2106ff7523357dc010698ae77ddeded289f9fd40dabb2b1e2ae097",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/cli.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/cli_application.py": {
+      "status": "modified",
+      "sha256": "d4c4eee95bdb1b3cbe490229fd93ad6bafb102f49aead9e609ad7cb2b0afb57a",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/cli_application.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/cli_commands.py": {
+      "status": "modified",
+      "sha256": "b852d7011dd84836b74e744a3100ecc1feb0a84f08e2c976eea1b2007894f30c",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/cli_commands.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/cli_dependencies.py": {
+      "status": "modified",
+      "sha256": "0998a605dfd451eda4680c1c2149304dbe498af37a6b1633f5f45269d3d3cb82",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/cli_dependencies.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/cli_doctor.py": {
+      "status": "modified",
+      "sha256": "3ada69da04c259499f72b17bc319346a5ff0c46462a269630825080470f85a70",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/cli_doctor.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/cli_parser.py": {
+      "status": "modified",
+      "sha256": "c3b14af4302b8e678c01d9b743b8d3e7ec48d142fe93878757a884d814c17821",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/cli_parser.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/core/limits.py": {
+      "status": "modified",
+      "sha256": "c223f31866a0c22fb37e9e9092e2d55438f1d33c8f550bfe1c896c073972ecf4",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/core/limits.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/core/privacy.py": {
+      "status": "modified",
+      "sha256": "c6992ce76a8a3350c71bbe89827bc3ec46e66ab5de9bc966f5c0b3a68dccf065",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/core/privacy.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/csv_profiler.py": {
+      "status": "modified",
+      "sha256": "bee858a3d5e64de857b954faa5b2fe3b35a40124707b18b0bc6a68e212543709",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/csv_profiler.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/generation/constraint_solver.py": {
+      "status": "modified",
+      "sha256": "0a8c8c7a92911e020396e2861820643c93d251d98e5278357ec61643b7bfc076",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/generation/constraint_solver.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/generation/entity_generator.py": {
+      "status": "modified",
+      "sha256": "a8b6bea1fa60e16ef079e193c659b67c987e4a23551757547d22d7c2216697a3",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/generation/entity_generator.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/io/artifacts.py": {
+      "status": "modified",
+      "sha256": "647683600338cabe07185e2ce29d76f8127b2d337d7b0c3c7dd4c697e18f4c33",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/io/artifacts.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/io/commands.py": {
+      "status": "modified",
+      "sha256": "ab3335c32a99824b19207d00e7153aa0f08c0f3357840c21afddfb5c3aa464a9",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/io/commands.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/io/workflows.py": {
+      "status": "modified",
+      "sha256": "68f89c5249ad7c97f05e53da17ca23299a464508fa96a647ea64107beb100f1e",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/io/workflows.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/io/writers.py": {
+      "status": "modified",
+      "sha256": "47b9196b219de8b03fafb56b031159e67122a60fc1fcb6c00d8c3b9f17c15bc4",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/io/writers.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/postgres_profiler.py": {
+      "status": "modified",
+      "sha256": "4d24f44380c34f87fee0ee1328d8f69029a3df19892f51ab16c78e0692831365",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/postgres_profiler.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/profiling/budget.py": {
+      "status": "modified",
+      "sha256": "6ec9ec2940e4e0190ed99e28fa15432362cbc7c3f0097b4fe38d921b3560395e",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/profiling/budget.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/profiling/cache.py": {
+      "status": "modified",
+      "sha256": "07344d62c90e9df3c7f8237c14931d262a50de50a02697e101387cddb2d74ed0",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/profiling/cache.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/profiling/schema_profiler.py": {
+      "status": "modified",
+      "sha256": "579329dfebd1eb925a6983d94e45cc3a72ff4ae5d78c8079fdf7cfdf6fd80a5f",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/profiling/schema_profiler.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/rules/expressions.py": {
+      "status": "modified",
+      "sha256": "726820df8536e8e4e3d27884193a65227775dcb6f0907863e2bda8aff4230405",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/rules/expressions.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/safety.py": {
+      "status": "modified",
+      "sha256": "47f45d3a2868bfe43150881b0d0b61447cf5f360c006ea9b366e38280328747f",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/safety.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/sql_query_profiling.py": {
+      "status": "modified",
+      "sha256": "18105b9e7808c4596f8219c1432b862230f8bdfa5dbc53694ef9279dd581a166",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/sql_query_profiling.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/sql_query_source.py": {
+      "status": "modified",
+      "sha256": "f36ed1d1a90fcab50f6af8f6fad55aa2f736c92a5a7f438491fb4daebae4919a",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/sql_query_source.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/trino_masking.py": {
+      "status": "modified",
+      "sha256": "da9bdd3a5f2e7611a92c65246ee796c97f852b95c9bd713b6c6dfa1f43c9decf",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/trino_masking.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/trino_work_budget.py": {
+      "status": "modified",
+      "sha256": "58f9a35c4c4a80a29a6c3d484f692eb9ac6a7dcf8f7e50090b7d6077b03ebe48",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/trino_work_budget.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/validation/constraint_validator.py": {
+      "status": "modified",
+      "sha256": "42910428626dc78b954a49bd93bed96d1678747b3cff84590b1c784acbecca17",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/validation/constraint_validator.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/validation/reconciliation.py": {
+      "status": "modified",
+      "sha256": "cf3b79986307786519e1e98b5dcf7abeff03789bc43a425999f5cadd98bb734e",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/validation/reconciliation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "src/test_data_agent/validation/schema_validator.py": {
+      "status": "modified",
+      "sha256": "6e59175eebc14fbb5ee6a21db324bfa281258d100e914349bf4362f13d672cb6",
+      "disposition": "adapted",
+      "target": "src/test_data_agent/validation/schema_validator.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/fixtures/contracts/generation-manifest.json": {
+      "status": "modified",
+      "sha256": "a4f0930c714406e123ea1ad1b22e590ed2aa34deb3653eaf20c155040c3208e4",
+      "disposition": "adapted",
+      "target": "tests/fixtures/contracts/generation-manifest.json",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/integration/test_postgres_query_example.py": {
+      "status": "modified",
+      "sha256": "8b37b3758d87354af2f3ded3f643b15faf52d05e281204658a3bcb2096ff5df3",
+      "disposition": "adapted",
+      "target": "tests/integration/test_postgres_query_example.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/integration/test_trino_integration.py": {
+      "status": "modified",
+      "sha256": "97719b82fde7efd09a0d4252424f6a34d2fd038e7a665dbb7400b9a63ad57bb7",
+      "disposition": "adapted",
+      "target": "tests/integration/test_trino_integration.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_advisor.py": {
+      "status": "modified",
+      "sha256": "d3dbf5b1e21696cb885fb0d48f24c85347c63b94ed853281f3b97699ef16293e",
+      "disposition": "adapted",
+      "target": "tests/test_advisor.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_ci_change_scope.py": {
+      "status": "modified",
+      "sha256": "5ee9ba994904262fb8dfc5ffcfc9550b77f32cf7808b7986effa3e32a61e94e9",
+      "disposition": "adapted",
+      "target": "tests/test_ci_change_scope.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_cli_dependencies.py": {
+      "status": "modified",
+      "sha256": "9613592d8dbaefa881bc2962b17fd4177d54371517c087d8c88fe0b30f418d3d",
+      "disposition": "adapted",
+      "target": "tests/test_cli_dependencies.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_cli_doctor.py": {
+      "status": "modified",
+      "sha256": "0c6557c9ad9416bdf3054e32e7cc59c101ecb377a74a0c2210d1c09f190903d8",
+      "disposition": "adapted",
+      "target": "tests/test_cli_doctor.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_cli_parser_contract.py": {
+      "status": "modified",
+      "sha256": "697b196d13468fa348541b6556b66b76f90e77bc0c49d467838ddbfcf9fe9c4e",
+      "disposition": "adapted",
+      "target": "tests/test_cli_parser_contract.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_csv_pipeline_regressions.py": {
+      "status": "modified",
+      "sha256": "203b833dae843c6562bac8c70e573d6e44ed7c6f24f8ed15e4717df0e21cd6b1",
+      "disposition": "adapted",
+      "target": "tests/test_csv_pipeline_regressions.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_dependency_compatibility.py": {
+      "status": "modified",
+      "sha256": "0d2f3b90f87cbb5ce69cd6cd68686ac42fa73393b0940096fe7b47086e370ce7",
+      "disposition": "adapted",
+      "target": "tests/test_dependency_compatibility.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_documentation.py": {
+      "status": "modified",
+      "sha256": "0551561a6116ad1add1e0b9530b4b8062dd02217ca44c6b06b6e3510d854391b",
+      "disposition": "adapted",
+      "target": "tests/test_documentation.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_domain_agnostic_pipeline.py": {
+      "status": "modified",
+      "sha256": "9c5681cdcaebb486af8478975e7d792aee0b9ffe62b73e529ea9ad4f2462eeda",
+      "disposition": "adapted",
+      "target": "tests/test_domain_agnostic_pipeline.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_identifier_pool.py": {
+      "status": "modified",
+      "sha256": "a4f560c426c2b0e97b22c534fb9026cde812e83fc4b7fb22386f758d8e90358d",
+      "disposition": "adapted",
+      "target": "tests/test_identifier_pool.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_installed_package.py": {
+      "status": "modified",
+      "sha256": "fd661f3ce90f7ec26c936686a537d2acce156124c0b4f1bb305a7722050feb76",
+      "disposition": "adapted",
+      "target": "tests/test_installed_package.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_postgres_sql_export.py": {
+      "status": "modified",
+      "sha256": "1796a4e2e9d0b0f92dcd91faff4f1f9f53781fa20bc021b0367255869c0e68e4",
+      "disposition": "adapted",
+      "target": "tests/test_postgres_sql_export.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_release_artifacts.py": {
+      "status": "modified",
+      "sha256": "ecbdbe27ea2341e0df6bbf472d7479d10a6824b0cbe8d043b7bfd31e2877a13a",
+      "disposition": "adapted",
+      "target": "tests/test_release_artifacts.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_safety.py": {
+      "status": "modified",
+      "sha256": "494302953aa4c69a74ef779a8a75de776945875a2772cfac11d340f2740372a9",
+      "disposition": "adapted",
+      "target": "tests/test_safety.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_schema_distinct_overflow.py": {
+      "status": "modified",
+      "sha256": "ebb1b1dfc7f429ad7643ecaae7f94e4a60a85f4f3ed512d1d8274ed6782a58aa",
+      "disposition": "adapted",
+      "target": "tests/test_schema_distinct_overflow.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "tests/test_sql_query_profiling.py": {
+      "status": "modified",
+      "sha256": "c0adc5f93ee9917225e45dcad04f9e91be7fc015e11ff71dbadcb4ccc68b6fa3",
+      "disposition": "adapted",
+      "target": "tests/test_sql_query_profiling.py",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    },
+    "uv.lock": {
+      "status": "modified",
+      "sha256": "1866ee11d7d184e4a823b768c0597b9a4b9ec946e41fc529d7b320b6499bcd09",
+      "disposition": "adapted",
+      "target": "uv.lock",
+      "reason": "Ported and reconciled with released 1.7.1 behavior, models, budgets and regression coverage; original file hash above identifies the source snapshot."
+    }
+  },
+  "disposition_counts": {
+    "superseded_documentation": 74,
+    "adapted": 118,
+    "historical_evidence": 130,
+    "covered_by_release": 1
+  }
+}
