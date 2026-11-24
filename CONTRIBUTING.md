@@ -28,6 +28,26 @@ details, or other sensitive project context to external AI services. Disclose
 material AI assistance in the pull request when it helps reviewers understand
 the provenance or review needs of a change.
 
+## Start From Current Development
+
+Start each new repository task from the authoritative remote's freshly fetched
+default development branch, unless the user explicitly pins a base or revision.
+Pinned benchmarks and reproduction work keep their requested source snapshots.
+A clarification or continuation of the same task does not require another fetch.
+
+Resolve the remote default rather than assuming that local `main` is current.
+Before implementation, record the fetched branch/commit, working branch/HEAD,
+dirty or clean state, and ahead/behind divergence. Merge into a clean feature
+branch to retain unpublished commits. Preserve dirty work and integrate it
+safely, or prepare an isolated worktree before coding. Do not silently reset,
+rebase, stash, or discard changes; those actions require authorization.
+
+If the remote is unavailable, state the fetch failure and exact available base;
+do not describe that snapshot as latest. Fetching source is separate from
+upgrading an installed package or dependencies. Keep the lockfile versions
+unless the upstream integration requires a change or the task explicitly asks
+for an upgrade.
+
 ## Development Setup
 
 Use Python 3.11 or newer.
