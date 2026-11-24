@@ -36,7 +36,7 @@ a new release or publication.
   the old metadata-only Parquet experiment does not replace that release feature.
 - Remove CSV distinct ceilings with the private keyed set-to-DuckDB handoff.
   Preserve parsed-byte source identity, deadlines, mining budgets, category scope
-  and complete profile equality. Refresh folder caches with format 11.
+  and complete profile equality. Refresh folder caches with format 12.
 - SQL query policy 1.2 retains the released 1.1 grouped aggregate language and
   adds sensitive projection provenance without new queries or permissions.
 - Finite phone-only numeric storage evidence can support an independently

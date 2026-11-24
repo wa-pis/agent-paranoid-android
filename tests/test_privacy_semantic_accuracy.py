@@ -17,9 +17,10 @@ from typing import Any
 import pytest
 
 from test_data_agent.adapters import csv_profile_to_dataset_spec
+from test_data_agent.adapters.csv_file import csv_file_to_dataset_profile
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.field import FieldProfile
-from test_data_agent.core.privacy import validate_local_category_values
+from test_data_agent.core.privacy import infer_source_value_signal, validate_local_category_values
 from test_data_agent.csv_profiler import (
     CSVColumnAccumulator,
     CSVColumnProfile,
@@ -29,7 +30,12 @@ from test_data_agent.csv_profiler import (
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.profiling.schema_profiler import FieldAccumulator, profile_field
-from test_data_agent.safety import validate_generated_row_privacy
+from test_data_agent.safety import (
+    ProfileSafetyError,
+    assert_profile_safe,
+    assert_spec_safe,
+    validate_generated_row_privacy,
+)
 from test_data_agent.validation import validate_dataset
 
 
@@ -130,6 +136,39 @@ def test_labeled_semantics_and_risk_are_independent_and_order_invariant(case: di
     assert outcomes[0] == outcomes[1] == outcomes[2], (
         f"permutation mismatch for synthetic case {case['id']}"
     )
+
+
+@pytest.mark.parametrize("suffix", ["", ".0"], ids=["integer", "integral_float"])
+def test_public_csv_profiles_keep_non_luhn_constant_quantiles_exact(tmp_path: Path, suffix: str) -> None:
+    value = "".join(("42424242", "42424243"))
+    source_value = value + suffix
+    assert infer_source_value_signal(source_value) is None
+    source = tmp_path / "source"
+    source.mkdir()
+    path = source / "items.csv"
+    path.write_text("sku\n" + source_value + "\n" + source_value + "\n")
+    cache_dir = tmp_path / "cache"
+    single = csv_file_to_dataset_profile(path)
+    folder = profile_example_folder(source, cache_dir=cache_dir)
+    cached = profile_example_folder(source, cache_dir=cache_dir)
+    assert cached == folder
+
+    for profile in (single, folder, cached):
+        field = profile.entity("items").field("sku")
+        assert field.sensitive is False
+        assert field.semantic_type is None
+        assert all(field.distribution[key] == int(value) for key in (
+            "min_value", "max_value", "p05", "p95",
+        ))
+        assert_profile_safe(profile)
+        assert_spec_safe(infer_dataset_spec(profile, count=2))
+
+        protected = profile.model_copy(deep=True)
+        protected.entity("items").field("sku").distribution = {
+            "kind": "numeric", "min_value": int(value) - 1,
+        }
+        with pytest.raises(ProfileSafetyError, match="sensitive"):
+            assert_profile_safe(protected)
 
 
 def test_semantic_accuracy_corpus_has_positive_and_negative_labels_per_target_family() -> None:

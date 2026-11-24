@@ -11,6 +11,7 @@ import hashlib
 import io
 import json
 import math
+from fractions import Fraction
 import re
 from collections import Counter
 from contextlib import contextmanager
@@ -687,21 +688,29 @@ def numeric_stats(numbers: Sequence[int | float], integer: bool) -> dict[str, An
     stats: dict[str, Any] = {
         "min_value": numbers[0],
         "max_value": numbers[-1],
-        "p05": percentile(numbers, 0.05),
-        "p95": percentile(numbers, 0.95),
     }
+    for key, numerator in (("p05", 1), ("p95", 19)):
+        if integer:
+            lower, weight = divmod((len(numbers) - 1) * numerator, 20)
+            upper = min(lower + 1, len(numbers) - 1)
+            # Round once, before binary FLOAT can change the integer endpoints.
+            interpolated = (Fraction(numbers[lower]) * (20 - weight)
+                            + Fraction(numbers[upper]) * weight) / 20
+            stats[key] = round(interpolated)
+        else:
+            stats[key] = percentile(numbers, numerator / 20)
     if integer:
         stats = {key: int(round(value)) for key, value in stats.items()}
     return stats
 
 
-def percentile(numbers: Sequence[int | float], ratio: float) -> float:
-    if len(numbers) == 1:
-        return float(numbers[0])
+def percentile(numbers: Sequence[int | float], ratio: float) -> int | float:
     index = ratio * (len(numbers) - 1)
     lower = int(index)
     upper = min(lower + 1, len(numbers) - 1)
     weight = index - lower
+    if weight == 0 or numbers[lower] == numbers[upper]:
+        return numbers[lower]
     return float(numbers[lower] * (1 - weight) + numbers[upper] * weight)
 
 

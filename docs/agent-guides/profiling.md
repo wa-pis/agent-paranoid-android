@@ -132,7 +132,9 @@ unchanged values after transformation.
 Computed folder CSV numeric summaries use the same content-sensitive policy as
 other source adapters; protected summaries mark the field sensitive and are
 omitted before publication or caching.
-Cache format 11 invalidates older folder caches and recomputes their evidence,
+CSV INTEGER quantiles use exact interpolation with one ties-to-even rounding;
+constant FLOAT endpoints remain unchanged rather than acquiring rounding noise.
+Cache format 12 invalidates older folder caches and recomputes their evidence,
 including shared semantic/privacy counters, finite numeric statistics,
 numeric-storage proof and repeated-identifier pool sizes. Caches contain no
 distinct digests, DuckDB state, raw rows or sensitive source values.
@@ -249,7 +251,7 @@ This structural check does not establish a native CSV parser peak-memory bound.
 CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
-format 11 invalidates older inferred bindings; reprofile saved artifacts.
+format 12 invalidates older inferred bindings; reprofile saved artifacts.
 
 
 Parquet distinctness reuses the scalar sensitivity scan and retains at most
@@ -276,7 +278,7 @@ eligible CSV measure in the generation spec. Protected names, identifiers and
 key/relationship bindings veto replacement. Unknown semantics alone cannot
 authorize replacement: the profile must retain complete finite phone-only
 numeric-storage evidence and a physical integer/float type. Weak SSN/card/secret
-signals, even in a late row, invalidate that proof. Cache format 11 invalidates older
+signals, even in a late row, invalidate that proof. Cache format 12 invalidates older
 folder evidence; changed profile/spec fingerprints require fresh review.
 
 Folder cache identity includes the source directory and file identities and change

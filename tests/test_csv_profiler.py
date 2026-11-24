@@ -10,10 +10,32 @@ from test_data_agent.adapters import csv_profile_to_dataset_spec
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.core.privacy import LocalCategoryField
-from test_data_agent.csv_profiler import profile_csv
+from test_data_agent.csv_profiler import numeric_stats, profile_csv
 from test_data_agent.generation import generate_dataset
 from test_data_agent.io.writers import write_parquet
 from test_data_agent.validation import validate_dataset
+
+
+@pytest.mark.parametrize("values,p05,p95", [
+    ([int("42424242" + "42424243")] * 2,
+     int("42424242" + "42424243"), int("42424242" + "42424243")),
+    ([2**53 + 1], 2**53 + 1, 2**53 + 1),
+    ([2**53 + 1, 2**53 + 3], 2**53 + 1, 2**53 + 3),
+    ([-(2**53 + 3), -(2**53 + 1)], -(2**53 + 3), -(2**53 + 1)),
+    ([2**53 + 1, 2**53 + 11], 2**53 + 2, 2**53 + 10),
+    ([2**1024 + 1], 2**1024 + 1, 2**1024 + 1),
+])
+def test_integer_quantiles_round_exactly_once(values: list[int], p05: int, p95: int) -> None:
+    assert numeric_stats(values, integer=True) == {
+        "min_value": values[0], "max_value": values[-1], "p05": p05, "p95": p95,
+    }
+
+
+def test_constant_float_quantiles_keep_the_original_endpoint() -> None:
+    value = float("42424242" + "42424243")
+    assert numeric_stats([value, value], integer=False) == {
+        "min_value": value, "max_value": value, "p05": value, "p95": value,
+    }
 
 
 def test_csv_profile_uses_safe_metadata_and_masks_pii() -> None:

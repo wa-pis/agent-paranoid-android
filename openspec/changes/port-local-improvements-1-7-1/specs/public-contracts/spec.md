@@ -47,7 +47,14 @@ SHALL retain their existing safety gates.
 - **GIVEN** a fictional numeric column whose computed summaries trigger shared privacy policy
 - **WHEN** a folder CSV profile is published or cached
 - **THEN** it marks the field sensitive and suppresses the numeric distribution
-- **AND** cache format 11 rejects earlier profiles rather than reusing stale summaries.
+- **AND** cache format 12 rejects earlier profiles rather than reusing stale summaries.
+
+#### Scenario: A numeric quantile would change through premature FLOAT rounding
+
+- **GIVEN** fictional INTEGER observations, including values beyond FLOAT precision
+- **WHEN** CSV numeric summaries are computed
+- **THEN** interpolation rounds exact integer arithmetic once with ties to even
+- **AND** constant FLOAT endpoints remain unchanged; shared privacy checks still apply.
 
 ### Requirement: Count complete CSV distinctness with private bounded spill
 

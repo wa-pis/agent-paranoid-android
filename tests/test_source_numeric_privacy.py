@@ -291,7 +291,10 @@ def test_csv_folder_suppresses_sensitive_derived_quantiles_like_single_csv(
     assert_spec_safe(infer_dataset_spec(folder, count=2))
 
 
-def test_csv_folder_rebuilds_previous_cache_with_sensitive_derived_quantiles(tmp_path: Path) -> None:
+@pytest.mark.parametrize("previous_version", [10, 11])
+def test_csv_folder_rebuilds_previous_cache_with_sensitive_derived_quantiles(
+    tmp_path: Path, previous_version: int,
+) -> None:
     source = tmp_path / "source"
     source.mkdir()
     (source / "items.csv").write_text("quantity\n123.45\n456.78\n")
@@ -305,7 +308,7 @@ def test_csv_folder_rebuilds_previous_cache_with_sensitive_derived_quantiles(tmp
     }
     cache_path = write_cached_profile(source, previous, cache_dir=cache_dir)
     cached_payload = json.loads(cache_path.read_text())
-    cached_payload["format_version"] = 10
+    cached_payload["format_version"] = previous_version
     cache_path.write_text(json.dumps(cached_payload))
 
     rebuilt = profile_example_folder(source, cache_dir=cache_dir)
@@ -314,7 +317,7 @@ def test_csv_folder_rebuilds_previous_cache_with_sensitive_derived_quantiles(tmp
     assert rebuilt.entity("items").field("quantity").distribution == {}
     assert_profile_safe(rebuilt)
     assert_spec_safe(infer_dataset_spec(rebuilt, count=2))
-    assert json.loads(cache_path.read_text())["format_version"] == 11
+    assert json.loads(cache_path.read_text())["format_version"] == 12
 
 
 @pytest.mark.parametrize("family", ["ssn", "card"])
