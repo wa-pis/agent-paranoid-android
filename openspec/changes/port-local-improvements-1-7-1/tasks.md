@@ -7,3 +7,7 @@
 - [x] Retain historical measurements and classify superseded documentation/implementations.
 - [x] Complete combined regression, seeded release parity, package/contract, coverage and static checks.
 - [x] Finish documentation/OpenSpec, independent review and final source-preservation audit.
+- [x] Complete the automation's final review, address reproduced regressions and record fresh gates.
+
+Current completion evidence: [final review](final-review.md) and
+[machine-readable checks](final-review-checks.json).
