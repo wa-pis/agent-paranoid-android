@@ -215,7 +215,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.8.0rc1
   <br>Package source 48538d05ec4d9ab6af3ffa951262703bae66f161
-  <br>Documentation 48538d05ec4d9ab6af3ffa951262703bae66f161
+  <br>Documentation 4db3428f6a5ed3a705f83a3c6db073683c00f4c3
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -354,8 +354,8 @@ changing this matrix are defined in
 regenerating existing fixtures.</p>
 <h2 id="getting-started-installation-install-from-pypi">Install From PyPI<a class="headerlink" href="#getting-started-installation-install-from-pypi" title="Permanent link">&para;</a></h2>
 <p>The stable release is <code>1.7.1</code>. Check <a href="#1.7.1-release-status">publication status</a> before installing.</p>
-<p>To test the prospective candidate after
-<a href="#1.8.0rc1-release-status">publication</a>, select it explicitly:</p>
+<p>To test the <a href="#1.8.0rc1-release-status">published candidate</a>,
+select it explicitly:</p>
 <pre><code class="language-bash">python3 -m pip install &quot;agent-paranoid-android==1.8.0rc1&quot;
 python3 -m pip install &quot;agent-paranoid-android[parquet]==1.8.0rc1&quot;
 python3 -m pip install &quot;agent-paranoid-android[profiling]==1.8.0rc1&quot;
@@ -1727,7 +1727,7 @@ Existing ordinary generation and reviewed
 <p>An export does not switch engines merely because it is large. The new public
 streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
 The optional <code>profiling</code> extra serves large input distinct counting, not CSV
-generation. After candidate publication, install its exact version:</p>
+generation. Install the exact candidate version:</p>
 <pre><code class="language-bash">python -m pip install &quot;agent-paranoid-android==1.8.0rc1&quot;
 </code></pre>
 <h2 id="how-to-parallel-generation-export-a-reviewed-spec">Export A Reviewed Spec<a class="headerlink" href="#how-to-parallel-generation-export-a-reviewed-spec" title="Permanent link">&para;</a></h2>
@@ -3360,7 +3360,8 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p>Agent Paranoid Android создаёт воспроизводимые синтетические тестовые данные по структуре CSV, безопасному профилю или проверенному <code>DatasetSpec</code>. Он нужен, когда важны схема, связи и бизнес-правила, а исходные строки нельзя передавать разработчикам.</p>
 <p>Рекомендуемая стабильная версия после публикации — <strong>1.7.1</strong>. См. <a href="#1.7.1-release-status">статус выпуска</a>.</p>
 <p>Кандидат с улучшениями профилирования и opt-in генерацией больших CSV:
-<a href="#1.8.0rc1-release-status">1.8.0rc1</a>. Он пока не опубликован.</p>
+<a href="#1.8.0rc1-release-status">1.8.0rc1</a>. См.
+<a href="#release-evidence-1.8.0rc1">свидетельства публикации — English</a>.</p>
 <h2 id="ru-_1">С чего начать<a class="headerlink" href="#ru-_1" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3413,9 +3414,9 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p><a href="#getting-started-installation">English</a> · Русский</p>
 <p>После публикации рекомендуемая стабильная версия — <strong>1.7.1</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
 <p>Перед установкой проверьте <a href="#1.7.1-release-status">статус выпуска</a>.</p>
-<p>Кандидат <strong>1.8.0rc1</strong> пока не опубликован; стабильная рекомендация остаётся
-1.7.1. После <a href="#1.8.0rc1-release-status">публикации кандидата</a> его нужно
-выбрать явно:</p>
+<p>Кандидат <strong>1.8.0rc1</strong> <a href="#1.8.0rc1-release-status">опубликован</a>;
+стабильная рекомендация остаётся 1.7.1. Для проверки кандидата выберите
+его явно:</p>
 <pre><code class="language-bash">python -m pip install &quot;agent-paranoid-android==1.8.0rc1&quot;
 python -m pip install &quot;agent-paranoid-android[profiling]==1.8.0rc1&quot;
 </code></pre>

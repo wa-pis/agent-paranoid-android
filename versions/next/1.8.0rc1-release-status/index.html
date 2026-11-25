@@ -210,15 +210,16 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Release candidate / not stable</strong> · Package 1.8.0rc1
   <br>Package source 48538d05ec4d9ab6af3ffa951262703bae66f161
-  <br>Documentation 48538d05ec4d9ab6af3ffa951262703bae66f161
+  <br>Documentation 4db3428f6a5ed3a705f83a3c6db073683c00f4c3
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
 
 
                 <h1 id="180rc1-release-status">1.8.0rc1 release status<a class="headerlink" href="#180rc1-release-status" title="Permanent link">&para;</a></h1>
-<p>This candidate is being prepared and is not yet published. Stable 1.7.1 remains
-the recommended release.</p>
+<p>This candidate is published. Its packages and three signed images passed
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45589440125">artifacts-scope public verification</a> (13/13 jobs); see
+<a href="../release-evidence-1.8.0rc1/">release evidence</a>. Stable 1.7.1 remains recommended.</p>
 <p>The candidate adds shared column semantics and privacy guards, exact bounded
 CSV distinct counting with an optional <code>profiling</code> DuckDB/Arrow extra, and
 explicit <code>tiled-v1</code> / <code>generate --stream-csv</code> generation. It also improves CSV
@@ -233,15 +234,12 @@ saved source artifacts and review the resulting specification. Existing source
 authorization, scan/work budgets and transformation approval boundaries remain
 in force; this release does not approve a dataset or activate a new
 transformation extension.</p>
-<p>Before publication, qualify the exact main commit with the full release gate,
-strict documentation, CI/Containers/Documentation/Security workflows,
-independent exact-source review, installed-artifact fictional checks and Ubuntu
-no-publish artifact hashes. Prior source checks and benchmark evidence keep
-their recorded source identity and do not replace candidate acceptance.
-Bind the accepted source and artifact hashes in the signed release manifest;
-verify GitHub, PyPI and all three GHCR artifacts after publication. Candidate
-documentation belongs at <code>versions/1.8.0rc1/</code>; keep the stable documentation
-catalog and default at publicly verified 1.7.1.</p>
+<p>Exact-source gates, independent technical AI review, Ubuntu artifact hashes
+and installed fictional acceptance are recorded in the release evidence.
+Historical benchmarks keep their original source identity. Candidate guidance
+belongs at <code>versions/1.8.0rc1/</code>; its documentation revision and full-scope public
+verification remain pending separately from artifact verification. The stable
+documentation catalog and default remain publicly verified 1.7.1.</p>
               
 </div>
 
