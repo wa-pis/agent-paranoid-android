@@ -51,7 +51,7 @@ extra or adding an optional dependency inside an existing extra is additive
 when its documented behavior and security boundary remain unchanged.
 
 The database-source additions available in stable `1.5.0` are retained in
-stable `1.7.1`; see [release status](../1.7.1-release-status.md).
+stable `1.8.0`; see [release status](../1.8.0-release-status.md).
 They use the existing `postgres` and `trino` extras and add no JVM or JDBC
 driver. JDBC-style URL support is endpoint syntax only, qualified wildcards
 expand into explicit columns, and

@@ -8,7 +8,7 @@ primary interfaces are the CLI and Python library. Database clients, MCP, and
 AI providers are optional integrations around the same review and validation
 boundaries.
 
-The database workflows below are available in stable `1.7.1`.
+The database workflows below are available in stable `1.8.0`.
 
 ## Quick Comparison
 

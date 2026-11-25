@@ -2,19 +2,10 @@
 
 [English](../../getting-started/installation.md) · Русский
 
-После публикации рекомендуемая стабильная версия — **1.7.1**. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.
+После публикации рекомендуемая стабильная версия — **1.8.0**. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.
 
 
-Перед установкой проверьте [статус выпуска](../../1.7.1-release-status.md).
-
-Кандидат **1.8.0rc1** [опубликован](../../1.8.0rc1-release-status.md);
-стабильная рекомендация остаётся 1.7.1. Для проверки кандидата выберите
-его явно:
-
-```bash
-python -m pip install "agent-paranoid-android==1.8.0rc1"
-python -m pip install "agent-paranoid-android[profiling]==1.8.0rc1"
-```
+Перед установкой проверьте [статус выпуска](../../1.8.0-release-status.md).
 
 Для `generate --stream-csv [--workers 1..4]` достаточно base. Дополнение
 `profiling` нужно для точного подсчёта distinct в больших входных CSV через
@@ -28,12 +19,12 @@ DuckDB/Arrow, а не для генерации. Ограничения, fallbac
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install "agent-paranoid-android==1.7.1"
+python -m pip install "agent-paranoid-android==1.8.0"
 test-data-agent --version
 test-data-agent doctor
 ```
 
-Ожидается версия 1.7.1 и doctor passed. Если команда не найдена, активируйте окружение и проверьте путь команды. Doctor использует временную вымышленную фикстуру и не обращается к внешним сервисам. Ошибка TLS при установке требует исправления сертификатов/индекса, а не отключения проверки.
+Ожидается версия 1.8.0 и doctor passed. Если команда не найдена, активируйте окружение и проверьте путь команды. Doctor использует временную вымышленную фикстуру и не обращается к внешним сервисам. Ошибка TLS при установке требует исправления сертификатов/индекса, а не отключения проверки.
 
 Установка из индекса и загрузка зависимостей **не проверялись выполнением** этим аудитом. Локальный wheel 1.6.0 и доступные зависимости проверены отдельно; это не доказательство чистой PyPI installation.
 
@@ -43,22 +34,22 @@ test-data-agent doctor
 
 ```powershell
 py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install "agent-paranoid-android==1.7.1"
+.\.venv\Scripts\python.exe -m pip install "agent-paranoid-android==1.8.0"
 .\.venv\Scripts\test-data-agent.exe --version
 .\.venv\Scripts\test-data-agent.exe doctor
 ```
 
-Ожидается 1.7.1 и doctor passed. При отсутствии launcher установите поддерживаемый Python. Windows-выполнение здесь не проверено. В следующих инструкциях заменяйте python и test-data-agent этими путями; вводите Bash-команды с продолжением строки одной строкой.
+Ожидается 1.8.0 и doctor passed. При отсутствии launcher установите поддерживаемый Python. Windows-выполнение здесь не проверено. В следующих инструкциях заменяйте python и test-data-agent этими путями; вводите Bash-команды с продолжением строки одной строкой.
 
 ## Необязательные extras
 
-Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.1". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.
+Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.8.0". Доступны parquet, profiling, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.
 
 Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. [поддержку](../reference/support-policy.md) и [footprint — English](../../reference/dependency-compatibility.md#installation-footprint).
 
 ## Когда нужна копия репозитория
 
-Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.7.1, например отдельный clone тега v1.7.1. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в [Contributing](https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md), сборка сайта — в [Publishing Documentation — English](../../development/documentation.md).
+Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.8.0, например отдельный clone тега v1.8.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в [Contributing](https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md), сборка сайта — в [Publishing Documentation — English](../../development/documentation.md).
 
 Перед обновлением существующих фикстур прочитайте [миграцию](../reference/generation-contract-migration.md). Package version и DatasetSpec schema_version различаются.
 

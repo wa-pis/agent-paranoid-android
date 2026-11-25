@@ -49,13 +49,13 @@ package or a problem with deployment credentials.
 `doctor --require-extra gigachat` uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 `GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
-GigaChat. Install stable `1.7.1` with the `gigachat` extra.
-See [release status](../1.7.1-release-status.md).
+GigaChat. Install stable `1.8.0` with the `gigachat` extra.
+See [release status](../1.8.0-release-status.md).
 
 ## JDBC-Style URL Rejected
 
 JDBC-style endpoint input, qualified column wildcards, and `profile-query` are
-available in stable `1.5.0` and retained in stable `1.7.1`.
+available in stable `1.5.0` and retained in stable `1.8.0`.
 
 Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,
@@ -105,7 +105,7 @@ messages; inspect the local reviewed file and allowlists instead.
 
 ## Transformation Rejected
 
-Stable `1.7.1` provides the common-profile CLI/MCP workflow. See the [CLI workflow](../reference/cli.md#common-profile-workflow-16-rc).
+Stable `1.8.0` provides the common-profile CLI/MCP workflow. See the [CLI workflow](../reference/cli.md#common-profile-workflow-16-rc).
 Published `1.5.0` does not include this command. Registration grants no dataset
 permission. The finite fictional transformation/session campaign is recorded in
 [stable evidence](../release-evidence-1.6.0.md); it grants no blanket dataset consent.
