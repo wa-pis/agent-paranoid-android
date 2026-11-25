@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/next/how-to/parallel-generation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Parallel And Streaming CSV - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../css/print-site.css" rel="stylesheet" />
+        <link href="../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Parallel And Streaming CSV";
+        var mkdocs_page_input_path = "how-to/parallel-generation.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/next/how-to/parallel-generation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href="../.." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Parallel And Streaming CSV</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#choose-the-export-path">Choose The Export Path</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#export-a-reviewed-spec">Export A Reviewed Spec</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#call-from-python">Call From Python</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#determinism-checks-and-publication">Determinism, Checks And Publication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#measure-on-the-target-machine">Measure On The Target Machine</a>
+    </li>
+    </ul></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-To Guides</li>
+      <li class="breadcrumb-item active">Parallel And Streaming CSV</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/how-to/parallel-generation.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Development / not stable</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="parallel-generation-and-streaming-csv">Parallel Generation And Streaming CSV<a class="headerlink" href="#parallel-generation-and-streaming-csv" title="Permanent link">&para;</a></h1>
+<p>This page describes <strong>1.8.0rc1 candidate features</strong>; check
+<a href="../../1.8.0rc1-release-status/">publication status</a> before installing.
+Published 1.7.1 does not include <code>--stream-csv</code> or the <code>tiled-v1</code> Python API.
+Existing ordinary generation and reviewed
+<code>scalable-v1</code>/<code>scalable-relational-v1</code> policies remain available; see
+<a href="../dataset-capacity/">capacity and scalable generation</a>.</p>
+<h2 id="choose-the-export-path">Choose The Export Path<a class="headerlink" href="#choose-the-export-path" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>When to use it</th>
+<th>Data and memory contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ordinary <code>generate</code></td>
+<td>Existing specs, rules, modes and supported relationships</td>
+<td>Existing seeded engine and limits; materialized rows</td>
+</tr>
+<tr>
+<td>Reviewed <code>scalable-v1</code> / <code>scalable-relational-v1</code></td>
+<td>The released bounded independent/eligible linked-table workflows</td>
+<td>Explicit execution policy, streaming validation/recovery and capacity tooling</td>
+</tr>
+<tr>
+<td>New <code>generate --stream-csv</code></td>
+<td>One independent valid-mode entity without global rules</td>
+<td>Fixed tiles, explicit worker count, CSV only; separate <code>tiled-v1</code> seed stream</td>
+</tr>
+<tr>
+<td>New Python <code>generate_dataset_parallel</code></td>
+<td>Callers that need generated rows in memory</td>
+<td>Parallel candidates, then global solving/validation; full result remains materialized</td>
+</tr>
+</tbody>
+</table>
+<p>An export does not switch engines merely because it is large. The new public
+streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
+The optional <code>profiling</code> extra serves large input distinct counting, not CSV
+generation. Install the exact candidate version:</p>
+<pre><code class="language-bash">python -m pip install &quot;agent-paranoid-android==1.8.0rc1&quot;
+</code></pre>
+<h2 id="export-a-reviewed-spec">Export A Reviewed Spec<a class="headerlink" href="#export-a-reviewed-spec" title="Permanent link">&para;</a></h2>
+<p>Use a reviewed DatasetSpec, for example this independently authored synthetic
+spec saved as <code>large-csv.yaml</code>:</p>
+<pre><code class="language-yaml">entities:
+  - name: items
+    row_count: 750000
+    primary_key: item_id
+    fields:
+      - name: item_id
+        data_type: integer
+        is_identifier: true
+      - name: metric
+        data_type: integer
+        distribution:
+          kind: numeric
+          min_value: 0
+          max_value: 100
+generation_settings:
+  seed: 42
+  output_format: csv
+</code></pre>
+<p>Start with a small output, then run the reviewed count in a separate directory:</p>
+<pre><code class="language-bash">test-data-agent generate large-csv.yaml --count 1000 --stream-csv --workers 1 --output out/tiled-smoke
+test-data-agent validate out/tiled-smoke/dataset_spec.yaml out/tiled-smoke
+test-data-agent generate large-csv.yaml --stream-csv --workers 4 --output out/tiled-full
+</code></pre>
+<p>CLI streaming supplies at most 1,000,000 rows and 25,000,000 cells, with four
+workers by default; <code>--workers</code> accepts 1–4 and requires <code>--stream-csv</code>.
+The existing output-byte, disk-space and invocation/deadline limits remain
+additional ceilings. The option accepts a DatasetSpec, not <code>--profile</code>, and
+defaults to CSV; requesting another output format is an error.</p>
+<p>Streaming is eligible only for one entity with fields, valid mode, no
+relationships, native constraints, embedded business rules or relational
+scenarios. Unsupported specs, callback business rules and source-folder checks
+keep the ordinary materialized path and its ordinary row limits. A large
+streaming request can therefore be refused after fallback. An existing reviewed
+<code>execution_policy</code> and this option are mutually exclusive: keep the selected
+released engine or remove the separate streaming request.</p>
+<p>The bundle contains the CSV, effective specification, validation report and
+generation manifest. Check
+<code>generation_manifest.json</code> → <code>reproducibility.generator_algorithm_version</code>:
+an actual streaming export records <code>tiled-v1</code>; fallback records the ordinary
+algorithm identity. The effective spec alone does not select <code>tiled-v1</code> for a
+later run: pass the option again.</p>
+<h2 id="call-from-python">Call From Python<a class="headerlink" href="#call-from-python" title="Permanent link">&para;</a></h2>
+<p>Use an importable module with the normal process-entry guard. The Python policy
+defaults differ from the CLI: one worker, <code>max_rows=None</code> (the existing configured
+row ceiling), and 10,000,000 cells. Supply explicit bounds for a larger run:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from test_data_agent.adapters.parallel_generation import ParallelGenerationPolicy
+from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent.io.workflows import generate_dataset_bundle
+
+
+def main() -&gt; None:
+    spec = load_dataset_spec(Path(&quot;large-csv.yaml&quot;))
+    result = generate_dataset_bundle(
+        spec,
+        output_folder=Path(&quot;out/tiled-python&quot;),
+        seed=42,
+        streaming=ParallelGenerationPolicy(
+            workers=2, max_rows=1_000_000, max_cells=25_000_000,
+        ),
+    )
+    assert result.validation.valid
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p><code>generate_dataset_artifacts</code> and <code>generate_dataset_from_spec_path</code> also accept
+the explicit <code>streaming</code> policy. For in-memory results,
+<code>test_data_agent.adapters.parallel_generation.generate_dataset_parallel(spec,
+seed, policy=...)</code> collects ordered tiles before global solving and validation.
+It rejects embedded business rules, relational scenarios and execution policies;
+it does not provide bounded-memory export or replace the reviewed relational
+engine. Process creation uses <code>spawn</code>; no start-method option is exposed.</p>
+<h2 id="determinism-checks-and-publication">Determinism, Checks And Publication<a class="headerlink" href="#determinism-checks-and-publication" title="Permanent link">&para;</a></h2>
+<p><code>tiled-v1</code> derives each fixed 4,096-row tile from the engine version, seed,
+entity and tile index. For the same spec, seed and dependency environment,
+changing between one, two and four workers preserves rows, order and CSV data
+bytes. This stream deliberately differs from ordinary generation and the
+released scalable engines. Review engine changes and keep the manifest when
+reproducing an export.</p>
+<p>Every tile undergoes schema/type, normalization, constraint and privacy checks.
+Global row counts and declared primary-key uniqueness are reconciled before
+publication; source rows are never used to fill the output. The typed CSV
+contract retains null/empty distinction, formula protection and exact DECIMAL
+text. Existing reviewed DECIMAL <code>numeric_measure</code> exceptions remain scoped;
+numeric storage or an unknown semantic label cannot disable privacy checks.</p>
+<p>Before workers or output open, the existing conservative allocation estimate
+checks all simultaneously in-flight tiles against the output-byte ceiling;
+it does not estimate the full requested dataset. Worker/Faker overhead and the
+global primary-key set consume additional memory. This is not an
+operating-system RSS cap. Output is written inside private staging with actual byte accounting
+and the existing atomic bundle publication/rollback path. Cancellation and
+ordinary failures clean workers and staging; hard process termination can still
+require checking abandoned staging before retrying in a new directory.</p>
+<h2 id="measure-on-the-target-machine">Measure On The Target Machine<a class="headerlink" href="#measure-on-the-target-machine" title="Permanent link">&para;</a></h2>
+<p>The repository's <code>scripts/benchmark_public_csv.py</code>,
+<code>scripts/benchmark_paired_csv.py</code> and generation benchmark helpers compare
+stages, process-tree peak-memory samples, determinism and validation on
+synthetic inputs. Earlier 100,000/750,000 × 25-field results belong to the
+pre-port implementation and environment. They are historical evidence, not
+measurements or speed promises for this 1.7.1-based branch. Re-run the selected
+benchmark against the exact checkout and dependency versions before making a
+performance decision.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../dataset-capacity/" class="btn btn-neutral float-left" title="Forecast And Scale Datasets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mcp/" class="btn btn-neutral float-right" title="Connect An MCP Client">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../dataset-capacity/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../mcp/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../js/print-site.js"></script>
+      <script src="../../search/main.js"></script>
+      <script src="../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
