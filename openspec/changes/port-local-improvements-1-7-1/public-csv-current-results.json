@@ -1,0 +1,2128 @@
+{
+  "completed": true,
+  "environment": {
+    "python": "3.11.15 (main, Jun 11 2026, 04:04:09) [Clang 22.1.3 ]",
+    "executable": "${VENV}/bin/python",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "logical_cpus": 14,
+    "dependencies": {
+      "agent-paranoid-android": "1.7.1",
+      "Faker": "40.35.0",
+      "pydantic": "2.14.3",
+      "PyYAML": "6.0.3"
+    }
+  },
+  "settings": {
+    "rows": [
+      100000,
+      750000
+    ],
+    "fields": 25,
+    "seed": 42,
+    "repeats": 4,
+    "caps": {
+      "TEST_DATA_AGENT_MAX_GENERATION_COUNT": "750000",
+      "TEST_DATA_AGENT_MAX_OUTPUT_BYTES": "4294967296",
+      "TEST_DATA_AGENT_MAX_GENERATION_SECONDS": "600"
+    },
+    "streaming_workers": 4,
+    "rss_sample_seconds": 0.1,
+    "rss_method": "concurrent process-tree ps RSS sum; shared pages may be counted repeatedly",
+    "validation": "all four report sections enabled; all mandatory checks retained",
+    "validation_passes": "combined runner; each concrete validator and normalization once per row/tile",
+    "engine_comparison": "legacy and tiled-v1 differ; require within-engine repeat equality",
+    "storage": "owned local TemporaryDirectory",
+    "audit_outside_measured_process": true
+  },
+  "runs": [
+    {
+      "rows": 100000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 6.05764920823276,
+      "sampled_peak_tree_rss_bytes": 278020096,
+      "sampled_peak_coordinator_rss_bytes": 278020096,
+      "peak_tree_process_count": 1,
+      "memory_samples": 51,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 5.733953542076051,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.013067541643977165,
+        "generation_ipc": 3.4742172081023455,
+        "combined_validation": 0.0005305414088070393,
+        "privacy_validation": 1.2628367911092937,
+        "schema_validation": 0.30321183428168297,
+        "relationship_validation": 1.00000761449337e-05,
+        "constraint_validation": 1.3249926269054413e-05,
+        "normalization": 0.10367250023409724,
+        "csv_write": 0.00023224856704473495,
+        "csv_encoding": 0.5577313750982285,
+        "artifacts_and_hashing": 0.018318334594368935,
+        "publication": 0.00011191703379154205
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 310460416,
+      "csv_bytes": 28177934,
+      "csv_sha256": "24e6f6833a83cebc9b17e52bc7b7c07449527741348be3221e64553d1b3ab462",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.19487179210409522,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 1
+    },
+    {
+      "rows": 100000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 3.0966037921607494,
+      "sampled_peak_tree_rss_bytes": 487325696,
+      "sampled_peak_coordinator_rss_bytes": 115736576,
+      "peak_tree_process_count": 6,
+      "memory_samples": 26,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 2.839317709207535,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.009274044074118137,
+        "generation_ipc": 0.43836187617853284,
+        "global_checks": 0.012381830252707005,
+        "combined_validation": 0.01317674107849598,
+        "privacy_validation": 1.3349435436539352,
+        "schema_validation": 0.32883025240153074,
+        "relationship_validation": 0.00023729540407657623,
+        "constraint_validation": 0.00023849960416555405,
+        "normalization": 0.10999475046992302,
+        "csv_encoding": 0.5334304617717862,
+        "csv_write": 0.040136540308594704,
+        "artifacts_and_hashing": 0.018191124312579632,
+        "publication": 0.00012074969708919525
+      },
+      "calls": {
+        "combined_validation": 25,
+        "privacy_validation": 25,
+        "schema_validation": 25,
+        "relationship_validation": 25,
+        "constraint_validation": 25,
+        "normalization": 25,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 115736576,
+      "csv_bytes": 28175783,
+      "csv_sha256": "76330b20f138af1c8b49d42fe8780057cd0b735895a98b0d98713cf715ab9979",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.18415449978783727,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 1
+    },
+    {
+      "rows": 100000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 3.0902003329247236,
+      "sampled_peak_tree_rss_bytes": 482476032,
+      "sampled_peak_coordinator_rss_bytes": 113999872,
+      "peak_tree_process_count": 6,
+      "memory_samples": 26,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 2.808422999922186,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.00913004158064723,
+        "generation_ipc": 0.41777645889669657,
+        "global_checks": 0.01190699776634574,
+        "combined_validation": 0.010072581935673952,
+        "privacy_validation": 1.3455744148232043,
+        "schema_validation": 0.3282489157281816,
+        "relationship_validation": 0.000255002174526453,
+        "constraint_validation": 0.0002462943084537983,
+        "normalization": 0.10850791726261377,
+        "csv_encoding": 0.5375251225195825,
+        "csv_write": 0.020532794762402773,
+        "artifacts_and_hashing": 0.01853533321991563,
+        "publication": 0.00011112494394183159
+      },
+      "calls": {
+        "combined_validation": 25,
+        "privacy_validation": 25,
+        "schema_validation": 25,
+        "relationship_validation": 25,
+        "constraint_validation": 25,
+        "normalization": 25,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 114212864,
+      "csv_bytes": 28175783,
+      "csv_sha256": "76330b20f138af1c8b49d42fe8780057cd0b735895a98b0d98713cf715ab9979",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.18491187505424023,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 2
+    },
+    {
+      "rows": 100000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 6.059524458833039,
+      "sampled_peak_tree_rss_bytes": 276365312,
+      "sampled_peak_coordinator_rss_bytes": 276365312,
+      "peak_tree_process_count": 1,
+      "memory_samples": 51,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 5.742533542215824,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.014568500220775604,
+        "generation_ipc": 3.461569540668279,
+        "combined_validation": 0.0005072932690382004,
+        "privacy_validation": 1.2767472919076681,
+        "schema_validation": 0.3015730418264866,
+        "relationship_validation": 7.916707545518875e-06,
+        "constraint_validation": 1.133279874920845e-05,
+        "normalization": 0.10374320764094591,
+        "csv_write": 0.00022349786013364792,
+        "csv_encoding": 0.5634542931802571,
+        "artifacts_and_hashing": 0.01995850121602416,
+        "publication": 0.00016912491992115974
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 309985280,
+      "csv_bytes": 28177934,
+      "csv_sha256": "24e6f6833a83cebc9b17e52bc7b7c07449527741348be3221e64553d1b3ab462",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.18592991726472974,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 2
+    },
+    {
+      "rows": 100000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 6.045436750166118,
+      "sampled_peak_tree_rss_bytes": 305315840,
+      "sampled_peak_coordinator_rss_bytes": 305315840,
+      "peak_tree_process_count": 1,
+      "memory_samples": 51,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 5.737209834158421,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.01385791739448905,
+        "generation_ipc": 3.441272791940719,
+        "combined_validation": 0.00048562465235590935,
+        "privacy_validation": 1.2870513750240207,
+        "schema_validation": 0.30468079214915633,
+        "relationship_validation": 8.37491825222969e-06,
+        "constraint_validation": 1.170765608549118e-05,
+        "normalization": 0.10282308422029018,
+        "csv_write": 0.00019933469593524933,
+        "csv_encoding": 0.5671268743462861,
+        "artifacts_and_hashing": 0.019542498979717493,
+        "publication": 0.00014945818111300468
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 310460416,
+      "csv_bytes": 28177934,
+      "csv_sha256": "24e6f6833a83cebc9b17e52bc7b7c07449527741348be3221e64553d1b3ab462",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.1897844998165965,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 3
+    },
+    {
+      "rows": 100000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 3.093033625278622,
+      "sampled_peak_tree_rss_bytes": 483672064,
+      "sampled_peak_coordinator_rss_bytes": 114196480,
+      "peak_tree_process_count": 6,
+      "memory_samples": 26,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 2.8502257498912513,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.010142623912543058,
+        "generation_ipc": 0.43666066881269217,
+        "global_checks": 0.011909835040569305,
+        "combined_validation": 0.01047291187569499,
+        "privacy_validation": 1.343442334793508,
+        "schema_validation": 0.3340844167396426,
+        "relationship_validation": 0.0002332925796508789,
+        "constraint_validation": 0.00024395668879151344,
+        "normalization": 0.11075254436582327,
+        "csv_encoding": 0.5416261269710958,
+        "csv_write": 0.031420371029525995,
+        "artifacts_and_hashing": 0.019108416978269815,
+        "publication": 0.000128250103443861
+      },
+      "calls": {
+        "combined_validation": 25,
+        "privacy_validation": 25,
+        "schema_validation": 25,
+        "relationship_validation": 25,
+        "constraint_validation": 25,
+        "normalization": 25,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 114196480,
+      "csv_bytes": 28175783,
+      "csv_sha256": "76330b20f138af1c8b49d42fe8780057cd0b735895a98b0d98713cf715ab9979",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.18804500019177794,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 3
+    },
+    {
+      "rows": 100000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 3.2170357913710177,
+      "sampled_peak_tree_rss_bytes": 488226816,
+      "sampled_peak_coordinator_rss_bytes": 112869376,
+      "peak_tree_process_count": 6,
+      "memory_samples": 27,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 2.885362499859184,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.0100270826369524,
+        "generation_ipc": 0.4521802901290357,
+        "global_checks": 0.013152337167412043,
+        "combined_validation": 0.013486084528267384,
+        "privacy_validation": 1.369035332929343,
+        "schema_validation": 0.3295510825701058,
+        "relationship_validation": 0.00024187564849853516,
+        "constraint_validation": 0.00024183187633752823,
+        "normalization": 0.1099634557031095,
+        "csv_encoding": 0.5417897501029074,
+        "csv_write": 0.024512543343007565,
+        "artifacts_and_hashing": 0.0210508331656456,
+        "publication": 0.0001300000585615635
+      },
+      "calls": {
+        "combined_validation": 25,
+        "privacy_validation": 25,
+        "schema_validation": 25,
+        "relationship_validation": 25,
+        "constraint_validation": 25,
+        "normalization": 25,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 112869376,
+      "csv_bytes": 28175783,
+      "csv_sha256": "76330b20f138af1c8b49d42fe8780057cd0b735895a98b0d98713cf715ab9979",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.19357379106804729,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 4
+    },
+    {
+      "rows": 100000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 6.0479791671969,
+      "sampled_peak_tree_rss_bytes": 277413888,
+      "sampled_peak_coordinator_rss_bytes": 277413888,
+      "peak_tree_process_count": 1,
+      "memory_samples": 51,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 5.723328459076583,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.013687083963304758,
+        "generation_ipc": 3.4527087500318885,
+        "combined_validation": 0.0004894565790891647,
+        "privacy_validation": 1.2595236250199378,
+        "schema_validation": 0.30866679223254323,
+        "relationship_validation": 7.584225386381149e-06,
+        "constraint_validation": 1.1040829122066498e-05,
+        "normalization": 0.10434383386746049,
+        "csv_write": 0.00021858466789126396,
+        "csv_encoding": 0.5642966241575778,
+        "artifacts_and_hashing": 0.019242958165705204,
+        "publication": 0.00013212533667683601
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 100000,
+        "privacy_validation": 100000,
+        "schema_validation": 100000,
+        "relationship_validation": 100000,
+        "constraint_validation": 100000,
+        "normalization": 100000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 332878334,
+      "coordinator_peak_rss_bytes": 310444032,
+      "csv_bytes": 28177934,
+      "csv_sha256": "24e6f6833a83cebc9b17e52bc7b7c07449527741348be3221e64553d1b3ab462",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 0.19503983296453953,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 4
+    },
+    {
+      "rows": 750000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 43.200567999854684,
+      "sampled_peak_tree_rss_bytes": 1998962688,
+      "sampled_peak_coordinator_rss_bytes": 1998962688,
+      "peak_tree_process_count": 1,
+      "memory_samples": 364,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 42.889770083129406,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.10806929040700197,
+        "generation_ipc": 25.92735716700554,
+        "combined_validation": 0.0005548750050365925,
+        "privacy_validation": 9.499306542333215,
+        "schema_validation": 2.2838725419715047,
+        "relationship_validation": 8.250121027231216e-06,
+        "constraint_validation": 1.0499730706214905e-05,
+        "normalization": 0.7707892498001456,
+        "csv_write": 0.0002232496626675129,
+        "csv_encoding": 4.215906749945134,
+        "artifacts_and_hashing": 0.0835273340344429,
+        "publication": 0.0001443331129848957
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 1998962688,
+      "csv_bytes": 211322612,
+      "csv_sha256": "5b3a754438204d3fb5dce71e814a8cbac6c4cd749b0db5b55576394dce1923dc",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.412389624863863,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 1
+    },
+    {
+      "rows": 750000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 18.999586750287563,
+      "sampled_peak_tree_rss_bytes": 569196544,
+      "sampled_peak_coordinator_rss_bytes": 194887680,
+      "peak_tree_process_count": 6,
+      "memory_samples": 160,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 18.64150991709903,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.009387793950736523,
+        "generation_ipc": 0.533209711778909,
+        "global_checks": 0.09022120526060462,
+        "combined_validation": 0.07243619579821825,
+        "privacy_validation": 10.245242870412767,
+        "schema_validation": 2.5388029208406806,
+        "relationship_validation": 0.001669993158429861,
+        "constraint_validation": 0.0016490654088556767,
+        "normalization": 0.8397463755682111,
+        "csv_encoding": 4.020171502139419,
+        "csv_write": 0.2014923682436347,
+        "artifacts_and_hashing": 0.08734649885445833,
+        "publication": 0.00013341568410396576
+      },
+      "calls": {
+        "combined_validation": 184,
+        "privacy_validation": 184,
+        "schema_validation": 184,
+        "relationship_validation": 184,
+        "constraint_validation": 184,
+        "normalization": 184,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 194887680,
+      "csv_bytes": 211321616,
+      "csv_sha256": "735b3374822b27e5afccaa73ebde1773ae43b7e93a1f9f06c43c8535f22a4405",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.4332735831849277,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 1
+    },
+    {
+      "rows": 750000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 18.85431741597131,
+      "sampled_peak_tree_rss_bytes": 572964864,
+      "sampled_peak_coordinator_rss_bytes": 196657152,
+      "peak_tree_process_count": 6,
+      "memory_samples": 159,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 18.543800332583487,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.009729583282023668,
+        "generation_ipc": 0.5275525487959385,
+        "global_checks": 0.09143712697550654,
+        "combined_validation": 0.07253401353955269,
+        "privacy_validation": 10.15387999964878,
+        "schema_validation": 2.511249577626586,
+        "relationship_validation": 0.0018725390546023846,
+        "constraint_validation": 0.0016602883115410805,
+        "normalization": 0.8423347910866141,
+        "csv_encoding": 4.026015871670097,
+        "csv_write": 0.2164296181872487,
+        "artifacts_and_hashing": 0.08897908357903361,
+        "publication": 0.00012529082596302032
+      },
+      "calls": {
+        "combined_validation": 184,
+        "privacy_validation": 184,
+        "schema_validation": 184,
+        "relationship_validation": 184,
+        "constraint_validation": 184,
+        "normalization": 184,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 196657152,
+      "csv_bytes": 211321616,
+      "csv_sha256": "735b3374822b27e5afccaa73ebde1773ae43b7e93a1f9f06c43c8535f22a4405",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.4257633327506483,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 2
+    },
+    {
+      "rows": 750000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 43.057171958032995,
+      "sampled_peak_tree_rss_bytes": 1998733312,
+      "sampled_peak_coordinator_rss_bytes": 1998733312,
+      "peak_tree_process_count": 1,
+      "memory_samples": 364,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 42.80289162509143,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.1057343753054738,
+        "generation_ipc": 25.81732670776546,
+        "combined_validation": 0.0005371668376028538,
+        "privacy_validation": 9.526659375056624,
+        "schema_validation": 2.3196960827335715,
+        "relationship_validation": 1.1082738637924194e-05,
+        "constraint_validation": 1.270882785320282e-05,
+        "normalization": 0.7667389586567879,
+        "csv_write": 0.00023504067212343216,
+        "csv_encoding": 4.180269541218877,
+        "artifacts_and_hashing": 0.08554571028798819,
+        "publication": 0.0001248749904334545
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 1999126528,
+      "csv_bytes": 211322612,
+      "csv_sha256": "5b3a754438204d3fb5dce71e814a8cbac6c4cd749b0db5b55576394dce1923dc",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.3972094999626279,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 2
+    },
+    {
+      "rows": 750000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 43.21220629196614,
+      "sampled_peak_tree_rss_bytes": 1997422592,
+      "sampled_peak_coordinator_rss_bytes": 1997422592,
+      "peak_tree_process_count": 1,
+      "memory_samples": 357,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 42.84950074972585,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.1093221241608262,
+        "generation_ipc": 26.003670500125736,
+        "combined_validation": 0.0005137897096574306,
+        "privacy_validation": 9.433906042017043,
+        "schema_validation": 2.2522520842030644,
+        "relationship_validation": 1.0542105883359909e-05,
+        "constraint_validation": 1.2082979083061218e-05,
+        "normalization": 0.7643043748103082,
+        "csv_write": 0.00021350011229515076,
+        "csv_encoding": 4.171486751176417,
+        "artifacts_and_hashing": 0.11369229108095169,
+        "publication": 0.0001166672445833683
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 1997488128,
+      "csv_bytes": 211322612,
+      "csv_sha256": "5b3a754438204d3fb5dce71e814a8cbac6c4cd749b0db5b55576394dce1923dc",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.4074659999459982,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 3
+    },
+    {
+      "rows": 750000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 18.954955500084907,
+      "sampled_peak_tree_rss_bytes": 575979520,
+      "sampled_peak_coordinator_rss_bytes": 194560000,
+      "peak_tree_process_count": 6,
+      "memory_samples": 158,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 18.56014283373952,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.01024129195138812,
+        "generation_ipc": 0.5426117116585374,
+        "global_checks": 0.09086713567376137,
+        "combined_validation": 0.07243504468351603,
+        "privacy_validation": 10.18445628369227,
+        "schema_validation": 2.5248769666068256,
+        "relationship_validation": 0.001763662789016962,
+        "constraint_validation": 0.0016600689850747585,
+        "normalization": 0.8409147877246141,
+        "csv_encoding": 4.00748808356002,
+        "csv_write": 0.19429825386032462,
+        "artifacts_and_hashing": 0.08841408463194966,
+        "publication": 0.0001154579222202301
+      },
+      "calls": {
+        "combined_validation": 184,
+        "privacy_validation": 184,
+        "schema_validation": 184,
+        "relationship_validation": 184,
+        "constraint_validation": 184,
+        "normalization": 184,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 194560000,
+      "csv_bytes": 211321616,
+      "csv_sha256": "735b3374822b27e5afccaa73ebde1773ae43b7e93a1f9f06c43c8535f22a4405",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.4014682909473777,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 3
+    },
+    {
+      "rows": 750000,
+      "mode": "streaming",
+      "status": "succeeded",
+      "subprocess_seconds": 18.89293866697699,
+      "sampled_peak_tree_rss_bytes": 570966016,
+      "sampled_peak_coordinator_rss_bytes": 197722112,
+      "peak_tree_process_count": 6,
+      "memory_samples": 159,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 18.530439583584666,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.00989270955324173,
+        "generation_ipc": 0.5324860438704491,
+        "global_checks": 0.09361855685710907,
+        "combined_validation": 0.07394741242751479,
+        "privacy_validation": 10.178684876766056,
+        "schema_validation": 2.496427793521434,
+        "relationship_validation": 0.0017918753437697887,
+        "constraint_validation": 0.0017102439887821674,
+        "normalization": 0.8441362497396767,
+        "csv_encoding": 4.0263975276611745,
+        "csv_write": 0.1800888366997242,
+        "artifacts_and_hashing": 0.0911177909001708,
+        "publication": 0.00013966625556349754
+      },
+      "calls": {
+        "combined_validation": 184,
+        "privacy_validation": 184,
+        "schema_validation": 184,
+        "relationship_validation": 184,
+        "constraint_validation": 184,
+        "normalization": 184,
+        "artifacts_and_hashing": 4,
+        "csv_write": 3,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": {
+        "engine": "tiled-v1",
+        "workers": 4,
+        "max_rows": 750000,
+        "max_cells": 18750000
+      },
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 197722112,
+      "csv_bytes": 211321616,
+      "csv_sha256": "735b3374822b27e5afccaa73ebde1773ae43b7e93a1f9f06c43c8535f22a4405",
+      "engine": "tiled-v1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.417333499994129,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 4
+    },
+    {
+      "rows": 750000,
+      "mode": "legacy",
+      "status": "succeeded",
+      "subprocess_seconds": 42.98724399972707,
+      "sampled_peak_tree_rss_bytes": 1999667200,
+      "sampled_peak_coordinator_rss_bytes": 1999667200,
+      "peak_tree_process_count": 1,
+      "memory_samples": 364,
+      "returncode": 0,
+      "stderr_present": false,
+      "api_seconds": 42.69237479194999,
+      "stage_seconds": {
+        "setup_and_bookkeeping": 0.10519416630268097,
+        "generation_ipc": 25.759947790764272,
+        "combined_validation": 0.0005237073637545109,
+        "privacy_validation": 9.52057091705501,
+        "schema_validation": 2.254152708221227,
+        "relationship_validation": 1.0417308658361435e-05,
+        "constraint_validation": 1.3791956007480621e-05,
+        "normalization": 0.7806626670062542,
+        "csv_write": 0.0002095429226756096,
+        "csv_encoding": 4.184472207911313,
+        "artifacts_and_hashing": 0.08650045795366168,
+        "publication": 0.00011641718447208405
+      },
+      "calls": {
+        "generation_ipc": 1,
+        "combined_validation": 1,
+        "privacy_validation": 1,
+        "schema_validation": 1,
+        "relationship_validation": 1,
+        "constraint_validation": 1,
+        "normalization": 1,
+        "csv_write": 5,
+        "csv_encoding": 2,
+        "artifacts_and_hashing": 4,
+        "publication": 1,
+        "mandatory_validation": 0,
+        "report_validation": 0
+      },
+      "checked_rows": {
+        "combined_validation": 750000,
+        "privacy_validation": 750000,
+        "schema_validation": 750000,
+        "relationship_validation": 750000,
+        "constraint_validation": 750000,
+        "normalization": 750000
+      },
+      "policy": null,
+      "preflight_estimated_bytes": 2496078334,
+      "coordinator_peak_rss_bytes": 1999667200,
+      "csv_bytes": 211322612,
+      "csv_sha256": "5b3a754438204d3fb5dce71e814a8cbac6c4cd749b0db5b55576394dce1923dc",
+      "engine": "1.7.1",
+      "exact_header_count_ordered_unique_keys": true,
+      "full_report_valid": true,
+      "manifest_and_output_hashes_valid": true,
+      "private_output": true,
+      "audit_seconds_outside_measurement": 1.431909958831966,
+      "no_partial_staging": true,
+      "scratch_removed": true,
+      "repeat": 4
+    }
+  ],
+  "summary": [
+    {
+      "rows": 100000,
+      "mode": "legacy",
+      "attempts": 4,
+      "failures": 0,
+      "median_api_seconds": 5.735581688117236,
+      "api_seconds_range": [
+        5.723328459076583,
+        5.742533542215824
+      ],
+      "max_sampled_peak_tree_rss_bytes": 305315840,
+      "max_coordinator_peak_rss_bytes": 310460416,
+      "median_stage_seconds": {
+        "artifacts_and_hashing": 0.01939272857271135,
+        "combined_validation": 0.0004983749240636826,
+        "constraint_validation": 1.1520227417349815e-05,
+        "csv_encoding": 0.5638754586689174,
+        "csv_write": 0.00022104126401245594,
+        "generation_ipc": 3.4571391453500837,
+        "normalization": 0.10370785393752158,
+        "privacy_validation": 1.269792041508481,
+        "publication": 0.00014079175889492035,
+        "relationship_validation": 8.145812898874283e-06,
+        "schema_validation": 0.30394631321541965,
+        "setup_and_bookkeeping": 0.013772500678896904
+      },
+      "repeat_csv_identical": true
+    },
+    {
+      "rows": 100000,
+      "mode": "streaming",
+      "attempts": 4,
+      "failures": 0,
+      "median_api_seconds": 2.844771729549393,
+      "api_seconds_range": [
+        2.808422999922186,
+        2.885362499859184
+      ],
+      "max_sampled_peak_tree_rss_bytes": 488226816,
+      "max_coordinator_peak_rss_bytes": 115736576,
+      "median_stage_seconds": {
+        "artifacts_and_hashing": 0.018821875099092722,
+        "combined_validation": 0.011824826477095485,
+        "constraint_validation": 0.00024289428256452084,
+        "csv_encoding": 0.5395756247453392,
+        "csv_write": 0.02796645718626678,
+        "generation_ipc": 0.4375112724956125,
+        "global_checks": 0.012145832646638155,
+        "normalization": 0.10997910308651626,
+        "privacy_validation": 1.3445083748083562,
+        "publication": 0.00012449990026652813,
+        "relationship_validation": 0.0002395855262875557,
+        "schema_validation": 0.32919066748581827,
+        "setup_and_bookkeeping": 0.009650563355535269
+      },
+      "repeat_csv_identical": true
+    },
+    {
+      "rows": 750000,
+      "mode": "legacy",
+      "attempts": 4,
+      "failures": 0,
+      "median_api_seconds": 42.82619618740864,
+      "api_seconds_range": [
+        42.69237479194999,
+        42.889770083129406
+      ],
+      "max_sampled_peak_tree_rss_bytes": 1999667200,
+      "max_coordinator_peak_rss_bytes": 1999667200,
+      "median_stage_seconds": {
+        "artifacts_and_hashing": 0.08602308412082493,
+        "combined_validation": 0.0005304371006786823,
+        "constraint_validation": 1.2395903468132019e-05,
+        "csv_encoding": 4.182370874565095,
+        "csv_write": 0.00021837488748133183,
+        "generation_ipc": 25.8723419373855,
+        "normalization": 0.7687641042284667,
+        "privacy_validation": 9.509938729694113,
+        "publication": 0.00012077111750841141,
+        "relationship_validation": 1.0479707270860672e-05,
+        "schema_validation": 2.269012625096366,
+        "setup_and_bookkeeping": 0.10690183285623789
+      },
+      "repeat_csv_identical": true
+    },
+    {
+      "rows": 750000,
+      "mode": "streaming",
+      "attempts": 4,
+      "failures": 0,
+      "median_api_seconds": 18.551971583161503,
+      "api_seconds_range": [
+        18.530439583584666,
+        18.64150991709903
+      ],
+      "max_sampled_peak_tree_rss_bytes": 575979520,
+      "max_coordinator_peak_rss_bytes": 197722112,
+      "median_stage_seconds": {
+        "artifacts_and_hashing": 0.08869658410549164,
+        "combined_validation": 0.07248510466888547,
+        "constraint_validation": 0.0016601786483079195,
+        "csv_encoding": 4.023093686904758,
+        "csv_write": 0.19789531105197966,
+        "generation_ipc": 0.532847877824679,
+        "global_checks": 0.09115213132463396,
+        "normalization": 0.8416247894056141,
+        "privacy_validation": 10.181570580229163,
+        "publication": 0.00012935325503349304,
+        "relationship_validation": 0.0017777690663933754,
+        "schema_validation": 2.5180632721167058,
+        "setup_and_bookkeeping": 0.009811146417632699
+      },
+      "repeat_csv_identical": true
+    }
+  ],
+  "source_file_fingerprints": [
+    {
+      "path": "scripts/benchmark_parallel_generation.py",
+      "sha256": "07b5fd3ac63d84b98f21076328866a97115b0241da99678520170bea011a0204"
+    },
+    {
+      "path": "scripts/benchmark_public_csv.py",
+      "sha256": "fcfdac0e78b1784c598b6354fb2c0d0ed113098a59828938581eec456acee722"
+    },
+    {
+      "path": "src/test_data_agent/__init__.py",
+      "sha256": "deb98662ce66fd7468256b717cc2c4100ea551b3fdebc527c03bc237e07b4ad0"
+    },
+    {
+      "path": "src/test_data_agent/adapters/__init__.py",
+      "sha256": "6ac59f866f3847b2f510dd4e56c84523ca8f5d192f5aa6dc73af2863a6059872"
+    },
+    {
+      "path": "src/test_data_agent/adapters/csv_file.py",
+      "sha256": "e967374a2061d4792708e4171b5808d7028c8a2eac2467ba55fcfecc15fca879"
+    },
+    {
+      "path": "src/test_data_agent/adapters/csv_folder.py",
+      "sha256": "a5c8d6fa6c9e01468fe3931a782bafc03af5f4ae12ad8affb9e0024dde90d9f7"
+    },
+    {
+      "path": "src/test_data_agent/adapters/json_profile.py",
+      "sha256": "51e4b468ea5e057bdf03b5413c7588d832ac66c1494e3f8a28a1d6bd9fec7c39"
+    },
+    {
+      "path": "src/test_data_agent/adapters/legacy_profile.py",
+      "sha256": "81136d45ea33e59df2f547ae56df668e160d552ec82a38b74da5c2f0c47daad0"
+    },
+    {
+      "path": "src/test_data_agent/adapters/parallel_generation.py",
+      "sha256": "ff5c2af6d9ae32cffe54b6869b98332059bbde1a418814cddd9b4963ce1716e3"
+    },
+    {
+      "path": "src/test_data_agent/adapters/parquet_dataset.py",
+      "sha256": "e3cc0e3e6ee936e9c8e4a3f1c0aeb2eb7c8808cceb258170eb48e996190f97f8"
+    },
+    {
+      "path": "src/test_data_agent/adapters/trino_profile.py",
+      "sha256": "b5e5f0b503c4107ade5574e273d03e1f5189487fb712033d08456d7215775f65"
+    },
+    {
+      "path": "src/test_data_agent/advisor.py",
+      "sha256": "4756d9d8e528cb64270f7f2e44ee197456054c286d84256953cc49417526b990"
+    },
+    {
+      "path": "src/test_data_agent/agent.py",
+      "sha256": "c339a4fff1bb1c25693b3c669605f7acf27ad9bebb7b94bb27236f7cc190a75b"
+    },
+    {
+      "path": "src/test_data_agent/agent_advising.py",
+      "sha256": "3009b0e0b9f2f405540d4afd459da319ec3d403671be92db917b92d0be40cae9"
+    },
+    {
+      "path": "src/test_data_agent/agent_approval.py",
+      "sha256": "f063eab0794db3ff12d4bbb074d1fa015c124987d16f5562347462fcd6e2ad51"
+    },
+    {
+      "path": "src/test_data_agent/agent_contracts.py",
+      "sha256": "76a4e8b8d4558b9b87e90df80ce3a3cf21b7b1b6f737518d6804fbd9830320c7"
+    },
+    {
+      "path": "src/test_data_agent/agent_planning.py",
+      "sha256": "d39f872b941aa1459ed36df13eb7ea846b570966394fa995cd2d29e91e0d2385"
+    },
+    {
+      "path": "src/test_data_agent/agent_recovery.py",
+      "sha256": "75d476bbe70fec945bb644560869f361cf08bcd04d55b20ffe43ee351ed42d3b"
+    },
+    {
+      "path": "src/test_data_agent/agent_review.py",
+      "sha256": "7b86f6feab2d45f2d23f4621f40ff682be4be8a7619d1d75ef44c6e53720189e"
+    },
+    {
+      "path": "src/test_data_agent/agent_status.py",
+      "sha256": "a3f38c5a99e83a146ae275d546d83adecbdd6aaf60b726b25db5c90e87464c48"
+    },
+    {
+      "path": "src/test_data_agent/audit.py",
+      "sha256": "b975c4b917bc3eb257bbfeb534e4045d24c8848229d64bbf4a3b0f63fbae05b1"
+    },
+    {
+      "path": "src/test_data_agent/business_rules.py",
+      "sha256": "f10bfc489f9e475d632d80b6cbe70be0db0da4b4a2396367a7b8fbbf0654b488"
+    },
+    {
+      "path": "src/test_data_agent/business_validator.py",
+      "sha256": "41ec47356ff968340b7fa5fcadef60e04b94d19a6b7566d56f31e13ff1497d2c"
+    },
+    {
+      "path": "src/test_data_agent/cli.py",
+      "sha256": "0e6dcadedb6cb9f0a6f70628c2a2cf1e02b942b72e8cb23ed3f8a372a8b73587"
+    },
+    {
+      "path": "src/test_data_agent/cli_agent.py",
+      "sha256": "5e8cda7881c8f1c1905ad963833b85ff7b3ac74125a9fd7f323ab055be5588a4"
+    },
+    {
+      "path": "src/test_data_agent/cli_application.py",
+      "sha256": "d4c4eee95bdb1b3cbe490229fd93ad6bafb102f49aead9e609ad7cb2b0afb57a"
+    },
+    {
+      "path": "src/test_data_agent/cli_commands.py",
+      "sha256": "212a76f3affd245ed853e246d5f101c914dc17e44b635347fdc124bac78e663f"
+    },
+    {
+      "path": "src/test_data_agent/cli_contract.py",
+      "sha256": "e73f2f5d8b2fe7c6ffe71b2a017927220d730f726f5a70b86dfe6a34580167f3"
+    },
+    {
+      "path": "src/test_data_agent/cli_dependencies.py",
+      "sha256": "0998a605dfd451eda4680c1c2149304dbe498af37a6b1633f5f45269d3d3cb82"
+    },
+    {
+      "path": "src/test_data_agent/cli_doctor.py",
+      "sha256": "3ada69da04c259499f72b17bc319346a5ff0c46462a269630825080470f85a70"
+    },
+    {
+      "path": "src/test_data_agent/cli_parser.py",
+      "sha256": "3b6f04286f1c4b1c144d5d957ed257de7d894f3f41c85fde1c84eadf84b713c1"
+    },
+    {
+      "path": "src/test_data_agent/cli_presenter.py",
+      "sha256": "5179bc86c15e5b3d8e11558768e656fb08a710fc6c7d9799b0b319898caf34b0"
+    },
+    {
+      "path": "src/test_data_agent/cli_text.py",
+      "sha256": "eee9dddd4d6f085c229a9f34478aede71c5dfad1df8e7b67c888424216d0004b"
+    },
+    {
+      "path": "src/test_data_agent/cli_transformation_candidate.py",
+      "sha256": "c3cf44d0d8d1a1956c1b456a61568d212a32002e64c5f6605137845f887bec93"
+    },
+    {
+      "path": "src/test_data_agent/container_health.py",
+      "sha256": "bef72260a67a516931e6dd187eede50f6c96711c0282142f01050bb02f235003"
+    },
+    {
+      "path": "src/test_data_agent/core/__init__.py",
+      "sha256": "2330b8290a0f556367e7f089d7b9c389ccf05b530b16ca1ca971b9b2a07ab5e3"
+    },
+    {
+      "path": "src/test_data_agent/core/constraint.py",
+      "sha256": "b2d5911eceff6b054cc23c86bde35cc6492fea3ab303f2618d127f691cf9b33d"
+    },
+    {
+      "path": "src/test_data_agent/core/csv_reader.py",
+      "sha256": "9e20979510c13629309ce709626e962e560349e3865ef3b8793c9f93004a9f49"
+    },
+    {
+      "path": "src/test_data_agent/core/dataset.py",
+      "sha256": "4803998b126c47c4ea98d871f7f1cdbee026ca15ff07fd42380900130f414e4a"
+    },
+    {
+      "path": "src/test_data_agent/core/decimal_units.py",
+      "sha256": "66150e9f63e0ba4f650a10981765cdb2b53f3374e99bcb88a74d59ee500dfd2a"
+    },
+    {
+      "path": "src/test_data_agent/core/distribution.py",
+      "sha256": "c180f7b1ae7154af717e808a0e0fc7a7dc7188d469b9533c39a39d2250eabba7"
+    },
+    {
+      "path": "src/test_data_agent/core/entity.py",
+      "sha256": "12f193e6767bec1999585a0bfe70b55dcf4f068fe3b0c69e85993321a030e503"
+    },
+    {
+      "path": "src/test_data_agent/core/execution_policy.py",
+      "sha256": "92d6bcd2a1fda1e8a742a3dfe91706c0f0f1e08ac77c4c1eed49685f3e1704ee"
+    },
+    {
+      "path": "src/test_data_agent/core/field.py",
+      "sha256": "8fd8a35ecf1e110dd9ab240f78da86aab82dbd330493e506380fc405c149a72c"
+    },
+    {
+      "path": "src/test_data_agent/core/fingerprints.py",
+      "sha256": "0be521df052c78c5fba2a350bdf8f16eb90bd97ce28b3892e1bc4a1f2e01c223"
+    },
+    {
+      "path": "src/test_data_agent/core/generation_progress.py",
+      "sha256": "0062aba7d33a068837cb6b30cbaf00597ccef8223e6f0f7554d27073613359b9"
+    },
+    {
+      "path": "src/test_data_agent/core/inference.py",
+      "sha256": "b52dba3e694b1cb8fda08dd4929b3b973c27fb744f48aec8eed9e8851f012bc8"
+    },
+    {
+      "path": "src/test_data_agent/core/limits.py",
+      "sha256": "6cdbdb6eacb45ee313326d07839cf643834f5de072bcfd5d2a022f36de7502f0"
+    },
+    {
+      "path": "src/test_data_agent/core/parquet_limits.py",
+      "sha256": "cb453d959bd074399007a085b13d2ed988100add1d37743c93556dd74039a51a"
+    },
+    {
+      "path": "src/test_data_agent/core/privacy.py",
+      "sha256": "705315f913e81c89b3d043ec4575871692af26ab0712260183d93242b459c207"
+    },
+    {
+      "path": "src/test_data_agent/core/relational_scenario.py",
+      "sha256": "26dedef29739068ed23bbe748fb5598b995b21257dbe55f4c57599e84ca71214"
+    },
+    {
+      "path": "src/test_data_agent/core/relationship.py",
+      "sha256": "41dec19cac0e08c6d076a118c1a89756a3a63ed54f66e5639ab9c11d81fc0483"
+    },
+    {
+      "path": "src/test_data_agent/core/semantics.py",
+      "sha256": "190ab94452243decb26f95e4015f5fa1bcd64fd762c858d625c573c1bf8c655f"
+    },
+    {
+      "path": "src/test_data_agent/core/serialization.py",
+      "sha256": "54a7937b3332307d9d23420df2cbdd07710b20356761a9486208e86ad8b62d29"
+    },
+    {
+      "path": "src/test_data_agent/core/settings.py",
+      "sha256": "98cf73ec0932a42e903b0417439884cee4cdb1f441531f09a58dd8b8165ba6ae"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_approval.py",
+      "sha256": "09536cbf402b10e0c7a12087b271dc2c9b5cd55b59fc8ebb34953f8eb56b7a71"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_csv.py",
+      "sha256": "c2f50ca5378134902e15bc172a2db172ced767e0fb65c49acb981df816058368"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_errors.py",
+      "sha256": "7badd7ca4b00b53ffabeb7f8b40b0a8d868caedf948f93f85ee48031e0f9d795"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_limits.py",
+      "sha256": "898b8ca95a7e7f9d01bf8603354f61690caaa9c8da5ab3706071f85047f7faac"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_mapping.py",
+      "sha256": "6c551fcd2dcd0f294cfd7d192ef5512501d7cd2d47d56e8770899be08c50023e"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_policy.py",
+      "sha256": "bf1baa90828b87f24346c4d8bb5486ea9fad957a99450fc980e3551ef5717938"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_report.py",
+      "sha256": "e2e74f882179a8ab817c1c5763da7fe84eff831608eb4a8839d70a181e9ab570"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_snapshot.py",
+      "sha256": "4da14fa9665bb5358f90ba63f97e89f295ef5434ea4f6b3b80be4c5e16652c7b"
+    },
+    {
+      "path": "src/test_data_agent/core/transformation_yaml.py",
+      "sha256": "e71cc0dc6ebde7bf8f8944f6a389f22c06ea0bad5e81634c3a3a089728b0ca37"
+    },
+    {
+      "path": "src/test_data_agent/csv_profiler.py",
+      "sha256": "210ecb0938e6428a7c576cf5f1257d6ae236566c4d67f31d981fb3dae39a9620"
+    },
+    {
+      "path": "src/test_data_agent/demo.py",
+      "sha256": "ebb32d922a88a9d6dfcd9e8bd23fe079ecc9c6735053d105de5ac986ec8bf41c"
+    },
+    {
+      "path": "src/test_data_agent/generation/__init__.py",
+      "sha256": "eed8708f36692779a08cad4e6149b344dbfbe5c9f467883ea5a52111fcef9557"
+    },
+    {
+      "path": "src/test_data_agent/generation/capacity.py",
+      "sha256": "5eee62ca514ab6d0d4b6c558f40e33eb9cbf308d11703c34e7f062df48517dbb"
+    },
+    {
+      "path": "src/test_data_agent/generation/constraint_solver.py",
+      "sha256": "549486659df39f45171030c200bf53f8617dc2e57ed4ab7dc59f1bf2f24ef360"
+    },
+    {
+      "path": "src/test_data_agent/generation/entity_generator.py",
+      "sha256": "505e4345c91701c85214150347ff2490c443a4abcf8113951972b2cd396d9a18"
+    },
+    {
+      "path": "src/test_data_agent/generation/limits.py",
+      "sha256": "6de3eebc52f9fe68e5dc7a4cc1a807144df6659eff98aff22b20178070d82011"
+    },
+    {
+      "path": "src/test_data_agent/generation/planner.py",
+      "sha256": "9d654bd75ccd94bea1f91ceec79d8f72a8baaab7dce413c6eac6d47adcf886e2"
+    },
+    {
+      "path": "src/test_data_agent/generation/relational.py",
+      "sha256": "67518de5f8f83ddb38f6cda6bb31952e509c8758a693192c4027febccbfa8c80"
+    },
+    {
+      "path": "src/test_data_agent/generation/relational_scenarios.py",
+      "sha256": "ea97ba232a7b17820b6f8093865b92eb72dde2ba8f4b97752351640ecf652a66"
+    },
+    {
+      "path": "src/test_data_agent/generation/scalable.py",
+      "sha256": "dba3a9f92c101c3645c97560539f66a180e524992d6797f45c6555620c5c307d"
+    },
+    {
+      "path": "src/test_data_agent/generation/semantic_provider.py",
+      "sha256": "a6fcd22e11b92f05b957e74258f08e0b42f7183c415bc195b0f96005bb4310c3"
+    },
+    {
+      "path": "src/test_data_agent/generation/tiled_generator.py",
+      "sha256": "3744bb67b7e531d5c37513f8b47eb9a34cc63da984b240b409db778f9970234f"
+    },
+    {
+      "path": "src/test_data_agent/io/__init__.py",
+      "sha256": "349faf300a1129b4927d768dcfebf8ebc5d519a836976367e80f79723d7c1856"
+    },
+    {
+      "path": "src/test_data_agent/io/artifacts.py",
+      "sha256": "06f63519a25a472ee901cc72a2db33176f77c687e261346e2bb486a2bdfc5e87"
+    },
+    {
+      "path": "src/test_data_agent/io/behavior_policy_files.py",
+      "sha256": "3cbaf8e5997cc9b62e199089f334b71c4263c27f16528e7f92a6ad3d66f26d0b"
+    },
+    {
+      "path": "src/test_data_agent/io/capacity.py",
+      "sha256": "4dabd2c9cf80d36cd9694862cd902f6303e3611300f3ac5aed6cc4cee86b96fa"
+    },
+    {
+      "path": "src/test_data_agent/io/commands.py",
+      "sha256": "d34db5ad54b788ddc828bd3b243022ad8e7106741b38a487cae78501aa67f1ee"
+    },
+    {
+      "path": "src/test_data_agent/io/csv_encoding.py",
+      "sha256": "6c5cf19899931041df8a37596fe308dd2388a219ad2720154e3bfdbe5456c764"
+    },
+    {
+      "path": "src/test_data_agent/io/csv_source.py",
+      "sha256": "f972be34b08ef06a76672dedb5e38e1a7b61b3a92860817ea086b07111a2873d"
+    },
+    {
+      "path": "src/test_data_agent/io/mapping_loader.py",
+      "sha256": "a4b0d231c3a175b875dbae7f653c86fa6cff295c0f176fbcf770660fe68e7079"
+    },
+    {
+      "path": "src/test_data_agent/io/mapping_snapshot.py",
+      "sha256": "c33998d1be84782676abdb19ce92fa874e67cac79d7f4ca3058e8870c0189e65"
+    },
+    {
+      "path": "src/test_data_agent/io/parquet_encoding.py",
+      "sha256": "46df8604c0d6493fad3ef4a4eabd660acfcf7d979573a8a8ef3011365d832686"
+    },
+    {
+      "path": "src/test_data_agent/io/path_policy.py",
+      "sha256": "aa9d7da0071b8c3692ad7e1e5b76bee9c0371236d896fa14b15e5c568491dad7"
+    },
+    {
+      "path": "src/test_data_agent/io/readers.py",
+      "sha256": "11fabe33cffaa6d792a54caf088bd99fdf2e85c530e36dd94303ff022bb0a201"
+    },
+    {
+      "path": "src/test_data_agent/io/scalable.py",
+      "sha256": "faab90fa7c1a0b6a38b6d4ddedc43a96e344503d0a82f72f15a5f217f29932ff"
+    },
+    {
+      "path": "src/test_data_agent/io/scalable_validation.py",
+      "sha256": "d4772dc34c25b608b3a4083309d898b1af77e7974db3152837853a82a12d8796"
+    },
+    {
+      "path": "src/test_data_agent/io/sql_rows.py",
+      "sha256": "10db408d2c888496db7904a40865bb1d14d397578080a8b4ffa3df130b6559e6"
+    },
+    {
+      "path": "src/test_data_agent/io/streaming_csv.py",
+      "sha256": "f99825612b8f4cb8280f6fe11c8c505b1893f416f991e05c40855ee33a308f73"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_batch.py",
+      "sha256": "5112c362738205911ed9f0dad43ddb9aeb41d129b28dae1c30337c096e222ed8"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_batch_profile.py",
+      "sha256": "259941f008443d2b8f3f803aeac556fec7990774300e263b508e6f982c53f301"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_batch_receipt.py",
+      "sha256": "bf9d8341c38459834a1400f3071a31136b60860a45a7faab89bbfd639dc3ddd5"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_batch_workflow.py",
+      "sha256": "77208738c7fec0fb9109f908ec00c5c5ce37726a9bd2855bd948d9f54b93dc2b"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_decisions.py",
+      "sha256": "cc57a8d3405dffc727ed4da00521fbee12790688f4afa3cbf1d1e0a53ec3c8d8"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_execute.py",
+      "sha256": "8148e03cf497f794c190cd855a2f188bab9a55238e04bf658e8d5ba901b3cb2d"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_input.py",
+      "sha256": "c00500dd79220dbdccda4ce1475ce0058ddb72ffcc7e95d75905b18268ed7e0a"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_output.py",
+      "sha256": "7433b3f1a69923d0c9458ad5aa1426a893448b247ad5ae4c440d505282583562"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_parquet.py",
+      "sha256": "c14c07c768931b232fa6d412d14f15636547c955b86614a6051e36b9b21b200c"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_postgres_capture.py",
+      "sha256": "a5152cd977d82aa6632028089c0631a864c5ea58dfc41688c4faae56833e570d"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_postgres_stream.py",
+      "sha256": "ec44f4fcfca25fe15216629bd568e1475b600409787d2a919c9c8edebf7f15d4"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_publish.py",
+      "sha256": "9ac9ee9d3434d76a603e8eb9b36c73f6d33bd4ccf5fae36a11000c59edb12181"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_query_capture.py",
+      "sha256": "d25e520625fa9b6eaacb2ff7fd7e58f7ee342dd8082e9f354afc1080759fe25f"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_query_sessions.py",
+      "sha256": "9942b10620cd63042cf3e0665cd1f4a91a3a531408ddaeeaee3cf984016e6490"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_query_snapshot.py",
+      "sha256": "086e302827ed90d697923955bfaf6fb0dfba31c28893c03f61c8d9c0334a9e60"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_query_workflow.py",
+      "sha256": "91c1b661ea1943a195be2c3d30a763e365c58a939c526ca1e39b4aa61f0ab124"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_receipt.py",
+      "sha256": "40801cecbffcac77a3e3181c4a4a9345a44ec26aa29f76d981e3ea5e43088955"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_source.py",
+      "sha256": "f1d76d523cbf9e52ee430eff2a5570a63548bd85da1586f27b0cd222633549dd"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_sql.py",
+      "sha256": "2fcf1e1e67380e79ed638adddd6d3140ef75eb411d6a6abf6d2f513252340b45"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_sql_isolation.py",
+      "sha256": "f0ad72edf3149001fe33caab2f8cd6398e7539c23afc1c51a3b4306878d8185b"
+    },
+    {
+      "path": "src/test_data_agent/io/transformation_trino_stream.py",
+      "sha256": "a8a78a8270184f634b9dcbfc0f125c5d543d65b32aa6d0226c6492fd696e4cc9"
+    },
+    {
+      "path": "src/test_data_agent/io/workflows.py",
+      "sha256": "2dd5dffc61147434d9589649425cde72dc50f742a6e0ba90edaa17dd52054605"
+    },
+    {
+      "path": "src/test_data_agent/io/writers.py",
+      "sha256": "50e6158bb35ec8ec11d225f63381c206dd915d409d79416815b6e0d9664c91a3"
+    },
+    {
+      "path": "src/test_data_agent/mcp_generator_server.py",
+      "sha256": "d94ca8a9d2c5232afe4142ab1d8dea16391591cd2fedb27d001845587846b05b"
+    },
+    {
+      "path": "src/test_data_agent/mcp_generator_transport.py",
+      "sha256": "d8edbf898c582def926f3c7ea7fb97b1c052ba4bb3b5f7085b172def92b8cfcb"
+    },
+    {
+      "path": "src/test_data_agent/mcp_transformation_candidate.py",
+      "sha256": "e98874ae2a76124e42d488b2a98985172caa602eabac351bd1fdfa65d33edaa9"
+    },
+    {
+      "path": "src/test_data_agent/mcp_trino_server.py",
+      "sha256": "1ebc764a66c8e5709ebd5315f83ee1cf8f40d7f9fedfb6d3bb541d528768a64f"
+    },
+    {
+      "path": "src/test_data_agent/mcp_trino_transport.py",
+      "sha256": "f0ce18d979a7f09db098b1fe2b2829edd9927cc2ab3030bf420c4ab25eb39619"
+    },
+    {
+      "path": "src/test_data_agent/migration.py",
+      "sha256": "2a0b5e7106e7a337889c60ecc8fdca2c8b2dd22b7cd63b77adabb6ea24c6732d"
+    },
+    {
+      "path": "src/test_data_agent/postgres_client.py",
+      "sha256": "8dfe4146003b1eb424376144d7d1a8e06aa049bc2be5999f6a3df7d390288319"
+    },
+    {
+      "path": "src/test_data_agent/postgres_config.py",
+      "sha256": "1e425ccafea8bed7ab14ebb9b0cb9c9ae42886839afa7554c4121c024de5c135"
+    },
+    {
+      "path": "src/test_data_agent/postgres_profiler.py",
+      "sha256": "76beed3e37daed5a6e0705696f1f2ab7208bf935ac9f7321ba820b9bb7185155"
+    },
+    {
+      "path": "src/test_data_agent/postgres_query_builders.py",
+      "sha256": "a7dceae7c6bf76aab36b737a5265d96f74ab445c5b20ce1e82c5209fa4e8dca3"
+    },
+    {
+      "path": "src/test_data_agent/postgres_sql_export.py",
+      "sha256": "f125cb22a4ab1646ea90261854d0cd0adf14556f379d0619097adb37acc3e4c3"
+    },
+    {
+      "path": "src/test_data_agent/profile_types.py",
+      "sha256": "a578c2bb678256e8a83c9b2c7a4a9df684364b047937b6138cc2d286b1525baa"
+    },
+    {
+      "path": "src/test_data_agent/profiling/__init__.py",
+      "sha256": "ac3689e53075d0f12e9c80514b0531fb1254921e54e23b67adea345e792ac25e"
+    },
+    {
+      "path": "src/test_data_agent/profiling/budget.py",
+      "sha256": "fb1142cb46e7a1def8f6f1585689a918bd5a229572dd2fd65cb8ffe4bffb3e6e"
+    },
+    {
+      "path": "src/test_data_agent/profiling/cache.py",
+      "sha256": "87bdbc1d25df221f66d18adbd0b1cc6cb3182f5c244d26e20aeac69fed70e5e0"
+    },
+    {
+      "path": "src/test_data_agent/profiling/constraint_miner.py",
+      "sha256": "e6e1f58a488c559420fd26c75a8fffc273f079cbc0df27fbe9522328c6f6abe5"
+    },
+    {
+      "path": "src/test_data_agent/profiling/duckdb_distinct.py",
+      "sha256": "67d98adf169d969e73f000b095850c87bd0815fc4c254a9950dee0a732637f67"
+    },
+    {
+      "path": "src/test_data_agent/profiling/numeric_shape.py",
+      "sha256": "7ee96592674bcf41961bf3dec655f7882f7c984ca7d39d6abbbdbd27f2af627f"
+    },
+    {
+      "path": "src/test_data_agent/profiling/relationship_profiler.py",
+      "sha256": "6f5cd26c2d1e3518697d03b100d7820130ad1bb84e570696294a379b40b44423"
+    },
+    {
+      "path": "src/test_data_agent/profiling/schema_profiler.py",
+      "sha256": "3f98bd946f58fd842e40576e85942fd6003aecdf3354377e388de9cc0483692c"
+    },
+    {
+      "path": "src/test_data_agent/providers/__init__.py",
+      "sha256": "fd96aaf47b9574c0113f35a585047e392e68a875895b8906d51dd412fb107da8"
+    },
+    {
+      "path": "src/test_data_agent/providers/category_privacy.py",
+      "sha256": "10f62d4fa19b1f7bcc69637197f0ac4c4a01578f196fa4c4e1e5cd60f22c0762"
+    },
+    {
+      "path": "src/test_data_agent/providers/gigachat.py",
+      "sha256": "7924f4b6bf2c3563de07f4fc4b7896a26c51fb33f8747ce8e812c585990f06ef"
+    },
+    {
+      "path": "src/test_data_agent/providers/openai.py",
+      "sha256": "b8279f8fd3e3e7625891c7a78f9464ce542c7baf224d958fd0ba7acadcbf39d7"
+    },
+    {
+      "path": "src/test_data_agent/relationship_discovery.py",
+      "sha256": "2d6cdc7e7eb1ea816d205de542000aff90cfe81039c81efb9e657458fe926a89"
+    },
+    {
+      "path": "src/test_data_agent/resources/__init__.py",
+      "sha256": "4e9802cf4831281f7d5c08b8c1c205c0b79bbccfbe070ce677cf64343a3bfbd5"
+    },
+    {
+      "path": "src/test_data_agent/rules/__init__.py",
+      "sha256": "3a965e46aa9e1c30c610cb1742d2c58bad15c0a89e5f60e5899c8004eb790090"
+    },
+    {
+      "path": "src/test_data_agent/rules/business_config.py",
+      "sha256": "2f2db69079a195bb9558cdcc9ee0c363f98fe2279bc94aee57e2f18cfcceb41b"
+    },
+    {
+      "path": "src/test_data_agent/rules/conditions.py",
+      "sha256": "b8a2983ecf09b68fbac116746f46a6570257467371ef2f9d51aaa577f9cfa11e"
+    },
+    {
+      "path": "src/test_data_agent/rules/contract.py",
+      "sha256": "08031f4e636809445ac73c395bec31beeedc705d819a878a5d62c70f2d078edb"
+    },
+    {
+      "path": "src/test_data_agent/rules/engine.py",
+      "sha256": "9af46fbf24a14633bfc3d3fbc2493d57bf6e73e4b97569319755c736fe489ff7"
+    },
+    {
+      "path": "src/test_data_agent/rules/expressions.py",
+      "sha256": "040fa8dc93839a327030904acdf8a3d6728ad837e93493997930fc7f3e2caebc"
+    },
+    {
+      "path": "src/test_data_agent/rules/models.py",
+      "sha256": "99e9e4b05569a611ab3fd95d586e510841784f94e6a4e355e668185be536cb2f"
+    },
+    {
+      "path": "src/test_data_agent/rules/relational_scenarios.py",
+      "sha256": "332581a66524cbe22b8c42903fbce700cdb4d7db997dc5ec7ee70cf4f6662677"
+    },
+    {
+      "path": "src/test_data_agent/rules/scenarios.py",
+      "sha256": "ed9cb189daf3f36c6c3456f6ae63adc74b88cf4817628c70cbe43a74d4fa5b80"
+    },
+    {
+      "path": "src/test_data_agent/rules/typed_values.py",
+      "sha256": "59457803b43dc1076e6e90625ed8cfdcc84b584d148fe7a7c434376101f3fee5"
+    },
+    {
+      "path": "src/test_data_agent/rules/validation.py",
+      "sha256": "595a250ddaf5d5123bc36123c5261b5f3118fd4dacdb7fa2952902d060436ef2"
+    },
+    {
+      "path": "src/test_data_agent/rules_engine.py",
+      "sha256": "66548d0a6fd3367a984c879aa67ea8b2968ab5322ba5e2571c5a2bc835d2cee6"
+    },
+    {
+      "path": "src/test_data_agent/safety.py",
+      "sha256": "2371375c9749c99db70fb6199061d12520452bdea78886768f5b3bfbd4d4c810"
+    },
+    {
+      "path": "src/test_data_agent/scenario.py",
+      "sha256": "a119a68a5b7bf1e10fd83f4bddae39e3c613b23a016155c1f080df4ecb58d9c0"
+    },
+    {
+      "path": "src/test_data_agent/sql_query_adapters.py",
+      "sha256": "10dccb0a8cb2cb8eba8fcc1a8ed7e5f38f6564db71ab4f3d729062634777116c"
+    },
+    {
+      "path": "src/test_data_agent/sql_query_profiling.py",
+      "sha256": "3171cd0be82c119f07f55dfc331342d844bdd777d6dff0db1dee09ff51ab4a27"
+    },
+    {
+      "path": "src/test_data_agent/sql_query_source.py",
+      "sha256": "72dd258b9bafc50dd37358c3ba2aca30fe1f036fd87436091ed9953f3a98aa6a"
+    },
+    {
+      "path": "src/test_data_agent/trino_auth.py",
+      "sha256": "597bc63d4435dd1d92e03f8049658588f983ae13808b2764eff214a46da26f8a"
+    },
+    {
+      "path": "src/test_data_agent/trino_client.py",
+      "sha256": "cd94f0ae86ccccd0458c8de7876ff5c06fd22f31120a4091367ab9cb81127908"
+    },
+    {
+      "path": "src/test_data_agent/trino_config.py",
+      "sha256": "ba41e834ed849c4e735614d07117938f39b5eb92c392e8821ec307b07f62407d"
+    },
+    {
+      "path": "src/test_data_agent/trino_masking.py",
+      "sha256": "cfc9f93a5c20dd19c64aa14d60e6dac2a82c11365ec9a8db086b63aeebff6959"
+    },
+    {
+      "path": "src/test_data_agent/trino_profiling.py",
+      "sha256": "969133cdf756030209fa5d0d50575d68143f0270df5fa345c52a1164d43fbcb0"
+    },
+    {
+      "path": "src/test_data_agent/trino_query_builders.py",
+      "sha256": "671a1c8ff665977f8d4fa9e1a4390119aec46db1a60a2677193701937c9a0191"
+    },
+    {
+      "path": "src/test_data_agent/trino_sql_policy.py",
+      "sha256": "1037b98dffd399c05e85ddcc2492d7cec4807875653238d61084598a9abe6579"
+    },
+    {
+      "path": "src/test_data_agent/trino_work_budget.py",
+      "sha256": "c0569c8058f07ad5cb0e3fd0440dc2628b6044a95bfda3cbb70b54fc125e0599"
+    },
+    {
+      "path": "src/test_data_agent/validation/__init__.py",
+      "sha256": "b59d169c7a67f0631dfa7e18abf8a3c303cb031e68ad6fc560731f94e611fb43"
+    },
+    {
+      "path": "src/test_data_agent/validation/constraint_validator.py",
+      "sha256": "1cd06b6150ddc2c8c04376c1bd74d948e3727d1c78ebeb35d454060e98089919"
+    },
+    {
+      "path": "src/test_data_agent/validation/reconciliation.py",
+      "sha256": "a2e269952824a9ba2f829258c58bc23da64e9493d6a896b9090c0c0dbd5e4648"
+    },
+    {
+      "path": "src/test_data_agent/validation/relational_scenarios.py",
+      "sha256": "4c03c0aeb3cd09e4eb649c9bf331ffc5c72ad5799257eb4f50622c9ff7133095"
+    },
+    {
+      "path": "src/test_data_agent/validation/relationship_validator.py",
+      "sha256": "2ff7e1b6cd792c17ccbe88f305ff945a7a33456d0b95396fd5768edf4764ee94"
+    },
+    {
+      "path": "src/test_data_agent/validation/schema_validator.py",
+      "sha256": "52fd223323befb4b2635c38b7ad7ee7ac4ece352f3b5af07d200738791208942"
+    },
+    {
+      "path": "src/test_data_agent/validation/values.py",
+      "sha256": "31185f45da7fe8240ecdf096977d8336e898081bb74bbd1b36ad62e3b0cadb23"
+    },
+    {
+      "path": "src/test_data_agent/version.py",
+      "sha256": "84049ce8dd3f1bda464899578429eee9115f8e2df3efeb3e1c52575ef89f83d4"
+    },
+    {
+      "path": "src/test_data_agent/workspace_store.py",
+      "sha256": "8d74082d06dacfa55f6ab7b220daa075aab32b1aa0f6897ecaf1a9bef96960ac"
+    }
+  ],
+  "source_manifest_sha256": "c0b45d4e89ba3c028567f28d748c5c851c943d3d9449272c925df8cb05b081b5",
+  "source_manifest_digest_encoding": "SHA-256 of UTF-8 json.dumps(path_to_hash_map, sort_keys=True, separators=(',', ':'))",
+  "source_commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+  "provenance": {
+    "source_commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+    "started_utc": "2026-11-25T07:23:10.837327+00:00",
+    "finished_utc": "2026-11-25T07:28:11.178186+00:00",
+    "exit_code": 0,
+    "source_matches_commit_before_and_after": true,
+    "source_file_count": 176,
+    "import_origins": {
+      "benchmark_public_csv": "scripts/benchmark_public_csv.py",
+      "test_data_agent": "src/test_data_agent/__init__.py",
+      "test_data_agent.adapters.parallel_generation": "src/test_data_agent/adapters/parallel_generation.py",
+      "test_data_agent.io.streaming_csv": "src/test_data_agent/io/streaming_csv.py",
+      "test_data_agent.io.workflows": "src/test_data_agent/io/workflows.py",
+      "test_data_agent.io.writers": "src/test_data_agent/io/writers.py"
+    },
+    "environment_overrides": {
+      "PYTHONPATH": "${CHECKOUT}/src:${CHECKOUT}/scripts",
+      "PYTHONHASHSEED": "0",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "raw_report_sha256": "779b653495e33633a6cfc2b16742054a3a8cdd6bab0641922a99e6b3175255c6"
+  },
+  "publication_normalization": {
+    "lossless_source_map_conversion": "source_sha256 map to source_file_fingerprints path/digest records",
+    "machine_specific_paths": [
+      "environment.executable",
+      "settings.storage",
+      "provenance.environment_overrides.PYTHONPATH"
+    ]
+  },
+  "stage_groups": {
+    "generation_ipc": [
+      "generation_ipc"
+    ],
+    "validation_and_normalization": [
+      "combined_validation",
+      "schema_validation",
+      "privacy_validation",
+      "relationship_validation",
+      "constraint_validation",
+      "normalization",
+      "global_checks"
+    ],
+    "csv_encoding_and_io": [
+      "csv_encoding",
+      "csv_write"
+    ],
+    "artifacts_and_publication": [
+      "artifacts_and_hashing",
+      "publication"
+    ],
+    "setup_and_bookkeeping": [
+      "setup_and_bookkeeping"
+    ]
+  },
+  "focused_validation": {
+    "source_commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+    "tests": 127,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "test_files": [
+      "tests/test_public_csv_benchmark.py",
+      "tests/test_paired_csv_benchmark.py",
+      "tests/test_streaming_csv_bundle.py",
+      "tests/test_streaming_csv_export.py",
+      "tests/test_streaming_csv_cli.py"
+    ],
+    "generated_bundles_removed": true
+  },
+  "grouped_summary": [
+    {
+      "rows": 100000,
+      "mode": "legacy",
+      "median_stage_group_seconds": {
+        "generation_ipc": 3.4571391453500837,
+        "validation_and_normalization": 1.6778162084519863,
+        "csv_encoding_and_io": 0.5640964999329299,
+        "artifacts_and_publication": 0.01953352033160627,
+        "setup_and_bookkeeping": 0.013772500678896904
+      }
+    },
+    {
+      "rows": 100000,
+      "mode": "streaming",
+      "median_stage_group_seconds": {
+        "generation_ipc": 0.4375112724956125,
+        "validation_and_normalization": 1.8079757080413401,
+        "csv_encoding_and_io": 0.5696743957232684,
+        "artifacts_and_publication": 0.018941562622785568,
+        "setup_and_bookkeeping": 0.009650563355535269
+      }
+    },
+    {
+      "rows": 750000,
+      "mode": "legacy",
+      "median_stage_group_seconds": {
+        "generation_ipc": 25.8723419373855,
+        "validation_and_normalization": 12.555238083936274,
+        "csv_encoding_and_io": 4.182593166362494,
+        "artifacts_and_publication": 0.0861437302082777,
+        "setup_and_bookkeeping": 0.10690183285623789
+      }
+    },
+    {
+      "rows": 750000,
+      "mode": "streaming",
+      "median_stage_group_seconds": {
+        "generation_ipc": 0.532847877824679,
+        "validation_and_normalization": 13.703645479399711,
+        "csv_encoding_and_io": 4.214075117371976,
+        "artifacts_and_publication": 0.08881695847958326,
+        "setup_and_bookkeeping": 0.009811146417632699
+      }
+    }
+  ],
+  "paired_path_comparisons": [
+    {
+      "rows": 100000,
+      "pairs": [
+        {
+          "repeat": 1,
+          "order": [
+            "legacy",
+            "streaming"
+          ],
+          "api_seconds_streaming_over_legacy": 0.49517626684145116,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 1.7528434203547645
+        },
+        {
+          "repeat": 2,
+          "order": [
+            "streaming",
+            "legacy"
+          ],
+          "api_seconds_streaming_over_legacy": 0.4890564381167764,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 1.7457908465733933
+        },
+        {
+          "repeat": 3,
+          "order": [
+            "legacy",
+            "streaming"
+          ],
+          "api_seconds_streaming_over_legacy": 0.4967964973010866,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 1.5841695733834182
+        },
+        {
+          "repeat": 4,
+          "order": [
+            "streaming",
+            "legacy"
+          ],
+          "api_seconds_streaming_over_legacy": 0.5041406448171447,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 1.759922041105599
+        }
+      ],
+      "median_streaming_over_legacy": {
+        "api_seconds_streaming_over_legacy": 0.4959863820712689,
+        "sampled_peak_tree_rss_bytes_streaming_over_legacy": 1.749317133464079
+      }
+    },
+    {
+      "rows": 750000,
+      "pairs": [
+        {
+          "repeat": 1,
+          "order": [
+            "legacy",
+            "streaming"
+          ],
+          "api_seconds_streaming_over_legacy": 0.4346376742278603,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 0.2847459571991771
+        },
+        {
+          "repeat": 2,
+          "order": [
+            "streaming",
+            "legacy"
+          ],
+          "api_seconds_streaming_over_legacy": 0.43323709283493705,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 0.2866639889173969
+        },
+        {
+          "repeat": 3,
+          "order": [
+            "legacy",
+            "streaming"
+          ],
+          "api_seconds_streaming_over_legacy": 0.43314723646711956,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 0.28836137245412713
+        },
+        {
+          "repeat": 4,
+          "order": [
+            "streaming",
+            "legacy"
+          ],
+          "api_seconds_streaming_over_legacy": 0.4340456503974742,
+          "sampled_peak_tree_rss_bytes_streaming_over_legacy": 0.28553052027857434
+        }
+      ],
+      "median_streaming_over_legacy": {
+        "api_seconds_streaming_over_legacy": 0.43364137161620564,
+        "sampled_peak_tree_rss_bytes_streaming_over_legacy": 0.28609725459798563
+      }
+    }
+  ]
+}
