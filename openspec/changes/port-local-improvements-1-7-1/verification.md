@@ -115,3 +115,42 @@ the rejected status as a raw string; the corresponding release test also warns.
 The 100,000/750,000 × 25-field performance campaigns were not repeated for this
 port. Historical results remain source-bound. Corpus/parity tests do not prove
 real-world detector recall, and bounded tile admission is not an OS RSS cap.
+
+## Release candidate safety follow-up
+
+Independent review of `204a32405b8edf8ad366d849ff0a5ef9fb0d0c11` found two
+release blockers. That candidate and its artifacts are not releasable.
+
+`GenerationBudget.remaining_seconds()` again calls the polymorphic `check()`
+before calculating native-work time. A real injected-clock `QueryWorkBudget`
+rejects expired requests through both `InvocationGenerationBudget` and
+`_McpTransformationBudget`, even while the generation deadline is live.
+Configured PostgreSQL and Trino capture refuse before entering the worker
+boundary when the request expires after policy checks. All six regressions
+failed before the fix and pass after it; the existing clock test now asserts
+elapsed-time behavior without requiring a particular number of clock reads.
+
+Native Parquet/PostgreSQL-query/Trino-query transformation profiling no longer
+retains unused distinct-digest sets. Distinctness remains unknown rather than
+reporting a false exact zero; privacy/type/null counters and bounded samples
+remain active. The three native regressions failed before the fix and pass
+after it, covering 64/2,048 distinct rows, both row orders and late sensitive/null
+evidence. Exact CSV distinct orchestration is unchanged. Neither fix changes
+read authority, transformation activation, approval rules or dependencies.
+
+A diagnostic working-tree run passed 272 tests and skipped two across the 13
+focused budget/capture/isolation/profiling modules. The skipped cases are
+`test_common_mcp_expiry_during_capture_is_typed_and_never_publishes[True-review]`
+and `[True-validate]` in `tests/test_transformation_review_regressions.py`, both
+with reason `only execute accepts a destination`; those combinations do not
+accept destination retention. Ruff and mypy (176 source files) passed.
+This shared-working-tree evidence is diagnostic. A final combined run on the
+frozen repair files passed 89 tests across the budget, configured SQL capture,
+CSV distinct and native-profile regression modules; Ruff and mypy also passed.
+The related native source/execute/query/batch/receipt run passed 585 tests and
+skipped four opt-in isolated CLI/MCP composition cases. Seven controlling-TTY
+cases failed in the sandbox; the selected external-sandbox rerun passed all 12
+selected cases, including those seven. No live source or dataset approval was
+used. Exact-source review and replacement Ubuntu-artifact acceptance remain
+required before any tag or publication; historical evidence keeps its original
+identity.

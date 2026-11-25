@@ -128,9 +128,11 @@ def test_single_csv_backend_failure_does_not_return_partial_profile(
 
 
 def test_generation_remaining_budget_is_bounded_and_expires() -> None:
-    ticks = iter([0.0, 0.25, 1.0])
-    budget = GenerationBudget(max_seconds=1.0, clock=lambda: next(ticks))
+    now = [0.0]
+    budget = GenerationBudget(max_seconds=1.0, clock=lambda: now[0])
+    now[0] = 0.25
     assert budget.remaining_seconds() == 0.75
+    now[0] = 1.0
     with pytest.raises(GenerationLimitError, match="native work configuration"):
         budget.remaining_seconds()
 
