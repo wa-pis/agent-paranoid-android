@@ -24,3 +24,15 @@ Historical local completion evidence: [final review](final-review.md) and
 
 Current evidence: [CI follow-up](ci-followup.md),
 [CSV benchmark](public-csv-current.md) and [human review guide](review-guide.md).
+
+## Release candidate safety follow-up
+
+- [x] Restore polymorphic request-deadline checks before native work; reproduce
+  both captured budget subclasses and PostgreSQL/Trino pre-spawn refusals.
+- [x] Remove unused unbounded distinct-digest retention from native
+  transformation profiling; retain unknown distinctness and privacy evidence.
+- [ ] Qualify the replacement candidate with fresh exact-source release gates,
+  review and installed Ubuntu-artifact acceptance before tagging/publication.
+
+The `204a3240` candidate is not releasable. See the release follow-up in
+[verification](verification.md#release-candidate-safety-follow-up).

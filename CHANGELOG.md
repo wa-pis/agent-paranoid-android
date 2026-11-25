@@ -42,6 +42,11 @@ generation. Stable 1.7.1 remains the recommended release.
 
 ### Security
 
+- Enforce captured MCP invocation deadlines before configuring native work or
+  starting configured SQL capture, even while the generation deadline is live.
+- Remove unused per-cell distinct digest retention from native transformation
+  profiling while retaining privacy evidence and bounded samples. Omitted
+  distinct counts remain unknown, without changing exact CSV counting.
 - Apply shared sensitivity checks to computed folder CSV numeric summaries and
   suppress protected distributions before publication or caching.
 - Apply sensitive numeric-summary and categorical-content guards across source
