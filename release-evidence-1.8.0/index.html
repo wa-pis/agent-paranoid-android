@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/release-evidence-1.8.0/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>1.8.0 release evidence - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../css/print-site.css" rel="stylesheet" />
+        <link href="../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1.8.0 release evidence";
+        var mkdocs_page_input_path = "release-evidence-1.8.0.md";
+        var mkdocs_page_url = "/agent-paranoid-android/release-evidence-1.8.0/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+<meta name="robots" content="noindex">
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+          <a href=".." class="icon icon-home"> Agent Paranoid Android
+        </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+<div lang="en">
+
+  
+    
+
+<p class="caption"><span class="caption-text">Start Here</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="..">Overview</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/installation/">Installation</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/first-csv/">First CSV Dataset</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/related-tables/">Related Tables</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../getting-started/review-output/">Review The Output</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">How-To Guides</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/business-rules/">Add Business Rules</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/postgresql/">Profile PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/trino/">Profile Through Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/transformation/">Transform Local Data</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/parallel-generation/">Parallel And Streaming CSV</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Integrations</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/mcp/">Connect An MCP Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../ai_integration/">Connect An AI Client</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/containers/">Containers</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference Index</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/choosing-an-approach/">Choose An Approach</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/profiles-and-specs/">Profiles And Specs</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../concepts/safety-model/">Safety Model</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Help</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../operations/troubleshooting/">Troubleshooting</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../known-issues/">Known Issues</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../downloads/">Downloads</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../versions/">Versions</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../roadmap/">Roadmap</a></li>
+  
+</ul>
+
+  
+
+  
+    
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../history/">History And Maintenance</a>
+  </li>
+</ul>
+
+  
+
+  
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="..">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">1.8.0 release evidence</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/release-evidence-1.8.0.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="../ru/" hreflang="ru" lang="ru">Русский (главная)</a>
+  
+</nav>
+
+<div lang="en">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Historical / maintainer material</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
+</aside>
+
+
+
+                <h1 id="180-release-evidence">1.8.0 release evidence<a class="headerlink" href="#180-release-evidence" title="Permanent link">&para;</a></h1>
+<p>Stable 1.8.0 is published and its packages and three signed images are publicly verified.
+The signed <code>v1.8.0</code> tag targets <code>b62bc17e49800e17f521cf5ea9f9043f55e0c5b8</code>
+(tree <code>714035198e99059f9c8d3ea84a0b24167013a76e</code>); its annotated tag object is
+<code>3251c73e41925a346d1809b9ac61e819b582a2a8</code>.
+<a href="https://github.com/wa-pis/agent-paranoid-android/releases/tag/v1.8.0">GitHub</a>, <a href="https://pypi.org/project/agent-paranoid-android/1.8.0/">PyPI</a> and all three
+signed images passed <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45611255179">artifacts-scope public verification</a>
+(13/13 jobs).
+The <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45608232472">Release workflow</a> passed and the GitHub stable release is published.
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45609755195">PyPI</a> passed. Public GitHub/PyPI distribution hashes and sizes match the accepted Ubuntu artifacts; stable-tag/source/workflow/environment publisher claims were verified.
+The <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45608232495">Containers workflow</a> passed all 11 jobs. Anonymous public registry manifests confirm the listed digests for both <code>linux/amd64</code> and <code>linux/arm64</code>.
+Artifacts-scope verification completed with all 13 jobs passing and no skips.</p>
+<h2 id="promotion-and-exact-stable-source-gates">Promotion and exact stable-source gates<a class="headerlink" href="#promotion-and-exact-stable-source-gates" title="Permanent link">&para;</a></h2>
+<p>This is a version/documentation-only promotion of the
+<a href="../release-evidence-1.8.0rc1/">accepted 1.8.0rc1 runtime</a>. Runtime behavior,
+dependencies, build settings, seeds, privacy boundaries and test scenarios are
+unchanged. Candidate acceptance and historical benchmarks retain their original
+source/artifact identities; they are not fresh stable execution evidence.</p>
+<p>Exact-source <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45603349901">CI</a>, <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45603349621">Containers</a>,
+<a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45603349539">Documentation</a> and <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45603350294">Security</a>
+passed. The <a href="https://github.com/wa-pis/agent-paranoid-android/actions/runs/45603390766">Ubuntu preflight</a>
+passed the full release gate: <strong>6,222 passed, 26 skipped,
+92.25% coverage</strong>. Skipped tests were not executed;
+no live database/provider coverage is inferred.</p>
+<p>The <a href="https://github.com/wa-pis/agent-paranoid-android/pull/723">independent technical AI source review</a> approved the exact stable source.
+The <a href="https://github.com/wa-pis/agent-paranoid-android/releases/download/v1.8.0/independent-artifact-audit-1.8.0.md">independent artifact audit</a> passed for the exact stable source and accepted Ubuntu artifacts.
+All 18 source finding dispositions remain recorded: 17 closed and RC6-S20 approved within its stated external-control limits. Current private PyPI administrator settings were not inspected.
+AI review is not human approval or dataset authorization.</p>
+<h2 id="artifacts">Artifacts<a class="headerlink" href="#artifacts" title="Permanent link">&para;</a></h2>
+<p>Accepted Ubuntu preflight and verified public GitHub/PyPI distributions agree on SHA-256:</p>
+<ul>
+<li>Wheel: <code>c7a8d059835494cce6e3461c5ee987e0d5eed1e095814850ce82a420540aa06d</code> (469,364 bytes)</li>
+<li>Sdist: <code>b352f5fb2c6fbe4c5322dba4764babae291b22bf2e6761d80bc93f9a4461ed9e</code> (3,091,827 bytes)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Signed image</th>
+<th>Published digest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLI</td>
+<td><code>sha256:b7764a1e989fc23f4037cecc8a4cb4115aa6bef92ea6177a36d6dc822d73a42d</code></td>
+</tr>
+<tr>
+<td>Generator MCP</td>
+<td><code>sha256:4f33186a1abf7aa8bb805cf782cbc2e533ddaae7d3d4607552b42ae42c76fb5b</code></td>
+</tr>
+<tr>
+<td>Trino MCP</td>
+<td><code>sha256:d2824d266aba8550551a0dda8bacfa39699df8ae2c946131292101b9b0c6ec70</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="installed-acceptance">Installed acceptance<a class="headerlink" href="#installed-acceptance" title="Permanent link">&para;</a></h2>
+<p>The accepted stable Ubuntu wheel passed <strong>600/600 core routes for MCP SDK1</strong> and
+<strong>600/600 for MCP SDK2</strong>, with
+two seeded runs per route.
+Each SDK covered 200 routes per Python, CLI and real-stdio MCP interface; repeat and cross-interface logical/spec/validation/business-report checks passed, and MCP processes were reaped. Installed payload/origin and dependency checks passed before/after. Each SDK also matched all 600 publicly hash-bound accepted RC routes across six declared logical/specification/validation/business/count fields with zero differences. This is logical parity, not byte identity of version-dependent artifacts. Database fixtures were fictional stand-ins.</p>
+<p>Separate installed option selections passed <strong>644 SDK2
+tests and 100 base tests</strong>, with
+0 failures and 0 skips.
+All six captured-deadline/pre-spawn and three native-profile-bounds regressions passed. The base environment had no Arrow, DuckDB or MCP. Execution used target Python <code>-I</code>, no <code>PYTHONPATH</code> and a root-only pytest path override. Before/after installed package and dist-info payload/provenance checks passed; dependency maps were unchanged. No per-test origin recorder was used.
+SDK1 used compatibility-only MCP 1.28.1 and httpx-sse 0.4.3; project dependencies and lockfile were unchanged.</p>
+<p>The public bounded <a href="https://github.com/wa-pis/agent-paranoid-android/releases/download/v1.8.0/installed-acceptance-1.8.0.json">installed acceptance asset</a>
+has SHA-256 <code>864ca216c388d606303c054d28b9762c83402da5dcbf45c9aed2a65eb9c1c9ec</code>.
+The public <a href="https://github.com/wa-pis/agent-paranoid-android/releases/download/v1.8.0/independent-artifact-audit-1.8.0.md">artifact audit</a> has SHA-256
+<code>c194ff99776137e10034d1190a0b0621cc18090cf944f6c8cdba00e2f35aab75</code>.
+Both assets were downloaded without authentication and matched the reviewed
+bytes and hashes.
+Core routes and selected options are separate finite scopes, not exhaustive
+option combinations or new capacity measurements. No live database/provider
+campaign, new manual human acceptance or dataset approval is claimed.</p>
+<h2 id="documentation-and-retained-boundaries">Documentation and retained boundaries<a class="headerlink" href="#documentation-and-retained-boundaries" title="Permanent link">&para;</a></h2>
+<p>Stable guidance belongs at
+<a href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/"><code>versions/1.8.0/</code></a>.
+The documentation revision and full-scope public verification are tracked
+separately; artifacts-only verification does not establish live guide acceptance.
+Historical documentation, RC evidence and benchmarks keep their original
+identities. The separate human-review task remains open. Publication grants no
+source access, dataset approval or new transformation activation.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/print-site.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

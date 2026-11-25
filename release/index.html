@@ -207,9 +207,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Historical / maintainer material</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Historical / maintainer material</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -224,6 +224,30 @@ checks. Advance the stable documentation pointer only after the package's public
 verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.</p>
+<h2 id="180-stable-promotion">1.8.0 Stable Promotion<a class="headerlink" href="#180-stable-promotion" title="Permanent link">&para;</a></h2>
+<p>Stable <a href="../1.8.0-release-status/">1.8.0</a> promotes the runtime of the
+<a href="../release-evidence-1.8.0rc1/">publicly verified 1.8.0rc1 candidate</a>.
+Compare every hunk with signed <code>v1.8.0rc1</code>: only version/classifier metadata,
+the root lockfile version, release documentation and version-only validation
+assertions may change. Retain the accepted runtime, dependencies, build,
+packaging, security boundaries and test scenarios unchanged.</p>
+<p>The exact stable-source gates, independent reviews, Ubuntu artifact hashes,
+installed-artifact acceptance, signed manifest and public verification are
+recorded in <a href="../release-evidence-1.8.0/">stable release evidence</a>. Candidate
+evidence retains its original identity and does not qualify the stable artifacts.
+The documentation revision and full-scope verification are tracked separately.
+Publication does not grant dataset approval or new transformation activation;
+the separate human-review task remains open.</p>
+<h2 id="180rc1-profiling-and-generation-candidate">1.8.0rc1 Profiling And Generation Candidate<a class="headerlink" href="#180rc1-profiling-and-generation-candidate" title="Permanent link">&para;</a></h2>
+<p>Candidate <a href="../1.8.0rc1-release-status/">1.8.0rc1</a> packages shared profiling/privacy,
+optional exact distinct counting, opt-in tiled/streaming CSV and validation/
+calculation changes. Its exact-source gates, installed fictional acceptance and
+public package/image verification are recorded in
+<a href="../release-evidence-1.8.0rc1/">release evidence</a>. At that candidate checkpoint,
+stable 1.7.1 remained recommended. Prior port and benchmark evidence keeps its
+original source identity. Candidate guidance belongs at <code>versions/1.8.0rc1/</code>;
+its publication did not advance the stable catalog or default. Stable promotion
+requires the separate authorization and gates described above.</p>
 <h2 id="171-corrective-release">1.7.1 Corrective Release<a class="headerlink" href="#171-corrective-release" title="Permanent link">&para;</a></h2>
 <p>Qualify the CLI and MCP corrections from PR #714 in
 <a href="../1.7.1rc1-release-status/">1.7.1rc1</a> before promoting the accepted runtime

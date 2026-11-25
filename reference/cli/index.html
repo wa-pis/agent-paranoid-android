@@ -207,9 +207,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -298,13 +298,14 @@ points, then exits successfully.</p>
 </tr>
 </tbody>
 </table>
-<p>Development-only addition: <a href="../../how-to/dataset-capacity/"><code>estimate-capacity</code></a>
+<p>Stable 1.8.0 includes <a href="../../how-to/dataset-capacity/"><code>estimate-capacity</code></a>, which
 forecasts file/database bytes and optionally local generation time. The same
-guide describes opt-in <code>scalable-v1</code> policy settings. These additions are
-unreleased and absent from published <code>1.7.0rc1</code>.</p>
-<p>The current development checkout additionally provides explicit
+guide describes opt-in <code>scalable-v1</code> policy settings and their existing bounds
+and calibration limits.</p>
+<p>Stable 1.8.0 additionally provides explicit
 <code>generate --stream-csv [--workers 1..4]</code> and <code>doctor --require-extra profiling</code>.
-These new options are absent from published 1.7.1; see
+These new options are absent from published 1.7.1; check
+<a href="../../1.8.0-release-status/">release status</a> and see
 <a href="../../how-to/parallel-generation/">Parallel Generation And Streaming CSV</a> for
 eligibility, fallback, limits and the separate deterministic <code>tiled-v1</code> stream.</p>
 <h2 id="selective-transformation-review-and-policy-decisions">Selective Transformation (Review And Policy Decisions)<a class="headerlink" href="#selective-transformation-review-and-policy-decisions" title="Permanent link">&para;</a></h2>

@@ -42,9 +42,9 @@
 </nav>
 <div lang="en">
 <aside aria-label="Documentation version" class="documentation-identity">
-<strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br/>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br/>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+<strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br/>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br/>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br/><a href="https://wa-pis.github.io/agent-paranoid-android/versions/stable/">Stable version selector</a> · <a href="https://wa-pis.github.io/agent-paranoid-android/downloads/">Downloads</a>
 </aside>
 <section class="handbook-cover"><h1>Agent Paranoid Android</h1><p>User Handbook / Руководство пользователя</p><p>Reproducible synthetic test data for CSV and database workflows</p></section>
@@ -73,12 +73,12 @@
 without copying source rows. Start with a file, safe database metadata, or an
 explicit specification, then review the plan before generating fresh values.</p>
 <p><a id="project-status"></a></p>
-<p>Stable <code>1.7.1</code> is the recommended release.
+<p>Stable <code>1.8.0</code> is the recommended release.
 Use the CLI below or the runnable
-<a href="https://github.com/wa-pis/agent-paranoid-android/tree/v1.7.1/examples/python_api">Python API example</a>.</p>
-<p>See <a href="https://wa-pis.github.io/agent-paranoid-android/1.7.1-release-status/">publication status</a> before installing.</p>
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/v1.8.0/examples/python_api">Python API example</a>.</p>
+<p>See <a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">publication status</a> before installing.</p>
 <h2 id="index-five-minute-check">Five-Minute Check<a class="headerlink" href="#index-five-minute-check" title="Permanent link">¶</a></h2>
-<pre><code class="language-bash">python3 -m pip install "agent-paranoid-android==1.7.1"
+<pre><code class="language-bash">python3 -m pip install "agent-paranoid-android==1.8.0"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 </code></pre>
@@ -153,7 +153,7 @@ metadata, never raw PII, secrets or source rows. See the
 <a href="https://wa-pis.github.io/agent-paranoid-android/versions/">Documentation Versions</a>. Maintainer and release records live in
 <a href="https://wa-pis.github.io/agent-paranoid-android/history/">History And Maintenance</a>.</p></section><section class="print-page" heading-number="1.2" id="getting-started-installation"><h1 id="getting-started-installation-installation">Installation<a class="headerlink" href="#getting-started-installation-installation" title="Permanent link">¶</a></h1>
 <p>English · <a href="#ru-getting-started-installation">Русский</a></p>
-<p>Stable <code>1.7.1</code> is the recommended release after publication.</p>
+<p>Stable <code>1.8.0</code> is the recommended release after publication.</p>
 <h2 id="getting-started-installation-requirements">Requirements<a class="headerlink" href="#getting-started-installation-requirements" title="Permanent link">¶</a></h2>
 <ul>
 <li>Python 3.11 or newer</li>
@@ -169,40 +169,45 @@ changing this matrix are defined in
 <a href="https://wa-pis.github.io/agent-paranoid-android/reference/generation-contract-migration/">migration notes</a> before
 regenerating existing fixtures.</p>
 <h2 id="getting-started-installation-install-from-pypi">Install From PyPI<a class="headerlink" href="#getting-started-installation-install-from-pypi" title="Permanent link">¶</a></h2>
-<p>The stable release is <code>1.7.1</code>. Check <a href="https://wa-pis.github.io/agent-paranoid-android/1.7.1-release-status/">publication status</a> before installing.</p>
+<p>The stable release is <code>1.8.0</code>. Check <a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">publication status</a> before installing.</p>
+<p>Streaming CSV generation needs only the base package. The optional <code>profiling</code>
+extra supplies DuckDB/Arrow for exact input distinct counting above the
+in-memory threshold; it does not select a generation engine. See
+<a href="#how-to-parallel-generation">Parallel Generation And Streaming CSV</a>.</p>
 <p>Create an isolated environment:</p>
 <h3 id="getting-started-installation-macos-and-linux">macOS and Linux<a class="headerlink" href="#getting-started-installation-macos-and-linux" title="Permanent link">¶</a></h3>
 <pre><code class="language-bash">python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.7.1"
+python3 -m pip install "agent-paranoid-android==1.8.0"
 </code></pre>
 <p>The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:</p>
-<pre><code class="language-bash">python3 -m pip install "agent-paranoid-android[parquet]==1.7.1"
-python3 -m pip install "agent-paranoid-android[mcp]==1.7.1"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.7.1"
-python3 -m pip install "agent-paranoid-android[postgres]==1.7.1"
-python3 -m pip install "agent-paranoid-android[openai]==1.7.1"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.7.1"
+<pre><code class="language-bash">python3 -m pip install "agent-paranoid-android[parquet]==1.8.0"
+python3 -m pip install "agent-paranoid-android[profiling]==1.8.0"
+python3 -m pip install "agent-paranoid-android[mcp]==1.8.0"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.8.0"
+python3 -m pip install "agent-paranoid-android[postgres]==1.8.0"
+python3 -m pip install "agent-paranoid-android[openai]==1.8.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.8.0"
 </code></pre>
 <p>Dependency footprint budgets live in <a href="https://wa-pis.github.io/agent-paranoid-android/reference/dependency-compatibility/#installation-footprint">Dependency Compatibility</a>.</p>
 <p>The <code>all</code> extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 <code>test-data-agent doctor --require-extra all</code> to verify that full environment.</p>
-<p>The experimental GigaChat adapter is retained in <code>1.7.1</code> through its
+<p>The experimental GigaChat adapter is retained in <code>1.8.0</code> through its
 explicit <code>gigachat</code> extra. Follow
 <a href="https://wa-pis.github.io/agent-paranoid-android/how-to/gigachat/">Use The GigaChat Advisor</a> for authentication, mandatory
 TLS verification, and the review-first workflow. The default provider remains
 OpenAI.</p>
 <p><a id="accepted-candidate-baseline"></a></p>
-<p>Stable <code>1.7.1</code> is the recommended default. Add an optional extra to the same
+<p>Stable <code>1.8.0</code> is the recommended default. Add an optional extra to the same
 exact stable pin only when needed.</p>
 <h3 id="getting-started-installation-windows-powershell">Windows PowerShell<a class="headerlink" href="#getting-started-installation-windows-powershell" title="Permanent link">¶</a></h3>
 <pre><code class="language-powershell">py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "agent-paranoid-android==1.7.1"
+python -m pip install "agent-paranoid-android==1.8.0"
 </code></pre>
 <p>Run the self-contained environment check:</p>
 <pre><code class="language-bash">test-data-agent doctor
@@ -733,7 +738,7 @@ source-key retention or duplicate merge occurs. Missing observations differ from
 nullable values. Declare entity/attribute uniqueness separately if required;
 the example intentionally permits repeated generated pairs.</p></section><section class="print-page" heading-number="2.2" id="how-to-postgresql"><h1 id="how-to-postgresql-profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#how-to-postgresql-profile-postgresql" title="Permanent link">¶</a></h1>
 <p>English · <a href="#ru-how-to-postgresql">Русский</a></p>
-<p>Database profiling is available in stable <code>1.7.1</code> and requires explicit
+<p>Database profiling is available in stable <code>1.8.0</code> and requires explicit
 read-only configuration, allowlists and resource budgets.</p>
 <p>Install the optional driver:</p>
 <pre><code class="language-bash">pip install "agent-paranoid-android[postgres]"
@@ -915,13 +920,13 @@ a placeholder JDBC-style URL, or <code>examples/local_postgres/run-wildcard.sh
 OUTPUT</code> for bounded table-qualified wildcard expansion. Run
 <code>examples/local_postgres/run-query.sh OUTPUT</code> for the reviewed query-file path.</p></section><section class="print-page" heading-number="2.3" id="how-to-trino"><h1 id="how-to-trino-profile-through-trino">Profile Through Trino<a class="headerlink" href="#how-to-trino-profile-through-trino" title="Permanent link">¶</a></h1>
 <p>English · <a href="#ru-how-to-trino">Русский</a></p>
-<p>Database profiling is available in stable <code>1.7.1</code> and requires explicit
+<p>Database profiling is available in stable <code>1.8.0</code> and requires explicit
 read-only configuration, allowlists and resource budgets.</p>
 <p>Install the optional Trino client and, when using MCP, the MCP SDK:</p>
 <pre><code class="language-bash">pip install "agent-paranoid-android[trino]"
 pip install "agent-paranoid-android[mcp,trino]"
 </code></pre>
-<p>Stable <code>1.7.1</code> supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
+<p>Stable <code>1.8.0</code> supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
 certificates are documented in the
 <a href="https://wa-pis.github.io/agent-paranoid-android/reference/configuration/#trino-connection">configuration reference</a>. Follow its
 runtime secret-indirection, HTTPS verification and local OAuth opt-in rules.
@@ -1487,9 +1492,10 @@ flag unsupported relational execution rather than certifying it.</p>
 recovery share this engine. Changing the engine changes the specification
 fingerprint and requires renewed human review. Automated SDK acceptance is
 technical evidence and does not represent manual client acceptance for a release.</p></section><section class="print-page" heading-number="2.6" id="how-to-parallel-generation"><h1 id="how-to-parallel-generation-parallel-generation-and-streaming-csv">Parallel Generation And Streaming CSV<a class="headerlink" href="#how-to-parallel-generation-parallel-generation-and-streaming-csv" title="Permanent link">¶</a></h1>
-<p>This page describes <strong>unreleased development-checkout features</strong> ported onto
-the 1.7.1 baseline. Published 1.7.1 does not include <code>--stream-csv</code> or the
-<code>tiled-v1</code> Python API. Existing ordinary generation and reviewed
+<p>This page describes <strong>stable 1.8.0 features</strong>; check
+<a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">publication status</a> before installing.
+Published 1.7.1 does not include <code>--stream-csv</code> or the <code>tiled-v1</code> Python API.
+Existing ordinary generation and reviewed
 <code>scalable-v1</code>/<code>scalable-relational-v1</code> policies remain available; see
 <a href="#how-to-dataset-capacity">capacity and scalable generation</a>.</p>
 <h2 id="how-to-parallel-generation-choose-the-export-path">Choose The Export Path<a class="headerlink" href="#how-to-parallel-generation-choose-the-export-path" title="Permanent link">¶</a></h2>
@@ -1527,8 +1533,8 @@ the 1.7.1 baseline. Published 1.7.1 does not include <code>--stream-csv</code> o
 <p>An export does not switch engines merely because it is large. The new public
 streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
 The optional <code>profiling</code> extra serves large input distinct counting, not CSV
-generation. Install this branch from its checkout before trying the new options:</p>
-<pre><code class="language-bash">python -m pip install -e .
+generation. Install the exact stable version:</p>
+<pre><code class="language-bash">python -m pip install "agent-paranoid-android==1.8.0"
 </code></pre>
 <h2 id="how-to-parallel-generation-export-a-reviewed-spec">Export A Reviewed Spec<a class="headerlink" href="#how-to-parallel-generation-export-a-reviewed-spec" title="Permanent link">¶</a></h2>
 <p>Use a reviewed DatasetSpec, for example this independently authored synthetic
@@ -2103,13 +2109,13 @@ deterministic generation, validates the output, and reports the result.</p>
 <pre><code class="language-bash">python3 -m pip install agent-paranoid-android
 </code></pre>
 <p>Add only the integrations the AI client needs. The exact pin below selects
-stable 1.7.1; see <a href="https://wa-pis.github.io/agent-paranoid-android/1.7.1-release-status/">publication status</a>.</p>
+stable 1.8.0; see <a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">publication status</a>.</p>
 <pre><code class="language-bash">python3 -m pip install "agent-paranoid-android[mcp,trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.7.1"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.8.0"
 </code></pre>
 <p>The experimental GigaChat adapter is included in stable <code>1.5.0</code> as an explicit
-opt-in and retained in stable <code>1.7.1</code>. OpenAI remains the default
+opt-in and retained in stable <code>1.8.0</code>. OpenAI remains the default
 provider. Follow
 <a href="https://wa-pis.github.io/agent-paranoid-android/how-to/gigachat/">Use The GigaChat Advisor</a> before configuring credentials.</p>
 <h2 id="ai_integration-agent-mode">Agent Mode<a class="headerlink" href="#ai_integration-agent-mode" title="Permanent link">¶</a></h2>
@@ -2516,7 +2522,7 @@ bounded CSV, PostgreSQL, or Trino evidence without copying source rows. Its
 primary interfaces are the CLI and Python library. Database clients, MCP, and
 AI providers are optional integrations around the same review and validation
 boundaries.</p>
-<p>The database workflows below are available in stable <code>1.7.1</code>.</p>
+<p>The database workflows below are available in stable <code>1.8.0</code>.</p>
 <h2 id="concepts-choosing-an-approach-quick-comparison">Quick Comparison<a class="headerlink" href="#concepts-choosing-an-approach-quick-comparison" title="Permanent link">¶</a></h2>
 <table>
 <thead>
@@ -2624,7 +2630,7 @@ literal:</p>
 <p>This authorization remains local. External advisors receive deterministic
 field-scoped labels, and default MCP responses do not receive the exact enum.</p>
 <h3 id="concepts-profiles-and-specs-sql-query-source">SQL Query Source<a class="headerlink" href="#concepts-profiles-and-specs-sql-query-source" title="Permanent link">¶</a></h3>
-<p>This source type is available in stable <code>1.7.1</code>.</p>
+<p>This source type is available in stable <code>1.8.0</code>.</p>
 <p>One reviewed local query file can shape a PostgreSQL or Trino virtual entity:</p>
 <pre><code class="language-bash">test-data-agent profile-query query.sql \
   --adapter postgres \
@@ -2908,11 +2914,11 @@ package or a problem with deployment credentials.</p>
 <p><code>doctor --require-extra gigachat</code> uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 <code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>, obtain a token, or contact
-GigaChat. Install stable <code>1.7.1</code> with the <code>gigachat</code> extra.
-See <a href="https://wa-pis.github.io/agent-paranoid-android/1.7.1-release-status/">release status</a>.</p>
+GigaChat. Install stable <code>1.8.0</code> with the <code>gigachat</code> extra.
+See <a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">release status</a>.</p>
 <h2 id="operations-troubleshooting-jdbc-style-url-rejected">JDBC-Style URL Rejected<a class="headerlink" href="#operations-troubleshooting-jdbc-style-url-rejected" title="Permanent link">¶</a></h2>
 <p>JDBC-style endpoint input, qualified column wildcards, and <code>profile-query</code> are
-available in stable <code>1.5.0</code> and retained in stable <code>1.7.1</code>.</p>
+available in stable <code>1.5.0</code> and retained in stable <code>1.8.0</code>.</p>
 <p>Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,
 allowlists, and budgets in their existing settings. Remove duplicate or
@@ -2951,7 +2957,7 @@ profile. Errors intentionally omit SQL text, literals, endpoints, and backend
 messages; inspect the local reviewed file and allowlists instead.</p>
 <p><a id="transformation-candidate-rejected"></a></p>
 <h2 id="operations-troubleshooting-transformation-rejected">Transformation Rejected<a class="headerlink" href="#operations-troubleshooting-transformation-rejected" title="Permanent link">¶</a></h2>
-<p>Stable <code>1.7.1</code> provides the common-profile CLI/MCP workflow. See the <a href="https://wa-pis.github.io/agent-paranoid-android/reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
+<p>Stable <code>1.8.0</code> provides the common-profile CLI/MCP workflow. See the <a href="https://wa-pis.github.io/agent-paranoid-android/reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
 Published <code>1.5.0</code> does not include this command. Registration grants no dataset
 permission. The finite fictional transformation/session campaign is recorded in
 <a href="https://wa-pis.github.io/agent-paranoid-android/release-evidence-1.6.0/">stable evidence</a>; it grants no blanket dataset consent.</p>
@@ -3153,7 +3159,7 @@ resource and artifact durability limits remain in their respective guides.</p>
 <section class="print-page" heading-number="8.1.1" id="ru"><h1 id="ru-agent-paranoid-android">Agent Paranoid Android<a class="headerlink" href="#ru-agent-paranoid-android" title="Permanent link">¶</a></h1>
 <p><a href="https://wa-pis.github.io/agent-paranoid-android/">English</a> · Русский</p>
 <p>Agent Paranoid Android создаёт воспроизводимые синтетические тестовые данные по структуре CSV, безопасному профилю или проверенному <code>DatasetSpec</code>. Он нужен, когда важны схема, связи и бизнес-правила, а исходные строки нельзя передавать разработчикам.</p>
-<p>Рекомендуемая стабильная версия после публикации — <strong>1.7.1</strong>. См. <a href="https://wa-pis.github.io/agent-paranoid-android/1.7.1-release-status/">статус выпуска</a>.</p>
+<p>Рекомендуемая стабильная версия после публикации — <strong>1.8.0</strong>. См. <a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">статус выпуска</a>.</p>
 <h2 id="ru-_1">С чего начать<a class="headerlink" href="#ru-_1" title="Permanent link">¶</a></h2>
 <table>
 <thead>
@@ -3185,7 +3191,7 @@ resource and artifact durability limits remain in their respective guides.</p>
 </tr>
 </tbody>
 </table>
-<p>Для первого знакомства: <a href="#ru-getting-started-installation">установка и встроенное демо</a>. Демо не требует базы, AI или копии репозитория. Примерам с <code>examples/</code> нужен checkout версии 1.7.1.</p>
+<p>Для первого знакомства: <a href="#ru-getting-started-installation">установка и встроенное демо</a>. Демо не требует базы, AI или копии репозитория. Примерам с <code>examples/</code> нужен checkout версии 1.8.0.</p>
 <h2 id="ru-_2">Основной процесс<a class="headerlink" href="#ru-_2" title="Permanent link">¶</a></h2>
 <ol>
 <li>Получите структуру и ограниченные агрегаты.</li>
@@ -3204,31 +3210,35 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p>Это русская редакция существующих пользовательских разделов: пути после <code>ru/</code> соответствуют английским страницам. Переключатель <strong>English / Русский</strong> открывает соответствующую страницу; ссылки доступны и при чтении Markdown в репозитории. Техническая справка <code>--help</code>, имена API и ключи остаются в оригинале.</p>
 <p>Исторические release evidence, ADR и служебные записи сопровождающих доступны в оригинале и помечены <strong>English</strong>. Они не представлены как переведённые страницы. Проверенные локальные примеры перенесены из прежнего русского руководства без изменения команд; условия и ограничения приведены в <a href="https://wa-pis.github.io/agent-paranoid-android/ru/quality-report/">отчёте</a>.</p></section><section class="print-page" heading-number="8.1.2" id="ru-getting-started-installation"><h1 id="ru-getting-started-installation-_1">Установка<a class="headerlink" href="#ru-getting-started-installation-_1" title="Permanent link">¶</a></h1>
 <p><a href="#getting-started-installation">English</a> · Русский</p>
-<p>После публикации рекомендуемая стабильная версия — <strong>1.7.1</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
-<p>Перед установкой проверьте <a href="https://wa-pis.github.io/agent-paranoid-android/1.7.1-release-status/">статус выпуска</a>.</p>
+<p>После публикации рекомендуемая стабильная версия — <strong>1.8.0</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
+<p>Перед установкой проверьте <a href="https://wa-pis.github.io/agent-paranoid-android/1.8.0-release-status/">статус выпуска</a>.</p>
+<p>Для <code>generate --stream-csv [--workers 1..4]</code> достаточно base. Дополнение
+<code>profiling</code> нужно для точного подсчёта distinct в больших входных CSV через
+DuckDB/Arrow, а не для генерации. Ограничения, fallback и отдельный seed stream
+описаны в <a href="#how-to-parallel-generation">руководстве по потоковому CSV — English</a>.</p>
 <h2 id="ru-getting-started-installation-pypi">Установка из PyPI<a class="headerlink" href="#ru-getting-started-installation-pypi" title="Permanent link">¶</a></h2>
 <p>На macOS/Linux откройте терминал в выбранной рабочей папке и выполните по очереди:</p>
 <pre><code class="language-bash">python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install "agent-paranoid-android==1.7.1"
+python -m pip install "agent-paranoid-android==1.8.0"
 test-data-agent --version
 test-data-agent doctor
 </code></pre>
-<p>Ожидается версия 1.7.1 и doctor passed. Если команда не найдена, активируйте окружение и проверьте путь команды. Doctor использует временную вымышленную фикстуру и не обращается к внешним сервисам. Ошибка TLS при установке требует исправления сертификатов/индекса, а не отключения проверки.</p>
+<p>Ожидается версия 1.8.0 и doctor passed. Если команда не найдена, активируйте окружение и проверьте путь команды. Doctor использует временную вымышленную фикстуру и не обращается к внешним сервисам. Ошибка TLS при установке требует исправления сертификатов/индекса, а не отключения проверки.</p>
 <p>Установка из индекса и загрузка зависимостей <strong>не проверялись выполнением</strong> этим аудитом. Локальный wheel 1.6.0 и доступные зависимости проверены отдельно; это не доказательство чистой PyPI installation.</p>
 <h2 id="ru-getting-started-installation-windows-powershell">Windows PowerShell<a class="headerlink" href="#ru-getting-started-installation-windows-powershell" title="Permanent link">¶</a></h2>
 <p>Откройте PowerShell в рабочей папке; не используйте Bash activation. Отдельный маршрут без изменения ExecutionPolicy:</p>
 <pre><code class="language-powershell">py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install "agent-paranoid-android==1.7.1"
+.\.venv\Scripts\python.exe -m pip install "agent-paranoid-android==1.8.0"
 .\.venv\Scripts\test-data-agent.exe --version
 .\.venv\Scripts\test-data-agent.exe doctor
 </code></pre>
-<p>Ожидается 1.7.1 и doctor passed. При отсутствии launcher установите поддерживаемый Python. Windows-выполнение здесь не проверено. В следующих инструкциях заменяйте python и test-data-agent этими путями; вводите Bash-команды с продолжением строки одной строкой.</p>
+<p>Ожидается 1.8.0 и doctor passed. При отсутствии launcher установите поддерживаемый Python. Windows-выполнение здесь не проверено. В следующих инструкциях заменяйте python и test-data-agent этими путями; вводите Bash-команды с продолжением строки одной строкой.</p>
 <h2 id="ru-getting-started-installation-extras">Необязательные extras<a class="headerlink" href="#ru-getting-started-installation-extras" title="Permanent link">¶</a></h2>
-<p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.7.1". Доступны parquet, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
+<p>Base поддерживает CSV, JSON и SQL export. Устанавливайте нужный extra с тем же точным pin: например, python -m pip install "agent-paranoid-android[parquet]==1.8.0". Доступны parquet, profiling, mcp, trino, postgres, openai и gigachat; all предназначен для разработки/демо/контейнеров.</p>
 <p>Проверьте extra локально через test-data-agent doctor --require-extra parquet, заменив имя. Это не проверка сети, credentials или подключения БД/provider. GigaChat и OpenAI adapters остаются experimental. См. <a href="https://wa-pis.github.io/agent-paranoid-android/ru/reference/support-policy/">поддержку</a> и <a href="https://wa-pis.github.io/agent-paranoid-android/reference/dependency-compatibility/#installation-footprint">footprint — English</a>.</p>
 <h2 id="ru-getting-started-installation-_2">Когда нужна копия репозитория<a class="headerlink" href="#ru-getting-started-installation-_2" title="Permanent link">¶</a></h2>
-<p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.7.1, например отдельный clone тега v1.7.1. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="https://wa-pis.github.io/agent-paranoid-android/development/documentation/">Publishing Documentation — English</a>.</p>
+<p>Демо ниже работает без Git. Примеры с examples/ требуют checkout 1.8.0, например отдельный clone тега v1.8.0. Не переключайте изменённую или старую рабочую копию автоматически. Разработка описана в <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md">Contributing</a>, сборка сайта — в <a href="https://wa-pis.github.io/agent-paranoid-android/development/documentation/">Publishing Documentation — English</a>.</p>
 <p>Перед обновлением существующих фикстур прочитайте <a href="https://wa-pis.github.io/agent-paranoid-android/ru/reference/generation-contract-migration/">миграцию</a>. Package version и DatasetSpec schema_version различаются.</p>
 <h2 id="ru-getting-started-installation-_3">Первый запуск без собственных данных<a class="headerlink" href="#ru-getting-started-installation-_3" title="Permanent link">¶</a></h2>
 <h3 id="ru-getting-started-installation-_4">Для чего это нужно<a class="headerlink" href="#ru-getting-started-installation-_4" title="Permanent link">¶</a></h3>
@@ -5013,4 +5023,4 @@ test-data-agent doctor --json
         });
     </script>
 </body>
-</html><!--Generated by HTMLArk 2026-11-25 07:56:20.899914. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-wrxh5k7q/current/handbook/attachment.html-->
+</html><!--Generated by HTMLArk 2026-11-25 12:23:03.848060. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-x5tityg4/current/handbook/attachment.html-->

@@ -207,9 +207,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -259,11 +259,11 @@ Censored distinct counts do not infer a pool; source identifiers are not preserv
 or source row mappings. Smaller output counts and nulls can leave pool members
 unused. Independent identifier domains remain separate; reviewed foreign keys
 bind generated child values to generated parent keys.</p>
-<p>The unreleased development checkout counts every non-null CSV value within the
+<p>Stable 1.8.0 counts every non-null CSV value within the
 existing input and invocation budgets. Small profiles use private in-memory
 digest sets. Above 1,000,000 retained distinct digests it switches to bounded
-DuckDB/Arrow storage; install it from the checkout with
-<code>pip install -e '.[profiling]'</code>. Published 1.7.1 does not include this extra.
+DuckDB/Arrow storage. Install the <a href="../../1.8.0-release-status/">stable release</a> with <code>pip install 'agent-paranoid-android[profiling]==1.8.0'</code>.
+Published 1.7.1 does not include this extra.
 Missing dependencies or native resource exhaustion fail the profile rather than
 returning a trusted partial count. Bounded raw frequency samples remain
 independent. Digests and temporary storage never appear in profile artifacts.</p>
@@ -275,7 +275,7 @@ sensitive profiles omit ranges as well as source categories. Ambiguous financial
 columns require review; local category permission is not declassification.</p>
 <p>NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-The unreleased checkout uses folder cache format 12 and recomputes older cached
+Stable 1.8.0 uses folder cache format 12 and recomputes older cached
 profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.</p>
