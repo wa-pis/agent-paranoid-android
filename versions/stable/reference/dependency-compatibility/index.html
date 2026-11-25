@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/reference/dependency-compatibility/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/reference/dependency-compatibility/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Dependency Compatibility - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Dependency Compatibility";
         var mkdocs_page_input_path = "reference/dependency-compatibility.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/reference/dependency-compatibility/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/reference/dependency-compatibility/";
       </script>
     
     <!--[if lt IE 9]>
@@ -208,9 +208,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -321,7 +321,7 @@ it does not replace the reviewed lock or minimum profiles.</p>
 <td>Base minimum; PyArrow 15.0.0</td>
 </tr>
 <tr>
-<td><code>profiling-minimum</code> (unreleased)</td>
+<td><code>profiling-minimum</code> (stable 1.8.0)</td>
 <td>3.11</td>
 <td>Base minimum; PyArrow 15.0.0; DuckDB 2.0.1</td>
 </tr>
@@ -353,7 +353,7 @@ it does not replace the reviewed lock or minimum profiles.</p>
 <tr>
 <td><code>latest-all</code></td>
 <td>3.11–3.15</td>
-<td>Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; DuckDB 2.0.1 (unreleased profiling extension); MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
+<td>Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; DuckDB 2.0.1 (stable 1.8.0 profiling extension); MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
 </tr>
 </tbody>
 </table>
@@ -385,7 +385,7 @@ each surface.</p>
 <td><code>tests/test_io_commands.py</code></td>
 </tr>
 <tr>
-<td><code>profiling-minimum</code> (unreleased)</td>
+<td><code>profiling-minimum</code> (stable 1.8.0)</td>
 <td>Bounded exact distinct tracking and private temporary files</td>
 <td><code>tests/test_duckdb_profiling.py</code>, <code>tests/test_duckdb_distinct_security.py</code></td>
 </tr>
@@ -506,7 +506,7 @@ hashed dependency evidence in a generated manifest.</p>
 </tr>
 <tr>
 <td>DuckDB</td>
-<td>Accept <code>&gt;=2.0.1,&lt;3.0.0</code> for the unreleased <code>profiling</code> extra</td>
+<td>Accept <code>&gt;=2.0.1,&lt;3.0.0</code> for the stable 1.8.0 <code>profiling</code> extra</td>
 <td>Exact-count equivalence, private temporary files, deadlines and missing-extra checks cover the native handoff.</td>
 </tr>
 <tr>
@@ -542,7 +542,7 @@ growth:</p>
 <td style="text-align: right;">11</td>
 </tr>
 <tr>
-<td><code>profiling</code> (unreleased)</td>
+<td><code>profiling</code> (stable 1.8.0)</td>
 <td>Exact CSV distinct tracking with DuckDB and Arrow</td>
 <td style="text-align: right;">12</td>
 </tr>
@@ -576,9 +576,11 @@ growth:</p>
 <p>These are regression budgets, not a guarantee that every platform installs the
 same count. <code>PyArrow</code> is the largest optional wheel. Install <code>profiling</code> only
 when the bounded DuckDB distinct backend is needed; it is not required by
-parallel generation or streaming CSV export. This extra is available from the
-development checkout (<code>pip install -e '.[profiling]'</code>), not the published 1.7.1
-wheel. The released <code>parquet</code> extra remains available independently.</p>
+parallel generation or streaming CSV export. Install the
+<a href="../../1.8.0-release-status/">stable release</a> with
+<code>pip install 'agent-paranoid-android[profiling]==1.8.0'</code>; the published 1.7.1
+wheel does not include it. The released <code>parquet</code> extra remains available
+independently.</p>
 <p>Python 3.15 compatibility evidence is recorded in the <code>python-315-support</code>
 OpenSpec change. The locked
 profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing

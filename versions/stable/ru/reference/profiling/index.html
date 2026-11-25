@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/ru/reference/profiling/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/ru/reference/profiling/" />
       <link rel="shortcut icon" href="../../../img/favicon.ico" />
     <title>Детали профилирования CSV - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "\u0414\u0435\u0442\u0430\u043b\u0438 \u043f\u0440\u043e\u0444\u0438\u043b\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f CSV";
         var mkdocs_page_input_path = "ru/reference/profiling.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/ru/reference/profiling/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/ru/reference/profiling/";
       </script>
     
     <!--[if lt IE 9]>
@@ -192,9 +192,9 @@
 <div lang="ru">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -206,7 +206,7 @@
 <ul>
 <li>Local-category opt-in допускает проверенный string enum до 20 значений длиной до 64 символов после content checks.</li>
 <li>Повторяющиеся low-cardinality string IDs могут остаться категориями с синтетическими labels. Для identifier field bounded distinct count может задать размер синтетического key pool; исходные ключи и частоты не сохраняются.</li>
-<li>Distinct tracker держит до 100000 SHA-256 fingerprints на столбец отдельно от bounded sample. После лимита count — lower_bound, а не доказательство уникальности или PK. Fingerprints в profile не пишутся.</li>
+<li>В стабильной 1.8.0 CSV distinct count остаётся точным в пределах входных бюджетов. До 1 000 000 суммарных distinct digest entries на файл используются Python sets, затем — ограниченный DuckDB/Arrow backend. Приватные digests и временное хранилище не попадают в профиль; ошибка бюджета или отсутствующий extra прерывают профилирование вместо возврата доверенного частичного count.</li>
 <li>String identifiers начинаются с synthetic_ и ASCII integer; это может менять seeded bytes относительно старого генератора без изменения schema_version.</li>
 </ul>
 <h2 id="_1">Свидетельства для пула идентификаторов<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -238,8 +238,15 @@
 </table>
 <p>Пул определяет доступный синтетический домен, а не частоты исходных ключей или соответствие исходным строкам. При меньшем числе выходных строк или наличии null часть пула может не использоваться. Независимые домены идентификаторов остаются раздельными; проверенные внешние ключи связывают созданные дочерние значения с созданными родительскими ключами.</p>
 <h2 id="main">Числовые свидетельства после исправлений main<a class="headerlink" href="#main" title="Permanent link">&para;</a></h2>
+<p>Стабильная 1.8.0 <a href="../../../1.8.0-release-status/">опубликована</a>.
+При необходимости установите
+<code>python -m pip install 'agent-paranoid-android[profiling]==1.8.0'</code>.
+Стабильная 1.7.1 не содержит дополнения <code>profiling</code>; небольшим CSV оно не нужно.
+Семантика выводится по всему столбцу независимо от порядка строк. Слабые
+признаки SSN/карт/секретов сохраняют sensitive без назначения семантики при
+отсутствии контекста; unknown не разрешает повторное использование значений.</p>
 <p>Negative decimal с ненулевой дробной частью не получает phone semantics только из-за пунктуации. Positive phone-shaped decimal и integral decimal/exponent identifiers остаются потенциально чувствительными независимо от amount-like имени. Sensitive names и secrets сохраняют veto; sensitive profile не содержит ranges и исходных categories. Local-category не является declassification.</p>
-<p>NaN, infinity и overflowing exponent text не являются конечной числовой статистикой. Столбец с ними не выводится как полное numeric distribution. Folder cache format 7 пересчитывает старые profiles. Standalone profile нужно получить заново и проверить новый spec; существующий approved plan не переписывается автоматически.</p>
+<p>NaN, infinity и overflowing exponent text не являются конечной числовой статистикой. Столбец с ними не выводится как полное numeric distribution. В 1.8.0 folder cache format 12 пересчитывает старые profiles. Standalone profile нужно получить заново и проверить новый spec; существующий approved plan не переписывается автоматически.</p>
 <p>Это поддерживаемое описание текущего main после 1.6.0, а не утверждение, что старый PyPI wheel получил исправления. Версию пакета и documentation revision рассматривайте отдельно.</p>
 <h2 id="parquet">Оценка уникальности Parquet<a class="headerlink" href="#parquet" title="Permanent link">&para;</a></h2>
 <p>Один ограниченный проход проверки содержимого также считает уникальные скаляры:

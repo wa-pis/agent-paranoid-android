@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/agent-guides/trino-security/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/agent-guides/trino-security/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Trino and MCP safety guide - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Trino and MCP safety guide";
         var mkdocs_page_input_path = "agent-guides/trino-security.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/agent-guides/trino-security/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/agent-guides/trino-security/";
       </script>
     
     <!--[if lt IE 9]>
@@ -208,9 +208,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Historical / maintainer material</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Historical / maintainer material</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -298,7 +298,7 @@ PostgreSQL no-row result descriptions retain valid driver-declared numeric
 precision/scale as type metadata. Missing shape stays unbounded numeric;
 malformed or unsupported declared shapes fail closed rather than rounding.</p>
 <h2 id="enforcement">Enforcement<a class="headerlink" href="#enforcement" title="Permanent link">&para;</a></h2>
-<p>SQL source policy 1.2 in the unreleased checkout retains 1.1's aliased
+<p>SQL source policy 1.2 in stable 1.8.0 retains 1.1's aliased
 SUM/COUNT/MIN/MAX/AVG projections and
 optional GROUP BY on explicit authorized source columns of one physical table.
 COUNT(<em>) is a row count, never a projection wildcard. Non-aggregate projections

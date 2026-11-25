@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/reference/support-policy/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/reference/support-policy/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Runtime And Integration Support - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Runtime And Integration Support";
         var mkdocs_page_input_path = "reference/support-policy.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/reference/support-policy/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/reference/support-policy/";
       </script>
     
     <!--[if lt IE 9]>
@@ -208,9 +208,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -261,6 +261,11 @@ the capabilities they need.</p>
 <td>isolated wheel install, <code>doctor --require-extra parquet</code>, Parquet tests</td>
 </tr>
 <tr>
+<td><code>profiling</code></td>
+<td>Exact CSV distinct tracking with the bounded DuckDB/Arrow backend</td>
+<td>isolated wheel install, <code>doctor --require-extra profiling</code>, exact-distinct spill and private-cleanup regressions</td>
+</tr>
+<tr>
 <td><code>mcp</code></td>
 <td>Generator MCP transport</td>
 <td>isolated wheel install, <code>doctor --require-extra mcp</code>, MCP contract tests</td>
@@ -297,7 +302,7 @@ extra unexpectedly require another is a breaking packaging change. Adding an
 extra or adding an optional dependency inside an existing extra is additive
 when its documented behavior and security boundary remain unchanged.</p>
 <p>The database-source additions available in stable <code>1.5.0</code> are retained in
-stable <code>1.7.1</code>; see <a href="../../1.7.1-release-status/">release status</a>.
+stable <code>1.8.0</code>; see <a href="../../1.8.0-release-status/">release status</a>.
 They use the existing <code>postgres</code> and <code>trino</code> extras and add no JVM or JDBC
 driver. JDBC-style URL support is endpoint syntax only, qualified wildcards
 expand into explicit columns, and

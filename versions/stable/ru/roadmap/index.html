@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/ru/roadmap/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/ru/roadmap/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Дорожная карта - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "\u0414\u043e\u0440\u043e\u0436\u043d\u0430\u044f \u043a\u0430\u0440\u0442\u0430";
         var mkdocs_page_input_path = "ru/roadmap.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/ru/roadmap/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/ru/roadmap/";
       </script>
     
     <!--[if lt IE 9]>
@@ -202,9 +202,9 @@
 <div lang="ru">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../downloads/">Скачать</a>
 </aside>
 
@@ -219,7 +219,15 @@
 через MCP и проверки целостности плана и восстановления. См. <a href="../history/">историю</a>.</p>
 <h2 id="_2">Сейчас<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в 1.7.0. Первые проверки описаны в отчёте <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</li>
+<li>
+<p>Сопровождать <a href="../../1.8.0-release-status/">стабильную 1.8.0</a>: общую
+  семантику и приватность, точный CSV distinct и opt-in потоковую генерацию.
+  Прежние проверки и бенчмарки сохраняют
+  привязку к своим SHA; <a href="../../release-evidence-1.8.0/">свидетельства стабильного выпуска — English</a> записаны отдельно.</p>
+</li>
+<li>
+<p>Собрать недостающие исторические сведения: настройки авторизации приложения Trino и происхождение внешних профилей. Числовое профилирование, relational planning/utility, bounded statistics и исправления CLI уже вошли в 1.7.0. Первые проверки описаны в отчёте <a href="../../feedback-acceptance-1.7.0rc1/">1.7.0rc1</a>. Проверки на вымышленных данных не воспроизводят отсутствующие частные входы или прежний 401.</p>
+</li>
 <li>Учитывать границы проверок преобразования. В архиве OpenSpec записаны
   36 комбинаций форматов на целевом объёме, три проверки отказа и ревью
   границы доверия. Результаты относятся к проверенным маршрутам и пакету;

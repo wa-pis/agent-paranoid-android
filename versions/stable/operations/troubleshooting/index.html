@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/operations/troubleshooting/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/operations/troubleshooting/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Troubleshooting - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Troubleshooting";
         var mkdocs_page_input_path = "operations/troubleshooting.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/operations/troubleshooting/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/operations/troubleshooting/";
       </script>
     
     <!--[if lt IE 9]>
@@ -251,9 +251,9 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -297,11 +297,11 @@ package or a problem with deployment credentials.</p>
 <p><code>doctor --require-extra gigachat</code> uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 <code>GIGACHAT_CREDENTIALS</code> or <code>GIGACHAT_ACCESS_TOKEN</code>, obtain a token, or contact
-GigaChat. Install stable <code>1.7.1</code> with the <code>gigachat</code> extra.
-See <a href="../../1.7.1-release-status/">release status</a>.</p>
+GigaChat. Install stable <code>1.8.0</code> with the <code>gigachat</code> extra.
+See <a href="../../1.8.0-release-status/">release status</a>.</p>
 <h2 id="jdbc-style-url-rejected">JDBC-Style URL Rejected<a class="headerlink" href="#jdbc-style-url-rejected" title="Permanent link">&para;</a></h2>
 <p>JDBC-style endpoint input, qualified column wildcards, and <code>profile-query</code> are
-available in stable <code>1.5.0</code> and retained in stable <code>1.7.1</code>.</p>
+available in stable <code>1.5.0</code> and retained in stable <code>1.8.0</code>.</p>
 <p>Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,
 allowlists, and budgets in their existing settings. Remove duplicate or
@@ -340,7 +340,7 @@ profile. Errors intentionally omit SQL text, literals, endpoints, and backend
 messages; inspect the local reviewed file and allowlists instead.</p>
 <p><a id="transformation-candidate-rejected"></a></p>
 <h2 id="transformation-rejected">Transformation Rejected<a class="headerlink" href="#transformation-rejected" title="Permanent link">&para;</a></h2>
-<p>Stable <code>1.7.1</code> provides the common-profile CLI/MCP workflow. See the <a href="../../reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
+<p>Stable <code>1.8.0</code> provides the common-profile CLI/MCP workflow. See the <a href="../../reference/cli/#common-profile-workflow-16-rc">CLI workflow</a>.
 Published <code>1.5.0</code> does not include this command. Registration grants no dataset
 permission. The finite fictional transformation/session campaign is recorded in
 <a href="../../release-evidence-1.6.0/">stable evidence</a>; it grants no blanket dataset consent.</p>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.7.1/how-to/parallel-generation/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.8.0/how-to/parallel-generation/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Parallel And Streaming CSV - Agent Paranoid Android</title>
     <link rel="stylesheet" href="../../css/theme.css" />
@@ -17,7 +17,7 @@
         // Current page data
         var mkdocs_page_name = "Parallel And Streaming CSV";
         var mkdocs_page_input_path = "how-to/parallel-generation.md";
-        var mkdocs_page_url = "/agent-paranoid-android/versions/1.7.1/how-to/parallel-generation/";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.8.0/how-to/parallel-generation/";
       </script>
     
     <!--[if lt IE 9]>
@@ -221,18 +221,19 @@
 <div lang="en">
 
 <aside class="documentation-identity" aria-label="Documentation version">
-  <strong>Maintained stable guidance</strong> · Package 1.7.1
-  <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
+  <strong>Maintained stable guidance</strong> · Package 1.8.0
+  <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
+  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
 
 
                 <h1 id="parallel-generation-and-streaming-csv">Parallel Generation And Streaming CSV<a class="headerlink" href="#parallel-generation-and-streaming-csv" title="Permanent link">&para;</a></h1>
-<p>This page describes <strong>unreleased development-checkout features</strong> ported onto
-the 1.7.1 baseline. Published 1.7.1 does not include <code>--stream-csv</code> or the
-<code>tiled-v1</code> Python API. Existing ordinary generation and reviewed
+<p>This page describes <strong>stable 1.8.0 features</strong>; check
+<a href="../../1.8.0-release-status/">publication status</a> before installing.
+Published 1.7.1 does not include <code>--stream-csv</code> or the <code>tiled-v1</code> Python API.
+Existing ordinary generation and reviewed
 <code>scalable-v1</code>/<code>scalable-relational-v1</code> policies remain available; see
 <a href="../dataset-capacity/">capacity and scalable generation</a>.</p>
 <h2 id="choose-the-export-path">Choose The Export Path<a class="headerlink" href="#choose-the-export-path" title="Permanent link">&para;</a></h2>
@@ -270,8 +271,8 @@ the 1.7.1 baseline. Published 1.7.1 does not include <code>--stream-csv</code> o
 <p>An export does not switch engines merely because it is large. The new public
 streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
 The optional <code>profiling</code> extra serves large input distinct counting, not CSV
-generation. Install this branch from its checkout before trying the new options:</p>
-<pre><code class="language-bash">python -m pip install -e .
+generation. Install the exact stable version:</p>
+<pre><code class="language-bash">python -m pip install &quot;agent-paranoid-android==1.8.0&quot;
 </code></pre>
 <h2 id="export-a-reviewed-spec">Export A Reviewed Spec<a class="headerlink" href="#export-a-reviewed-spec" title="Permanent link">&para;</a></h2>
 <p>Use a reviewed DatasetSpec, for example this independently authored synthetic

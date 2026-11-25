@@ -1,5 +1,5 @@
 {
-  "stable": "1.7.1",
+  "stable": "1.8.0",
   "releases": [
     {
       "version": "1.6.0",
@@ -15,6 +15,11 @@
       "version": "1.7.1",
       "commit": "8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e",
       "verification_run": 43750169209
+    },
+    {
+      "version": "1.8.0",
+      "commit": "b62bc17e49800e17f521cf5ea9f9043f55e0c5b8",
+      "verification_run": 45611255179
     }
   ]
 }
