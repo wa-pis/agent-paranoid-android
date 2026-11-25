@@ -112,10 +112,11 @@ def _stream(
 
             connection = duckdb.connect(":memory:", config={
                 "memory_limit": "128MiB", "threads": "1", "async_threads": "1",
-                "temp_directory": str(scratch / "spill"), "enable_external_access": "false",
+                "temp_directory": str(scratch / "spill"),
                 "autoinstall_known_extensions": "false", "autoload_known_extensions": "false",
                 "python_enable_replacements": "false",
             })
+            connection.execute("SET enable_external_access = false")
             connection.execute("SET enable_logging = false")
             connection.execute("SET max_temp_directory_size = '2GiB'")
             connection.execute("SET preserve_insertion_order = false")

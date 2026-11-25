@@ -74,13 +74,17 @@ def run_worker(args: argparse.Namespace) -> dict[str, object]:
             "temp_directory": str(scratch / "spill"),
             "autoinstall_known_extensions": "false",
             "autoload_known_extensions": "false",
-            "enable_external_access": "false",
         })
-        connection.execute("SET max_temp_directory_size='4GiB'")
-        connection.execute("SET preserve_insertion_order=false")
-        if not streaming:
-            connection.execute("CREATE TABLE digests (column_id INTEGER, digest BLOB)")
-            connection.execute("BEGIN")
+        try:
+            connection.execute("SET enable_external_access = false")
+            connection.execute("SET max_temp_directory_size='4GiB'")
+            connection.execute("SET preserve_insertion_order=false")
+            if not streaming:
+                connection.execute("CREATE TABLE digests (column_id INTEGER, digest BLOB)")
+                connection.execute("BEGIN")
+        except BaseException:
+            connection.close()
+            raise
     setup_seconds = time.perf_counter() - started
     input_seconds = 0.0
     ingest_seconds = 0.0

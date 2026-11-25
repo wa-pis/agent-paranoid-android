@@ -60,6 +60,9 @@ def engine(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
             return self.connection.execute(query, *args, **kwargs)
 
         def register(self, name, reader):
+            assert self.connection.execute(
+                "SELECT current_setting('enable_external_access'), current_setting('lock_configuration')"
+            ).fetchall() == [(False, True)]
             self.reader = reader
             if state.on_register is not None:
                 reader = state.on_register(self, reader)
@@ -82,6 +85,72 @@ def assert_clean(engine) -> None:
     assert engine.records
     assert all(record.closed for record in engine.records)
     assert list(engine.scratch.iterdir()) == []
+
+
+def test_scratch_is_configured_before_external_access_is_disabled(
+    engine, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original_connect = engine.duckdb.connect
+    consumed = False
+
+    def connect(database, *, config):
+        # Linux may apply the external-access ban before the unordered scratch setting.
+        if "temp_directory" in config and config.get("enable_external_access") == "false":
+            raise engine.duckdb.PermissionException(CANARY)
+        return original_connect(database, config=config)
+
+    def inspect_reader(record, reader):
+        assert not consumed
+        assert record.connection.execute(
+            "SELECT current_setting('enable_external_access'), current_setting('lock_configuration')"
+        ).fetchall() == [(False, True)]
+        return reader
+
+    def remaining():
+        nonlocal consumed
+        consumed = True
+        yield 0, digest("fictional-other-value")
+
+    monkeypatch.setattr(engine.duckdb, "connect", connect)
+    engine.on_register = inspect_reader
+
+    assert engine.module.count_distinct_stream(
+        [{digest(CANARY)}], remaining(), LocalProfileBudget(),
+    ) == [2]
+    assert consumed
+    assert_clean(engine)
+
+
+@pytest.mark.parametrize("setting", ["enable_external_access = false", "lock_configuration = true"])
+def test_configuration_failure_closes_before_reader_or_source_consumption(
+    engine, monkeypatch: pytest.MonkeyPatch, setting: str,
+) -> None:
+    original_connect = engine.duckdb.connect
+
+    def connect(database, *, config):
+        connection = original_connect(database, config=config)
+        original_execute = connection.execute
+
+        def execute(query, *args, **kwargs):
+            if query == "SET " + setting:
+                raise engine.duckdb.Error(CANARY)
+            return original_execute(query, *args, **kwargs)
+
+        connection.execute = execute
+        return connection
+
+    def remaining():
+        raise AssertionError("configuration must finish before source consumption")
+        yield
+
+    monkeypatch.setattr(engine.duckdb, "connect", connect)
+    with pytest.raises(engine.module.DistinctTrackingError) as caught:
+        engine.module.count_distinct_stream([{digest(CANARY)}], remaining(), LocalProfileBudget())
+
+    assert caught.value.__context__ is None
+    assert CANARY not in "".join(traceback.format_exception(caught.value))
+    assert all(record.reader is None for record in engine.records)
+    assert_clean(engine)
 
 
 def test_arrow_receives_only_ordinals_and_fresh_keyed_digests(
@@ -133,10 +202,11 @@ def test_arrow_receives_only_ordinals_and_fresh_keyed_digests(
         assert all(token not in {first, second, key} for _, token in tokens)
     for record in engine.records:
         assert record.config["threads"] == record.config["async_threads"] == "1"
-        for setting in ("enable_external_access", "autoinstall_known_extensions",
-                        "autoload_known_extensions", "python_enable_replacements"):
+        for setting in ("autoinstall_known_extensions", "autoload_known_extensions",
+                        "python_enable_replacements"):
             assert record.config[setting] == "false"
         query_names = [query for query, _ in record.queries]
+        assert query_names[0] == "SET enable_external_access = false"
         assert "SET enable_logging = false" in query_names
         assert query_names.index("SET lock_configuration = true") < len(query_names) - 1
         assert any(query == "SET max_execution_time = ?" and args[0][0] > 0

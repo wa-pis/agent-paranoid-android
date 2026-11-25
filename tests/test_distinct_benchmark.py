@@ -87,6 +87,9 @@ def test_streaming_duckdb_consumes_lazy_input_once(
 
         def register(self, name, reader):
             assert produced_batches == 0
+            assert self.connection.execute(
+                "SELECT current_setting('enable_external_access')"
+            ).fetchall() == [(False,)]
             readers.append(reader)
             return self.connection.register(name, reader)
 
@@ -108,6 +111,50 @@ def test_streaming_duckdb_consumes_lazy_input_once(
     assert benchmark.run_worker(args)["counts"] == [100] * 3
     assert produced_batches == 6
     assert len(readers) == 1
+
+
+def test_duckdb_setup_failure_closes_without_ingesting(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    duckdb = pytest.importorskip("duckdb")
+    pytest.importorskip("pyarrow")
+    original_connect = duckdb.connect
+    connections = []
+
+    class FailingConnection:
+        closed = False
+
+        def __init__(self, connection):
+            self.connection = connection
+
+        def execute(self, query, *args, **kwargs):
+            if query == "SET enable_external_access = false":
+                raise duckdb.Error("fictional setup failure")
+            return self.connection.execute(query, *args, **kwargs)
+
+        def close(self):
+            self.connection.close()
+            self.closed = True
+
+    def connect(*args, **kwargs):
+        connection = FailingConnection(original_connect(*args, **kwargs))
+        connections.append(connection)
+        return connection
+
+    def forbidden_input(*args):
+        raise AssertionError("setup must finish before input generation")
+
+    monkeypatch.setattr(duckdb, "connect", connect)
+    monkeypatch.setattr(benchmark, "digest_batches", forbidden_input)
+    args = benchmark.parser().parse_args([
+        "--engine", "duckdb", "--rows", "2", "--columns", "1", "--scratch", str(tmp_path),
+    ])
+    args.rows = args.rows[0]
+
+    with pytest.raises(duckdb.Error, match="fictional setup failure"):
+        benchmark.run_worker(args)
+
+    assert connections and all(connection.closed for connection in connections)
 
 
 @pytest.mark.parametrize("engine", ["python", "sqlite"])

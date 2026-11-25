@@ -97,22 +97,23 @@ def count_distinct_stream(
                     "threads": "1",
                     "async_threads": "1",
                     "temp_directory": scratch,
-                    "enable_external_access": "false",
                     "autoinstall_known_extensions": "false",
                     "autoload_known_extensions": "false",
                     "python_enable_replacements": "false",
                 })
+                # Configure owned scratch before this ban can reject its path.
+                connection.execute("SET enable_external_access = false")
                 connection.execute("SET enable_logging = false")
                 connection.execute("SET max_temp_directory_size = ?", [TEMP_LIMIT])
                 connection.execute("SET preserve_insertion_order = false")
-                schema = pa.schema([("column_id", pa.int32()), ("digest", pa.binary(32))])
-                reader = pa.RecordBatchReader.from_batches(schema, batches())
-                connection.register("digests", reader)
                 budget.check_deadline("distinct counting")
                 connection.execute("SET max_execution_time = ?", [
                     max(1, ceil(budget.remaining_seconds() * 1_000)),
                 ])
                 connection.execute("SET lock_configuration = true")
+                schema = pa.schema([("column_id", pa.int32()), ("digest", pa.binary(32))])
+                reader = pa.RecordBatchReader.from_batches(schema, batches())
+                connection.register("digests", reader)
                 by_column = dict(connection.execute(
                     "SELECT column_id, count(DISTINCT digest) FROM digests GROUP BY column_id"
                 ).fetchall())

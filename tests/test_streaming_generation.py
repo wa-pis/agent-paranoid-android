@@ -290,12 +290,20 @@ def observed_duckdb(monkeypatch: pytest.MonkeyPatch):
 
         def execute(self, sql, *args, **kwargs):
             self.queries.append((sql, args))
-            if ((state.fail_at == "insert" and sql.startswith("INSERT"))
+            if sql != "SET enable_external_access = false":
+                assert self.connection.execute(
+                    "SELECT current_setting('enable_external_access')"
+                ).fetchall() == [(False,)]
+            if ((state.fail_at == "external_access" and sql == "SET enable_external_access = false")
+                    or (state.fail_at == "insert" and sql.startswith("INSERT"))
                     or (state.fail_at == "global" and "count(DISTINCT" in sql)):
                 raise duckdb.Error(CANARY)
             return self.connection.execute(sql, *args, **kwargs)
 
         def register(self, name, batch):
+            assert self.connection.execute(
+                "SELECT current_setting('enable_external_access')"
+            ).fetchall() == [(False,)]
             if batch.num_rows and state.fail_at == "register":
                 raise duckdb.Error(CANARY)
             return self.connection.register(name, batch)
@@ -314,6 +322,9 @@ def observed_duckdb(monkeypatch: pytest.MonkeyPatch):
 
     def connect(database, *, config):
         assert database == ":memory:"
+        # Reproduce native configuration ordering that rejects this on Linux.
+        if config.get("enable_external_access") == "false" and config.get("temp_directory"):
+            raise duckdb.PermissionException("temporary directory configuration is restricted")
         return ObservedConnection(original_connect(database, config=config), config)
 
     monkeypatch.setattr(duckdb, "connect", connect)
@@ -329,11 +340,12 @@ def test_duckdb_configuration_is_private_bounded_and_disables_external_access(
     assert record.closed
     assert record.config["memory_limit"] == "128MiB"
     assert record.config["threads"] == record.config["async_threads"] == "1"
-    for setting in ("enable_external_access", "autoinstall_known_extensions",
+    for setting in ("autoinstall_known_extensions",
                     "autoload_known_extensions", "python_enable_replacements"):
         assert record.config[setting] == "false"
     assert Path(record.config["temp_directory"]).parent == scratch
     queries = [sql for sql, _ in record.queries]
+    assert queries[0] == "SET enable_external_access = false"
     assert "SET enable_logging = false" in queries
     assert "SET max_temp_directory_size = '2GiB'" in queries
     assert any(sql == "SET max_execution_time = ?" and args[0][0] > 0
@@ -353,7 +365,7 @@ def test_run_wrapper_removes_private_scratch_after_success(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize("stage", ("register", "insert", "global", "readback", "close"))
+@pytest.mark.parametrize("stage", ("external_access", "register", "insert", "global", "readback", "close"))
 def test_native_failures_are_redacted_and_scratch_is_removed(
     tmp_path: Path, fake_tiles, monkeypatch: pytest.MonkeyPatch, observed_duckdb,
     capsys: pytest.CaptureFixture[str], stage: str,
