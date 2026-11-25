@@ -74,7 +74,8 @@ def test_receipt_boundary_rejects_source_conflicting_with_reviewed_evidence():
 
 
 def test_receipt_rejects_relabelled_numeric_profile_on_same_source_bytes():
-    prepared = request(source=b"code\n123.45\n456.78\n")
+    # Short authored values keep interpolated quantiles outside sensitive shapes.
+    prepared = request(source=b"code\n1.25\n2.75\n")
     source = next(part for part in prepared.parts if part.kind == "source")
     evidence = DatasetProfile.model_validate_json(
         next(part.payload for part in prepared.parts if part.kind == "evidence")
@@ -90,7 +91,7 @@ def test_receipt_rejects_relabelled_numeric_profile_on_same_source_bytes():
     with pytest.raises(ValueError) as error:
         _canonical_request(forged, max_total_bytes=8192, max_review_bytes=4096,
                            budget=GenerationBudget(5))
-    assert "123.45" not in str(error.value)
+    assert "1.25" not in str(error.value)
 
 
 def test_local_tty_issues_owner_only_receipt_and_stale_bytes_fail(tmp_path):

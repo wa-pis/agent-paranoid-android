@@ -26,7 +26,8 @@ from test_data_agent.core.privacy import (
     PrivacyClassification,
     SENSITIVE_SEMANTIC_TYPES,
     SYNTHETIC_PREFIX,
-    infer_sensitive_type_from_values,
+    has_sensitive_numeric_summary,
+    infer_category_value_signal,
     infer_sensitive_value_type,
     is_sensitive_field,
 )
@@ -156,10 +157,10 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
                 raise SpecSafetyError(
                     f"dataset spec field {entity.name!r}.{field.name!r} exceeds the safe category limit"
                 )
-            detected = infer_sensitive_type_from_values(
-                item.get("value") for item in categories if isinstance(item, dict)
-            )
-            if detected is not None:
+            if any(
+                infer_category_value_signal(item.get("value")) is not None
+                for item in categories if isinstance(item, dict)
+            ):
                 raise SpecSafetyError(
                     f"dataset spec field {entity.name!r}.{field.name!r} "
                     "contains raw-looking sensitive values"
@@ -193,21 +194,23 @@ def assert_profile_safe(profile: DatasetProfile) -> None:
             kind = str(field.distribution.get("kind", ""))
             if kind == "categorical" and not sensitive:
                 categories = field.distribution.get("categories", [])
-                content_sensitive_type = infer_sensitive_type_from_values(
-                    item.get("value") for item in categories if isinstance(item, dict)
-                )
-                if content_sensitive_type is not None:
+                if any(
+                    infer_category_value_signal(item.get("value")) is not None
+                    for item in categories if isinstance(item, dict)
+                ):
                     raise ProfileSafetyError(
                         f"profile field {entity.name!r}.{field.name!r} contains raw-looking sensitive values"
                     )
+            if kind == "numeric" and has_sensitive_numeric_summary(field.distribution):
+                sensitive = True
             if not sensitive:
                 continue
-            if profile.source_type == "trino" and kind == "numeric" and any(
+            if kind == "numeric" and any(
                 field.distribution.get(key) is not None
                 for key in ("min_value", "max_value", "p05", "p95")
             ):
                 raise ProfileSafetyError(
-                    f"sensitive Trino profile field {entity.name!r}.{field.name!r} "
+                    f"sensitive profile field {entity.name!r}.{field.name!r} "
                     "contains exact numeric summaries"
                 )
             if kind not in _SAFE_SENSITIVE_DISTRIBUTIONS:
@@ -342,6 +345,8 @@ def validate_generated_row_privacy(
                     continue
                 if isinstance(value, (dict, list, tuple)):
                     return ["row privacy validation requires scalar fields"]
+                if not isinstance(value, str) and field.data_type != FieldType.DECIMAL:
+                    continue
                 # CSV encodes numeric synthetic values as strings. Classify their
                 # declared numeric representation, not those digits as a phone.
                 if parse_numeric_strings and isinstance(value, str) and (

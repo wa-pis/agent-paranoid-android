@@ -22,7 +22,10 @@ from test_data_agent.cli_agent import (
     agent_request_from_args as _agent_request_from_args,
 )
 from test_data_agent.cli_application import run_cli_command as _run_cli_command
-from test_data_agent.cli_commands import apply_business_rules_from_args as _apply_business_rules_from_args
+from test_data_agent.cli_commands import (
+    BusinessRulesApplier,
+    apply_business_rules_from_args as _apply_business_rules_from_args,
+)
 from test_data_agent.cli_contract import (
     CliErrorCode,
     CliExternalServiceError,
@@ -433,11 +436,17 @@ def _json_artifacts(args: argparse.Namespace) -> list[str]:
 def run_command(args: argparse.Namespace) -> int:
     """Compatibility wrapper for extracted CLI composition and dispatch."""
 
+    rules_applier: BusinessRulesApplier | None = apply_business_rules_from_args
+    if (args.command == "generate"
+            and getattr(args, "profile", None) is None
+            and getattr(args, "business_rules", None) is None
+            and rules_applier is _DEFAULT_BUSINESS_RULES_APPLIER):
+        rules_applier = None
     return _run_cli_command(
         args,
         examples_text=EXAMPLES_TEXT,
         doctor_inspector=inspect_doctor,
-        business_rules_applier=apply_business_rules_from_args,
+        business_rules_applier=rules_applier,
         request_builder=agent_request_from_args,
         advisor_runner=advise_agent_workspace_with_provider,
     )
@@ -527,6 +536,9 @@ def apply_business_rules_from_args(
         seed,
         spec,
     )
+
+
+_DEFAULT_BUSINESS_RULES_APPLIER = apply_business_rules_from_args
 
 
 if __name__ == "__main__":

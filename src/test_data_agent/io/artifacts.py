@@ -183,6 +183,7 @@ def write_generation_manifest(
     output_folder: Path,
     business_report: Any | None = None,
     entity_artifacts: dict[str, str] | None = None,
+    generator_algorithm_version: str | None = None,
 ) -> GenerationManifest:
     spec_sha256 = dataset_spec_fingerprint(spec)
     business_validation = business_validation_manifest(business_report)
@@ -203,7 +204,10 @@ def write_generation_manifest(
             spec_sha256=spec_sha256,
             business_validation=business_validation,
         ),
-        reproducibility=reproducibility_evidence(spec, output_format, output_folder),
+        reproducibility=reproducibility_evidence(
+            spec, output_format, output_folder,
+            generator_algorithm_version=generator_algorithm_version,
+        ),
     )
     write_json_artifact(manifest, output_folder / "generation_manifest.json")
     return manifest
@@ -241,6 +245,8 @@ def reproducibility_evidence(
     spec: DatasetSpec,
     output_format: OutputFormat,
     output_folder: Path,
+    *,
+    generator_algorithm_version: str | None = None,
 ) -> ReproducibilityEvidence:
     dependencies = {
         name: importlib.metadata.version(name)
@@ -275,7 +281,7 @@ def reproducibility_evidence(
         ).hexdigest(),
         locale=spec.generation_settings.locale or DEFAULT_LOCALE,
         serializer=serializer,
-        generator_algorithm_version=__version__,
+        generator_algorithm_version=generator_algorithm_version or __version__,
         output_sha256=artifact_hashes(output_folder),
     )
 
@@ -284,6 +290,7 @@ def normalized_dependency_versions() -> dict[str, str]:
     required = ("Faker", "pydantic", "PyYAML")
     optional = (
         "pyarrow",
+        "duckdb",
         "mcp",
         "sqlglot",
         "trino",

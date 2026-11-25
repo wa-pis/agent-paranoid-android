@@ -115,6 +115,14 @@ class LocalProfileBudget:
                 stage=stage,
             )
 
+    def remaining_seconds(self) -> float:
+        """Pass the invocation's remaining time to bounded native operations."""
+        self.check_deadline("native work configuration")
+        remaining = max(0.0, self.limits.max_seconds - (self._clock() - self._started_at))
+        if self._request_budget is not None:
+            remaining = min(remaining, self._request_budget.remaining_invocation_seconds())
+        return remaining
+
     def check_sample_rows(self, requested: int) -> None:
         if requested > self.limits.max_sample_rows:
             raise LocalProfileLimitError(

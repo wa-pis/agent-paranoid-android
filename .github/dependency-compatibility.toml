@@ -19,8 +19,16 @@ latest = "6.0.3"
 [dependencies.pyarrow]
 requirement = "pyarrow"
 extra = "parquet"
+extras = ["parquet", "profiling"]
 minimum = "15.0.0"
 latest = "26.0.1"
+
+[dependencies.duckdb]
+requirement = "duckdb"
+extra = "profiling"
+minimum = "2.0.1"
+latest = "2.0.1"
+upper_major = 3
 
 [dependencies.mcp]
 requirement = "mcp"
@@ -66,6 +74,9 @@ latest = "3.3.4"
 constraint = ".github/constraints/dependency-minimum.txt"
 
 [minimum_profiles.parquet]
+constraint = ".github/constraints/dependency-minimum.txt"
+
+[minimum_profiles.profiling]
 constraint = ".github/constraints/dependency-minimum.txt"
 
 [minimum_profiles.mcp]

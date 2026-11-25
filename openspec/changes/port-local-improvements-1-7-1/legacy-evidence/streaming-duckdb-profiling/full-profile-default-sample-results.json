@@ -1,0 +1,85 @@
+{
+  "environment": {
+    "python": "3.11.2 (v3.11.2:878ead1ac1, Feb  7 2023, 10:02:41) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cpu": "Apple M4 Max",
+    "physical_cpus": 14,
+    "ram_bytes": 38654705664,
+    "dependencies": {
+      "duckdb": "2.0.1",
+      "pyarrow": "25.0.0",
+      "pydantic": "2.13.4",
+      "Faker": "40.35.0",
+      "PyYAML": "6.0.3"
+    }
+  },
+  "settings": {
+    "columns": 25,
+    "rule_sample_rows": 50000,
+    "profile_deadline_seconds": 600,
+    "repeats": 3,
+    "distinct_transition": 1000000
+  },
+  "runs": [
+    {
+      "profile_sha256": "6201797464690b1f329059ce61ad88f13392a11cff2cc73603745af4e49d46ca",
+      "profile_seconds": 19.537443541921675,
+      "peak_rss_bytes": 1074348032,
+      "rows": 250000,
+      "backend": "set",
+      "repeat": 1,
+      "wall_seconds": 19.772216917015612,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "6201797464690b1f329059ce61ad88f13392a11cff2cc73603745af4e49d46ca",
+      "profile_seconds": 24.17149225017056,
+      "peak_rss_bytes": 534577152,
+      "rows": 250000,
+      "backend": "auto",
+      "repeat": 1,
+      "wall_seconds": 24.418476750142872,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "6201797464690b1f329059ce61ad88f13392a11cff2cc73603745af4e49d46ca",
+      "profile_seconds": 24.104887958150357,
+      "peak_rss_bytes": 546177024,
+      "rows": 250000,
+      "backend": "auto",
+      "repeat": 2,
+      "wall_seconds": 24.358865541871637,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "6201797464690b1f329059ce61ad88f13392a11cff2cc73603745af4e49d46ca",
+      "profile_seconds": 19.774352625012398,
+      "peak_rss_bytes": 1077575680,
+      "rows": 250000,
+      "backend": "set",
+      "repeat": 2,
+      "wall_seconds": 20.028858582954854,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "6201797464690b1f329059ce61ad88f13392a11cff2cc73603745af4e49d46ca",
+      "profile_seconds": 19.804227416869253,
+      "peak_rss_bytes": 1078738944,
+      "rows": 250000,
+      "backend": "set",
+      "repeat": 3,
+      "wall_seconds": 20.06835904205218,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "6201797464690b1f329059ce61ad88f13392a11cff2cc73603745af4e49d46ca",
+      "profile_seconds": 24.1425287919119,
+      "peak_rss_bytes": 559087616,
+      "rows": 250000,
+      "backend": "auto",
+      "repeat": 3,
+      "wall_seconds": 24.38965595792979,
+      "full_profile_equal": true
+    }
+  ]
+}

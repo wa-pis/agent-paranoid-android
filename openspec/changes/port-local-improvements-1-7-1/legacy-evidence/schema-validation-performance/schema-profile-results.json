@@ -1,0 +1,55 @@
+{
+  "old_sha256": "b2879d0f714ed7ee154e147bb9e57552d3a0653873411e79dd02d3e3b16399ce",
+  "new_sha256": "6e59175eebc14fbb5ee6a21db324bfa281258d100e914349bf4362f13d672cb6",
+  "rows": 10000,
+  "fields": 25,
+  "seed": 42,
+  "repeats": 9,
+  "runs": [
+    {
+      "old": 0.08040054235607386,
+      "new": 0.03310266602784395
+    },
+    {
+      "new": 0.03284816676750779,
+      "old": 0.08048520796000957
+    },
+    {
+      "old": 0.0803666659630835,
+      "new": 0.032581415958702564
+    },
+    {
+      "new": 0.03252445813268423,
+      "old": 0.08051975024864078
+    },
+    {
+      "old": 0.08113666716963053,
+      "new": 0.0327800833620131
+    },
+    {
+      "new": 0.033105583395808935,
+      "old": 0.08072329079732299
+    },
+    {
+      "old": 0.08035654108971357,
+      "new": 0.03235087497159839
+    },
+    {
+      "new": 0.032495041843503714,
+      "old": 0.08071241620928049
+    },
+    {
+      "old": 0.08008916676044464,
+      "new": 0.03253433294594288
+    }
+  ],
+  "old_median_seconds": 0.08048520796000957,
+  "new_median_seconds": 0.032581415958702564,
+  "speedup": 2.470279623882086,
+  "less_time_percent": 59.51875284351482,
+  "protocol": "same generated fictional rows, nine interleaved alternating-order passes, no concurrent heavy verification",
+  "scalar_parity_checks": 8392,
+  "row_parity_checks": 2506,
+  "mismatches": 0,
+  "parity_checks_run_separately_from_authoritative_timing": true
+}

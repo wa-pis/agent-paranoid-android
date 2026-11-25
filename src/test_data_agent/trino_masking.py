@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from test_data_agent.profiling.numeric_shape import shape_prevalence
 
+import math
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -12,13 +13,20 @@ from decimal import Decimal
 from typing import Any
 
 from test_data_agent.core.privacy import (
+    has_sensitive_numeric_summary,
     infer_sensitive_from_name as infer_sensitive_from_name,
     infer_sensitive_type_from_values as infer_sensitive_type_from_values,
     infer_sensitive_value_type as infer_sensitive_value_type,
+    infer_source_value_signal,
     looks_sensitive_value as looks_sensitive_value,
     mask_pattern as mask_pattern,
     mask_value as mask_value,
     synthetic_category_distribution as synthetic_category_distribution,
+)
+from test_data_agent.core.semantics import (
+    ColumnSemanticEvidence,
+    semantic_name_hint,
+    supported_signal_type,
 )
 from test_data_agent.core.limits import InputLimitError, max_input_cell_chars, max_input_cells, max_json_depth
 from test_data_agent.trino_config import TrinoConfig
@@ -118,7 +126,12 @@ def _mask_returned_value(
     return mask_value(value)
 
 
-def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:
+def summarize_top_values(
+    top_values: list[dict[str, Any]],
+    *,
+    field_name: str = "",
+    non_null_count: int | None = None,
+) -> dict[str, Any]:
     """Replace source categories with masked patterns or synthetic rank labels."""
     max_chars = max_input_cell_chars()
     if any(
@@ -126,26 +139,42 @@ def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:
         for row in top_values
     ):
         raise InputLimitError("Trino category value exceeds the safe input limit")
-    content_sensitive_type = infer_sensitive_type_from_values(
-        row.get("value") for row in top_values
-    )
-    if content_sensitive_type is None:
-        return {
-            "top_values": synthetic_category_distribution(
-                int(row.get("count") or 0) for row in top_values
-            )
-        }
-
-    pattern_counts: Counter[str] = Counter()
+    evidence = ColumnSemanticEvidence()
+    signals = []
+    frequencies: list[int] = []
+    valid_coverage = True
     for row in top_values:
         value = row.get("value")
-        value_type = infer_sensitive_value_type(value) or content_sensitive_type
-        pattern_counts[mask_pattern(str(value), value_type)] += int(
-            row.get("count") or 0
-        )
+        signal = infer_source_value_signal(value)
+        count = row.get("count")
+        frequency = count if type(count) is int and count > 0 else 0
+        valid_coverage = valid_coverage and frequency > 0 and value is not None
+        try:
+            numeric = value is not None and math.isfinite(float(value))
+        except (TypeError, ValueError, OverflowError):
+            numeric = False
+        evidence.add(signal, numeric=numeric, count=frequency)
+        signals.append(signal)
+        frequencies.append(frequency)
+    if not evidence.sensitive:
+        return {
+            "top_values": synthetic_category_distribution(frequencies)
+        }
+
+    semantic_type = evidence.resolve_aggregate(
+        field_name, non_null_count=non_null_count if valid_coverage else None,
+    )
+    hint = semantic_name_hint(field_name, numeric=evidence.all_numeric)
+    pattern_counts: Counter[str] = Counter()
+    for row, signal, count in zip(top_values, signals, frequencies, strict=True):
+        value = row.get("value")
+        value_type = supported_signal_type(
+            signal, hint=hint, numeric=evidence.all_numeric,
+        ) if signal is not None else semantic_type
+        pattern_counts[mask_pattern(str(value), value_type)] += count
     return {
         "sensitive": True,
-        "semantic_type": content_sensitive_type,
+        "semantic_type": semantic_type,
         "masked_patterns": [
             {"pattern": pattern, "count": count}
             for pattern, count in pattern_counts.most_common(10)
@@ -186,6 +215,7 @@ class TrinoMasker:
             )
         )
         aggregates = aggregate_rows[0] if aggregate_rows else {}
+        sensitive = sensitive or has_sensitive_numeric_summary(aggregates)
         row_count = int(aggregates.get("row_count") or 0)
         non_null_count = int(aggregates.get("non_null_count") or 0)
         profile: dict[str, Any] = {
@@ -207,6 +237,7 @@ class TrinoMasker:
                 if key not in profile
                 and key
                 not in {"max_abs_magnitude", "has_negative", "has_positive", "zero_count", "subunit_count", "min_subunit_magnitude"}
+                and not (sensitive and key in {"min_value", "max_value", "p05", "p95"})
                 and value is not None
             }
         )
@@ -240,7 +271,19 @@ class TrinoMasker:
                         max_top_values,
                     )
                 )
-                profile.update(summarize_top_values(top_values))
+                full_row_count = aggregates.get("row_count")
+                full_non_null_count = aggregates.get("non_null_count")
+                if (
+                    type(full_row_count) is not int
+                    or type(full_non_null_count) is not int
+                    or not 0 <= full_non_null_count <= full_row_count
+                ):
+                    full_non_null_count = None
+                profile.update(summarize_top_values(
+                    top_values,
+                    field_name=column,
+                    non_null_count=full_non_null_count,
+                ))
         return profile
 
     def run_safe_select(self, sql: str) -> list[dict[str, Any]]:

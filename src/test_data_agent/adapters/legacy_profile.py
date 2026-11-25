@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 import re
 from typing import Any
@@ -12,20 +13,29 @@ from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.privacy import (
     LocalCategoryField,
-    infer_sensitive_type_from_values,
-    infer_sensitive_value_type,
+    has_sensitive_numeric_summary,
+    infer_category_value_signal,
     is_sensitive_field,
     mask_pattern,
 )
+from test_data_agent.core.semantics import (
+    ColumnSemanticEvidence,
+    semantic_name_hint,
+    supported_signal_type,
+)
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.profile_types import ProfileDataType, coerce_profile_type
-from test_data_agent.csv_profiler import MAX_DISTINCT_DIGESTS
+
+
+# Older single-CSV profiles stopped counting at this historical boundary.
+_LEGACY_CSV_DISTINCT_CENSOR = 99_999
 
 
 def legacy_profile_to_dataset_profile(
     profile: Mapping[str, Any],
     *,
     source_type: str = "legacy_profile",
+    max_chars: int | None = None,
 ) -> DatasetProfile:
     table_name = str(profile.get("table", "synthetic_table"))
     row_count = int(profile.get("row_count", 0) or 0)
@@ -34,8 +44,8 @@ def legacy_profile_to_dataset_profile(
             table_name,
             row_count,
             column,
-            suppress_sensitive_numeric=source_type
-            in {"postgres", "trino", "postgres_query", "trino_query"},
+            non_null_count=_exact_non_null_count(profile.get("row_count"), column),
+            max_chars=max_chars,
         )
         for column in profile.get("columns", [])
     ]
@@ -46,10 +56,13 @@ def legacy_profile_to_dataset_profile(
         distinct = column.get("approx_distinct_count")
         non_null_rows = row_count * (1 - field.null_ratio)
         if (
-            field.is_identifier and type(distinct) is int
+            field.is_identifier and field.unique_ratio_kind != "lower_bound"
+            and type(distinct) is int
             and 0 < distinct < non_null_rows
-            # CSV digest counts at the cap are censored, not a measured pool.
-            and not (source_type == "csv" and distinct >= MAX_DISTINCT_DIGESTS - 1)
+            and not (
+                source_type == "csv" and field.unique_ratio_kind != "exact"
+                and distinct >= _LEGACY_CSV_DISTINCT_CENSOR
+            )
         ):
             field.distribution = {**field.distribution, "pool_size": distinct}
 
@@ -57,6 +70,7 @@ def legacy_profile_to_dataset_profile(
         field.name
         for field in field_profiles
         if field.is_identifier and field.unique_ratio is not None and field.unique_ratio >= 1.0
+        and field.unique_ratio_kind != "lower_bound"
     ]
 
     return DatasetProfile(
@@ -97,7 +111,8 @@ def _field_profile_from_column(
     row_count: int,
     column: Mapping[str, Any],
     *,
-    suppress_sensitive_numeric: bool = False,
+    non_null_count: int | None = None,
+    max_chars: int | None = None,
 ) -> FieldProfile:
     name = str(column.get("name", "column"))
     unique_ratio = None if column.get("approx_distinct_count", 0) is None else _safe_ratio(
@@ -108,17 +123,49 @@ def _field_profile_from_column(
     )
     semantic_type = _optional_string(column.get("semantic_type"))
     top_values = column.get("top_values") or []
-    content_sensitive_type = infer_sensitive_type_from_values(
-        item.get("value") for item in top_values if isinstance(item, Mapping)
+    evidence = ColumnSemanticEvidence()
+    signals = []
+    frequencies: list[int] = []
+    valid_coverage = True
+    for item in top_values:
+        if not isinstance(item, Mapping):
+            raise ValueError("profile top values must contain object entries")
+        value = item.get("value")
+        signal = infer_category_value_signal(value, max_chars=max_chars)
+        count = item.get("count")
+        frequency = count if type(count) is int and count > 0 else 0
+        valid_coverage = valid_coverage and frequency > 0 and value is not None
+        try:
+            numeric = value is not None and math.isfinite(float(value))
+        except (TypeError, ValueError, OverflowError):
+            numeric = False
+        evidence.add(signal, numeric=numeric, count=frequency)
+        signals.append(signal)
+        frequencies.append(frequency)
+    inferred_semantic = evidence.resolve_aggregate(
+        name, non_null_count=non_null_count if valid_coverage else None,
     )
-    if content_sensitive_type == "secret" or semantic_type is None:
-        semantic_type = content_sensitive_type or semantic_type
+    if any(signal.strong_secret for signal in evidence.matches) or semantic_type is None:
+        semantic_type = inferred_semantic or semantic_type
     sensitive = (
         bool(column.get("sensitive", False))
         or is_sensitive_field(name, semantic_type)
-        or content_sensitive_type is not None
+        or evidence.sensitive
+        or has_sensitive_numeric_summary(column, max_chars=max_chars)
     )
     precision, scale = _declared_decimal_shape(column)
+    hint = semantic_name_hint(name, numeric=evidence.all_numeric)
+    masked_top_values = [
+        MaskedPattern(
+            pattern=mask_pattern(
+                str(item.get("value", "")),
+                (supported_signal_type(signal, hint=hint, numeric=evidence.all_numeric)
+                 if signal is not None else None) or semantic_type,
+            ),
+            count=count,
+        ).model_dump(mode="json")
+        for item, signal, count in zip(top_values, signals, frequencies, strict=True)
+    ] if sensitive else []
     return FieldProfile(
         name=name,
         data_type=_field_type_from_raw(column.get("data_type", "string")),
@@ -128,6 +175,7 @@ def _field_profile_from_column(
         null_ratio=None if column.get("null_ratio", 0.0) is None
         else float(column.get("null_ratio", 0.0)),
         unique_ratio=unique_ratio,
+        unique_ratio_kind=column.get("unique_ratio_kind", "unspecified"),
         sensitive=sensitive,
         semantic_type=semantic_type,
         numeric_storage_type=column.get("numeric_storage_type"),
@@ -137,9 +185,8 @@ def _field_profile_from_column(
             table_name,
             is_identifier,
             sensitive,
-            semantic_type,
             column,
-            suppress_sensitive_numeric=suppress_sensitive_numeric,
+            masked_top_values=masked_top_values,
         ),
     )
 
@@ -206,10 +253,9 @@ def _distribution_from_profile_column(
     table_name: str,
     is_identifier: bool,
     sensitive: bool,
-    semantic_type: str | None,
     column: Mapping[str, Any],
     *,
-    suppress_sensitive_numeric: bool = False,
+    masked_top_values: list[dict[str, Any]],
 ) -> dict[str, Any]:
     raw_type = str(column.get("data_type", "")).lower()
     if raw_type == FieldType.DECIMAL.value or coerce_profile_type(raw_type) == ProfileDataType.DECIMAL:
@@ -227,35 +273,34 @@ def _distribution_from_profile_column(
     if sensitive and top_values:
         return {
             "kind": "masked_patterns",
-            "patterns": [
-                MaskedPattern(
-                    pattern=mask_pattern(
-                        str(item.get("value", "")),
-                        infer_sensitive_value_type(item.get("value")) or semantic_type,
-                    ),
-                    count=int(item.get("count", 0) or 0),
-                ).model_dump(mode="json")
-                for item in top_values
-            ],
+            "patterns": masked_top_values,
         }
     if top_values:
+        categories = []
+        for item in top_values:
+            try:
+                count = float(item.get("count", 1) or 1)
+            except (TypeError, ValueError, OverflowError):
+                raise ValueError("profile category counts must be numeric") from None
+            if not math.isfinite(count) or count < 0:
+                raise ValueError("profile category counts must be numeric")
+            categories.append(
+                CategoryWeight(value=item.get("value"), count=count).model_dump(mode="json")
+            )
         return {
             "kind": "categorical",
-            "categories": [
-                CategoryWeight(value=item.get("value"), count=float(item.get("count", 1) or 1)).model_dump(mode="json")
-                for item in top_values
-            ],
+            "categories": categories,
         }
 
-    if suppress_sensitive_numeric and sensitive:
+    if sensitive:
         numeric_shape = column.get("numeric_shape")
         if isinstance(numeric_shape, Mapping):
-            return {"kind": "numeric_shape", **dict(numeric_shape)}
+            return {**dict(numeric_shape), "kind": "numeric_shape"}
         return {}
 
     numeric_shape = column.get("numeric_shape")
     if isinstance(numeric_shape, Mapping):
-        return {"kind": "numeric_shape", **dict(numeric_shape)}
+        return {**dict(numeric_shape), "kind": "numeric_shape"}
 
     numeric_distribution = {
         "kind": "numeric",
@@ -291,6 +336,24 @@ def _optional_string(value: Any) -> str | None:
     if value in (None, ""):
         return None
     return str(value)
+
+
+def _exact_non_null_count(row_count: Any, column: Mapping[str, Any]) -> int | None:
+    if type(row_count) is not int or row_count < 0:
+        return None
+    if "non_null_count" in column:
+        count = column["non_null_count"]
+        if type(count) is int and 0 <= count <= row_count:
+            if "null_count" in column:
+                null_count = column["null_count"]
+                if type(null_count) is not int or null_count != row_count - count:
+                    return None
+            return count
+        return None
+    null_count = column.get("null_count")
+    if type(null_count) is int and 0 <= null_count <= row_count:
+        return row_count - null_count
+    return None
 
 
 def _safe_ratio(distinct_count: Any, row_count: int) -> float:

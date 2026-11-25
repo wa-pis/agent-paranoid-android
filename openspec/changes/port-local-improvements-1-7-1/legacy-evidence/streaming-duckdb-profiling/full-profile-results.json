@@ -1,0 +1,145 @@
+{
+  "environment": {
+    "python": "3.11.2 (v3.11.2:878ead1ac1, Feb  7 2023, 10:02:41) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cpu": "Apple M4 Max",
+    "physical_cpus": 14,
+    "ram_bytes": 38654705664,
+    "dependencies": {
+      "duckdb": "2.0.1",
+      "pyarrow": "25.0.0",
+      "pydantic": "2.13.4",
+      "Faker": "40.35.0",
+      "PyYAML": "6.0.3"
+    }
+  },
+  "settings": {
+    "columns": 25,
+    "rule_sample_rows": 2000,
+    "profile_deadline_seconds": 600,
+    "repeats": 3,
+    "distinct_transition": 1000000
+  },
+  "runs": [
+    {
+      "profile_sha256": "1980773ff02f928b8f6b0e0df2bf48d7e66c9d4e2428d5a2d93bb59b98216adc",
+      "profile_seconds": 0.7977156662382185,
+      "peak_rss_bytes": 110821376,
+      "rows": 10000,
+      "backend": "set",
+      "repeat": 1,
+      "wall_seconds": 1.0368297090753913,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "1980773ff02f928b8f6b0e0df2bf48d7e66c9d4e2428d5a2d93bb59b98216adc",
+      "profile_seconds": 0.8050968330353498,
+      "peak_rss_bytes": 109805568,
+      "rows": 10000,
+      "backend": "auto",
+      "repeat": 1,
+      "wall_seconds": 1.0545564582571387,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "1980773ff02f928b8f6b0e0df2bf48d7e66c9d4e2428d5a2d93bb59b98216adc",
+      "profile_seconds": 0.7884348751977086,
+      "peak_rss_bytes": 110149632,
+      "rows": 10000,
+      "backend": "auto",
+      "repeat": 2,
+      "wall_seconds": 1.0436996668577194,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "1980773ff02f928b8f6b0e0df2bf48d7e66c9d4e2428d5a2d93bb59b98216adc",
+      "profile_seconds": 0.80284683406353,
+      "peak_rss_bytes": 105299968,
+      "rows": 10000,
+      "backend": "set",
+      "repeat": 2,
+      "wall_seconds": 1.0722037088125944,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "1980773ff02f928b8f6b0e0df2bf48d7e66c9d4e2428d5a2d93bb59b98216adc",
+      "profile_seconds": 0.8237206661142409,
+      "peak_rss_bytes": 112230400,
+      "rows": 10000,
+      "backend": "set",
+      "repeat": 3,
+      "wall_seconds": 1.0938841253519058,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "1980773ff02f928b8f6b0e0df2bf48d7e66c9d4e2428d5a2d93bb59b98216adc",
+      "profile_seconds": 0.8027365827001631,
+      "peak_rss_bytes": 111722496,
+      "rows": 10000,
+      "backend": "auto",
+      "repeat": 3,
+      "wall_seconds": 1.0819838750176132,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "b6ae8d325c05d285cea939422439472ba1ff98382483ce4793117b5f31872598",
+      "profile_seconds": 8.126368291210383,
+      "peak_rss_bytes": 437125120,
+      "rows": 100000,
+      "backend": "set",
+      "repeat": 1,
+      "wall_seconds": 8.397627708967775,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "b6ae8d325c05d285cea939422439472ba1ff98382483ce4793117b5f31872598",
+      "profile_seconds": 9.950654208194464,
+      "peak_rss_bytes": 432111616,
+      "rows": 100000,
+      "backend": "auto",
+      "repeat": 1,
+      "wall_seconds": 10.216546667274088,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "b6ae8d325c05d285cea939422439472ba1ff98382483ce4793117b5f31872598",
+      "profile_seconds": 9.7390092080459,
+      "peak_rss_bytes": 391168000,
+      "rows": 100000,
+      "backend": "auto",
+      "repeat": 2,
+      "wall_seconds": 10.002039209008217,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "b6ae8d325c05d285cea939422439472ba1ff98382483ce4793117b5f31872598",
+      "profile_seconds": 8.065212041139603,
+      "peak_rss_bytes": 446513152,
+      "rows": 100000,
+      "backend": "set",
+      "repeat": 2,
+      "wall_seconds": 8.314808791968971,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "b6ae8d325c05d285cea939422439472ba1ff98382483ce4793117b5f31872598",
+      "profile_seconds": 7.826731792185456,
+      "peak_rss_bytes": 447266816,
+      "rows": 100000,
+      "backend": "set",
+      "repeat": 3,
+      "wall_seconds": 8.076697582844645,
+      "full_profile_equal": true
+    },
+    {
+      "profile_sha256": "b6ae8d325c05d285cea939422439472ba1ff98382483ce4793117b5f31872598",
+      "profile_seconds": 9.669598707929254,
+      "peak_rss_bytes": 433340416,
+      "rows": 100000,
+      "backend": "auto",
+      "repeat": 3,
+      "wall_seconds": 9.919384915847331,
+      "full_profile_equal": true
+    }
+  ]
+}

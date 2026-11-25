@@ -71,6 +71,19 @@ def test_user_defined_operators_cannot_bypass_limits():
         expressions.safe_eval("value * 2", {"value": Operand()})
 
 
+@pytest.mark.parametrize("values", [[256], [128, 128], [128, 128, -128]])
+def test_integer_aggregate_bounds_operands_and_intermediate_results(monkeypatch, values):
+    monkeypatch.setattr(expressions, "MAX_EXACT_EXPRESSION_BITS", 8)
+    with pytest.raises(ValueError, match="^expression resource limit exceeded$"):
+        expressions.safe_eval('sum("value")', {"rows": [{"value": value} for value in values]})
+
+
+def test_bounded_integer_aggregate_preserves_exact_values():
+    value = 2**53 + 1
+    result = expressions.safe_eval('sum("value")', {"rows": [{"value": value}, {"value": 2}]})
+    assert type(result) is int and result == value + 2
+
+
 def test_all_formula_services_reject_before_allocation(monkeypatch):
     from test_data_agent.core.constraint import Constraint, ConstraintType
     from test_data_agent.core.dataset import DatasetSpec

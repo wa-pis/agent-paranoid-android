@@ -17,6 +17,7 @@ from yaml import YAMLError
 from pydantic import TypeAdapter, ValidationError
 
 from test_data_agent.adapters import load_profile_or_spec
+from test_data_agent.adapters.parallel_generation import ParallelGenerationPolicy
 from test_data_agent.cli_contract import CliExternalServiceError
 from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -81,6 +82,7 @@ def generate_dataset_from_spec_path(
     invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
     overwrite: bool = False,
+    streaming: ParallelGenerationPolicy | None = None,
 ) -> int:
     if output_folder.resolve() in spec_path.resolve().parents:
         raise ValueError("output folder must not contain the input specification")
@@ -95,6 +97,7 @@ def generate_dataset_from_spec_path(
         invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
         overwrite=overwrite,
+        **({"streaming": streaming} if streaming is not None else {}),
     )
     write_generation_summary(output_folder)
     return exit_code
@@ -108,6 +111,16 @@ def generate_dataset_command(
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
     output_format = None if args.output_format is None else OutputFormat(args.output_format)
+    if getattr(args, "stream_csv", False) and output_format is None:
+        output_format = OutputFormat.CSV
+    streaming_options: dict[str, Any] = {}
+    if getattr(args, "stream_csv", False):
+        workers = getattr(args, "workers", None)
+        streaming_options["streaming"] = ParallelGenerationPolicy(
+            workers=4 if workers is None else workers,
+            max_rows=1_000_000,
+            max_cells=25_000_000,
+        )
     return generate_dataset_from_spec_path(
         args.spec,
         output_folder=args.output,
@@ -118,6 +131,7 @@ def generate_dataset_command(
         invalid_ratio=getattr(args, "invalid_ratio", None),
         business_rules_applier=business_rules_applier,
         overwrite=getattr(args, "overwrite", False),
+        **streaming_options,
     )
 
 

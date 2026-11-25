@@ -19,6 +19,7 @@ from test_data_agent.validation.constraint_validator import TemporalMetrics, val
 from test_data_agent.validation.relationship_validator import RelationshipMetrics, validate_relationships
 from test_data_agent.validation.schema_validator import validate_schema
 from test_data_agent.validation.relational_scenarios import RelationalScenarioEvidence, inspect_relational_scenarios
+from test_data_agent.validation.values import normalize_dataset_values
 
 
 class ValidationSection(BaseModel):
@@ -76,9 +77,27 @@ def validate_dataset(
     budget: GenerationBudget | None = None,
 ) -> DatasetValidationReport:
     budget = budget or GenerationBudget()
+    budget.check("validation normalization")
+    normalized, input_errors = normalize_dataset_values(rows_by_entity, spec)
+    budget.check("validation normalization")
+    return _validation_report(normalized, spec, budget=budget, input_errors=input_errors)
+
+
+def _validation_report(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+    input_errors: list[str] | None = None,
+    completed: set[str] | None = None,
+    metrics: list[RelationshipMetrics] | None = None,
+    temporal_metrics: list[TemporalMetrics] | None = None,
+) -> DatasetValidationReport:
+    budget = budget or GenerationBudget()
     settings = spec.validation_settings.model_copy(deep=True)
-    metrics: list[RelationshipMetrics] = []
-    temporal_metrics: list[TemporalMetrics] = []
+    metrics = [] if metrics is None else metrics
+    temporal_metrics = [] if temporal_metrics is None else temporal_metrics
+    completed = set() if completed is None else completed
     mandatory = bool(spec.relational_scenarios)
     validators: list[tuple[str, bool, Callable[[], list[str]]]] = [
         ("schema", settings.validate_schema or mandatory, lambda: validate_schema(rows_by_entity, spec)),
@@ -98,7 +117,7 @@ def validate_dataset(
     for name, enabled, validator in validators:
         if not enabled:
             continue
-        result = section(name, validator())
+        result = section(name, input_errors or ([] if name in completed else validator()))
         if name == "relationships":
             result.checked = len(metrics)
             result.passed = sum(item.valid for item in metrics)
@@ -129,7 +148,7 @@ def validate_dataset(
         active_temporal_constraints=active_temporal,
         temporal_checks=("not_declared" if not active_temporal else
                          "executed" if "constraints" in executed else "not_run"),
-        temporal_metrics=temporal_metrics,
+        temporal_metrics=temporal_metrics if "constraints" in executed else [],
     )
     scenario_evidence = (inspect_relational_scenarios(rows_by_entity, spec, tuple(spec.relational_scenarios), budget=budget)
                          if spec.relational_scenarios else None)
@@ -168,6 +187,17 @@ def assert_generated_dataset_valid(
     budget: GenerationBudget | None = None,
 ) -> None:
     """Enforce invariants independently of optional validation report settings."""
+    _validate_generated_mandatory(rows_by_entity, spec, budget=budget)
+
+
+def _validate_generated_mandatory(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+    metrics: list[RelationshipMetrics] | None = None,
+    temporal_metrics: list[TemporalMetrics] | None = None,
+) -> None:
     budget = budget or GenerationBudget()
     budget.check("post-solve validation")
     assert_spec_safe(spec)
@@ -185,5 +215,33 @@ def assert_generated_dataset_valid(
         validate_business_rules_for_spec(spec.business_rules, spec)
         if not validate_business_rules(rows_by_entity, spec.business_rules, budget=budget, spec=spec).valid:
             raise GenerationValidationError("generated dataset failed post-solve business-rule validation")
-    if (not spec.relational_scenarios and validate_relationships(rows_by_entity, spec, budget=budget)) or validate_constraints(rows_by_entity, spec, budget=budget):
+    if (not spec.relational_scenarios and validate_relationships(rows_by_entity, spec, budget=budget, metrics=metrics)) or validate_constraints(rows_by_entity, spec, budget=budget, temporal_metrics=temporal_metrics):
         raise GenerationValidationError("generated dataset failed post-solve constraint validation")
+
+
+def _validate_generated_dataset(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> tuple[DatasetValidationReport, dict[str, list[dict[str, Any]]]]:
+    """Share checks within one immutable plain-generation boundary only."""
+    budget = budget or GenerationBudget()
+    metrics: list[RelationshipMetrics] = []
+    temporal_metrics: list[TemporalMetrics] = []
+    _validate_generated_mandatory(rows_by_entity, spec, budget=budget,
+                                  metrics=metrics, temporal_metrics=temporal_metrics)
+    budget.check("validation normalization")
+    normalized, input_errors = normalize_dataset_values(rows_by_entity, spec)
+    budget.check("validation normalization")
+    completed = {"privacy"}
+    if (normalized is rows_by_entity
+            and spec.generation_settings.mode not in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
+            and spec.business_rules is None and not spec.relational_scenarios):
+        completed.update({"schema", "relationships", "constraints"})
+    else:
+        metrics = []
+        temporal_metrics = []
+    report = _validation_report(normalized, spec, budget=budget, input_errors=input_errors,
+                                completed=completed, metrics=metrics, temporal_metrics=temporal_metrics)
+    return report, normalized

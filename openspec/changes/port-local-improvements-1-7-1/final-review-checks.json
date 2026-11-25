@@ -1,0 +1,117 @@
+{
+  "cache_format": 12,
+  "changed_since_port": [
+    "AGENTS.md",
+    "src/test_data_agent/csv_profiler.py",
+    "src/test_data_agent/profiling/cache.py",
+    "src/test_data_agent/profiling/schema_profiler.py",
+    "src/test_data_agent/validation/schema_validator.py"
+  ],
+  "coverage": {
+    "covered_lines": 19983,
+    "missing_lines": 1680,
+    "num_statements": 21663,
+    "percent_covered": 92.24484143470434
+  },
+  "date": "2026-11-25",
+  "deterministic_replay": {
+    "cases": 27,
+    "exact_target_matches": 27,
+    "generated_bundles_removed": true,
+    "installed_profile": "all",
+    "module_origin": "isolated installed all wheel",
+    "shared_dependency_versions_match": true
+  },
+  "development_branch": "origin/main",
+  "fetched_development_commit": "49d12c515c3aa7d012b038c5d1c96b50195fbcc1",
+  "focused": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 337
+  },
+  "full_suite": {
+    "errors": 0,
+    "failures": 0,
+    "junit_seconds": 325.692,
+    "passed": 6255,
+    "skipped": 25,
+    "tests": 6280,
+    "unchanged_skip_identities_and_reasons": true
+  },
+  "historical_evidence_files_unchanged": 130,
+  "independent_review": {
+    "generation_validation": "passed after FLOAT fix",
+    "integer_quantiles": "passed; 480 quantiles independently matched a Decimal oracle",
+    "profiling_distinct_tempfiles": "passed after derived-summary fix",
+    "shared_privacy_source_provenance": "passed after derived-summary fix"
+  },
+  "installed_profiles_environment": "Temporary copies of the preceding isolated installed-wheel environments; only the project wheel was replaced offline with --no-deps. Dependency versions match the full-suite environment.",
+  "installed_wheel_profiles": {
+    "all": "passed",
+    "base": "passed",
+    "profiling": "passed"
+  },
+  "live_source_access": false,
+  "mypy": "passed",
+  "not_rerun": [
+    "100000/750000 x25 performance campaigns",
+    "minimum-dependency140test environment",
+    "other Python/OS CI jobs",
+    "live databases/providers",
+    "real transformation approvals or new activation acceptance"
+  ],
+  "original_source_files_unchanged": 323,
+  "outcome": "local_branch_ready_for_review",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "publication": false,
+  "python": "3.11.15",
+  "reviewed_commit": "1a40ad089412603450a68864d4a420a47d437339",
+  "ruff": "passed",
+  "runtime_policy_sha256": "8de3784ce88523bb25d0f5f09b68cf1673ab826043718bfe533c2ca92c658c9e",
+  "source_runtime_sha256": "1aa87b5a5de150fd8f5e9b9073b7dd3de3e44bf7640bffeff6ab9eb218e98494",
+  "static_checks": {
+    "business_rules.schema.json": {
+      "matches": true
+    },
+    "compileall": {
+      "exit_code": 0
+    },
+    "dataset_spec.schema.json": {
+      "matches": true
+    },
+    "dependency_compatibility": {
+      "exit_code": 0
+    },
+    "dependency_licenses": {
+      "exit_code": 0
+    },
+    "mkdocs_strict": {
+      "exit_code": 0
+    },
+    "openspec_strict": {
+      "exit_code": 0
+    },
+    "operational_budgets": {
+      "exit_code": 0
+    }
+  },
+  "superseded_attempts": [
+    {
+      "status": "interrupted before final code freeze; not a passing gate"
+    },
+    {
+      "failed": 1,
+      "failure": "card_non_luhn_identifier exposed premature FLOAT quantile rounding",
+      "passed": 6244,
+      "resolved_by": "1a40ad089412603450a68864d4a420a47d437339",
+      "reviewed_commit": "77096f938582c8cf6889914ca7a94327d70f8c86",
+      "skipped": 25
+    }
+  ],
+  "wheel": {
+    "bytes": 469217,
+    "sha256": "783381c941e51159189cee7ee4b4763390310814eb03ea62ed5f011c60240f8e"
+  },
+  "wheel_runtime_files_match": 174
+}

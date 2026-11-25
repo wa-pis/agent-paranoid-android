@@ -1,0 +1,527 @@
+{
+  "source_head": "26af69043cfd8d46df48ed43e18d5e168d223d3a",
+  "source_version": "1.5.0",
+  "note": "Historical measurements and proposals; not a 1.7.1 performance claim or active contract. Preserved byte-for-byte.",
+  "files": {
+    "openspec/changes/csv-encoding-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/benchmark.md",
+      "sha256": "e5eeb0e8489f9508cc69188fa7367a052909e4ba7baa5f3b7696641f940d2530"
+    },
+    "openspec/changes/csv-encoding-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/design.md",
+      "sha256": "dde1340c178cd6a3a85dde24326feff2f16a73278f8507a4481b511d4c7d768f"
+    },
+    "openspec/changes/csv-encoding-performance/encoding-profile-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/encoding-profile-results.json",
+      "sha256": "0d8888696c6b3d500cb502dd8bb1f8af123700116e904ccf2344a78a5d20ae8c"
+    },
+    "openspec/changes/csv-encoding-performance/paired-benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/paired-benchmark.md",
+      "sha256": "31a58c5384852d5046cfbd08e5f30f7f3dd07ff73fc1145081ead86f864ad55b"
+    },
+    "openspec/changes/csv-encoding-performance/paired-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/paired-results.json",
+      "sha256": "a49dc561b99be67cae219c06f109b23a2f475432be0ab9dd89bf27bb20f1c95f"
+    },
+    "openspec/changes/csv-encoding-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/proposal.md",
+      "sha256": "90586f2498cb4ccf401a3d42da310cd8fe90832edfa69149f1984f87c9b4029c"
+    },
+    "openspec/changes/csv-encoding-performance/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/public-csv-results.json",
+      "sha256": "3bcb174e80561d2fa26b06f52786a62a6b04656f95017b36caff80ecf280d937"
+    },
+    "openspec/changes/csv-encoding-performance/specs/artifact-contract/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/specs/artifact-contract/spec.md",
+      "sha256": "0316ef313f480739d84ec2b01e523856b55a457e2663e39592c684e2dea6fb3e"
+    },
+    "openspec/changes/csv-encoding-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/tasks.md",
+      "sha256": "9d5b7b87e87abfac7bf85bbdaa63291036f89541713191b636955b563fddaab1"
+    },
+    "openspec/changes/csv-encoding-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-encoding-performance/validation.md",
+      "sha256": "5560e649631f3b9163f6f11b2fadb750bcf42965b5059da6b778c81256ec2ebc"
+    },
+    "openspec/changes/csv-folder-distinct-tracking/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-folder-distinct-tracking/proposal.md",
+      "sha256": "56ecfe08aa945424e5dbb6a3b10b345c2b75d4f95938ddbfe633a0a6335fdb60"
+    },
+    "openspec/changes/csv-folder-distinct-tracking/specs/safe-csv-profiling/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-folder-distinct-tracking/specs/safe-csv-profiling/spec.md",
+      "sha256": "4198a44b299771bbd95113ce89e5b0cd31e42112a76c766e152812bdcec8f477"
+    },
+    "openspec/changes/csv-folder-distinct-tracking/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/csv-folder-distinct-tracking/tasks.md",
+      "sha256": "6eed5e5f06976c5d6f4012d3ceaf983aa89d85ff0e4eeec1e18c38c1659bad03"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/design.md",
+      "sha256": "2fee94fce2acb10e1818880a72df4d15e1ea9af90d1c318c5f78f162323c081f"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/distinct-benchmark-evidence.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/distinct-benchmark-evidence.md",
+      "sha256": "719f530aed8788321cfc0b810b6cab1e70aed3d9b7bb7b4609d2d23de2e7fe3d"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/distinct-benchmark-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/distinct-benchmark-results.json",
+      "sha256": "b0bb268ce03dbe3e61180ff2295384ff49c50aadd68b325c075c0ba60657efd5"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/distinct-benchmark-stream-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/distinct-benchmark-stream-results.json",
+      "sha256": "fcbec87bb82c713329bb21d71d7feb897087d1f938ee23c20ed69a045989d864"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/generation-distribution-evidence.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/generation-distribution-evidence.md",
+      "sha256": "5295fb9b01578b79e4ce6c10ea2944ff50c256c9c96cb0cbd963ea1ade460170"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/generation-distribution-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/generation-distribution-results.json",
+      "sha256": "18d51581ee84529bf0bcbe105591eedffee4aee86ecf8a5725dccdfebf1f0287"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/parallel-generation-evidence.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/parallel-generation-evidence.md",
+      "sha256": "858edc5f127d3f6ef69b888e6954eeb7eba726fb00807883ae12b75aedb8b122"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/parallel-generation-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/parallel-generation-results.json",
+      "sha256": "046c03f8a6e5ae3335185c185f91a03372af3d3e654af3f21e0a6605b1fbee4d"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/proposal.md",
+      "sha256": "5344bc6e14ba3e5a73471fdcd76d392458c448a50c99a153084db5db0c64b195"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/specs/dataset-capacity/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/specs/dataset-capacity/spec.md",
+      "sha256": "9940e4ab8fcff14fbac873aa89229296fc4e35a8edabd468b133ba00239a81bb"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/streaming-generation-evidence.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/streaming-generation-evidence.md",
+      "sha256": "9aab7742cbc45df056d3109cb1ae0947585628a8d0320eede4f801feed338ddd"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/streaming-generation-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/streaming-generation-results.json",
+      "sha256": "e2e783220ae186cbc3d8d4aa203decab2b6e443b9e8e9ceb550d3d877588c7d3"
+    },
+    "openspec/changes/dataset-scale-estimation-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/dataset-scale-estimation-performance/tasks.md",
+      "sha256": "b00df917b19fbac3fbb8dd1c8622824e949293bcbd59a11e864d0ebeef3fab4b"
+    },
+    "openspec/changes/generation-dispatch-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/benchmark.md",
+      "sha256": "10789b0fdef2a7050d32960b851cf7119d53d112257739481df32508c6fc1742"
+    },
+    "openspec/changes/generation-dispatch-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/design.md",
+      "sha256": "9a5a9067b57987164ae01bd6032ddba16e1f850af0abe52de540eaaec7f107c1"
+    },
+    "openspec/changes/generation-dispatch-performance/dispatch-profile-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/dispatch-profile-results.json",
+      "sha256": "9a3bcb41ac6ed80f4013ed5ba3939563a94b8c984a4d120d4621903edef7d79a"
+    },
+    "openspec/changes/generation-dispatch-performance/generation-dispatch.patch": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/generation-dispatch.patch",
+      "sha256": "1b227d271fe5584d3c4bc55367c92dce852c89e53dfdbeaf8fd6f1b0f5657ada"
+    },
+    "openspec/changes/generation-dispatch-performance/paired-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/paired-results.json",
+      "sha256": "ee1ccb8a738271d34fe7158af13e2454e6891244c5de12482aa5725fa19a4b1c"
+    },
+    "openspec/changes/generation-dispatch-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/proposal.md",
+      "sha256": "494c9811eaa5eda54b833561cd95071e71f8ccd61a7144579bbca1a2a6f4c3bf"
+    },
+    "openspec/changes/generation-dispatch-performance/specs/synthetic-generation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/specs/synthetic-generation/spec.md",
+      "sha256": "00948eeae380e25e87f2796424d3c3a9bd6a806696453fa520c8dfa14962d31f"
+    },
+    "openspec/changes/generation-dispatch-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/tasks.md",
+      "sha256": "04d78bf72b790e70e119d1078629f7e05d0837b599ee9f4cdf299d2b1b081a11"
+    },
+    "openspec/changes/generation-dispatch-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/generation-dispatch-performance/validation.md",
+      "sha256": "40168da07e1dec90389d590d6cab2f1d3577989bae3b152180cf344db5bf8cca"
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/design.md",
+      "sha256": "1b901690ac3b6a57e291e39b01fa9bab41bc5df604dc0e45e5f345344f1c2c86"
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/progress.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/progress.md",
+      "sha256": "9c0aa7da41ccd7d058b6ebb2ecfecbcf1f215e62f4eb4896940ab6435ab9b91d"
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/proposal.md",
+      "sha256": "5bc8b71920e25eb2d9feba8ea1d5d2445068e85fcf9d91dabd18a18675c18f30"
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/specs/safe-mcp-workflow/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/specs/safe-mcp-workflow/spec.md",
+      "sha256": "96e5c8467797d9ca510ccaa1d2ec7607ed16b82b37d4c983773a34120c673c1f"
+    },
+    "openspec/changes/mcp-client-workflow-1-6-rc2/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/mcp-client-workflow-1-6-rc2/tasks.md",
+      "sha256": "373a032f37f7c97164a11a51efc10c8423283cbe4c77b2ba011c60300816f4a5"
+    },
+    "openspec/changes/numeric-phone-inference/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/design.md",
+      "sha256": "f6e7b7344d983840fdbf0c1e2855d2b6d25d76a8202acc36957b197d5e827804"
+    },
+    "openspec/changes/numeric-phone-inference/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/proposal.md",
+      "sha256": "f23bc06258205783e0ac41986e5f0710ced6ebb82c89788ea12c033429a2c61c"
+    },
+    "openspec/changes/numeric-phone-inference/specs/safe-csv-profiling/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/specs/safe-csv-profiling/spec.md",
+      "sha256": "15c97f54775c41c90aa0f97b661e9b83a45c0d8186ed2537e1a6a2350263354d"
+    },
+    "openspec/changes/numeric-phone-inference/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/tasks.md",
+      "sha256": "c324e924265aba2969eafa333eb04c00bc49b5ae3207cd97f406abc7e15d4775"
+    },
+    "openspec/changes/numeric-phone-inference/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/numeric-phone-inference/validation.md",
+      "sha256": "f1b203dad9bc331670d3d25c948c23f851fc8808c85f704a8de015a475b7e89f"
+    },
+    "openspec/changes/privacy-detector-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/benchmark.md",
+      "sha256": "6989907db1deb945791fc4c5bf8c537817726a18670e0ad849c1b88efd35001e"
+    },
+    "openspec/changes/privacy-detector-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/design.md",
+      "sha256": "669786ed231ba9c24d5bab5774ce8773e139c2aaf7e8ffbbac56b2b4deee6924"
+    },
+    "openspec/changes/privacy-detector-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/proposal.md",
+      "sha256": "506310859c8d1fb7418dd42b974f7637e0c82b965d318e4fe9fecf3de514f686"
+    },
+    "openspec/changes/privacy-detector-performance/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/public-csv-results.json",
+      "sha256": "31d9d79ab3f9ff0fd1cdee5f2195e259f13ab38155cc301d790be5bdcfd047c2"
+    },
+    "openspec/changes/privacy-detector-performance/specs/dataset-validation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/specs/dataset-validation/spec.md",
+      "sha256": "d8c6db85a0d8dc00a5daa2a666a07cd8c61b8662034c3b819cf1c0d5eea41732"
+    },
+    "openspec/changes/privacy-detector-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/tasks.md",
+      "sha256": "5ae21f46937e58c19359ea1a505b66eac368be128e3a7d9004ff675bd6041429"
+    },
+    "openspec/changes/privacy-detector-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-detector-performance/validation.md",
+      "sha256": "8b809f10a10cb24b45c9b7082d3f7f38a8ebf6d46e554c9e33b3a334d1188080"
+    },
+    "openspec/changes/privacy-signal-strength/accuracy-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/accuracy-results.json",
+      "sha256": "ee33dd81469d5aeb9f331bbae299195ec981e4fc906cf901caee99dd298343d0"
+    },
+    "openspec/changes/privacy-signal-strength/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/design.md",
+      "sha256": "43beb5cdddd5c45f5336ee976e2def07199ca311c101058ed6f77ef370ee84f0"
+    },
+    "openspec/changes/privacy-signal-strength/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/proposal.md",
+      "sha256": "d1785a6a57105ca56174c720bc74b5c05e76a5f22b3ca51520302c63fbebe3f0"
+    },
+    "openspec/changes/privacy-signal-strength/specs/safe-csv-profiling/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/specs/safe-csv-profiling/spec.md",
+      "sha256": "47fe81d4486ae58d350ac9357dcc47a0f0a94d48a9b4a542a2a3be50ce01e93f"
+    },
+    "openspec/changes/privacy-signal-strength/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/tasks.md",
+      "sha256": "2d21cb60fb7934796509d6b58b8d4022e974b64be40438bdd6ace3886afe1d86"
+    },
+    "openspec/changes/privacy-signal-strength/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-signal-strength/validation.md",
+      "sha256": "368f8b0cf8d4077152a5e9c559a42c335c011a0708ff9381151142bde8702798"
+    },
+    "openspec/changes/privacy-validation-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/benchmark.md",
+      "sha256": "f1887d98e04c0c74592b616ac7768223fbb5be624ef0f50ea88b9b1fd70ae09e"
+    },
+    "openspec/changes/privacy-validation-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/design.md",
+      "sha256": "21a252e43ce4e9560a0f72d840856f1ae60655755539d5fdb12bd2a3034ae2c1"
+    },
+    "openspec/changes/privacy-validation-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/proposal.md",
+      "sha256": "3e4bdb9cedde8d977744cd19499ffdb33a6319173d5e8ee60b2d24d7b543f959"
+    },
+    "openspec/changes/privacy-validation-performance/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/public-csv-results.json",
+      "sha256": "ed54cd83c855384c4e2a70486604a939f7aec7aec11e238fde3dc6b0723cf88c"
+    },
+    "openspec/changes/privacy-validation-performance/specs/dataset-validation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/specs/dataset-validation/spec.md",
+      "sha256": "4691ecd52eb863101575131320e950ce8fad7af508a535c0e3c218579bebf8c9"
+    },
+    "openspec/changes/privacy-validation-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/tasks.md",
+      "sha256": "b42663dbd24218e63bc8399a614e626f85a399124a9f5ebf81299a446da52dce"
+    },
+    "openspec/changes/privacy-validation-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/privacy-validation-performance/validation.md",
+      "sha256": "d45fbffbb1961ec8630867e459f9701081901889a4289e6a2df8e5c11167741c"
+    },
+    "openspec/changes/public-streaming-csv/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/design.md",
+      "sha256": "25ef9aa1a5fbf6bb3e85cb27871e1d54447d9a8c723aa6e459299931ef9f3394"
+    },
+    "openspec/changes/public-streaming-csv/installed-cli-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/installed-cli-results.json",
+      "sha256": "67a7ddaf2b5540b6a16cd0ce7f8dcb8a114f9f6cd95256b724547a10e75c018d"
+    },
+    "openspec/changes/public-streaming-csv/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/proposal.md",
+      "sha256": "e21d3f4be99ae363b8af84c34f3cf23a90bae6227c5f8745d28c062cfdada8d7"
+    },
+    "openspec/changes/public-streaming-csv/public-csv-benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/public-csv-benchmark.md",
+      "sha256": "673cc70d11ae5d50ec341f0d555c0bf0c78a488426f3e59339fe3f890a92fc52"
+    },
+    "openspec/changes/public-streaming-csv/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/public-csv-results.json",
+      "sha256": "2fe32ce83b36684aa561848f04cdc8e97bdc1bc829e963fc997876b953777cf5"
+    },
+    "openspec/changes/public-streaming-csv/specs/streaming-csv-export/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/specs/streaming-csv-export/spec.md",
+      "sha256": "55c6b8a80f2ac28dd7b63b43e8128caafea8d3b048b183ed4eb58c667fcffb78"
+    },
+    "openspec/changes/public-streaming-csv/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/tasks.md",
+      "sha256": "644ac5b3ea1ebda343266444d4af31c495c5116026afbac3e26e3aa7190e3511"
+    },
+    "openspec/changes/public-streaming-csv/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/public-streaming-csv/validation.md",
+      "sha256": "11e65a768433669a3cdbf4236fcd6ff82f14660786920a9e9d9179d21aa6be04"
+    },
+    "openspec/changes/schema-validation-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/benchmark.md",
+      "sha256": "1997ca27f04b60d549b23d6ef095f66caed2602777314f7c54a5988840488ea0"
+    },
+    "openspec/changes/schema-validation-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/design.md",
+      "sha256": "18d06dc22dc1b8041bd6af89c4bc13541afdf9abb0ff0a63ba8b97af834872d6"
+    },
+    "openspec/changes/schema-validation-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/proposal.md",
+      "sha256": "8c3cd6d06eb168ce59f5ab02fc0f8af13d83591e6ec704593b6456abf820f4a4"
+    },
+    "openspec/changes/schema-validation-performance/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/public-csv-results.json",
+      "sha256": "8001de3b876dfbef3dc51dff012a61044df8c1492dec4fed6e902d864eb05da4"
+    },
+    "openspec/changes/schema-validation-performance/schema-profile-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/schema-profile-results.json",
+      "sha256": "a4f816c0b44563d42ff6fe959424dc6e0cab5a5643647f3dfc1614a4c98b6306"
+    },
+    "openspec/changes/schema-validation-performance/specs/dataset-validation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/specs/dataset-validation/spec.md",
+      "sha256": "4d4779c01f08bea2711b918754fd9aec6116bf1f3f853aac637c3a3deda847a3"
+    },
+    "openspec/changes/schema-validation-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/tasks.md",
+      "sha256": "0eb5e79a7c1d13d68be1329de1c8a0cae2a63a18b74a70bf5c6c5ab3a8d83eb2"
+    },
+    "openspec/changes/schema-validation-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/schema-validation-performance/validation.md",
+      "sha256": "20b0c09d0ce1a8c27179fabd3fc0cf48ad9c8bd0ec9173055656af3181144880"
+    },
+    "openspec/changes/shared-generation-validation/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/benchmark.md",
+      "sha256": "d427475f9fd6108db0660407f13d0a59f156c2efb3bce4985a89d94fe3c10586"
+    },
+    "openspec/changes/shared-generation-validation/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/design.md",
+      "sha256": "30a27ec8479df2410265714576b0c331a00400f5dc918d136d74c9aac27bc29d"
+    },
+    "openspec/changes/shared-generation-validation/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/proposal.md",
+      "sha256": "1700821db389b2b600837f13d6bf408f1e53e2cf0a08ec35e7765b3b83c450dd"
+    },
+    "openspec/changes/shared-generation-validation/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/public-csv-results.json",
+      "sha256": "423108624a2edadecc4d432314520fd5dd3a45ec1c60dc4170e24b387228a1d7"
+    },
+    "openspec/changes/shared-generation-validation/specs/dataset-validation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/specs/dataset-validation/spec.md",
+      "sha256": "a8dbf9fa062062ea4e9488dbb7c9e61e9ed1d9e438376faa9b357434f96c2bc0"
+    },
+    "openspec/changes/shared-generation-validation/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/tasks.md",
+      "sha256": "29f01b4f7d64c2c2d104c587dc7917167dec791c304025bf4b7db6e870cd0e6a"
+    },
+    "openspec/changes/shared-generation-validation/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/shared-generation-validation/validation.md",
+      "sha256": "9dfcf47be3400430a0c0a3acf1930ab1f6a325677305caf3c6ae53e065cf42fe"
+    },
+    "openspec/changes/source-independent-profiling/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/benchmark.md",
+      "sha256": "812a8ccdbae8783dbe75973e5cca443e729bdb400396f0dc6031027de59270f3"
+    },
+    "openspec/changes/source-independent-profiling/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/design.md",
+      "sha256": "a5d0d2bbe5ef686e2afb0eea9d33c802c710a1cfa4b91cfcace6993b9e5c5cb4"
+    },
+    "openspec/changes/source-independent-profiling/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/proposal.md",
+      "sha256": "f789fdbe038472eab324346642a101c264f8756591e5c66ac3a9607f3d51ee01"
+    },
+    "openspec/changes/source-independent-profiling/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/public-csv-results.json",
+      "sha256": "e2a84aed6a266c85d59295f8f19eb2d4d3882712391f9f896f59bbb4add84330"
+    },
+    "openspec/changes/source-independent-profiling/specs/safe-source-profiling/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/specs/safe-source-profiling/spec.md",
+      "sha256": "873e26ee478f9d71d2096abf9d10909ac0cb2632fd3a68ab9abd959139f8cc44"
+    },
+    "openspec/changes/source-independent-profiling/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/tasks.md",
+      "sha256": "bf21b3185958dbed8089aaa627e9f1c706bcbd1ab9ad453db7c6493db0dcc58f"
+    },
+    "openspec/changes/source-independent-profiling/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/validation.md",
+      "sha256": "5d1a3d774d0de62e51a323020a7123b6f06ee22c1f37d949205ddee2a877a0e6"
+    },
+    "openspec/changes/source-independent-profiling/verification.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/source-independent-profiling/verification.json",
+      "sha256": "0a6eae9c9097a43eb1cd05b99a114deac9727df0bc5116f5da3d5a4e3f5d7e37"
+    },
+    "openspec/changes/streaming-duckdb-profiling/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/design.md",
+      "sha256": "15623d073d5b6d80fc9afd61ebd86aaf08241afc6957dadd213ea5a56fbc5d79"
+    },
+    "openspec/changes/streaming-duckdb-profiling/full-profile-default-sample-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/full-profile-default-sample-results.json",
+      "sha256": "894932df901c693980980924086364718df46eb55840cc41f9b5646d078be510"
+    },
+    "openspec/changes/streaming-duckdb-profiling/full-profile-large-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/full-profile-large-results.json",
+      "sha256": "d58e03609f3d3718e750e761bb6bd6538a27f1bfb46615e7afd3faee92ccf09b"
+    },
+    "openspec/changes/streaming-duckdb-profiling/full-profile-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/full-profile-results.json",
+      "sha256": "43206155e71a089c98353b746320f28a8220f591aaaf217f8a573c4ffc75c056"
+    },
+    "openspec/changes/streaming-duckdb-profiling/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/proposal.md",
+      "sha256": "7f9494233287a6aba4f8093c42892f967270136aa80732e5959b9b4a31f7cb0b"
+    },
+    "openspec/changes/streaming-duckdb-profiling/specs/safe-csv-profiling/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/specs/safe-csv-profiling/spec.md",
+      "sha256": "1acbb307ac146e4161fc815af2cf0964b79b5d294205d2edf8dd2c3b1d8fe845"
+    },
+    "openspec/changes/streaming-duckdb-profiling/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/tasks.md",
+      "sha256": "fb1a0ba77abdc469dfe34e0d6e81bea9121b1ea461848265a885b315deb8bd26"
+    },
+    "openspec/changes/streaming-duckdb-profiling/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/streaming-duckdb-profiling/validation.md",
+      "sha256": "1d4b2336d9387c8edbb6f3ff663378f497cb37eb36980a2aa50dd03b31210049"
+    },
+    "openspec/changes/string-generation-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/benchmark.md",
+      "sha256": "c84fbf7ee3594e222cc03d1908475d29e2a4ca2415aefa5951f50c8c97a3f316"
+    },
+    "openspec/changes/string-generation-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/design.md",
+      "sha256": "b03ab98f2e192690266f06f2e5d8a17ebe50c17dacf1ea0f3eb70d289f5f9aae"
+    },
+    "openspec/changes/string-generation-performance/paired-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/paired-results.json",
+      "sha256": "e60c24be5cd63dae48e55e8200ec9fe10b5d9152531759f0cb634e176f0afab5"
+    },
+    "openspec/changes/string-generation-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/proposal.md",
+      "sha256": "2a59717bb4564e416a642bfda55ce9213894a20a868c89a7e648cd35fc637b1e"
+    },
+    "openspec/changes/string-generation-performance/specs/synthetic-generation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/specs/synthetic-generation/spec.md",
+      "sha256": "413b059800bf45d4413c5128869ae7d2b26cc9e695afa46459e93b650e63cf66"
+    },
+    "openspec/changes/string-generation-performance/string-generation.patch": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/string-generation.patch",
+      "sha256": "b26654622552ebf30de3ce46b6ac92291b9dcff0f18a6cd28153182ed7d99791"
+    },
+    "openspec/changes/string-generation-performance/string-profile-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/string-profile-results.json",
+      "sha256": "3d48b3083f6618ddfdf9520f4026f5fc6891ae024e0e01570031f149e5471dcd"
+    },
+    "openspec/changes/string-generation-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/tasks.md",
+      "sha256": "a7ca7081baf255ebf161271154932517ef8e853de78c52f13f151efbe1d0fc88"
+    },
+    "openspec/changes/string-generation-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/string-generation-performance/validation.md",
+      "sha256": "20e40af1450601bd0fe01304ce6e9d1ce70206c5986475a14eb0051f921b06d8"
+    },
+    "openspec/changes/validation-consistency-hardening/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/design.md",
+      "sha256": "1a5f44f6bec08db20d22c19ea871f75ba97938e2a13cc442fc42e0ca7809b0dc"
+    },
+    "openspec/changes/validation-consistency-hardening/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/proposal.md",
+      "sha256": "4d9ced5d3a2b4ff727abd99290d90743ef95811ea9f0a33e49367f334d24dcd2"
+    },
+    "openspec/changes/validation-consistency-hardening/specs/dataset-validation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/specs/dataset-validation/spec.md",
+      "sha256": "0fd8016177b5e54c451960fea9e9c6882b37d58f96fa6bd3a9bd5ad5d02aead7"
+    },
+    "openspec/changes/validation-consistency-hardening/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/validation-consistency-hardening/tasks.md",
+      "sha256": "4c5b4502f7bb63dc10548b2851239d46f335b1d84405fcdb6c1aa6d6dac2532d"
+    },
+    "openspec/changes/value-normalization-performance/benchmark.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/benchmark.md",
+      "sha256": "c0d2cbde0f34886ec4b7b779292a09d4a43d076092ea64a4bae84a91104ba3bb"
+    },
+    "openspec/changes/value-normalization-performance/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/design.md",
+      "sha256": "c66ad5a0eb9605e98eb015e877c1ff5bdeb6496466971a73ea698189ec710e46"
+    },
+    "openspec/changes/value-normalization-performance/normalization-profile-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/normalization-profile-results.json",
+      "sha256": "5c3411d20740900ff2018899a057968b9494b376c3ebcb8635904116d354ba8e"
+    },
+    "openspec/changes/value-normalization-performance/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/proposal.md",
+      "sha256": "6c816eb565fb1bbf61b0451ba9b3794e397129b6831b3e1dae4f69560f74f5fd"
+    },
+    "openspec/changes/value-normalization-performance/public-csv-results.json": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/public-csv-results.json",
+      "sha256": "65e588a7784c6591e7e7d30517ef4ba3c3f93cdd081cc7701d79d6ee7520eb24"
+    },
+    "openspec/changes/value-normalization-performance/specs/dataset-validation/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/specs/dataset-validation/spec.md",
+      "sha256": "2eedec1fc978eb5e5e134d87b7f313a5ee204fb838b8612ae58b16ca4c900348"
+    },
+    "openspec/changes/value-normalization-performance/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/tasks.md",
+      "sha256": "de5d08fd67b23a350c4985e2d3c5f4672f334ad5b7634259cff477ad4eabb1b1"
+    },
+    "openspec/changes/value-normalization-performance/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/value-normalization-performance/validation.md",
+      "sha256": "40008a6a5d35f5dac2be8c28c211b879833589d751e9fa9011b27d7e6b8d4767"
+    },
+    "openspec/changes/whole-column-semantics/design.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/design.md",
+      "sha256": "f45efd62bf597600a373806641cff7c19c508cf9331d940b44921a6f63b59456"
+    },
+    "openspec/changes/whole-column-semantics/proposal.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/proposal.md",
+      "sha256": "a2a0c7a0b47f4f8f1b2191a4038b1a9cf3715e68f6b25b4d1cb3cf2c24660dab"
+    },
+    "openspec/changes/whole-column-semantics/specs/safe-csv-profiling/spec.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/specs/safe-csv-profiling/spec.md",
+      "sha256": "2b71606075e87683e2b68e661fe91329f13e0c9c1598001dee8fb252b9d99fab"
+    },
+    "openspec/changes/whole-column-semantics/tasks.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/tasks.md",
+      "sha256": "6c1bf926b9a8d1997a6e70847b683479ad64c95b991586f5aa1047e8b9d4f4b7"
+    },
+    "openspec/changes/whole-column-semantics/validation.md": {
+      "path": "openspec/changes/port-local-improvements-1-7-1/legacy-evidence/whole-column-semantics/validation.md",
+      "sha256": "9aa90e6b07d6a7d509b5c55732160369bdf638f2fda8d2a0fab59a743777e19b"
+    }
+  }
+}

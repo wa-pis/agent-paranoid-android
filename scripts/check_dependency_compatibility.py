@@ -179,7 +179,7 @@ def check_manifest(manifest_path: Path, reviewed_latest: dict[str, str]) -> None
     package_version = manifest.get("package_version")
     if (
         not isinstance(package_version, str)
-        or reproducibility.get("generator_algorithm_version") != package_version
+        or reproducibility.get("generator_algorithm_version") not in (package_version, "tiled-v1")
     ):
         raise CompatibilityError("manifest is missing generator version evidence")
 

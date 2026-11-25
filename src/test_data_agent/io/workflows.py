@@ -12,6 +12,7 @@ from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
     csv_profile_to_dataset_profile,
 )
+from test_data_agent.adapters.parallel_generation import ParallelGenerationPolicy
 from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.field import FieldSpec
@@ -31,7 +32,8 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import GenerationMode, OutputFormat
-from test_data_agent.generation.entity_generator import generate_dataset
+from test_data_agent.generation.entity_generator import _generate_dataset_candidates, generate_dataset
+from test_data_agent.generation.tiled_generator import ENGINE_VERSION
 from test_data_agent.generation.limits import (
     estimate_dataset_output_bytes,
     estimate_field_output_bytes as estimate_field_output_bytes,
@@ -56,6 +58,7 @@ from test_data_agent.io.path_policy import (
     replace_path,
 )
 from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
+from test_data_agent.io.streaming_csv import can_stream_csv, write_streaming_csv
 from test_data_agent.safety import (
     assert_no_csv_folder_source_rows,
     assert_no_profiled_csv_rows,
@@ -63,7 +66,11 @@ from test_data_agent.safety import (
 )
 from test_data_agent.trino_work_budget import generation_budget_for_invocation
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
-from test_data_agent.validation.reconciliation import GenerationValidationError, assert_generated_dataset_valid
+from test_data_agent.validation.reconciliation import (
+    GenerationValidationError,
+    _validate_generated_dataset,
+    assert_generated_dataset_valid,
+)
 
 
 BusinessRulesApplier = Callable[..., Any | None]
@@ -94,6 +101,7 @@ def generate_dataset_bundle(
     profile: DatasetProfile | None = None,
     source_folder: Path | None = None,
     progress: Callable[[GenerationProgress], None] | None = None,
+    streaming: ParallelGenerationPolicy | None = None,
 ) -> DatasetGenerationResult:
     if profile is not None:
         assert_profile_safe(profile)
@@ -114,7 +122,25 @@ def generate_dataset_bundle(
         raise ValueError("dataset spec must contain at least one entity")
     effective_output_format = output_format or effective_spec.generation_settings.output_format
     execution_policy = effective_spec.generation_settings.execution_policy
-    max_count = execution_policy.max_rows if execution_policy is not None else max_generation_count()
+    if streaming is not None and effective_output_format != OutputFormat.CSV:
+        raise ValueError("streaming generation requires CSV output")
+    if streaming is not None and execution_policy is not None:
+        raise ValueError("select either tiled CSV streaming or a reviewed execution policy")
+    use_streaming = bool(
+        streaming is not None and business_rules_applier is None
+        and source_folder is None and can_stream_csv(effective_spec)
+    )
+    combine_csv_validation = (
+        effective_output_format == OutputFormat.CSV
+        and effective_spec.generation_settings.mode == GenerationMode.VALID
+        and business_rules_applier is None and effective_spec.business_rules is None
+        and not effective_spec.relational_scenarios
+    )
+    max_count = (
+        execution_policy.max_rows if execution_policy is not None
+        else streaming.max_rows if use_streaming and streaming is not None and streaming.max_rows is not None
+        else max_generation_count()
+    )
     if count is not None:
         if count < 1:
             raise ValueError("count must be positive")
@@ -145,9 +171,19 @@ def generate_dataset_bundle(
         return generate_scalable_bundle(effective_spec, output_folder=output_folder,
             seed=effective_seed, profile=profile, overwrite=overwrite, progress=progress,
             check_batch=(lambda rows: assert_no_csv_folder_source_rows(source_folder, rows)) if source_folder is not None else None)
-    budget = prepare_generation_budget(effective_spec, output_folder)
+    if use_streaming:
+        enforce_output_capacity(output_folder.parent)
+        budget = generation_budget_for_invocation()
+    else:
+        budget = prepare_generation_budget(effective_spec, output_folder)
     embedded_reports: list[BusinessValidationReport] = []
-    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget, business_reports=embedded_reports)
+    rows_by_entity: dict[str, list[dict[str, Any]]] = {}
+    report: DatasetValidationReport | None = None
+    if not use_streaming:
+        generator = _generate_dataset_candidates if combine_csv_validation else generate_dataset
+        rows_by_entity = generator(
+            effective_spec, seed=effective_seed, budget=budget, business_reports=embedded_reports,
+        )
     budget.check("dataset generation")
     business_report = (
         invoke_business_rules_applier(
@@ -164,15 +200,30 @@ def generate_dataset_bundle(
     budget.check("business rule application")
     if source_folder is not None:
         assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
-    assert_generated_dataset_valid(rows_by_entity, effective_spec, budget=budget)
+    if not use_streaming:
+        if combine_csv_validation:
+            report, _ = _validate_generated_dataset(rows_by_entity, effective_spec, budget=budget)
+        else:
+            assert_generated_dataset_valid(rows_by_entity, effective_spec, budget=budget)
     assert_business_report_valid(business_report, effective_spec.generation_settings.mode)
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
-        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec, budget=budget)
-        budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
+        if use_streaming:
+            assert streaming is not None
+            report = write_streaming_csv(
+                effective_spec, output_folder=temp_folder, seed=effective_seed,
+                policy=streaming, budget=budget,
+            )
+            row_counts = {entity.name: entity.row_count for entity in effective_spec.entities}
+        else:
+            write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec, budget=budget)
+            budget.check("dataset export")
+            if not combine_csv_validation:
+                report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
+            row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
         budget.check("dataset validation")
+        assert report is not None
         generation_valid = report.valid and business_report_is_valid(
             business_report,
             effective_spec.generation_settings.mode,
@@ -183,7 +234,6 @@ def generate_dataset_bundle(
         write_dataset_validation_report(report, temp_folder)
         if business_report is not None:
             write_json_artifact(business_report, temp_folder / "business_validation_report.json")
-        row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
         write_generation_manifest(
             effective_spec,
             seed=effective_seed,
@@ -192,6 +242,7 @@ def generate_dataset_bundle(
             validation_valid=generation_valid,
             business_report=business_report,
             output_folder=temp_folder,
+            generator_algorithm_version=ENGINE_VERSION if use_streaming else None,
         )
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
@@ -202,7 +253,6 @@ def generate_dataset_bundle(
     except BaseException:
         cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
         raise
-    row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
     return DatasetGenerationResult(
         seed=effective_seed,
         output_format=effective_output_format,
@@ -224,6 +274,7 @@ def generate_dataset_artifacts(
     invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
     overwrite: bool = False,
+    streaming: ParallelGenerationPolicy | None = None,
 ) -> int:
     result = generate_dataset_bundle(
         spec,
@@ -235,6 +286,7 @@ def generate_dataset_artifacts(
         invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
         overwrite=overwrite,
+        streaming=streaming,
     )
     return 0 if result_is_valid(result) else 1
 

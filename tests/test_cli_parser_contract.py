@@ -46,6 +46,19 @@ def test_parser_errors_escape_control_characters(capsys) -> None:
     assert "\x1b" not in output.err
 
 
+def test_doctor_parser_accepts_profiling_extra(monkeypatch: pytest.MonkeyPatch) -> None:
+    parsed: list[argparse.Namespace] = []
+
+    def capture(args: argparse.Namespace) -> int:
+        parsed.append(args)
+        return 0
+
+    monkeypatch.setattr(cli_module, "run_command", capture)
+
+    assert cli_module.main(["doctor", "--require-extra", "profiling", "--skip-smoke"]) == 0
+    assert parsed[0].require_extra == ["profiling"]
+
+
 def test_agent_plan_parser_defaults_match_contract(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

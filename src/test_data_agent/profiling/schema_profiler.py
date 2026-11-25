@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from test_data_agent.core.csv_reader import ScopedDictReader
 import csv
+import hashlib
+import math
 import random
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -14,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.limits import (
+    DEFAULT_MAX_IN_MEMORY_DISTINCT,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -24,22 +27,24 @@ from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.privacy import (
     LocalCategoryField,
+    has_sensitive_numeric_summary,
     infer_sensitive_from_name,
-    infer_sensitive_type_from_values,
     mask_pattern,
     PrivacySettings,
     semantic_type_is_sensitive,
     synthetic_category_distribution,
     validate_local_category_values,
 )
+from test_data_agent.core.semantics import ColumnSemanticEvidence
 from test_data_agent.csv_profiler import (
-    _csv_sensitive_value_type,
+    _column_semantic_evidence,
+    _csv_sensitive_signal,
+    _profile_mask_type,
     _numeric_storage_type,
     bound_csv_reader,
     detect_csv_dialect,
     detect_csv_encoding,
     infer_data_type,
-    infer_semantic_type,
     numeric_stats,
     parse_bool,
     parse_date_value,
@@ -50,11 +55,12 @@ from test_data_agent.csv_profiler import (
 )
 from test_data_agent.io.csv_source import CsvSourceBinding
 from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_paths
+from test_data_agent.profiling import duckdb_distinct
 
-MAX_DISTINCT_TRACKED = 10_000
 MAX_CATEGORY_TRACKED = 1_000
 MAX_RESERVOIR_VALUES = 2_000
 MAX_SEMANTIC_SAMPLE = 100
+MAX_IN_MEMORY_DISTINCT = DEFAULT_MAX_IN_MEMORY_DISTINCT
 
 
 def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) -> dict[str, list[dict[str, str]]]:
@@ -220,18 +226,41 @@ def _profile_schema_with_sample(
             accumulators = {name: FieldAccumulator(name=name) for name in fieldnames}
             sampled_rows: list[dict[str, str]] = []
             row_count = 0
-            for row in reader:
-                budget.check_deadline("CSV row start")
-                row_count += 1
-                total_rows += 1
-                enforce_input_row_count(total_rows, label="CSV folder")
-                budget.consume_cells(len(fieldnames))
-                if len(sampled_rows) < max_rows_per_entity:
-                    budget.consume_sample_row()
-                    sampled_rows.append(dict(row))
-                for name, accumulator in accumulators.items():
-                    budget.check_deadline("CSV field profiling")
-                    accumulator.add(row.get(name, ""))
+            ordered_accumulators = list(accumulators.values())
+
+            def cells() -> Iterator[tuple[int, bytes]]:
+                nonlocal row_count, total_rows
+                for row in reader:
+                    budget.check_deadline("CSV row start")
+                    row_count += 1
+                    total_rows += 1
+                    enforce_input_row_count(total_rows, label="CSV folder")
+                    budget.consume_cells(len(fieldnames))
+                    if len(sampled_rows) < max_rows_per_entity:
+                        budget.consume_sample_row()
+                        sampled_rows.append(dict(row))
+                    for column, accumulator in enumerate(ordered_accumulators):
+                        budget.check_deadline("CSV field profiling")
+                        digest = accumulator.add(row.get(accumulator.name, ""))
+                        if digest is not None:
+                            yield column, digest
+
+            values = cells()
+            sizes = [0] * len(fieldnames)
+            tracked = 0
+            for column, _ in values:
+                size = len(ordered_accumulators[column].distinct_digests)
+                tracked += size - sizes[column]
+                sizes[column] = size
+                if tracked > MAX_IN_MEMORY_DISTINCT:
+                    for accumulator in ordered_accumulators:
+                        accumulator.distinct_count = 0
+                    counts = duckdb_distinct.count_distinct_stream(
+                        [item.distinct_digests for item in ordered_accumulators], values, budget,
+                    )
+                    for accumulator, count in zip(ordered_accumulators, counts, strict=True):
+                        accumulator.distinct_count = count
+                    break
         rows_by_entity[entity_name] = sampled_rows
         fields: list[FieldProfile] = []
         for accumulator in accumulators.values():
@@ -258,15 +287,16 @@ def _profile_schema_with_sample(
 def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
     non_null = [value.strip() for value in values if value is not None and value.strip() != ""]
     distinct_count = len(set(non_null))
-    semantic_type = infer_semantic_type(name, non_null)
-    data_type = infer_data_type(name, non_null, semantic_type)
+    evidence = _column_semantic_evidence(non_null)
+    semantic_type = evidence.resolve(name)
     unique_ratio = distinct_count / len(non_null) if non_null else 0.0
     is_identifier = is_identifier_name(name) or (unique_ratio >= 0.98 and "id" in name.lower())
-    sensitive = infer_sensitive_from_name(name) or semantic_type_is_sensitive(semantic_type)
-    content_sensitive_type = infer_sensitive_type_from_values(non_null)
-    if content_sensitive_type == "secret" or semantic_type is None:
-        semantic_type = content_sensitive_type or semantic_type
-    sensitive = sensitive or content_sensitive_type is not None
+    data_type = infer_data_type(name, non_null, semantic_type)
+    sensitive = (
+        infer_sensitive_from_name(name)
+        or semantic_type_is_sensitive(semantic_type)
+        or evidence.sensitive
+    )
     return FieldProfile(
         name=name,
         data_type=normalize_field_type(data_type.value),
@@ -280,6 +310,7 @@ def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
             semantic_type, len(non_null),
             all(parse_int(value) is not None for value in non_null),
             all(parse_float(value) is not None for value in non_null),
+            evidence=evidence,
         ),
         is_identifier=is_identifier,
     )
@@ -303,10 +334,9 @@ class FieldAccumulator:
     null_count: int = 0
     non_null_count: int = 0
     semantic_sample: list[str] = field(default_factory=list)
-    content_sensitive_type: str | None = None
-    distinct_values: set[str] = field(default_factory=set)
-    distinct_overflow: bool = False
-    duplicate_seen: bool = False
+    semantic_evidence: ColumnSemanticEvidence = field(default_factory=ColumnSemanticEvidence)
+    distinct_digests: set[bytes] = field(default_factory=set)
+    distinct_count: int | None = None
     category_counts: Counter[str] = field(default_factory=Counter)
     category_overflow: bool = False
     numeric_values: list[int | float] = field(default_factory=list)
@@ -322,33 +352,26 @@ class FieldAccumulator:
     possible_datetime: bool = True
     rng: random.Random = field(default_factory=lambda: random.Random(0))
 
-    def add(self, raw_value: str | None) -> None:
+    def add(self, raw_value: str | None) -> bytes | None:
         self.row_count += 1
         value = "" if raw_value is None else str(raw_value).strip()
         if value == "":
             self.null_count += 1
-            return
+            return None
         self.non_null_count += 1
         if len(self.semantic_sample) < MAX_SEMANTIC_SAMPLE:
             self.semantic_sample.append(value)
-        detected_type = _csv_sensitive_value_type(value)
-        if detected_type == "secret" or self.content_sensitive_type is None:
-            self.content_sensitive_type = detected_type
-        self.track_distinct(value)
+        signal = _csv_sensitive_signal(value)
+        digest = hashlib.sha256(value.encode("utf-8")).digest()
+        if self.distinct_count is None:
+            self.distinct_digests.add(digest)
         self.track_category(value)
-        self.track_types(value)
+        numeric = self.track_types(value)
+        self.semantic_evidence.add(signal, numeric=numeric)
         length = len(value)
         self.min_length = length if self.min_length is None else min(self.min_length, length)
         self.max_length = length if self.max_length is None else max(self.max_length, length)
-
-    def track_distinct(self, value: str) -> None:
-        if value in self.distinct_values:
-            self.duplicate_seen = True
-            return
-        if len(self.distinct_values) < MAX_DISTINCT_TRACKED:
-            self.distinct_values.add(value)
-        else:
-            self.distinct_overflow = True
+        return digest
 
     def track_category(self, value: str) -> None:
         if self.category_overflow:
@@ -359,7 +382,7 @@ class FieldAccumulator:
             return
         self.category_counts[value] += 1
 
-    def track_types(self, value: str) -> None:
+    def track_types(self, value: str) -> bool:
         int_value = parse_int(value)
         float_value = parse_float(value)
         bool_value = parse_bool(value)
@@ -382,6 +405,9 @@ class FieldAccumulator:
             self.reservoir_add(self.datetime_values, datetime_value)
         elif date_value is not None:
             self.reservoir_add(self.date_values, date_value)
+        return int_value is not None or (
+            float_value is not None and math.isfinite(float_value)
+        )
 
     def reservoir_add(self, values: list[Any], value: Any) -> None:
         if len(values) < MAX_RESERVOIR_VALUES:
@@ -392,18 +418,16 @@ class FieldAccumulator:
             values[index] = value
 
     def to_profile(self, table_row_count: int) -> FieldProfile:
-        semantic_type = infer_semantic_type(self.name, self.semantic_sample)
-        if self.content_sensitive_type == "secret" or semantic_type is None:
-            semantic_type = self.content_sensitive_type or semantic_type
+        semantic_type = self.semantic_evidence.resolve(self.name)
         data_type = self.infer_field_type(semantic_type)
         unique_ratio = self.estimate_unique_ratio()
         is_identifier = is_identifier_name(self.name) or (
-            not self.distinct_overflow and unique_ratio >= 0.98 and "id" in self.name.lower()
+            unique_ratio >= 0.98 and "id" in self.name.lower()
         )
         sensitive = (
             infer_sensitive_from_name(self.name)
             or semantic_type_is_sensitive(semantic_type)
-            or self.content_sensitive_type is not None
+            or self.semantic_evidence.sensitive
         )
         profile = FieldProfile(
             name=self.name,
@@ -411,19 +435,25 @@ class FieldAccumulator:
             nullable=self.null_count > 0,
             null_ratio=round(self.null_count / table_row_count, 6) if table_row_count else 0.0,
             unique_ratio=round(unique_ratio, 6),
-            unique_ratio_kind="lower_bound" if self.distinct_overflow else "exact",
+            unique_ratio_kind="exact",
             sensitive=sensitive,
             semantic_type=semantic_type,
             numeric_storage_type=_numeric_storage_type(
                 semantic_type, self.non_null_count, self.possible_int, self.possible_float,
+                evidence=self.semantic_evidence,
             ),
             is_identifier=is_identifier,
         )
-        profile.distribution = self.distribution(profile)
+        distribution = self.distribution(profile)
+        if distribution.get("kind") == "numeric" and has_sensitive_numeric_summary(distribution):
+            # Derived quantiles must follow the same policy as source summaries.
+            profile.sensitive = True
+            distribution = {}
+        profile.distribution = distribution
         return profile
 
     def infer_field_type(self, semantic_type: str | None) -> FieldType:
-        if semantic_type in {"email", "phone", "ssn"}:
+        if semantic_type in {"email", "phone", "ssn", "name", "address"}:
             return FieldType.STRING
         if self.non_null_count == 0:
             return FieldType.STRING
@@ -442,19 +472,23 @@ class FieldAccumulator:
     def estimate_unique_ratio(self) -> float:
         if self.non_null_count == 0:
             return 0.0
-        if self.distinct_overflow:
-            # Truncate rather than round upward: this is a guaranteed lower bound.
-            return (len(self.distinct_values) * 1_000_000 // self.non_null_count) / 1_000_000
-        return len(self.distinct_values) / self.non_null_count
+        return self.unique_count / self.non_null_count
+
+    @property
+    def unique_count(self) -> int:
+        return len(self.distinct_digests) if self.distinct_count is None else self.distinct_count
 
     def distribution(self, profile: FieldProfile) -> dict[str, Any]:
         if profile.is_identifier:
-            if not self.distinct_overflow and 0 < len(self.distinct_values) < self.non_null_count:
-                return {"kind": "synthetic_identifier", "pool_size": len(self.distinct_values)}
+            if 0 < self.unique_count < self.non_null_count:
+                return {"kind": "synthetic_identifier", "pool_size": self.unique_count}
             return {"kind": "synthetic_identifier"}
         if profile.sensitive:
             patterns = Counter(
-                mask_pattern(value, _csv_sensitive_value_type(value) or profile.semantic_type)
+                mask_pattern(value, _profile_mask_type(
+                    self.name, _csv_sensitive_signal(value), semantic_type=profile.semantic_type,
+                    numeric=self.semantic_evidence.all_numeric,
+                ))
                 for value in self.semantic_sample
             )
             return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}

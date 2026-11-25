@@ -16,7 +16,7 @@ from test_data_agent.core.limits import (
     enforce_parquet_metadata_limits, max_total_input_bytes,
 )
 from test_data_agent.core.parquet_limits import inspect_parquet_batch
-from test_data_agent.core.privacy import infer_sensitive_from_name, infer_sensitive_value_type
+from test_data_agent.core.privacy import infer_sensitive_from_name, infer_source_value_signal
 from test_data_agent.csv_profiler import CSVProfile, CSVColumnProfile
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.generation.planner import infer_dataset_spec
@@ -87,11 +87,13 @@ def parquet_file_to_dataset_profile(
     for index, arrow_field in enumerate(arrow_schema):
         budget.check_deadline("Parquet field metadata")
         null_count = _parquet_null_count(parquet_file.metadata, index, arrow_field.name)
+        scalar_type = _scalar_arrow_type(arrow_field.type)
+        data_type = _csv_data_type_from_arrow(scalar_type)
         columns.append(CSVColumnProfile(
             name=arrow_field.name,
-            data_type=_csv_data_type_from_arrow(arrow_field.type),
-            decimal_precision=arrow_field.type.precision if str(arrow_field.type).startswith("decimal") else None,
-            decimal_scale=arrow_field.type.scale if str(arrow_field.type).startswith("decimal") else None,
+            data_type=data_type,
+            decimal_precision=scalar_type.precision if data_type == "decimal" else None,
+            decimal_scale=scalar_type.scale if data_type == "decimal" else None,
             nullable=arrow_field.nullable,
             null_count=null_count,
             null_ratio=(round(null_count / row_count, 6) if row_count else 0.0)
@@ -156,10 +158,8 @@ def _inspect_parquet_columns(
             for scalar in column:
                 budget.check_deadline("Parquet sensitivity inspection")
                 value = scalar.as_py()
-                # This representation is inspection-only, never native matching.
-                evidence = str(value) if type(value) in (int, float, Decimal) else value
                 # Binary/composite content is unsupported evidence, not proof of safety.
-                if isinstance(value, (bytes, list, tuple, dict)) or infer_sensitive_value_type(evidence):
+                if isinstance(value, (bytes, list, tuple, dict)) or infer_source_value_signal(value):
                     observations[index].sensitive = True
                 _observe_distinct(observations[index], value)
     budget.check_deadline("Parquet sensitivity inspection")
@@ -211,18 +211,28 @@ def _parquet_null_count(metadata: Any, index: int, field_name: str) -> int | Non
     return total if rows == metadata.num_rows and total <= rows else None
 
 
+def _scalar_arrow_type(arrow_type: Any) -> Any:
+    import pyarrow as pa
+
+    while pa.types.is_dictionary(arrow_type):
+        arrow_type = arrow_type.value_type
+    return arrow_type
+
+
 def _csv_data_type_from_arrow(arrow_type: object) -> str:
-    name = str(arrow_type).lower()
-    if name.startswith("decimal"):
+    import pyarrow as pa
+
+    arrow_type = _scalar_arrow_type(arrow_type)
+    if pa.types.is_decimal(arrow_type):
         return "decimal"
-    if any(part in name for part in ("int", "uint")):
+    if pa.types.is_integer(arrow_type):
         return "integer"
-    if any(part in name for part in ("float", "double")):
+    if pa.types.is_floating(arrow_type):
         return "float"
-    if name == "bool":
+    if pa.types.is_boolean(arrow_type):
         return "boolean"
-    if "timestamp" in name:
+    if pa.types.is_timestamp(arrow_type):
         return "datetime"
-    if name == "date32[day]" or name == "date64[ms]":
+    if pa.types.is_date(arrow_type):
         return "date"
     return "string"

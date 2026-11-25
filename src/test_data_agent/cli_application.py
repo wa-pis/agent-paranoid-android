@@ -38,7 +38,7 @@ def run_cli_command(
     *,
     examples_text: str,
     doctor_inspector: DoctorInspector,
-    business_rules_applier: BusinessRulesApplier,
+    business_rules_applier: BusinessRulesApplier | None,
     request_builder: AgentRequestBuilder,
     advisor_runner: AgentAdvisorRunner,
 ) -> int:

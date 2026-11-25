@@ -1,0 +1,602 @@
+{
+  "dependencies": {
+    "release": {
+      "Faker": "40.35.0",
+      "PyYAML": "6.0.3",
+      "duckdb": null,
+      "mcp": "2.2.0",
+      "pyarrow": "26.0.1",
+      "pydantic": "2.14.3"
+    },
+    "target": {
+      "Faker": "40.35.0",
+      "PyYAML": "6.0.3",
+      "duckdb": "2.0.1",
+      "mcp": "2.2.0",
+      "pyarrow": "26.0.1",
+      "pydantic": "2.14.3"
+    }
+  },
+  "intended_calculation_order_fix": {
+    "intentional_mixed_calculation_fix_order0": {
+      "release_exception": "GenerationValidationError",
+      "release_status": "error",
+      "target_direct_rows_sha256": "c4d8c2460db6179cd349642050734ff1abb5a643f6928c0af60de31417a194ab",
+      "target_status": "ok",
+      "target_validation_valid": true
+    },
+    "intentional_mixed_calculation_fix_order1": {
+      "release_exception": "GenerationValidationError",
+      "release_status": "error",
+      "target_direct_rows_sha256": "c4d8c2460db6179cd349642050734ff1abb5a643f6928c0af60de31417a194ab",
+      "target_status": "ok",
+      "target_validation_valid": true
+    },
+    "intentional_mixed_calculation_fix_order2": {
+      "release_exception": "GenerationValidationError",
+      "release_status": "error",
+      "target_direct_rows_sha256": "c4d8c2460db6179cd349642050734ff1abb5a643f6928c0af60de31417a194ab",
+      "target_status": "ok",
+      "target_validation_valid": true
+    },
+    "intentional_mixed_calculation_fix_order3": {
+      "release_exception": "GenerationValidationError",
+      "release_status": "error",
+      "target_direct_rows_sha256": "c4d8c2460db6179cd349642050734ff1abb5a643f6928c0af60de31417a194ab",
+      "target_status": "ok",
+      "target_validation_valid": true
+    },
+    "intentional_mixed_calculation_fix_order4": {
+      "release_exception": "GenerationValidationError",
+      "release_status": "error",
+      "target_direct_rows_sha256": "c4d8c2460db6179cd349642050734ff1abb5a643f6928c0af60de31417a194ab",
+      "target_status": "ok",
+      "target_validation_valid": true
+    },
+    "intentional_mixed_calculation_fix_order5": {
+      "release_exception": "GenerationValidationError",
+      "release_status": "error",
+      "target_direct_rows_sha256": "c4d8c2460db6179cd349642050734ff1abb5a643f6928c0af60de31417a194ab",
+      "target_status": "ok",
+      "target_validation_valid": true
+    }
+  },
+  "intentional_environment_metadata_delta": "DuckDB2.0.1 is the new optional profiling extra; no generation case imports or uses it. Target now records it in normalized dependency metadata; frozen release does not enumerate DuckDB.",
+  "own_source_roots": {
+    "release": "/private/var/folders/kh/0kc0tcyj5z5_lg7s2qdzc3rm0000gn/T/apa-port171-5zxcyx8x/release/src/test_data_agent/__init__.py",
+    "target": "/Users/agrudin/.codex/worktrees/port-local-improvements-1-7-1/agent-paranoid-android/src/test_data_agent/__init__.py"
+  },
+  "persistence": "Private directory; generated CSV bundles removed in finally; only synthetic fixture/probe and metadata/hashes retained.",
+  "python": "3.11.15",
+  "seed": 170117,
+  "shared_dependency_versions_match": true,
+  "unchanged_case_count": 21,
+  "unchanged_cases": {
+    "additional_decimal_business_aggregate": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 86,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "additional_decimal_native_aggregate": {
+      "csv_artifact_count": 3,
+      "direct_decimal_native_cells": 111,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "branches": 17,
+        "leaves": 37,
+        "roots": 7
+      },
+      "target_status": "ok"
+    },
+    "ordinary_conditional_decimal_formula": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 86,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "ordinary_decimal_business_formula": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 86,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "ordinary_edge": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 79,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "ordinary_load_test": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 157,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 93
+      },
+      "target_status": "ok"
+    },
+    "ordinary_mixed": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 35,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "ordinary_native_formula_temporal": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 53,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "ordinary_negative": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 0,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "ordinary_relations_parent_after_child": {
+      "csv_artifact_count": 3,
+      "direct_decimal_native_cells": 101,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "branches": 17,
+        "leaves": 37,
+        "roots": 7
+      },
+      "target_status": "ok"
+    },
+    "ordinary_scenario_mixed": {
+      "csv_artifact_count": 2,
+      "direct_decimal_native_cells": 9,
+      "field_types": [
+        "decimal",
+        "integer"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "children": 6,
+        "parents": 3
+      },
+      "target_status": "ok"
+    },
+    "ordinary_scenario_valid": {
+      "csv_artifact_count": 2,
+      "direct_decimal_native_cells": 9,
+      "field_types": [
+        "decimal",
+        "integer"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "children": 6,
+        "parents": 3
+      },
+      "target_status": "ok"
+    },
+    "ordinary_valid": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": 51,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "scalable-relational-v1_edge_workers1_batch7": {
+      "csv_artifact_count": 3,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "branches": 17,
+        "leaves": 37,
+        "roots": 7
+      },
+      "target_status": "ok"
+    },
+    "scalable-relational-v1_edge_workers2_batch19": {
+      "csv_artifact_count": 3,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "branches": 17,
+        "leaves": 37,
+        "roots": 7
+      },
+      "target_status": "ok"
+    },
+    "scalable-relational-v1_valid_workers1_batch7": {
+      "csv_artifact_count": 3,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "branches": 17,
+        "leaves": 37,
+        "roots": 7
+      },
+      "target_status": "ok"
+    },
+    "scalable-relational-v1_valid_workers2_batch19": {
+      "csv_artifact_count": 3,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "branches": 17,
+        "leaves": 37,
+        "roots": 7
+      },
+      "target_status": "ok"
+    },
+    "scalable-v1_edge_workers1_batch7": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "scalable-v1_edge_workers2_batch19": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "scalable-v1_valid_workers1_batch7": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    },
+    "scalable-v1_valid_workers2_batch19": {
+      "csv_artifact_count": 1,
+      "direct_decimal_native_cells": null,
+      "field_types": [
+        "boolean",
+        "date",
+        "datetime",
+        "decimal",
+        "float",
+        "integer",
+        "string"
+      ],
+      "normalized_difference_paths": [],
+      "raw_difference_paths": [
+        "manifest.reproducibility.normalized_dependencies.duckdb",
+        "manifest.reproducibility.normalized_dependencies_sha256"
+      ],
+      "release_status": "ok",
+      "row_counts": {
+        "items": 31
+      },
+      "target_status": "ok"
+    }
+  },
+  "unchanged_runtime_mismatch_count": 0,
+  "worker_and_batch_invariance": {
+    "release": {
+      "scalable-relational-v1_edge": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      },
+      "scalable-relational-v1_valid": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      },
+      "scalable-v1_edge": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      },
+      "scalable-v1_valid": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      }
+    },
+    "target": {
+      "scalable-relational-v1_edge": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      },
+      "scalable-relational-v1_valid": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      },
+      "scalable-v1_edge": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      },
+      "scalable-v1_valid": {
+        "csv_bytes_equal": true,
+        "logical_rows_equal": true
+      }
+    }
+  }
+}

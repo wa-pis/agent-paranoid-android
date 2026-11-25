@@ -239,6 +239,12 @@ The Python API can pass narrower `LocalProfileLimits` through a fresh
 structured `LocalProfileLimitError`. A failed profile is not written to the
 metadata-only cache.
 
+The unreleased checkout's exact CSV distinct backend keeps up to 1,000,000
+digests in memory, then uses the optional `profiling` DuckDB/Arrow extra with
+private bounded temporary storage. The threshold selects a backend, not a
+distinct-count ceiling. Existing byte, cell and deadline caps still apply;
+see [profiling details](profiling.md).
+
 ## PostgreSQL Profiling
 
 `profile-postgres` requires `POSTGRES_ALLOWED_SCHEMAS`,

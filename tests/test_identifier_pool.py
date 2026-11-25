@@ -6,7 +6,6 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.distribution import SyntheticIdentifierDistribution
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec
-from test_data_agent.csv_profiler import MAX_DISTINCT_DIGESTS
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling.schema_profiler import profile_schema
 from test_data_agent.safety import validate_generated_row_privacy
@@ -117,11 +116,11 @@ def test_nearly_unique_folder_key_is_not_a_primary_key(tmp_path):
     assert profile.entities[0].fields[0].distribution["pool_size"] == 99
 
 
-def test_censored_csv_count_does_not_create_a_pool():
+def test_historical_censored_csv_count_does_not_create_a_pool():
     profile = legacy_profile_to_dataset_profile({
-        "table": "events", "row_count": MAX_DISTINCT_DIGESTS * 2,
+        "table": "events", "row_count": 200_000,
         "columns": [{"name": "run_id", "data_type": "integer",
-                     "approx_distinct_count": MAX_DISTINCT_DIGESTS - 1}],
+                     "approx_distinct_count": 99_999}],
     }, source_type="csv")
     assert "pool_size" not in profile.entities[0].fields[0].distribution
 
@@ -138,17 +137,17 @@ def test_unknown_or_empty_distinct_count_does_not_invent_identifier_pool(distinc
     assert (profile.entities[0].field("run_id").unique_ratio is None) == (distinct is None)
 
 
-def test_folder_distinct_overflow_cannot_infer_a_pool(tmp_path):
-    from test_data_agent.profiling.schema_profiler import MAX_DISTINCT_TRACKED
-
+def test_complete_folder_count_can_infer_a_pool_above_the_old_cap(tmp_path):
+    count = 10_001
     (tmp_path / "events.csv").write_text(
-        "run_id\n" + "\n".join(str(i) for i in range(MAX_DISTINCT_TRACKED + 1)) + "\n"
+        "run_id\n" + "\n".join(str(i) for i in range(count)) + "\n"
     )
     profile = profile_schema(tmp_path)
     field = profile.entities[0].field("run_id")
-    assert field.unique_ratio_kind == "lower_bound"
-    assert "pool_size" not in field.distribution
-    assert profile.entities[0].primary_key_candidates == []
+    assert field.unique_ratio_kind == "exact"
+    assert field.unique_ratio == 1.0
+    assert field.distribution["kind"] == "synthetic_identifier"
+    assert profile.entities[0].primary_key_candidates == ["run_id"]
 
 
 @pytest.mark.parametrize("statistics", [True, False])

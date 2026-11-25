@@ -11,7 +11,7 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.generation.limits import enforce_dataset_rule_work
 from test_data_agent.core.limits import GenerationBudget, GenerationLimitError
 from test_data_agent.rules.conditions import Condition, condition_matches
-from test_data_agent.rules.expressions import parse_datetime, safe_eval, numbers_close
+from test_data_agent.rules.expressions import comparable_number, parse_datetime, safe_eval, numbers_close
 from test_data_agent.rules.typed_values import formula_value, numeric_row, aggregate_mapping_values
 
 
@@ -156,12 +156,11 @@ def coerce_numeric_row(
     coerced: dict[str, Any] = {}
     for key, value in budget.iter_rule_work(row.items()):
         if isinstance(value, str):
-            try:
-                number = float(value)
-            except ValueError:
+            number = comparable_number(value)
+            if number is None:
                 coerced[key] = value
                 continue
-            coerced[key] = int(number) if number.is_integer() else number
+            coerced[key] = int(number) if isinstance(number, float) and number.is_integer() else number
         else:
             coerced[key] = value
     return coerced

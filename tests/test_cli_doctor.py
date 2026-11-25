@@ -36,7 +36,8 @@ def test_actual_doctor_retains_failed_local_configuration() -> None:
     assert states["capability:trino"]["remediation"] == "check local capability setup and rerun doctor"
 
 
-def test_doctor_service_reports_optional_and_required_extras() -> None:
+@pytest.mark.parametrize("extra", ["parquet", "profiling"])
+def test_doctor_service_reports_optional_and_required_extras(extra: str) -> None:
     def import_without_pyarrow(name: str) -> ModuleType:
         if name == "pyarrow":
             raise ModuleNotFoundError("not installed", name=name)
@@ -45,7 +46,7 @@ def test_doctor_service_reports_optional_and_required_extras() -> None:
     service = _service(import_without_pyarrow)
 
     optional = service.inspect(skip_smoke=True)
-    required = service.inspect(skip_smoke=True, required_extras={"parquet"})
+    required = service.inspect(skip_smoke=True, required_extras={extra})
 
     assert "extra parquet: not installed (optional)" in optional.checks
     optional_parquet = next(
@@ -53,8 +54,21 @@ def test_doctor_service_reports_optional_and_required_extras() -> None:
     )
     assert optional_parquet.remediation == install_extra_command("parquet")
     assert required.failures == (
-        "extra parquet: missing pyarrow "
-        f"(install with: {install_extra_command('parquet')})",
+        f"extra {extra}: missing pyarrow "
+        f"(install with: {install_extra_command(extra)})",
+    )
+
+
+def test_doctor_all_requires_profiling() -> None:
+    def without_duckdb(name: str) -> ModuleType:
+        if name == "duckdb":
+            raise ModuleNotFoundError("not installed", name=name)
+        return ModuleType(name)
+
+    report = _service(without_duckdb).inspect(skip_smoke=True, required_extras={"all"})
+
+    assert report.failures == (
+        f"extra profiling: missing duckdb (install with: {install_extra_command('profiling')})",
     )
 
 
@@ -118,7 +132,7 @@ def test_doctor_distinguishes_missing_from_broken_optional_import() -> None:
 
     report = _service(broken_import).inspect(skip_smoke=True, required_extras={"parquet"})
 
-    assert report.failures == ("extra parquet: import failed",)
+    assert report.failures == ("extra parquet: import failed", "extra profiling: import failed")
     check = next(check for check in report.states if check.name == "extra:parquet")
     assert check.status == "failed"
     assert check.remediation is None

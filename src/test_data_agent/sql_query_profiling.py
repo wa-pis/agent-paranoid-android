@@ -123,7 +123,9 @@ def build_query_column_summary_query(
     temporal_bounds: bool = False,
 ) -> TrustedProfileQuery:
     safe = _allowed_output_column(plan, column)
-    if temporal_bounds and infer_sensitive_from_name(column):
+    if temporal_bounds and (
+        infer_sensitive_from_name(column) or column in plan.sensitive_output_fields
+    ):
         raise SqlQueryProfileError("SQL query temporal bounds require a non-sensitive field")
     temporal_sql = f", min({safe}) AS min_temporal, max({safe}) AS max_temporal" if temporal_bounds else ""
     return TrustedProfileQuery(
@@ -216,8 +218,10 @@ def _local_categories(
             )
         if category_field.field not in plan.safe_local_category_output_fields:
             raise SqlQueryProfileError("SQL query local category field is not allowed")
-        if category_field.field in selected or infer_sensitive_from_name(
-            category_field.field
+        if (
+            category_field.field in selected
+            or infer_sensitive_from_name(category_field.field)
+            or category_field.field in plan.sensitive_output_fields
         ):
             raise SqlQueryProfileError("SQL query local category field is not allowed")
         selected[category_field.field] = category_field
@@ -232,6 +236,7 @@ def _column_summary_query(plan: ValidatedSqlQuery, column: QueryResultColumn) ->
         plan, column.name,
         temporal_bounds=(profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
                          and not infer_sensitive_from_name(column.name)
+                         and column.name not in plan.sensitive_output_fields
                          and column.name in plan.safe_temporal_output_fields),
     )
 
@@ -286,6 +291,7 @@ def _profile_column(
     temporal_bounds = (
         profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
         and not infer_sensitive_from_name(column.name)
+        and column.name not in plan.sensitive_output_fields
         and column.name in plan.safe_temporal_output_fields
     )
     numeric_shape = profile_type in {
@@ -308,8 +314,11 @@ def _profile_column(
         "name": column.name,
         "data_type": column.data_type,
         "nullable": column.nullable,
+        "non_null_count": non_null_count,
+        "null_count": row_count - non_null_count,
         "null_ratio": (row_count - non_null_count) / row_count if row_count else 0.0,
         "approx_distinct_count": distinct_count,
+        "sensitive": column.name in plan.sensitive_output_fields,
     }
     if temporal_bounds:
         lower, upper = summary.get("min_temporal"), summary.get("max_temporal")

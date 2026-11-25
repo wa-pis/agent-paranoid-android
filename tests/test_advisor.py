@@ -283,7 +283,7 @@ def test_categorical_sanitization_replaces_every_json_scalar() -> None:
     profile.entity("customers").field("segment").distribution = {
         "kind": "categorical",
         "categories": [
-            {"value": 901234567, "count": 1},
+            {"value": 901, "count": 1},
             {"value": 1.25, "count": 1},
             {"value": True, "count": 1},
             {"value": None, "count": 1},
@@ -295,8 +295,8 @@ def test_categorical_sanitization_replaces_every_json_scalar() -> None:
             data_type=FieldType.FLOAT,
             distribution={
                 "kind": "numeric",
-                "min_value": 1_000_000,
-                "max_value": 9_000_000,
+                "min_value": 1_000,
+                "max_value": 9_000,
             },
         )
     )
@@ -307,7 +307,7 @@ def test_categorical_sanitization_replaces_every_json_scalar() -> None:
             fields=["email"],
             condition={
                 "field": "segment",
-                "in_values": [901234567, 1.25, True, None],
+                "in_values": [901, 1.25, True, None],
             },
             confidence=1.0,
         )
@@ -334,13 +334,28 @@ def test_categorical_sanitization_replaces_every_json_scalar() -> None:
         .distribution["categories"]
     ] == expected
     numeric = request.profile.entity("customers").field("amount").distribution
-    assert numeric["min_value"] == 1_000_000
-    assert numeric["max_value"] == 9_000_000
+    assert numeric["min_value"] == 1_000
+    assert numeric["max_value"] == 9_000
     assert request.profile.constraints[0].condition == {
         "field": "segment",
         "in_values": expected,
     }
     assert _rebuild_advisor_request_for_profile_verification(profile, request) == request
+
+
+@pytest.mark.parametrize("kind", ["categorical", "numeric"])
+def test_advisor_rejects_sensitive_native_numeric_evidence_before_request(kind: str) -> None:
+    profile = safe_profile()
+    field = profile.entity("customers").field("segment")
+    candidate = int("".join(("900", "12", "3456")))
+    field.data_type = FieldType.INTEGER
+    field.distribution = (
+        {"kind": kind, "categories": [{"value": candidate, "count": 1}]}
+        if kind == "categorical" else {"kind": kind, "min_value": candidate}
+    )
+    with pytest.raises(ProfileSafetyError) as error:
+        build_advisor_request(profile)
+    assert str(candidate) not in str(error.value)
 
 
 def test_categorical_sanitization_rejects_non_json_scalar() -> None:

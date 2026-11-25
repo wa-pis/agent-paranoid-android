@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover
     exp = None  # type: ignore[assignment]
 
 
-QUERY_SOURCE_POLICY_VERSION = "1.1"
+QUERY_SOURCE_POLICY_VERSION = "1.2"
 DEFAULT_MAX_QUERY_BYTES = 64 * 1024
 DEFAULT_MAX_AST_NODES = 500
 DEFAULT_MAX_AST_DEPTH = 32
@@ -127,6 +127,7 @@ class ValidatedSqlQuery:
     safe_local_category_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
     safe_temporal_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
     has_unmodeled_expressions: bool = False
+    sensitive_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
 
 
 _ALLOWED_NODE_NAMES = frozenset(
@@ -314,6 +315,15 @@ def authorize_query_source(
     output_fields = tuple(_projection_name(item) for item in statement.expressions)
     if len(output_fields) != len(set(output_fields)):
         raise SqlQuerySourceError("SQL query output field names must be unique")
+    sensitive_output_fields = frozenset(
+        output
+        for projection, output in zip(statement.expressions, output_fields, strict=True)
+        if infer_sensitive_from_name(output)
+        or any(
+            infer_sensitive_from_name(column.name)
+            for column in projection.find_all(exp.Column)
+        )
+    )
     source_fields_are_non_sensitive = all(
         not infer_sensitive_from_name(column.name)
         for column in statement.find_all(exp.Column)
@@ -356,6 +366,7 @@ def authorize_query_source(
             or _direct_source_field(projection) is None and any(projection.find_all(exp.Column))
             for projection in statement.expressions
         ),
+        sensitive_output_fields=sensitive_output_fields,
     )
 
 

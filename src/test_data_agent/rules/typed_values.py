@@ -157,6 +157,8 @@ def aggregate_mapping_values(
                 scale=distribution.scale,
                 budget=budget,
             )
+        elif value.denominator == 1:
+            expected = value.numerator
         else:
             rounded = round(float(value), 6)
             expected = int(rounded) if rounded.is_integer() else rounded

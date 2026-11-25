@@ -32,14 +32,22 @@ MAX_EXACT_EXPRESSION_BITS = 16_384
 MAX_EXPRESSION_SEQUENCE_LENGTH = DEFAULT_MAX_INPUT_CELL_CHARS
 
 
-def comparable_number(value: Any) -> float | None:
+def comparable_number(value: Any) -> int | float | None:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:
+            pass
     try:
-        return float(value)
-    except (TypeError, ValueError):
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
         return None
+    return number if math.isfinite(number) else None
 
 
-def numbers_close(actual: Any, expected: Any, tolerance: float) -> bool:
+def numbers_close(actual: Any, expected: Any, tolerance: float = 0.000001) -> bool:
     try:
         return abs(exact_number(actual) - exact_number(expected)) <= exact_number(tolerance)
     except (ValueError, TypeError, ArithmeticError):
@@ -59,12 +67,16 @@ def parse_datetime(value: Any) -> datetime | None:
 
 def aggregate(
     field: str, rows: list[dict[str, Any]], *, budget: GenerationBudget | None = None
-) -> float:
+) -> int | float:
     budget = budget or GenerationBudget()
     budget.consume_rule_work()
     if field == "*":
-        return float(len(rows))
-    return sum(comparable_number(row.get(field)) or 0.0 for row in budget.iter_rule_work(rows))
+        return len(rows)
+    total: int | float = 0
+    for row in budget.iter_rule_work(rows):
+        value = _bounded_operand(comparable_number(row.get(field)) or 0)
+        total = _bounded_operand(total + value)
+    return total
 
 
 def safe_eval(
@@ -303,7 +315,7 @@ def eval_node(
             field = expect_field_name(node.args[0])
             return aggregate(field, row.get("rows", []), budget=budget)
         if node.func.id == "count":
-            return float(len(row.get("rows", [])))
+            return len(row.get("rows", []))
     raise ValueError("unsupported expression")
 
 

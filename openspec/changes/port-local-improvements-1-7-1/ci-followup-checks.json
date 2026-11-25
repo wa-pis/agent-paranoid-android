@@ -1,0 +1,601 @@
+{
+  "schema_version": "pr-ci-followup/v1",
+  "collected_at_utc": "2026-11-25T07:23:56+00:00",
+  "repository": {
+    "nameWithOwner": "wa-pis/agent-paranoid-android",
+    "url": "https://github.com/wa-pis/agent-paranoid-android"
+  },
+  "pull_request": {
+    "number": 718,
+    "url": "https://github.com/wa-pis/agent-paranoid-android/pull/718",
+    "state": "OPEN",
+    "base_branch": "main",
+    "head_branch": "codex/port-local-improvements-1-7-1",
+    "head_commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+    "mergeable": "MERGEABLE",
+    "merge_state": "CLEAN",
+    "reviews_submitted": 0
+  },
+  "tested_commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+  "scope": "Completed GitHub check metadata for this exact PR head, plus aggregate local XML/coverage metadata. This report is added after the tested commit and does not certify later commits.",
+  "check_summary": {
+    "total": 56,
+    "passed": 51,
+    "skipped": 5,
+    "failed": 0,
+    "pending": 0
+  },
+  "workflow_runs": [
+    {
+      "conclusion": "success",
+      "createdAt": "2026-11-25T06:44:16Z",
+      "databaseId": 45562814769,
+      "event": "pull_request",
+      "headBranch": "codex/port-local-improvements-1-7-1",
+      "headSha": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+      "status": "completed",
+      "updatedAt": "2026-11-25T06:59:56Z",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769",
+      "workflowName": "CI"
+    },
+    {
+      "conclusion": "success",
+      "createdAt": "2026-11-25T06:44:16Z",
+      "databaseId": 45562814738,
+      "event": "pull_request",
+      "headBranch": "codex/port-local-improvements-1-7-1",
+      "headSha": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+      "status": "completed",
+      "updatedAt": "2026-11-25T06:48:07Z",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738",
+      "workflowName": "Containers"
+    },
+    {
+      "conclusion": "success",
+      "createdAt": "2026-11-25T06:44:16Z",
+      "databaseId": 45562814811,
+      "event": "pull_request",
+      "headBranch": "codex/port-local-improvements-1-7-1",
+      "headSha": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+      "status": "completed",
+      "updatedAt": "2026-11-25T06:46:51Z",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814811",
+      "workflowName": "Documentation"
+    },
+    {
+      "conclusion": "success",
+      "createdAt": "2026-11-25T06:44:16Z",
+      "databaseId": 45562814933,
+      "event": "pull_request",
+      "headBranch": "codex/port-local-improvements-1-7-1",
+      "headSha": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+      "status": "completed",
+      "updatedAt": "2026-11-25T06:45:51Z",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814933",
+      "workflowName": "Security"
+    }
+  ],
+  "checks": [
+    {
+      "name": "CodeQL",
+      "workflow": null,
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/runs/139030937152"
+    },
+    {
+      "name": "docs/readthedocs.org:agent-paranoid-android",
+      "workflow": null,
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "",
+      "url": "https://agent-paranoid-android--718.org.readthedocs.build/en/718/"
+    },
+    {
+      "name": "Classify changes",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030348453"
+    },
+    {
+      "name": "Minimum dependencies / base",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576333"
+    },
+    {
+      "name": "Minimum dependencies / gigachat",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576311"
+    },
+    {
+      "name": "Minimum dependencies / mcp",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576337"
+    },
+    {
+      "name": "Minimum dependencies / openai",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576287"
+    },
+    {
+      "name": "Minimum dependencies / parquet",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576281"
+    },
+    {
+      "name": "Minimum dependencies / postgres",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576420"
+    },
+    {
+      "name": "Minimum dependencies / profiling",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576303"
+    },
+    {
+      "name": "Minimum dependencies / trino",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576318"
+    },
+    {
+      "name": "Optional wheel / gigachat / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576678"
+    },
+    {
+      "name": "Optional wheel / gigachat / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576703"
+    },
+    {
+      "name": "Optional wheel / mcp / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576536"
+    },
+    {
+      "name": "Optional wheel / mcp / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576520"
+    },
+    {
+      "name": "Optional wheel / openai / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576751"
+    },
+    {
+      "name": "Optional wheel / openai / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576612"
+    },
+    {
+      "name": "Optional wheel / parquet / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576460"
+    },
+    {
+      "name": "Optional wheel / parquet / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576481"
+    },
+    {
+      "name": "Optional wheel / postgres / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576680"
+    },
+    {
+      "name": "Optional wheel / postgres / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576896"
+    },
+    {
+      "name": "Optional wheel / profiling / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576542"
+    },
+    {
+      "name": "Optional wheel / profiling / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576489"
+    },
+    {
+      "name": "Optional wheel / trino / Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576625"
+    },
+    {
+      "name": "Optional wheel / trino / Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576676"
+    },
+    {
+      "name": "PostgreSQL integration",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576236"
+    },
+    {
+      "name": "Python 3.11",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576233"
+    },
+    {
+      "name": "Python 3.12",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576139"
+    },
+    {
+      "name": "Python 3.13",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576393"
+    },
+    {
+      "name": "Python 3.14",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576176"
+    },
+    {
+      "name": "Python 3.15",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576200"
+    },
+    {
+      "name": "Trino integration",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576087"
+    },
+    {
+      "name": "Wheel compatibility (Python 3.11)",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576159"
+    },
+    {
+      "name": "Wheel compatibility (Python 3.12)",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576140"
+    },
+    {
+      "name": "Wheel compatibility (Python 3.13)",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576252"
+    },
+    {
+      "name": "Wheel compatibility (Python 3.14)",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576208"
+    },
+    {
+      "name": "Wheel compatibility (Python 3.15)",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576220"
+    },
+    {
+      "name": "Wheel smoke",
+      "workflow": "CI",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814769/job/139030576234"
+    },
+    {
+      "name": "Classify changes",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030348468"
+    },
+    {
+      "name": "Publish ${{ matrix.target }}",
+      "workflow": "Containers",
+      "state": "SKIPPED",
+      "bucket": "skipping",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139031917978"
+    },
+    {
+      "name": "Validate ARM64 cli",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030453983"
+    },
+    {
+      "name": "Validate ARM64 generator-mcp",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030454074"
+    },
+    {
+      "name": "Validate ARM64 trino-mcp",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030453998"
+    },
+    {
+      "name": "Validate cli",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030454029"
+    },
+    {
+      "name": "Validate generator-mcp",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030454025"
+    },
+    {
+      "name": "Validate trino-mcp",
+      "workflow": "Containers",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030454005"
+    },
+    {
+      "name": "Verify release tag",
+      "workflow": "Containers",
+      "state": "SKIPPED",
+      "bucket": "skipping",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814738/job/139030350879"
+    },
+    {
+      "name": "Build documentation",
+      "workflow": "Documentation",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814811/job/139030349034"
+    },
+    {
+      "name": "Build isolated PR head preview",
+      "workflow": "Documentation",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814811/job/139031240729"
+    },
+    {
+      "name": "Deploy documentation",
+      "workflow": "Documentation",
+      "state": "SKIPPED",
+      "bucket": "skipping",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814811/job/139031243044"
+    },
+    {
+      "name": "Retain verified mike versions",
+      "workflow": "Documentation",
+      "state": "SKIPPED",
+      "bucket": "skipping",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814811/job/139031243933"
+    },
+    {
+      "name": "Verify public documentation",
+      "workflow": "Documentation",
+      "state": "SKIPPED",
+      "bucket": "skipping",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814811/job/139031244041"
+    },
+    {
+      "name": "Classify changes",
+      "workflow": "Security",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814933/job/139030348961"
+    },
+    {
+      "name": "CodeQL",
+      "workflow": "Security",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814933/job/139030440543"
+    },
+    {
+      "name": "Dependency review",
+      "workflow": "Security",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814933/job/139030440540"
+    },
+    {
+      "name": "Secret history scan",
+      "workflow": "Security",
+      "state": "SUCCESS",
+      "bucket": "pass",
+      "event": "pull_request",
+      "url": "https://github.com/wa-pis/agent-paranoid-android/actions/runs/45562814933/job/139030440544"
+    }
+  ],
+  "followup_fixes": [
+    {
+      "commit": "c855178bd2eaaac03dcff0d634bb662aaa71fe5a",
+      "subject": "fix(examples): match query policy version",
+      "changed_paths": [
+        "examples/local_postgres/run.sh",
+        "examples/local_trino/run.py"
+      ]
+    },
+    {
+      "commit": "b8fc1c2bfcaa63becebb8e8ae8cb10b314ebda2e",
+      "subject": "fix(ci): scope verified secret false positives",
+      "changed_paths": [
+        ".gitleaksignore"
+      ]
+    },
+    {
+      "commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+      "subject": "fix: order DuckDB sandbox initialization",
+      "changed_paths": [
+        "scripts/benchmark_distinct_tracking.py",
+        "scripts/streaming_generation.py",
+        "src/test_data_agent/profiling/duckdb_distinct.py",
+        "tests/test_distinct_benchmark.py",
+        "tests/test_duckdb_distinct_security.py",
+        "tests/test_streaming_generation.py"
+      ]
+    }
+  ],
+  "local_validation": {
+    "commit": "0529fb43ce1dbe85bb948623f83a66ac58500fdd",
+    "primary_run": {
+      "artifact": "full-suite.xml",
+      "tests": 6285,
+      "failures": 8,
+      "errors": 0,
+      "skipped": 25,
+      "passed": 6252,
+      "seconds": 373.514
+    },
+    "tty_rerun": {
+      "artifact": "tty-rerun.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 8,
+      "seconds": 10.411
+    },
+    "interpretation": "The primary run had eight controlling-TTY environment failures. All eight passed in a separate TTY rerun; these are two invocations, not one failure-free full-suite invocation.",
+    "coverage": {
+      "artifact": "coverage.json",
+      "covered_lines": 19983,
+      "num_statements": 21664,
+      "missing_lines": 1681,
+      "percent_covered": 92.24058345642541
+    },
+    "metadata_only": true,
+    "raw_artifacts_committed": false
+  },
+  "preserved_historical_evidence": [
+    "verification.md",
+    "checks.json",
+    "runtime-policy.json",
+    "final-review.md",
+    "final-review-checks.json",
+    "final-runtime-policy.json"
+  ],
+  "limits": [
+    "No CI logs, local test values, credentials or source-file hash map were collected for this report.",
+    "Large performance campaigns are outside this CI snapshot; historical timings do not measure this tested commit.",
+    "Green checks do not constitute a human PR review, new transformation activation approval or release acceptance."
+  ]
+}

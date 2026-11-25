@@ -59,6 +59,30 @@ def generate_dataset(
 ) -> dict[str, list[dict[str, Any]]]:
     if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
         raise GenerationLimitError("seed must be a signed 64-bit integer")
+    budget = budget or GenerationBudget()
+    validation_spec = spec.model_copy(deep=True)
+    rows_by_entity = _generate_dataset_candidates(
+        validation_spec, seed, budget=budget, semantic_provider=semantic_provider,
+        business_reports=business_reports,
+    )
+    if validation_spec.generation_settings.mode == GenerationMode.LOAD_TEST:
+        for entity in validation_spec.entities:
+            entity.row_count *= validation_spec.generation_settings.load_multiplier
+    assert_generated_dataset_valid(rows_by_entity, validation_spec, budget=budget)
+    return rows_by_entity
+
+
+def _generate_dataset_candidates(
+    spec: DatasetSpec,
+    seed: int,
+    *,
+    budget: GenerationBudget | None = None,
+    semantic_provider: SemanticValueProvider | None = None,
+    business_reports: list[BusinessValidationReport] | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """Private candidates: consumers validate before callbacks or external I/O."""
+    if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
+        raise GenerationLimitError("seed must be a signed 64-bit integer")
     if spec.generation_settings.execution_policy is not None:
         raise ValueError("scalable-v1 streams to files; use generate_dataset_bundle instead of in-memory generate_dataset")
     assert_spec_safe(spec)
@@ -130,7 +154,6 @@ def generate_dataset(
             raise ValueError("generated dataset failed business-rule validation")
         if mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE} and not report.expectations_met:
             raise ValueError("generated dataset has unexpected business-rule violations")
-    assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     return rows_by_entity
 
 
@@ -232,15 +255,13 @@ def generate_field_value(
     typed_distribution = field.typed_distribution if resolved_distribution is False else resolved_distribution
     if isinstance(typed_distribution, CategoricalDistribution) and typed_distribution.categories:
         return weighted_choice(typed_distribution.categories, rng)
-    numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None
-    numeric_shape = typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None
-    boolean_distribution = typed_distribution if isinstance(typed_distribution, BooleanDistribution) else None
-    date_distribution = typed_distribution if isinstance(typed_distribution, DateRangeDistribution) else None
-    datetime_distribution = typed_distribution if isinstance(typed_distribution, DateTimeRangeDistribution) else None
-    string_distribution = typed_distribution if isinstance(typed_distribution, StringPatternDistribution) else None
     if field.data_type == FieldType.INTEGER:
+        numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None
+        numeric_shape = typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None
         return int(round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0, default_max=1000)))
     if field.data_type == FieldType.FLOAT:
+        numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None
+        numeric_shape = typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None
         value = ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0)
         return value if numeric_shape is not None and numeric_shape.subunit_ratio else round(value, 6)
     if field.data_type == FieldType.DECIMAL:
@@ -250,12 +271,23 @@ def generate_field_value(
             precision=typed_distribution.precision, scale=typed_distribution.scale,
         )
     if field.data_type == FieldType.BOOLEAN:
-        return boolean_value(boolean_distribution, distribution, rng)
+        return boolean_value(
+            typed_distribution if isinstance(typed_distribution, BooleanDistribution) else None,
+            distribution, rng,
+        )
     if field.data_type == FieldType.DATE:
-        return ranged_datetime(date_distribution, distribution, rng, date_only=True)
+        return ranged_datetime(
+            typed_distribution if isinstance(typed_distribution, DateRangeDistribution) else None,
+            distribution, rng, date_only=True,
+        )
     if field.data_type == FieldType.DATETIME:
-        return ranged_datetime(datetime_distribution, distribution, rng, date_only=False)
-    return synthetic_string(field, string_distribution, rng)
+        return ranged_datetime(
+            typed_distribution if isinstance(typed_distribution, DateTimeRangeDistribution) else None,
+            distribution, rng, date_only=False,
+        )
+    return synthetic_string(
+        field, typed_distribution if isinstance(typed_distribution, StringPatternDistribution) else None, rng,
+    )
 
 
 def edge_field_value(field: FieldSpec, row_index: int, rng: random.Random) -> Any:

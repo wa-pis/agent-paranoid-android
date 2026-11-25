@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-25",
+  "base_tag": "v1.7.1",
+  "base_commit": "8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e",
+  "python": "3.11.15",
+  "platform": "macOS arm64",
+  "full_suite": {
+    "passed": 6236,
+    "skipped": 25,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 340.067,
+    "skip_reasons": {
+      "set TEST_POSTGRES_INTEGRATION=1 for disposable PostgreSQL": 4,
+      "set TEST_TRINO_INTEGRATION=1 with a local Trino service": 6,
+      "requires an MCP-only installation": 1,
+      "Linux exec resource-accounting regression": 1,
+      "requires isolated actual CLI composition": 3,
+      "requires isolated actual CLI/MCP composition": 1,
+      "preservation negatives target prospective bounded stdio": 6,
+      "only execute accepts a destination": 2,
+      "requires the isolated registration candidate": 1
+    }
+  },
+  "coverage": {
+    "covered_lines": 19972,
+    "num_statements": 21653,
+    "missing_lines": 1681,
+    "percent_covered": 92.23664157391586
+  },
+  "minimum_suite": {
+    "tests": 140,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0
+  },
+  "checks": {
+    "ruff": "pass",
+    "mypy174modules": "pass",
+    "compileall": "pass",
+    "json_schema_freshness": "pass",
+    "dependency_compatibility": "pass",
+    "dependency_licenses113": "pass",
+    "operational_budgets": "pass",
+    "mkdocs_strict": "pass",
+    "documentation_tests80": "pass",
+    "openspec_strict": "pass",
+    "installed_wheel_base_profiling_all": "pass",
+    "source323_hashes_unchanged": "pass",
+    "historical130_hashes_unchanged": "pass",
+    "parity21_unchanged_cases": "pass",
+    "final_target27_case_replay": "pass"
+  },
+  "runtime_policy_sha256": "2b2613323ce80115701a7dae211f6c0ce9b8f07bbea7c0932d893dbeb4cfd49c",
+  "wheel": {
+    "bytes": 468957,
+    "sha256": "66a0e234892cd6f75ce10459333c27a681a3bb68c782c122043aee54040e0bcf"
+  },
+  "publication": false,
+  "live_source_access": false
+}

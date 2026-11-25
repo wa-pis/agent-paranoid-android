@@ -11,13 +11,13 @@ import hashlib
 import io
 import json
 import math
+from fractions import Fraction
 import re
 from collections import Counter
 from contextlib import contextmanager
-from collections.abc import Callable, Iterator, Mapping, Sequence
-from dataclasses import dataclass
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from dataclasses import dataclass, replace
 from datetime import date, datetime
-from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -26,8 +26,8 @@ from test_data_agent.core.csv_reader import ScopedDictReader
 
 from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_FILE_BYTES,
+    DEFAULT_MAX_IN_MEMORY_DISTINCT,
     GenerationBudget,
-    InputLimitError,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -37,14 +37,20 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.privacy import (
     LocalCategoryField,
+    SensitiveValueSignal,
     infer_sensitive_from_name,
-    infer_sensitive_value_type,
+    infer_profile_string_signal,
     mask_pattern,
     semantic_type_is_sensitive,
     synthetic_category_distribution,
     validate_local_category_values,
 )
-from test_data_agent.profile_types import ProfileDataType, infer_profile_data_type
+from test_data_agent.core.semantics import (
+    ColumnSemanticEvidence,
+    semantic_name_hint,
+    supported_signal_type,
+)
+from test_data_agent.profile_types import ProfileDataType
 
 from test_data_agent.trino_work_budget import generation_budget_for_invocation
 
@@ -53,54 +59,45 @@ if TYPE_CHECKING:
     from test_data_agent.io.csv_source import CsvSourceBinding
 
 
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-PHONE_RE = re.compile(r"^\+?[\d\s().-]{7,}$")
-SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
 MAX_ENUM_VALUES = 20
 MAX_TRACKED_DISTINCT_VALUES = 1_000
-MAX_DISTINCT_DIGESTS = 100_000
+MAX_IN_MEMORY_DISTINCT = DEFAULT_MAX_IN_MEMORY_DISTINCT
 MAX_NUMERIC_SAMPLE_VALUES = 10_000
 CSV_SAMPLE_BYTES = 8192
+_csv_sensitive_signal = infer_profile_string_signal
 
 
 def _csv_sensitive_value_type(value: str, *, max_chars: int | None = None) -> str | None:
-    if len(value) > (max_input_cell_chars() if max_chars is None else max_chars):
-        raise InputLimitError("CSV cell exceeds character limit")
-    detected = infer_sensitive_value_type(value)
-    if detected not in {None, "phone"}:
-        return detected
-    try:
-        number = Decimal(value)
-    except InvalidOperation:
-        return detected
-    if not number.is_finite():
-        return detected
-    # Statistics retain binary floats. Inspect that representation as well as
-    # the exact decimal; rounding must not turn an unclassified value into PII.
-    # Bound magnitude before conversion or expansion of exponent notation.
-    if not -64 <= number.adjusted() <= 18:
-        return detected
-    retained = Decimal(str(float(number)))
-    # Only negative fractional measures are unambiguous here. Positive dotted
-    # numbers and integral decimal identifiers remain potentially sensitive.
-    if (
-        detected == "phone" and re.fullmatch(r"-\d+\.\d+", value)
-        and number != number.to_integral_value()
-        and retained != retained.to_integral_value()
-    ):
-        return None
-    for candidate in (number, retained):
-        exponent = candidate.as_tuple().exponent
-        if not isinstance(exponent, int) or exponent < -64:
+    signal = _csv_sensitive_signal(value, max_chars=max_chars)
+    return signal.value_type if signal is not None else None
+
+
+def _profile_mask_type(
+    name: str, signal: SensitiveValueSignal | None, *,
+    semantic_type: str | None, numeric: bool,
+) -> str | None:
+    if signal is None:
+        return semantic_type
+    return supported_signal_type(
+        signal, hint=semantic_name_hint(name, numeric=numeric), numeric=numeric,
+    )
+
+
+def _column_semantic_evidence(
+    values: Iterable[str], *, max_chars: int | None = None,
+) -> ColumnSemanticEvidence:
+    evidence = ColumnSemanticEvidence()
+    for raw_value in values:
+        value = raw_value.strip()
+        if not value:
             continue
-        canonical = format(candidate.copy_abs(), "f")
-        if "." in canonical:
-            canonical = canonical.rstrip("0").rstrip(".")
-        normalized_type = infer_sensitive_value_type(canonical)
-        if normalized_type == "secret":
-            return normalized_type
-        detected = detected or normalized_type
-    return detected
+        integer = parse_int(value)
+        number = parse_float(value)
+        evidence.add(
+            _csv_sensitive_signal(value, max_chars=max_chars),
+            numeric=integer is not None or (number is not None and math.isfinite(number)),
+        )
+    return evidence
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,6 +115,7 @@ class CSVColumnProfile(BaseModel):
     null_count: int | None
     null_ratio: float | None
     approx_distinct_count: int | None
+    unique_ratio_kind: Literal["unspecified", "exact", "lower_bound"] = "unspecified"
     sensitive: bool
     semantic_type: str | None = None
     numeric_storage_type: Literal["integer", "float"] | None = None
@@ -257,6 +255,16 @@ def _profile_csv_rows(
     check_shape: Callable[[int, int], None] | None = None,
     max_chars: int | None = None,
 ) -> CSVProfile:
+    from test_data_agent.profiling import duckdb_distinct
+    from test_data_agent.profiling.budget import (
+        LocalProfileBudget,
+        default_local_profile_limits,
+    )
+
+    limits = default_local_profile_limits()
+    if budget is not None:
+        limits = replace(limits, max_seconds=min(limits.max_seconds, budget.remaining_seconds()))
+    work_budget = LocalProfileBudget(limits)
     fieldnames = validate_csv_headers(reader.fieldnames)
     if check_shape is None:
         enforce_input_column_count(len(fieldnames), label="CSV")
@@ -264,34 +272,61 @@ def _profile_csv_rows(
         check_shape(0, len(fieldnames))
     reader.fieldnames = fieldnames
     accumulators = {name: CSVColumnAccumulator(name, max_chars=max_chars) for name in fieldnames}
+    ordered_accumulators = list(accumulators.values())
     row_count = 0
-    for row in reader:
-        if budget is not None:
-            budget.check("CSV snapshot profiling")
-        row_count += 1
-        if check_shape is None:
-            enforce_input_row_count(row_count, label="CSV")
-            enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
-        else:
-            check_shape(row_count, len(fieldnames))
-        for name in fieldnames:
+
+    def cells() -> Iterator[tuple[int, bytes]]:
+        nonlocal row_count
+        for row in reader:
+            work_budget.check_deadline("CSV row start")
             if budget is not None:
                 budget.check("CSV snapshot profiling")
-            raw = row.get(name, "")
-            if literal_empty and raw == null_token:
-                accumulators[name].observe_sensitivity(raw)
-                continue
-            accumulators[name].add(raw, literal_empty=literal_empty)
-        if row_digests is not None:
-            row_digests.add(csv_row_digest(row, fieldnames))
+            row_count += 1
+            if check_shape is None:
+                enforce_input_row_count(row_count, label="CSV")
+                enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
+            else:
+                check_shape(row_count, len(fieldnames))
+            for column, accumulator in enumerate(ordered_accumulators):
+                work_budget.check_deadline("CSV field profiling")
+                if budget is not None:
+                    budget.check("CSV snapshot profiling")
+                raw = row.get(accumulator.name, "")
+                if literal_empty and raw == null_token:
+                    accumulator.observe_sensitivity(raw)
+                    continue
+                digest = accumulator.add(raw, literal_empty=literal_empty)
+                if digest is not None:
+                    yield column, digest
+            if row_digests is not None:
+                row_digests.add(csv_row_digest(row, fieldnames))
+
+    values = cells()
+    sizes = [0] * len(fieldnames)
+    tracked = 0
+    for column, _ in values:
+        size = len(ordered_accumulators[column].distinct_digests)
+        tracked += size - sizes[column]
+        sizes[column] = size
+        if tracked > MAX_IN_MEMORY_DISTINCT:
+            for accumulator in ordered_accumulators:
+                accumulator.distinct_count = 0
+            counts = duckdb_distinct.count_distinct_stream(
+                [item.distinct_digests for item in ordered_accumulators], values, work_budget,
+            )
+            for accumulator, count in zip(ordered_accumulators, counts, strict=True):
+                accumulator.distinct_count = count
+            break
     allowed = {item.field for item in local_category_fields if item.entity == table_name}
     columns = []
     for name, accumulator in accumulators.items():
+        work_budget.check_deadline("CSV field finalization")
         if budget is not None:
             budget.check("CSV snapshot profiling")
         columns.append(accumulator.to_profile(row_count, preserve_categories=name in allowed))
     if budget is not None:
         budget.check("CSV snapshot profiling")
+    work_budget.check_deadline("CSV profile finalization")
     return CSVProfile(
         table=table_name,
         row_count=row_count,
@@ -366,11 +401,12 @@ class CSVColumnAccumulator:
         if type(self.max_chars) is not int or self.max_chars < 1:
             raise ValueError("invalid CSV character limit")
         self.non_null_count = 0
-        self.semantic_sample: list[str] = []
-        self.content_sensitive_type: str | None = None
+        self.semantic_evidence = ColumnSemanticEvidence()
+        self.extra_sensitive = False
         self.counts: Counter[str] = Counter()
         self.distinct_overflow = False
         self.distinct_digests: set[bytes] = set()
+        self.distinct_count: int | None = None
         self.integer_values: list[int] = []
         self.float_values: list[float] = []
         self.date_values: list[date] = []
@@ -381,34 +417,36 @@ class CSVColumnAccumulator:
         self.all_datetime = True
         self.all_date = True
 
-    def add(self, raw_value: str | None, *, literal_empty: bool = False) -> None:
+    def add(self, raw_value: str | None, *, literal_empty: bool = False) -> bytes | None:
         value = raw_value.strip() if raw_value is not None else ""
         if value == "" and not literal_empty:
-            return
+            return None
         self.non_null_count += 1
-        if len(self.semantic_sample) < 100:
-            self.semantic_sample.append(value)
-        self.observe_sensitivity(value)
-        self.add_count(value)
-        self.add_typed_samples(value)
+        signal = _csv_sensitive_signal(value, max_chars=self.max_chars)
+        digest = self.add_count(value)
+        numeric = self.add_typed_samples(value)
+        self.semantic_evidence.add(signal, numeric=numeric)
+        return digest
 
     def observe_sensitivity(self, value: str) -> None:
-        detected_type = _csv_sensitive_value_type(value.strip(), max_chars=self.max_chars)
-        if detected_type == "secret" or self.content_sensitive_type is None:
-            self.content_sensitive_type = detected_type
+        # Null sentinels still require inspection, but do not support semantics.
+        signal = _csv_sensitive_signal(value.strip(), max_chars=self.max_chars)
+        self.extra_sensitive = self.extra_sensitive or signal is not None
 
-    def add_count(self, value: str) -> None:
-        if len(self.distinct_digests) < MAX_DISTINCT_DIGESTS:
-            self.distinct_digests.add(hashlib.sha256(value.encode()).digest())
+    def add_count(self, value: str) -> bytes:
+        digest = hashlib.sha256(value.encode()).digest()
+        if self.distinct_count is None:
+            self.distinct_digests.add(digest)
         if value in self.counts:
             self.counts[value] += 1
-            return
+            return digest
         if len(self.counts) < MAX_TRACKED_DISTINCT_VALUES:
             self.counts[value] = 1
-            return
+            return digest
         self.distinct_overflow = True
+        return digest
 
-    def add_typed_samples(self, value: str) -> None:
+    def add_typed_samples(self, value: str) -> bool:
         parsed_int = parse_int(value)
         if parsed_int is None:
             self.all_int = False
@@ -435,24 +473,29 @@ class CSVColumnAccumulator:
             self.all_date = False
         elif len(self.date_values) < MAX_NUMERIC_SAMPLE_VALUES:
             self.date_values.append(parsed_date)
+        return parsed_int is not None or (
+            parsed_float is not None and math.isfinite(parsed_float)
+        )
 
     def to_profile(self, row_count: int, *, preserve_categories: bool = False) -> CSVColumnProfile:
         null_count = row_count - self.non_null_count
-        semantic_type = infer_semantic_type(self.name, self.semantic_sample, max_chars=self.max_chars)
-        if self.content_sensitive_type == "secret" or semantic_type is None:
-            semantic_type = self.content_sensitive_type or semantic_type
+        semantic_type = self.semantic_evidence.resolve(self.name)
         base_type = self.infer_data_type(semantic_type)
         sensitive = (
             infer_sensitive_from_name(self.name)
             or semantic_type_is_sensitive(semantic_type)
-            or self.content_sensitive_type is not None
+            or self.semantic_evidence.sensitive
+            or self.extra_sensitive
         )
         top_values: list[dict[str, Any]] = []
         masked_patterns: list[dict[str, Any]] = []
         if sensitive:
             pattern_counts: Counter[str] = Counter()
             for value, count in self.counts.items():
-                value_type = _csv_sensitive_value_type(value, max_chars=self.max_chars) or semantic_type
+                value_type = _profile_mask_type(
+                    self.name, _csv_sensitive_signal(value, max_chars=self.max_chars), semantic_type=semantic_type,
+                    numeric=self.semantic_evidence.all_numeric,
+                )
                 pattern_counts[mask_pattern(value, value_type)] += count
             masked_patterns = [{"pattern": pattern, "count": count} for pattern, count in pattern_counts.most_common(10)]
         elif (
@@ -477,12 +520,14 @@ class CSVColumnAccumulator:
             nullable=null_count > 0,
             null_count=null_count,
             null_ratio=round(null_count / row_count, 6) if row_count else 0.0,
-            # A capped lower bound must never certify uniqueness at the cap.
-            approx_distinct_count=min(len(self.distinct_digests), MAX_DISTINCT_DIGESTS - 1),
+            approx_distinct_count=(self.distinct_count if self.distinct_count is not None
+                                   else len(self.distinct_digests)),
+            unique_ratio_kind="exact",
             sensitive=sensitive,
             semantic_type=semantic_type,
-            numeric_storage_type=_numeric_storage_type(
+            numeric_storage_type=None if self.extra_sensitive else _numeric_storage_type(
                 semantic_type, self.non_null_count, self.all_int, self.all_float,
+                evidence=self.semantic_evidence,
             ),
             top_values=top_values,
             masked_patterns=masked_patterns,
@@ -490,13 +535,10 @@ class CSVColumnAccumulator:
         )
 
     def infer_data_type(self, semantic_type: str | None) -> ProfileDataType:
-        if semantic_type == "email":
-            return ProfileDataType.EMAIL
-        if semantic_type == "phone":
-            return ProfileDataType.PHONE
-        profile_hint = infer_profile_data_type({"name": self.name, "data_type": "string", "semantic_type": semantic_type})
-        if profile_hint != ProfileDataType.STRING:
-            return profile_hint
+        if semantic_type in {"email", "phone", "name", "address"}:
+            return ProfileDataType(semantic_type)
+        if semantic_type == "ssn":
+            return ProfileDataType.STRING
         if self.non_null_count == 0:
             return ProfileDataType.STRING
         if self.all_int:
@@ -528,19 +570,13 @@ class CSVColumnAccumulator:
 def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnProfile:
     non_null = [value.strip() for value in values if value is not None and value.strip() != ""]
     null_count = row_count - len(non_null)
-    semantic_type = infer_semantic_type(name, non_null)
-    content_sensitive_type = None
-    for value in non_null:
-        detected = _csv_sensitive_value_type(value)
-        if detected == "secret" or content_sensitive_type is None:
-            content_sensitive_type = detected
-    if content_sensitive_type == "secret" or semantic_type is None:
-        semantic_type = content_sensitive_type or semantic_type
+    evidence = _column_semantic_evidence(non_null)
+    semantic_type = evidence.resolve(name)
     base_type = infer_data_type(name, non_null, semantic_type)
     sensitive = (
         infer_sensitive_from_name(name)
         or semantic_type_is_sensitive(semantic_type)
-        or content_sensitive_type is not None
+        or evidence.sensitive
     )
     counts = Counter(non_null)
 
@@ -550,7 +586,10 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
         masked_patterns = [
             {"pattern": pattern, "count": count}
             for pattern, count in Counter(
-                mask_pattern(value, _csv_sensitive_value_type(value) or semantic_type)
+                mask_pattern(value, _profile_mask_type(
+                    name, _csv_sensitive_signal(value), semantic_type=semantic_type,
+                    numeric=evidence.all_numeric,
+                ))
                 for value in non_null
             ).most_common(10)
         ]
@@ -567,12 +606,14 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
         null_count=null_count,
         null_ratio=round(null_count / row_count, 6) if row_count else 0.0,
         approx_distinct_count=len(counts),
+        unique_ratio_kind="exact",
         sensitive=sensitive,
         semantic_type=semantic_type,
         numeric_storage_type=_numeric_storage_type(
             semantic_type, len(non_null),
             all(parse_int(value) is not None for value in non_null),
             all(parse_float(value) is not None for value in non_null),
+            evidence=evidence,
         ),
         top_values=top_values,
         masked_patterns=masked_patterns,
@@ -582,41 +623,28 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
 
 def _numeric_storage_type(
     semantic_type: str | None, non_null: int, all_integer: bool, all_float: bool,
+    *, evidence: ColumnSemanticEvidence | None = None,
 ) -> Literal["integer", "float"] | None:
-    """Retain finite scalar storage evidence without clearing phone sensitivity."""
-    if semantic_type != "phone" or not non_null:
+    """Retain finite phone-only numeric evidence without assigning semantics."""
+    if not non_null or semantic_type not in {None, "phone"}:
+        return None
+    if evidence is None:
+        if semantic_type != "phone":
+            return None
+    elif set(evidence.matches) != {SensitiveValueSignal.PHONE}:
         return None
     return "integer" if all_integer else "float" if all_float else None
 
 
 def infer_semantic_type(name: str, values: list[str], *, max_chars: int | None = None) -> str | None:
-    lowered = name.lower()
-    if "email" in lowered or "mail" in lowered:
-        return "email"
-    if "phone" in lowered:
-        return "phone"
-    if "ssn" in lowered or "tax_id" in lowered:
-        return "ssn"
-    sample = values[:100]
-    if sample and sum(bool(EMAIL_RE.fullmatch(value)) for value in sample) / len(sample) >= 0.8:
-        return "email"
-    if sample and sum(bool(SSN_RE.fullmatch(value)) for value in sample) / len(sample) >= 0.8:
-        return "ssn"
-    if sample and sum(
-        _csv_sensitive_value_type(value, max_chars=max_chars) == "phone" for value in sample
-    ) / len(sample) >= 0.8:
-        return "phone"
-    return None
+    return _column_semantic_evidence(values, max_chars=max_chars).resolve(name)
 
 
 def infer_data_type(name: str, values: list[str], semantic_type: str | None) -> ProfileDataType:
-    if semantic_type == "email":
-        return ProfileDataType.EMAIL
-    if semantic_type == "phone":
-        return ProfileDataType.PHONE
-    profile_hint = infer_profile_data_type({"name": name, "data_type": "string", "semantic_type": semantic_type})
-    if profile_hint != ProfileDataType.STRING:
-        return profile_hint
+    if semantic_type in {"email", "phone", "name", "address"}:
+        return ProfileDataType(semantic_type)
+    if semantic_type == "ssn":
+        return ProfileDataType.STRING
     if not values:
         return ProfileDataType.STRING
     if all(parse_int(value) is not None for value in values):
@@ -660,21 +688,29 @@ def numeric_stats(numbers: Sequence[int | float], integer: bool) -> dict[str, An
     stats: dict[str, Any] = {
         "min_value": numbers[0],
         "max_value": numbers[-1],
-        "p05": percentile(numbers, 0.05),
-        "p95": percentile(numbers, 0.95),
     }
+    for key, numerator in (("p05", 1), ("p95", 19)):
+        if integer:
+            lower, weight = divmod((len(numbers) - 1) * numerator, 20)
+            upper = min(lower + 1, len(numbers) - 1)
+            # Round once, before binary FLOAT can change the integer endpoints.
+            interpolated = (Fraction(numbers[lower]) * (20 - weight)
+                            + Fraction(numbers[upper]) * weight) / 20
+            stats[key] = round(interpolated)
+        else:
+            stats[key] = percentile(numbers, numerator / 20)
     if integer:
         stats = {key: int(round(value)) for key, value in stats.items()}
     return stats
 
 
-def percentile(numbers: Sequence[int | float], ratio: float) -> float:
-    if len(numbers) == 1:
-        return float(numbers[0])
+def percentile(numbers: Sequence[int | float], ratio: float) -> int | float:
     index = ratio * (len(numbers) - 1)
     lower = int(index)
     upper = min(lower + 1, len(numbers) - 1)
     weight = index - lower
+    if weight == 0 or numbers[lower] == numbers[upper]:
+        return numbers[lower]
     return float(numbers[lower] * (1 - weight) + numbers[upper] * weight)
 
 

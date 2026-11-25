@@ -115,6 +115,33 @@ are not dataset authorization or proof of completed review.
   CLI or transport boundary.
 - Prefer the smallest clear change and avoid dependencies that do not simplify
   safe, testable behavior.
+- Shared semantics, privacy, generation and validation policy must apply across
+  every supported source adapter. Add regression coverage across source variants
+  when changing that policy; source labels must not bypass safety checks.
+- Use the evidence each source already provides. Schema-only and aggregate-only
+  sources must retain unknown semantics when evidence is absent; parity must not
+  introduce source-row reads, broader SQL access or weaker resource budgets.
+
+## Source freshness at task start
+
+- At the start of each new repository task, fetch the authoritative remote's
+  default development branch and resolve that default remotely. Do this once
+  per task, not for every clarification or continuation. Do not substitute a
+  release tag, stale local `main`, or package upgrade for a source fetch.
+- An explicitly requested base or revision takes precedence, including pinned
+  benchmark and reproducibility work. Keep that base unless the user changes it.
+- Report the fetched branch and commit, current branch and HEAD, dirty/clean
+  state, and ahead/behind divergence before implementation.
+- Merge the fetched development branch into a clean feature branch, retaining
+  unpublished commits. Preserve and safely integrate dirty work or use an
+  isolated worktree before coding. Never silently reset, rebase, stash, or
+  discard work; such operations require authorization.
+- If fetching fails, state the failure and exact available base. Do not claim
+  that an unfetched snapshot is the latest development version.
+- Source synchronization does not authorize package/dependency upgrades. Keep
+  locked versions unless upstream integration requires a change or the user
+  explicitly requests one. This policy applies to this project, not global
+  agent settings.
 
 ## Task-specific guides
 

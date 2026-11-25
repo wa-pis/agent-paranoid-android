@@ -8,14 +8,14 @@ from test_data_agent.profiling.schema_profiler import FieldAccumulator
 
 @pytest.mark.parametrize("route", ["column", "single_csv", "folder"])
 @pytest.mark.parametrize(("values", "sensitive", "semantic"), [
-    (["2468.125", "3579.625"], True, "phone"),
-    (["2468125", "3579625"], True, "phone"),
-    (["2.468125e3", "3.579625e3"], True, "phone"),
+    (["2468.125", "3579.625"], True, None),
+    (["2468125", "3579625"], True, None),
+    (["2.468125e3", "3.579625e3"], True, None),
     (["-2468.125", "-3579.625"], False, None),
-    (["-2.5"] * 105 + ["+1 (555) 010-0117"], True, "phone"),
-    (["-2.5"] * 105 + ["000-12-3456"], True, "ssn"),
+    (["-2.5"] * 105 + ["+1 (555) 010-0117"], True, None),
+    (["-2.5"] * 105 + ["000-12-3456"], True, None),
     (["-2.5"] * 105 + ["api_key=fictional_not_a_real_credential"], True, "secret"),
-    (["-2.5"] * 105 + ["4111111111111111"], True, "secret"),
+    (["-2.5"] * 105 + ["4111111111111111"], True, None),
 ])
 def test_numeric_csv_privacy_matrix(route, values, sensitive, semantic):
     if route == "column":

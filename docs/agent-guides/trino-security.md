@@ -93,7 +93,8 @@ malformed or unsupported declared shapes fail closed rather than rounding.
 
 ## Enforcement
 
-SQL source policy 1.1 permits aliased SUM/COUNT/MIN/MAX/AVG projections and
+SQL source policy 1.2 in the unreleased checkout retains 1.1's aliased
+SUM/COUNT/MIN/MAX/AVG projections and
 optional GROUP BY on explicit authorized source columns of one physical table.
 COUNT(*) is a row count, never a projection wildcard. Non-aggregate projections
 use physical source-column identity: table column-alias lists and decorated
@@ -107,6 +108,11 @@ Existing table/column authorization, AST/statement/scan/result/time budgets and
 source-free profile wrappers apply unchanged. Grouping does not declassify values
 or authorize disclosure of small groups. Aggregate profiles do not support
 automatic dependency-preserving inference, including COUNT(*) without columns.
+
+Policy 1.2 also retains physical-column sensitivity behind direct aliases and
+applies the shared value/summary guard to categories and temporal bounds. An
+innocent output alias cannot declassify a sensitive source column. This change
+does not expand the SQL language, authorization, query counts or scan budgets.
 
 Query profiles carry value-free `has_unmodeled_expressions` metadata. A
 source-dependent non-column projection marks the profile unsupported for
