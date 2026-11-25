@@ -82,6 +82,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/parallel-generation/">Parallel And Streaming CSV</a></li>
+  
 </ul>
 
   
@@ -207,7 +209,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.7.1
   <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation 49d12c515c3aa7d012b038c5d1c96b50195fbcc1
+  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -246,8 +248,13 @@ range in package metadata alone is not compatibility evidence.</p>
 </tr>
 <tr>
 <td>PyArrow</td>
-<td>Parquet reading, writing, and schema conversion</td>
-<td><code>parquet</code></td>
+<td>Parquet reading, writing, schema conversion and bounded distinct handoff</td>
+<td><code>parquet</code>, <code>profiling</code></td>
+</tr>
+<tr>
+<td>DuckDB</td>
+<td>Exact CSV distinct tracking above the in-memory threshold</td>
+<td><code>profiling</code></td>
 </tr>
 <tr>
 <td>MCP</td>
@@ -313,6 +320,11 @@ it does not replace the reviewed lock or minimum profiles.</p>
 <td>Base minimum; PyArrow 15.0.0</td>
 </tr>
 <tr>
+<td><code>profiling-minimum</code> (unreleased)</td>
+<td>3.11</td>
+<td>Base minimum; PyArrow 15.0.0; DuckDB 2.0.1</td>
+</tr>
+<tr>
 <td><code>mcp-minimum</code></td>
 <td>3.11</td>
 <td>Faker 25.0.0; Pydantic 2.11.0; PyYAML 6.0.0; MCP 1.28.1</td>
@@ -340,7 +352,7 @@ it does not replace the reviewed lock or minimum profiles.</p>
 <tr>
 <td><code>latest-all</code></td>
 <td>3.11–3.15</td>
-<td>Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
+<td>Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; DuckDB 2.0.1 (unreleased profiling extension); MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4</td>
 </tr>
 </tbody>
 </table>
@@ -370,6 +382,11 @@ each surface.</p>
 <td><code>parquet-minimum</code></td>
 <td>Parquet serialization and loading</td>
 <td><code>tests/test_io_commands.py</code></td>
+</tr>
+<tr>
+<td><code>profiling-minimum</code> (unreleased)</td>
+<td>Bounded exact distinct tracking and private temporary files</td>
+<td><code>tests/test_duckdb_profiling.py</code>, <code>tests/test_duckdb_distinct_security.py</code></td>
 </tr>
 <tr>
 <td><code>mcp-minimum</code></td>
@@ -487,6 +504,11 @@ hashed dependency evidence in a generated manifest.</p>
 <td>The adapter retains the 0.2.3 minimum and checks the 0.2.4 <code>chat.create</code> contract with offline SDK transport; earlier 0.2.x releases use an incompatible call shape.</td>
 </tr>
 <tr>
+<td>DuckDB</td>
+<td>Accept <code>&gt;=2.0.1,&lt;3.0.0</code> for the unreleased <code>profiling</code> extra</td>
+<td>Exact-count equivalence, private temporary files, deadlines and missing-extra checks cover the native handoff.</td>
+</tr>
+<tr>
 <td>Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg</td>
 <td>Add no upper bound</td>
 <td>The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible.</td>
@@ -519,6 +541,11 @@ growth:</p>
 <td style="text-align: right;">11</td>
 </tr>
 <tr>
+<td><code>profiling</code> (unreleased)</td>
+<td>Exact CSV distinct tracking with DuckDB and Arrow</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr>
 <td><code>mcp</code></td>
 <td>Generator MCP server</td>
 <td style="text-align: right;">35</td>
@@ -546,8 +573,11 @@ growth:</p>
 </tbody>
 </table>
 <p>These are regression budgets, not a guarantee that every platform installs the
-same count. <code>PyArrow</code> is the largest optional wheel, so keep <code>parquet</code> out of
-environments that do not produce Parquet files.</p>
+same count. <code>PyArrow</code> is the largest optional wheel. Install <code>profiling</code> only
+when the bounded DuckDB distinct backend is needed; it is not required by
+parallel generation or streaming CSV export. This extra is available from the
+development checkout (<code>pip install -e '.[profiling]'</code>), not the published 1.7.1
+wheel. The released <code>parquet</code> extra remains available independently.</p>
 <p>Python 3.15 compatibility evidence is recorded in the <code>python-315-support</code>
 OpenSpec change. The locked
 profile uses Pydantic 2.14.3 and PyArrow 26.0.1 while retaining the existing

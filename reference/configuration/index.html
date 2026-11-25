@@ -82,6 +82,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/parallel-generation/">Parallel And Streaming CSV</a></li>
+  
 </ul>
 
   
@@ -207,7 +209,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.7.1
   <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation 49d12c515c3aa7d012b038c5d1c96b50195fbcc1
+  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -539,6 +541,11 @@ rows via <code>--rule-sample-rows</code>.</p>
 <code>LocalProfileBudget</code>. Deadline, sample, byte, or cell exhaustion raises a
 structured <code>LocalProfileLimitError</code>. A failed profile is not written to the
 metadata-only cache.</p>
+<p>The unreleased checkout's exact CSV distinct backend keeps up to 1,000,000
+digests in memory, then uses the optional <code>profiling</code> DuckDB/Arrow extra with
+private bounded temporary storage. The threshold selects a backend, not a
+distinct-count ceiling. Existing byte, cell and deadline caps still apply;
+see <a href="../profiling/">profiling details</a>.</p>
 <h2 id="postgresql-profiling">PostgreSQL Profiling<a class="headerlink" href="#postgresql-profiling" title="Permanent link">&para;</a></h2>
 <p><code>profile-postgres</code> requires <code>POSTGRES_ALLOWED_SCHEMAS</code>,
 <code>POSTGRES_ALLOWED_TABLES</code>, and <code>POSTGRES_ALLOWED_COLUMNS</code>. Connection settings

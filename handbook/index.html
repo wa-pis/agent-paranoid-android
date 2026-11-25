@@ -88,6 +88,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../how-to/parallel-generation/">Parallel And Streaming CSV</a></li>
+  
 </ul>
 
   
@@ -212,7 +214,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.7.1
   <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation 49d12c515c3aa7d012b038c5d1c96b50195fbcc1
+  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -225,7 +227,7 @@
 <ul><li><a href="#index">Overview</a></li><li><a href="#getting-started-installation">Installation</a></li><li><a href="#getting-started-first-csv">First CSV Dataset</a></li><li><a href="#getting-started-related-tables">Related Tables</a></li><li><a href="#getting-started-review-output">Review The Output</a></li></ul>
 
 <h2><a href="#section-2">How-To Guides</a></h2>
-<ul><li><a href="#how-to-business-rules">Add Business Rules</a></li><li><a href="#how-to-postgresql">Profile PostgreSQL</a></li><li><a href="#how-to-trino">Profile Through Trino</a></li><li><a href="#how-to-transformation">Transform Local Data</a></li><li><a href="#how-to-dataset-capacity">Forecast And Scale Datasets</a></li></ul>
+<ul><li><a href="#how-to-business-rules">Add Business Rules</a></li><li><a href="#how-to-postgresql">Profile PostgreSQL</a></li><li><a href="#how-to-trino">Profile Through Trino</a></li><li><a href="#how-to-transformation">Transform Local Data</a></li><li><a href="#how-to-dataset-capacity">Forecast And Scale Datasets</a></li><li><a href="#how-to-parallel-generation">Parallel And Streaming CSV</a></li></ul>
 
 <h2><a href="#section-3">Integrations</a></h2>
 <ul><li><a href="#how-to-mcp">Connect An MCP Client</a></li><li><a href="#ai_integration">Connect An AI Client</a></li><li><a href="#operations-containers">Containers</a></li></ul>
@@ -1665,7 +1667,158 @@ flag unsupported relational execution rather than certifying it.</p>
 <p>Python file-bundle APIs, CLI <code>generate</code>/<code>validate</code>, and MCP planning/approval/
 recovery share this engine. Changing the engine changes the specification
 fingerprint and requires renewed human review. Automated SDK acceptance is
-technical evidence and does not represent manual client acceptance for a release.</p></section></section>
+technical evidence and does not represent manual client acceptance for a release.</p></section><section class="print-page" id="how-to-parallel-generation" heading-number="2.6"><h1 id="how-to-parallel-generation-parallel-generation-and-streaming-csv">Parallel Generation And Streaming CSV<a class="headerlink" href="#how-to-parallel-generation-parallel-generation-and-streaming-csv" title="Permanent link">&para;</a></h1>
+<p>This page describes <strong>unreleased development-checkout features</strong> ported onto
+the 1.7.1 baseline. Published 1.7.1 does not include <code>--stream-csv</code> or the
+<code>tiled-v1</code> Python API. Existing ordinary generation and reviewed
+<code>scalable-v1</code>/<code>scalable-relational-v1</code> policies remain available; see
+<a href="#how-to-dataset-capacity">capacity and scalable generation</a>.</p>
+<h2 id="how-to-parallel-generation-choose-the-export-path">Choose The Export Path<a class="headerlink" href="#how-to-parallel-generation-choose-the-export-path" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>When to use it</th>
+<th>Data and memory contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ordinary <code>generate</code></td>
+<td>Existing specs, rules, modes and supported relationships</td>
+<td>Existing seeded engine and limits; materialized rows</td>
+</tr>
+<tr>
+<td>Reviewed <code>scalable-v1</code> / <code>scalable-relational-v1</code></td>
+<td>The released bounded independent/eligible linked-table workflows</td>
+<td>Explicit execution policy, streaming validation/recovery and capacity tooling</td>
+</tr>
+<tr>
+<td>New <code>generate --stream-csv</code></td>
+<td>One independent valid-mode entity without global rules</td>
+<td>Fixed tiles, explicit worker count, CSV only; separate <code>tiled-v1</code> seed stream</td>
+</tr>
+<tr>
+<td>New Python <code>generate_dataset_parallel</code></td>
+<td>Callers that need generated rows in memory</td>
+<td>Parallel candidates, then global solving/validation; full result remains materialized</td>
+</tr>
+</tbody>
+</table>
+<p>An export does not switch engines merely because it is large. The new public
+streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
+The optional <code>profiling</code> extra serves large input distinct counting, not CSV
+generation. Install this branch from its checkout before trying the new options:</p>
+<pre><code class="language-bash">python -m pip install -e .
+</code></pre>
+<h2 id="how-to-parallel-generation-export-a-reviewed-spec">Export A Reviewed Spec<a class="headerlink" href="#how-to-parallel-generation-export-a-reviewed-spec" title="Permanent link">&para;</a></h2>
+<p>Use a reviewed DatasetSpec, for example this independently authored synthetic
+spec saved as <code>large-csv.yaml</code>:</p>
+<pre><code class="language-yaml">entities:
+  - name: items
+    row_count: 750000
+    primary_key: item_id
+    fields:
+      - name: item_id
+        data_type: integer
+        is_identifier: true
+      - name: metric
+        data_type: integer
+        distribution:
+          kind: numeric
+          min_value: 0
+          max_value: 100
+generation_settings:
+  seed: 42
+  output_format: csv
+</code></pre>
+<p>Start with a small output, then run the reviewed count in a separate directory:</p>
+<pre><code class="language-bash">test-data-agent generate large-csv.yaml --count 1000 --stream-csv --workers 1 --output out/tiled-smoke
+test-data-agent validate out/tiled-smoke/dataset_spec.yaml out/tiled-smoke
+test-data-agent generate large-csv.yaml --stream-csv --workers 4 --output out/tiled-full
+</code></pre>
+<p>CLI streaming supplies at most 1,000,000 rows and 25,000,000 cells, with four
+workers by default; <code>--workers</code> accepts 1–4 and requires <code>--stream-csv</code>.
+The existing output-byte, disk-space and invocation/deadline limits remain
+additional ceilings. The option accepts a DatasetSpec, not <code>--profile</code>, and
+defaults to CSV; requesting another output format is an error.</p>
+<p>Streaming is eligible only for one entity with fields, valid mode, no
+relationships, native constraints, embedded business rules or relational
+scenarios. Unsupported specs, callback business rules and source-folder checks
+keep the ordinary materialized path and its ordinary row limits. A large
+streaming request can therefore be refused after fallback. An existing reviewed
+<code>execution_policy</code> and this option are mutually exclusive: keep the selected
+released engine or remove the separate streaming request.</p>
+<p>The bundle contains the CSV, effective specification, validation report and
+generation manifest. Check
+<code>generation_manifest.json</code> → <code>reproducibility.generator_algorithm_version</code>:
+an actual streaming export records <code>tiled-v1</code>; fallback records the ordinary
+algorithm identity. The effective spec alone does not select <code>tiled-v1</code> for a
+later run: pass the option again.</p>
+<h2 id="how-to-parallel-generation-call-from-python">Call From Python<a class="headerlink" href="#how-to-parallel-generation-call-from-python" title="Permanent link">&para;</a></h2>
+<p>Use an importable module with the normal process-entry guard. The Python policy
+defaults differ from the CLI: one worker, <code>max_rows=None</code> (the existing configured
+row ceiling), and 10,000,000 cells. Supply explicit bounds for a larger run:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from test_data_agent.adapters.parallel_generation import ParallelGenerationPolicy
+from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent.io.workflows import generate_dataset_bundle
+
+
+def main() -&gt; None:
+    spec = load_dataset_spec(Path(&quot;large-csv.yaml&quot;))
+    result = generate_dataset_bundle(
+        spec,
+        output_folder=Path(&quot;out/tiled-python&quot;),
+        seed=42,
+        streaming=ParallelGenerationPolicy(
+            workers=2, max_rows=1_000_000, max_cells=25_000_000,
+        ),
+    )
+    assert result.validation.valid
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p><code>generate_dataset_artifacts</code> and <code>generate_dataset_from_spec_path</code> also accept
+the explicit <code>streaming</code> policy. For in-memory results,
+<code>test_data_agent.adapters.parallel_generation.generate_dataset_parallel(spec,
+seed, policy=...)</code> collects ordered tiles before global solving and validation.
+It rejects embedded business rules, relational scenarios and execution policies;
+it does not provide bounded-memory export or replace the reviewed relational
+engine. Process creation uses <code>spawn</code>; no start-method option is exposed.</p>
+<h2 id="how-to-parallel-generation-determinism-checks-and-publication">Determinism, Checks And Publication<a class="headerlink" href="#how-to-parallel-generation-determinism-checks-and-publication" title="Permanent link">&para;</a></h2>
+<p><code>tiled-v1</code> derives each fixed 4,096-row tile from the engine version, seed,
+entity and tile index. For the same spec, seed and dependency environment,
+changing between one, two and four workers preserves rows, order and CSV data
+bytes. This stream deliberately differs from ordinary generation and the
+released scalable engines. Review engine changes and keep the manifest when
+reproducing an export.</p>
+<p>Every tile undergoes schema/type, normalization, constraint and privacy checks.
+Global row counts and declared primary-key uniqueness are reconciled before
+publication; source rows are never used to fill the output. The typed CSV
+contract retains null/empty distinction, formula protection and exact DECIMAL
+text. Existing reviewed DECIMAL <code>numeric_measure</code> exceptions remain scoped;
+numeric storage or an unknown semantic label cannot disable privacy checks.</p>
+<p>Before workers or output open, the existing conservative allocation estimate
+checks all simultaneously in-flight tiles against the output-byte ceiling;
+it does not estimate the full requested dataset. Worker/Faker overhead and the
+global primary-key set consume additional memory. This is not an
+operating-system RSS cap. Output is written inside private staging with actual byte accounting
+and the existing atomic bundle publication/rollback path. Cancellation and
+ordinary failures clean workers and staging; hard process termination can still
+require checking abandoned staging before retrying in a new directory.</p>
+<h2 id="how-to-parallel-generation-measure-on-the-target-machine">Measure On The Target Machine<a class="headerlink" href="#how-to-parallel-generation-measure-on-the-target-machine" title="Permanent link">&para;</a></h2>
+<p>The repository's <code>scripts/benchmark_public_csv.py</code>,
+<code>scripts/benchmark_paired_csv.py</code> and generation benchmark helpers compare
+stages, process-tree peak-memory samples, determinism and validation on
+synthetic inputs. Earlier 100,000/750,000 × 25-field results belong to the
+pre-port implementation and environment. They are historical evidence, not
+measurements or speed promises for this 1.7.1-based branch. Re-run the selected
+benchmark against the exact checkout and dependency versions before making a
+performance decision.</p></section></section>
                     <section class='print-page md-section' id='section-3' heading-number='3'>
                         <h1>Integrations<a class='headerlink' href='#section-3' title='Permanent link'></a>
                         </h1>
@@ -4955,6 +5108,8 @@ test-data-agent doctor --json
 .print-site-enumerate-headings #how-to-transformation > h1:before { content: '2.4 ' }
 
 .print-site-enumerate-headings #how-to-dataset-capacity > h1:before { content: '2.5 ' }
+
+.print-site-enumerate-headings #how-to-parallel-generation > h1:before { content: '2.6 ' }
 
 .print-site-enumerate-headings #section-3 > h1:before { content: '3 ' }
 .print-site-enumerate-headings #how-to-mcp > h1:before { content: '3.1 ' }
