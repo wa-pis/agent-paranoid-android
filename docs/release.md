@@ -11,6 +11,23 @@ verification succeeds. Documentation revisions are separate from package source;
 historical evidence is retained unchanged; later guide corrections carry their
 own documentation revision.
 
+## 1.8.0 Stable Promotion
+
+Prepare [1.8.0](1.8.0-release-status.md) from the
+[publicly verified 1.8.0rc1 candidate](release-evidence-1.8.0rc1.md).
+Compare every hunk with signed `v1.8.0rc1`: only version/classifier metadata,
+the root lockfile version, release documentation and version-only validation
+assertions may change. Retain the accepted runtime, dependencies, build,
+packaging, security boundaries and test scenarios unchanged.
+
+The final stable source still requires fresh exact-commit gates, independent
+review, Ubuntu artifact hashes, installed-artifact acceptance, a signed manifest
+and post-publication verification. Candidate evidence retains its original
+identity and does not qualify the stable artifacts. Keep the stable documentation
+catalog and default at publicly verified 1.7.1 until stable artifact verification
+succeeds. Publication does not grant dataset approval or new transformation
+activation; the separate human-review task remains open.
+
 ## 1.8.0rc1 Profiling And Generation Candidate
 
 Candidate [1.8.0rc1](1.8.0rc1-release-status.md) packages shared profiling/privacy,

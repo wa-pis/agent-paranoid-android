@@ -8,19 +8,16 @@ explicit specification, then review the plan before generating fresh values.
 
 <a id="project-status"></a>
 
-Stable `1.7.1` is the recommended release.
+Stable `1.8.0` is the recommended release.
 Use the CLI below or the runnable
-[Python API example](https://github.com/wa-pis/agent-paranoid-android/tree/v1.7.1/examples/python_api).
+[Python API example](https://github.com/wa-pis/agent-paranoid-android/tree/v1.8.0/examples/python_api).
 
-See [publication status](1.7.1-release-status.md) before installing.
-
-For the opt-in generation and profiling candidate, see
-[1.8.0rc1 status](1.8.0rc1-release-status.md).
+See [publication status](1.8.0-release-status.md) before installing.
 
 ## Five-Minute Check
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.7.1"
+python3 -m pip install "agent-paranoid-android==1.8.0"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```

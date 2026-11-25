@@ -6,7 +6,7 @@ Deterministic synthetic test data from CSV and database metadata, without
 copying source rows. Use the CLI or Python library to profile structure, review
 a `DatasetSpec`, generate reproducible datasets, and validate the result.
 
-Stable `1.7.1` is the recommended release. See [publication status](docs/1.7.1-release-status.md) before installing.
+Stable `1.8.0` is the recommended release. See [publication status](docs/1.8.0-release-status.md) before installing.
 
 Read the [documentation](https://wa-pis.github.io/agent-paranoid-android/)
 for task guides, [offline downloads](docs/downloads.md), and
@@ -18,10 +18,6 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
-Candidate `1.8.0rc1` is published; see
-[candidate evidence](docs/release-evidence-1.8.0rc1.md). Select it explicitly:
-`python3 -m pip install "agent-paranoid-android==1.8.0rc1"`.
-
 ## Install And Try It
 
 Python 3.11 or newer is required.
@@ -29,7 +25,7 @@ Python 3.11 or newer is required.
 Install the exact stable release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.7.1"
+python3 -m pip install "agent-paranoid-android==1.8.0"
 test-data-agent demo --output out/demo
 ```
 

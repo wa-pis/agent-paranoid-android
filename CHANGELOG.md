@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.8.0] - 2026-11-25
+
+Promotes the [publicly verified 1.8.0rc1](docs/release-evidence-1.8.0rc1.md)
+with version and documentation changes only. Shared profiling/privacy, exact
+CSV distinct counting and opt-in streaming generation retain the accepted
+candidate's behavior and limits. See the
+[release status](docs/1.8.0-release-status.md) before installing.
+
 ## [1.8.0rc1] - 2026-11-25
 
 Candidate for shared profiling/privacy improvements and opt-in large CSV
