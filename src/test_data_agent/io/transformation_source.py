@@ -80,6 +80,9 @@ def _profile_transformation_source(
     reader = source_reader(source, policy, budget=budget)
     max_chars = resolve_input_limit(InputDimension.CELL_CHARS, policy.resource_limits, os.environ).value
     accumulators = {name: CSVColumnAccumulator(name, max_chars=max_chars) for name in reader.fieldnames}
+    for accumulator in accumulators.values():
+        # Native review discards distinctness; disable the CSV digest collector.
+        accumulator.distinct_count = 0
     count = 0
     for row in reader:
         count += 1
@@ -89,7 +92,8 @@ def _profile_transformation_source(
             # Only profiling sensitivity uses numeric text; matching retains native values.
             accumulator.add(None if value is None else str(value), literal_empty=value is not None)
     profile = csv_profile_to_dataset_profile(CSVProfile(table=source.name, row_count=count,
-        columns=[accumulator.to_profile(count, preserve_categories=False)
+        columns=[accumulator.to_profile(count, preserve_categories=False).model_copy(update={
+            "approx_distinct_count": None, "unique_ratio_kind": "unspecified"})
                  for accumulator in accumulators.values()]), max_chars=max_chars)
     profile.source_type = policy.input_format
     for entity in profile.entities:
