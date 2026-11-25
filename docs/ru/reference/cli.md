@@ -26,7 +26,7 @@ test-data-agent --help
 | validate | Проверка bundle по spec | Validation report |
 
 Кандидат 1.8.0rc1 добавляет `generate --stream-csv [--workers 1..4]` и
-`doctor --require-extra profiling`. Он пока не опубликован; эти опции отсутствуют
+`doctor --require-extra profiling`. Кандидат опубликован; эти опции отсутствуют
 в стабильной 1.7.1. См. [статус кандидата](../../1.8.0rc1-release-status.md) и
 [ограничения потокового CSV — English](../../how-to/parallel-generation.md).
 

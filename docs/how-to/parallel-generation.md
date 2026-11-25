@@ -19,7 +19,7 @@ Existing ordinary generation and reviewed
 An export does not switch engines merely because it is large. The new public
 streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
 The optional `profiling` extra serves large input distinct counting, not CSV
-generation. After candidate publication, install its exact version:
+generation. Install the exact candidate version:
 
 ```bash
 python -m pip install "agent-paranoid-android==1.8.0rc1"

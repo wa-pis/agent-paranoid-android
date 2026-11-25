@@ -11,14 +11,14 @@ stronger planning and recovery integrity. See the [release history](history.md).
 
 ## Now
 
-- Qualify the [1.8.0rc1 candidate](1.8.0rc1-release-status.md) while
+- Maintain the [published 1.8.0rc1 candidate](1.8.0rc1-release-status.md) while
   retaining released configurable inference, exact DECIMAL, reviewed
   transformation and scalable generation contracts. The
   [parallel/streaming CSV guide](how-to/parallel-generation.md) describes the
   explicit new options; shared profiling semantics and optional exact distinct
   counting retain source-independent privacy and bounded source access.
   Current 100,000/750,000-row CSV measurements retain their exact pre-release
-  source identity; candidate acceptance still requires fresh exact-source gates.
+  source identity; see the separate [release evidence](release-evidence-1.8.0rc1.md).
 - Follow up on the remaining external `1.6.0` evidence gaps through the
   [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):
   historical Trino application authentication settings and external profile

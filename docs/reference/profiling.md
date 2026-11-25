@@ -32,8 +32,7 @@ bind generated child values to generated parent keys.
 Candidate 1.8.0rc1 counts every non-null CSV value within the
 existing input and invocation budgets. Small profiles use private in-memory
 digest sets. Above 1,000,000 retained distinct digests it switches to bounded
-DuckDB/Arrow storage. After [candidate publication](../1.8.0rc1-release-status.md),
-install it with `pip install 'agent-paranoid-android[profiling]==1.8.0rc1'`.
+DuckDB/Arrow storage. Install the [published candidate](../1.8.0rc1-release-status.md) with `pip install 'agent-paranoid-android[profiling]==1.8.0rc1'`.
 Published 1.7.1 does not include this extra.
 Missing dependencies or native resource exhaustion fail the profile rather than
 returning a trusted partial count. Bounded raw frequency samples remain

@@ -157,8 +157,8 @@ growth:
 These are regression budgets, not a guarantee that every platform installs the
 same count. `PyArrow` is the largest optional wheel. Install `profiling` only
 when the bounded DuckDB distinct backend is needed; it is not required by
-parallel generation or streaming CSV export. After
-[candidate publication](../1.8.0rc1-release-status.md), install it with
+parallel generation or streaming CSV export. Install the
+[published candidate](../1.8.0rc1-release-status.md) with
 `pip install 'agent-paranoid-android[profiling]==1.8.0rc1'`; the published 1.7.1
 wheel does not include it. The released `parquet` extra remains available
 independently.

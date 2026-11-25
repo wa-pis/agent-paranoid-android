@@ -10,6 +10,7 @@ runtime baseline with its original [campaign evidence](acceptance-evidence-1.6.0
 
 | Version | Evidence |
 | --- | --- |
+| `1.8.0rc1` | [Profiling/opt-in generation candidate, packages and images publicly verified](release-evidence-1.8.0rc1.md) |
 | `1.7.0rc2` | [Capacity/performance candidate, publicly verified](release-evidence-1.7.0rc2.md) |
 | `1.7.0rc1` | [Feedback candidate publication](release-evidence-1.7.0rc1.md) |
 | `1.6.0` | [Stable, publicly verified](release-evidence-1.6.0.md) |

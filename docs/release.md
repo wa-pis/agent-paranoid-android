@@ -13,13 +13,14 @@ own documentation revision.
 
 ## 1.8.0rc1 Profiling And Generation Candidate
 
-Prepare [1.8.0rc1](1.8.0rc1-release-status.md) for the shared profiling/privacy,
-optional exact distinct backend, opt-in tiled/streaming CSV and validation/
-calculation changes. Stable 1.7.1 remains recommended. Require fresh exact-main
-gates, independent review, installed-artifact fictional checks, Ubuntu artifact
-hashes, signed acceptance and public verification. Prior port and benchmark
-evidence retains its original source identity. Candidate guidance belongs at
-`versions/1.8.0rc1/`; do not advance the stable catalog or default.
+Candidate [1.8.0rc1](1.8.0rc1-release-status.md) packages shared profiling/privacy,
+optional exact distinct counting, opt-in tiled/streaming CSV and validation/
+calculation changes. Its exact-source gates, installed fictional acceptance and
+public package/image verification are recorded in
+[release evidence](release-evidence-1.8.0rc1.md). Stable 1.7.1 remains recommended.
+Prior port and benchmark evidence keeps its original source identity. Candidate
+guidance belongs at `versions/1.8.0rc1/`; do not advance the stable catalog or
+default. Any future stable promotion requires its own authorization and gates.
 
 ## 1.7.1 Corrective Release
 
