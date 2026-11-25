@@ -211,6 +211,62 @@ def test_remaining_generation_deadline_is_not_reset():
         budget.remaining_seconds()
 
 
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("budget_kind", ["invocation", "transformation"])
+def test_expired_request_after_policy_checks_refuses_capture_before_spawn(
+    tmp_path, monkeypatch, adapter, budget_kind,
+):
+    from test_data_agent.io import transformation_query_workflow as workflow
+    from test_data_agent.mcp_transformation_candidate import _McpTransformationBudget
+    from test_data_agent.trino_work_budget import (
+        InvocationGenerationBudget, QueryWorkBudget, QueryWorkBudgetExceeded,
+        QueryWorkDimension,
+    )
+    from tests.test_trino_work_budget import work_limits
+
+    profile, bindings, captures = fixture(tmp_path, adapter)
+    now = [0.0]
+    request = QueryWorkBudget(
+        work_limits(max_invocation_seconds=1.0), monotonic_clock=lambda: now[0],
+    )
+    budget_type = (InvocationGenerationBudget if budget_kind == "invocation"
+                   else _McpTransformationBudget)
+    budget = budget_type(request)
+    parsed = []
+    load_policy = workflow.load_behavior_policy_yaml
+
+    def expire_after_last_policy(*args, **kwargs):
+        policy = load_policy(*args, **kwargs)
+        parsed.append(policy)
+        if len(parsed) == len(profile.inputs):
+            now[0] = 1.0
+        return policy
+
+    calls = []
+
+    def capture(binding, *, max_seconds):
+        calls.append(binding)
+        return captures[binding.request.entity_name]
+
+    capture_module = ("transformation_postgres_capture._capture_configured_postgres"
+                      if adapter is SqlQueryAdapter.POSTGRES
+                      else "transformation_trino_stream._capture_configured_trino")
+    monkeypatch.setattr(workflow, "load_behavior_policy_yaml", expire_after_last_policy)
+    monkeypatch.setattr(f"test_data_agent.io.{capture_module}", capture)
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        with _temporary_query_batch_profile(
+            tmp_path, profile, queries=bindings, max_total_bytes=65536,
+            max_review_bytes=32768, budget=budget,
+        ):
+            pytest.fail("expired request must not materialize a capture workspace")
+
+    assert error.value.dimension is QueryWorkDimension.INVOCATION_SECONDS
+    assert len(parsed) == len(profile.inputs)
+    GenerationBudget.check(budget, "still-live generation deadline")
+    assert calls == []
+    assert not list(tmp_path.glob("*.query"))
+
+
 @pytest.mark.parametrize("fault", [None, "source", "traversal", "symlink", "missing"])
 def test_configured_query_references_use_owned_files_and_environment(tmp_path, monkeypatch, fault):
     from test_data_agent.io.transformation_query_workflow import (

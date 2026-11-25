@@ -92,6 +92,7 @@ class GenerationBudget:
 
     def remaining_seconds(self) -> float:
         """Remaining time in this invocation; child work must not reset it."""
+        self.check("native work configuration")
         remaining = self.max_seconds - (self._clock() - self._started_at)
         if remaining <= 0:
             raise GenerationLimitError(

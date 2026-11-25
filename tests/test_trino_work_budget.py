@@ -182,6 +182,28 @@ def test_invocation_deadline_uses_injected_monotonic_clock() -> None:
     assert error.value.limit == 5.0
 
 
+@pytest.mark.parametrize("budget_kind", ["invocation", "transformation"])
+def test_remaining_generation_time_keeps_captured_request_deadline(budget_kind: str) -> None:
+    from test_data_agent.core.limits import GenerationBudget
+    from test_data_agent.mcp_transformation_candidate import _McpTransformationBudget
+    from test_data_agent.trino_work_budget import InvocationGenerationBudget
+
+    now = [0.0]
+    request = QueryWorkBudget(
+        work_limits(max_invocation_seconds=1.0), monotonic_clock=lambda: now[0],
+    )
+    budget_type = (InvocationGenerationBudget if budget_kind == "invocation"
+                   else _McpTransformationBudget)
+    budget = budget_type(request)
+    assert budget.remaining_seconds() > 0
+
+    now[0] = 1.0
+    GenerationBudget.check(budget, "still-live generation deadline")
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        budget.remaining_seconds()
+    assert error.value.dimension is QueryWorkDimension.INVOCATION_SECONDS
+
+
 def test_limits_reserve_transport_overflow_error() -> None:
     with pytest.raises(ValueError, match="transport_response_bytes must be at least"):
         work_limits(transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES - 1)
