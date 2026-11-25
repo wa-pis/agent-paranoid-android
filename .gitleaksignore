@@ -5,3 +5,8 @@
 0a4f451a9292ff24f0cd628448bec16cea659185:.gitleaksignore:generic-api-key:1
 # Authentication method names in acceptance prose; no credential.
 ac7f76f9a435c3c5f637b3940ee0ff782b1eddc8:openspec/changes/selective-source-transformation/progress.md:generic-api-key:38
+# Verified source-file SHA-256 fingerprints in immutable port manifests.
+47543ce3e1703a351ea653ba221e3bcb1103c8ca:openspec/changes/port-local-improvements-1-7-1/runtime-policy.json:generic-api-key:163
+b9703784ee5c30a2e6964045a000b1fe2ca47a39:openspec/changes/port-local-improvements-1-7-1/final-runtime-policy.json:generic-api-key:162
+# Fixed fictional detector input; no credential or external-service consumer.
+47543ce3e1703a351ea653ba221e3bcb1103c8ca:tests/test_privacy_detector_equivalence.py:generic-api-key:136
