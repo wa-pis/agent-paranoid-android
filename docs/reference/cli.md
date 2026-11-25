@@ -51,9 +51,10 @@ forecasts file/database bytes and optionally local generation time. The same
 guide describes opt-in `scalable-v1` policy settings. These additions are
 unreleased and absent from published `1.7.0rc1`.
 
-The current development checkout additionally provides explicit
+Candidate 1.8.0rc1 additionally provides explicit
 `generate --stream-csv [--workers 1..4]` and `doctor --require-extra profiling`.
-These new options are absent from published 1.7.1; see
+These new options are absent from published 1.7.1; check
+[candidate publication status](../1.8.0rc1-release-status.md) and see
 [Parallel Generation And Streaming CSV](../how-to/parallel-generation.md) for
 eligibility, fallback, limits and the separate deterministic `tiled-v1` stream.
 
