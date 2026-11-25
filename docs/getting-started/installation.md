@@ -24,8 +24,8 @@ regenerating existing fixtures.
 
 The stable release is `1.7.1`. Check [publication status](../1.7.1-release-status.md) before installing.
 
-To test the prospective candidate after
-[publication](../1.8.0rc1-release-status.md), select it explicitly:
+To test the [published candidate](../1.8.0rc1-release-status.md),
+select it explicitly:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.8.0rc1"

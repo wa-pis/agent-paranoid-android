@@ -154,3 +154,18 @@ selected cases, including those seven. No live source or dataset approval was
 used. Exact-source review and replacement Ubuntu-artifact acceptance remain
 required before any tag or publication; historical evidence keeps its original
 identity.
+
+## Replacement candidate qualification — 2026-11-25
+
+Replacement candidate `1.8.0rc1` qualified at exact source
+`48538d05ec4d9ab6af3ffa951262703bae66f161`. Fresh exact-source gates,
+independent technical AI review and installed Ubuntu-artifact acceptance are
+recorded in the [published release evidence](../../../docs/release-evidence-1.8.0rc1.md).
+Publication and [artifacts-scope public verification](https://github.com/wa-pis/agent-paranoid-android/actions/runs/45589440125)
+completed with all 13 jobs passing. This closes the replacement qualification
+requirement above; the diagnostic and historical evidence retains its recorded
+source identity and measurements. Candidate `204a3240` and its artifacts remain
+unreleasable. The documentation revision and full-scope public verification
+are tracked separately; artifacts-only verification does not establish live
+guide acceptance. The separate human-review task stays open. Publication grants
+no dataset approval or new transformation activation.

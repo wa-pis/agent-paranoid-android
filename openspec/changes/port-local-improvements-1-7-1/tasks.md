@@ -31,8 +31,9 @@ Current evidence: [CI follow-up](ci-followup.md),
   both captured budget subclasses and PostgreSQL/Trino pre-spawn refusals.
 - [x] Remove unused unbounded distinct-digest retention from native
   transformation profiling; retain unknown distinctness and privacy evidence.
-- [ ] Qualify the replacement candidate with fresh exact-source release gates,
-  review and installed Ubuntu-artifact acceptance before tagging/publication.
+- [x] Qualify the replacement candidate with fresh exact-source release gates,
+  review and installed Ubuntu-artifact acceptance before tagging/publication;
+  see [1.8.0rc1 release evidence](../../../docs/release-evidence-1.8.0rc1.md).
 
 The `204a3240` candidate is not releasable. See the release follow-up in
 [verification](verification.md#release-candidate-safety-follow-up).

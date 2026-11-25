@@ -98,7 +98,7 @@ entry threshold across columns, not a row limit; the input is not reread.
 The former CSV distinct-count censor no longer stops counting at 10,000 values.
 
 DuckDB and Arrow are an optional `profiling` extra in the 1.8.0rc1 candidate.
-After [candidate publication](../1.8.0rc1-release-status.md), install it with:
+Install the [published candidate](../1.8.0rc1-release-status.md) with:
 
 ```bash
 python -m pip install "agent-paranoid-android[profiling]==1.8.0rc1"
