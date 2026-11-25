@@ -7,6 +7,20 @@
 
 Перед установкой проверьте [статус выпуска](../../1.7.1-release-status.md).
 
+Кандидат **1.8.0rc1** пока не опубликован; стабильная рекомендация остаётся
+1.7.1. После [публикации кандидата](../../1.8.0rc1-release-status.md) его нужно
+выбрать явно:
+
+```bash
+python -m pip install "agent-paranoid-android==1.8.0rc1"
+python -m pip install "agent-paranoid-android[profiling]==1.8.0rc1"
+```
+
+Для `generate --stream-csv [--workers 1..4]` достаточно base. Дополнение
+`profiling` нужно для точного подсчёта distinct в больших входных CSV через
+DuckDB/Arrow, а не для генерации. Ограничения, fallback и отдельный seed stream
+описаны в [руководстве по потоковому CSV — English](../../how-to/parallel-generation.md).
+
 ## Установка из PyPI
 
 На macOS/Linux откройте терминал в выбранной рабочей папке и выполните по очереди:

@@ -32,7 +32,7 @@ virtual schema, and safe aggregates, and never retain SQL text, literals,
 backend messages, endpoints, or query rows. Database wildcard selectors must
 first resolve to a deterministic explicit-column snapshot.
 
-The development port onto the 1.7.1 baseline uses query-source policy `1.2`.
+The 1.8.0rc1 candidate uses query-source policy `1.2`.
 Sensitivity follows projected source-column names through aliases, so renaming
 a protected column cannot authorize exact categories or temporal bounds. The
 existing query language, grouped-aggregate restrictions, batched summaries,
@@ -97,14 +97,14 @@ and the remaining iterator to a streaming DuckDB/Arrow backend. This is an
 entry threshold across columns, not a row limit; the input is not reread.
 The former CSV distinct-count censor no longer stops counting at 10,000 values.
 
-DuckDB and Arrow are an optional `profiling` extra in this unreleased checkout:
+DuckDB and Arrow are an optional `profiling` extra in the 1.8.0rc1 candidate.
+After [candidate publication](../1.8.0rc1-release-status.md), install it with:
 
 ```bash
-python -m pip install -e ".[profiling]"
+python -m pip install "agent-paranoid-android[profiling]==1.8.0rc1"
 ```
 
-The published 1.7.1 package does not contain this development extra; install
-the checkout as shown above. Small CSV
+The published 1.7.1 package does not contain this extra. Small CSV
 profiles need neither dependency. Crossing the threshold without them fails
 with installation guidance instead of returning a truncated trusted count.
 

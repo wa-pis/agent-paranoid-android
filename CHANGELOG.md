@@ -4,13 +4,18 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.8.0rc1] - 2026-11-25
+
+Candidate for shared profiling/privacy improvements and opt-in large CSV
+generation. Stable 1.7.1 remains the recommended release.
+
 ### Added
 
 - Add explicit `generate --stream-csv [--workers 1..4]` and Python `tiled-v1`
   generation for eligible synthetic CSV exports, alongside the released
-  execution-policy engines. See the [development guide](docs/how-to/parallel-generation.md)
+  execution-policy engines. See the [candidate guide](docs/how-to/parallel-generation.md)
   for fallback, limits and the separate seeded stream.
-- Add an optional checkout `profiling` extra for streaming DuckDB/Arrow distinct
+- Add an optional `profiling` extra for streaming DuckDB/Arrow distinct
   counting when CSV digest sets exceed 1,000,000 entries. Small profiles retain
   Python sets; CSV counts no longer stop at the former distinct-value censor.
 
@@ -20,8 +25,10 @@ All notable changes to this project are documented here.
   context. Weak SSN/card/token evidence stays sensitive while leaving semantics
   unknown without supporting context; row order does not affect inference.
 - Advance folder caches to format 12 and authorized SQL query-source policy to
-  1.2. Reprofile affected artifacts before review; query language and database
-  access/work budgets are unchanged.
+  1.2; query language and database access/work budgets are unchanged.
+- Reuse normalized values and completed validation checks during eligible CSV
+  export, preserving all safety gates, typed CSV/DECIMAL encoding and atomic
+  publication.
 
 ### Fixed
 
@@ -29,9 +36,6 @@ All notable changes to this project are documented here.
   inputs, while rejecting non-finite values and preserving privacy checks.
 - Compute CSV integer quantiles without premature FLOAT rounding and preserve
   constant endpoints, preventing fabricated sensitive numeric summaries.
-- Reuse normalized values and completed validation checks during eligible CSV
-  export, preserving all safety gates, typed CSV/DECIMAL encoding and atomic
-  publication.
 - Preserve exact integer comparisons and aggregate results beyond FLOAT
   precision, and order native formulas, aggregates and repairs by their shared
   dependencies. Cycles fail before publication.
@@ -43,6 +47,13 @@ All notable changes to this project are documented here.
 - Apply sensitive numeric-summary and categorical-content guards across source
   variants. Keep alias provenance sensitive, strict source limits, bounded
   private distinct scratch and reviewed `numeric_measure`/transformation scopes.
+
+### Migration
+
+- Reprofile saved source artifacts and review the resulting specification;
+  older folder caches are recomputed and existing approved plans are not
+  silently rewritten. Install the optional `profiling` extra when exact CSV
+  distinct counting exceeds the in-memory threshold.
 
 ## [1.7.1]
 

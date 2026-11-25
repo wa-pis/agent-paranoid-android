@@ -14,6 +14,9 @@ Use the CLI below or the runnable
 
 See [publication status](1.7.1-release-status.md) before installing.
 
+For the opt-in generation and profiling candidate, see
+[1.8.0rc1 status](1.8.0rc1-release-status.md).
+
 ## Five-Minute Check
 
 ```bash
