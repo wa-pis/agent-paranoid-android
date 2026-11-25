@@ -13,20 +13,20 @@ own documentation revision.
 
 ## 1.8.0 Stable Promotion
 
-Prepare [1.8.0](1.8.0-release-status.md) from the
+Stable [1.8.0](1.8.0-release-status.md) promotes the runtime of the
 [publicly verified 1.8.0rc1 candidate](release-evidence-1.8.0rc1.md).
 Compare every hunk with signed `v1.8.0rc1`: only version/classifier metadata,
 the root lockfile version, release documentation and version-only validation
 assertions may change. Retain the accepted runtime, dependencies, build,
 packaging, security boundaries and test scenarios unchanged.
 
-The final stable source still requires fresh exact-commit gates, independent
-review, Ubuntu artifact hashes, installed-artifact acceptance, a signed manifest
-and post-publication verification. Candidate evidence retains its original
-identity and does not qualify the stable artifacts. Keep the stable documentation
-catalog and default at publicly verified 1.7.1 until stable artifact verification
-succeeds. Publication does not grant dataset approval or new transformation
-activation; the separate human-review task remains open.
+The exact stable-source gates, independent reviews, Ubuntu artifact hashes,
+installed-artifact acceptance, signed manifest and public verification are
+recorded in [stable release evidence](release-evidence-1.8.0.md). Candidate
+evidence retains its original identity and does not qualify the stable artifacts.
+The documentation revision and full-scope verification are tracked separately.
+Publication does not grant dataset approval or new transformation activation;
+the separate human-review task remains open.
 
 ## 1.8.0rc1 Profiling And Generation Candidate
 
@@ -34,10 +34,11 @@ Candidate [1.8.0rc1](1.8.0rc1-release-status.md) packages shared profiling/priva
 optional exact distinct counting, opt-in tiled/streaming CSV and validation/
 calculation changes. Its exact-source gates, installed fictional acceptance and
 public package/image verification are recorded in
-[release evidence](release-evidence-1.8.0rc1.md). Stable 1.7.1 remains recommended.
-Prior port and benchmark evidence keeps its original source identity. Candidate
-guidance belongs at `versions/1.8.0rc1/`; do not advance the stable catalog or
-default. Any future stable promotion requires its own authorization and gates.
+[release evidence](release-evidence-1.8.0rc1.md). At that candidate checkpoint,
+stable 1.7.1 remained recommended. Prior port and benchmark evidence keeps its
+original source identity. Candidate guidance belongs at `versions/1.8.0rc1/`;
+its publication did not advance the stable catalog or default. Stable promotion
+requires the separate authorization and gates described above.
 
 ## 1.7.1 Corrective Release
 

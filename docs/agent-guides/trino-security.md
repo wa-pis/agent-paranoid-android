@@ -93,7 +93,7 @@ malformed or unsupported declared shapes fail closed rather than rounding.
 
 ## Enforcement
 
-SQL source policy 1.2 in the 1.8.0rc1 candidate retains 1.1's aliased
+SQL source policy 1.2 in stable 1.8.0 retains 1.1's aliased
 SUM/COUNT/MIN/MAX/AVG projections and
 optional GROUP BY on explicit authorized source columns of one physical table.
 COUNT(*) is a row count, never a projection wildcard. Non-aggregate projections

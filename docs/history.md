@@ -9,11 +9,12 @@ activate extensions or authorize a dataset.
 
 ## Releases And Migration
 
+- [Stable 1.8.0 publication evidence](release-evidence-1.8.0.md)
 - [1.8.0rc1 profiling/generation candidate evidence](release-evidence-1.8.0rc1.md)
 - [1.7.0rc2 capacity/performance candidate evidence](release-evidence-1.7.0rc2.md)
 - [1.7.0rc1 feedback candidate evidence](release-evidence-1.7.0rc1.md)
 - [Installed original-feedback replay and dispositions](feedback-acceptance-1.7.0rc1.md)
-- [Current stable release status](1.7.1-release-status.md)
+- [Current stable release status](1.8.0-release-status.md)
 - [Stable 1.7.1 publication evidence](release-evidence-1.7.1.md)
 - [Stable 1.7.0 publication evidence](release-evidence-1.7.0.md)
 - [Stable 1.6.0 publication evidence](release-evidence-1.6.0.md)

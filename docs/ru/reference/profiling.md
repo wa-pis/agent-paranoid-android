@@ -6,7 +6,7 @@
 
 - Local-category opt-in допускает проверенный string enum до 20 значений длиной до 64 символов после content checks.
 - Повторяющиеся low-cardinality string IDs могут остаться категориями с синтетическими labels. Для identifier field bounded distinct count может задать размер синтетического key pool; исходные ключи и частоты не сохраняются.
-- В кандидате 1.8.0rc1 CSV distinct count остаётся точным в пределах входных бюджетов. До 1 000 000 суммарных distinct digest entries на файл используются Python sets, затем — ограниченный DuckDB/Arrow backend. Приватные digests и временное хранилище не попадают в профиль; ошибка бюджета или отсутствующий extra прерывают профилирование вместо возврата доверенного частичного count.
+- В стабильной 1.8.0 CSV distinct count остаётся точным в пределах входных бюджетов. До 1 000 000 суммарных distinct digest entries на файл используются Python sets, затем — ограниченный DuckDB/Arrow backend. Приватные digests и временное хранилище не попадают в профиль; ошибка бюджета или отсутствующий extra прерывают профилирование вместо возврата доверенного частичного count.
 - String identifiers начинаются с synthetic_ и ASCII integer; это может менять seeded bytes относительно старого генератора без изменения schema_version.
 
 ## Свидетельства для пула идентификаторов
@@ -22,9 +22,9 @@
 
 ## Числовые свидетельства после исправлений main
 
-Кандидат 1.8.0rc1 [опубликован](../../1.8.0rc1-release-status.md).
+Стабильная 1.8.0 [опубликована](../../1.8.0-release-status.md).
 При необходимости установите
-`python -m pip install 'agent-paranoid-android[profiling]==1.8.0rc1'`.
+`python -m pip install 'agent-paranoid-android[profiling]==1.8.0'`.
 Стабильная 1.7.1 не содержит дополнения `profiling`; небольшим CSV оно не нужно.
 Семантика выводится по всему столбцу независимо от порядка строк. Слабые
 признаки SSN/карт/секретов сохраняют sensitive без назначения семантики при
@@ -32,7 +32,7 @@
 
 Negative decimal с ненулевой дробной частью не получает phone semantics только из-за пунктуации. Positive phone-shaped decimal и integral decimal/exponent identifiers остаются потенциально чувствительными независимо от amount-like имени. Sensitive names и secrets сохраняют veto; sensitive profile не содержит ranges и исходных categories. Local-category не является declassification.
 
-NaN, infinity и overflowing exponent text не являются конечной числовой статистикой. Столбец с ними не выводится как полное numeric distribution. В 1.8.0rc1 folder cache format 12 пересчитывает старые profiles. Standalone profile нужно получить заново и проверить новый spec; существующий approved plan не переписывается автоматически.
+NaN, infinity и overflowing exponent text не являются конечной числовой статистикой. Столбец с ними не выводится как полное numeric distribution. В 1.8.0 folder cache format 12 пересчитывает старые profiles. Standalone profile нужно получить заново и проверить новый spec; существующий approved plan не переписывается автоматически.
 
 Это поддерживаемое описание текущего main после 1.6.0, а не утверждение, что старый PyPI wheel получил исправления. Версию пакета и documentation revision рассматривайте отдельно.
 

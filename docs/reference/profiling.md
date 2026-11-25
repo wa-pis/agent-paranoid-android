@@ -29,10 +29,10 @@ or source row mappings. Smaller output counts and nulls can leave pool members
 unused. Independent identifier domains remain separate; reviewed foreign keys
 bind generated child values to generated parent keys.
 
-Candidate 1.8.0rc1 counts every non-null CSV value within the
+Stable 1.8.0 counts every non-null CSV value within the
 existing input and invocation budgets. Small profiles use private in-memory
 digest sets. Above 1,000,000 retained distinct digests it switches to bounded
-DuckDB/Arrow storage. Install the [published candidate](../1.8.0rc1-release-status.md) with `pip install 'agent-paranoid-android[profiling]==1.8.0rc1'`.
+DuckDB/Arrow storage. Install the [stable release](../1.8.0-release-status.md) with `pip install 'agent-paranoid-android[profiling]==1.8.0'`.
 Published 1.7.1 does not include this extra.
 Missing dependencies or native resource exhaustion fail the profile rather than
 returning a trusted partial count. Bounded raw frequency samples remain
@@ -47,7 +47,7 @@ columns require review; local category permission is not declassification.
 
 NaN, infinity and overflowing exponent text are not finite numeric evidence.
 A column containing them is not inferred as a complete numeric distribution.
-Candidate 1.8.0rc1 uses folder cache format 12 and recomputes older cached
+Stable 1.8.0 uses folder cache format 12 and recomputes older cached
 profiles. Reprofile saved standalone
 artifacts and review the new specification rather than trusting old nonfinite
 extrema; existing approved plans are not silently rewritten.
