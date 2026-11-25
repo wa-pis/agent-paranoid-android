@@ -2,9 +2,7 @@
   {
     "version": "1.8.0rc1",
     "title": "1.8.0rc1 (release candidate)",
-    "aliases": [
-      "next"
-    ]
+    "aliases": []
   },
   {
     "version": "1.7.1",
