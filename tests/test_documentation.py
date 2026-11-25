@@ -135,8 +135,9 @@ def test_readme_is_a_focused_entrypoint() -> None:
         if evidence.is_file():
             assert f"Candidate `{PROJECT_VERSION}` is published" in readme
         else:
-            assert f"Prospective candidate `{PROJECT_VERSION}`" in readme
-            assert "not yet published" in readme
+            assert f"docs/{PROJECT_VERSION}-release-status.md" in readme
+            # Wheel metadata keeps this README after publication.
+            assert "not yet published" not in readme
     else:
         assert "Preview `" not in readme
         assert "--pre" not in readme

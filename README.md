@@ -18,8 +18,8 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 [Русская документация](docs/ru/index.md)
 
-Prospective candidate `1.8.0rc1` is not yet published. See
-[candidate status](docs/1.8.0rc1-release-status.md). After publication:
+Check [candidate publication status](docs/1.8.0rc1-release-status.md) before
+installing `1.8.0rc1`. If available, select the exact candidate:
 `python3 -m pip install "agent-paranoid-android==1.8.0rc1"`.
 
 ## Install And Try It
