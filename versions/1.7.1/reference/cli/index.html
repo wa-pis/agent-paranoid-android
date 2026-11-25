@@ -83,6 +83,8 @@
   
   <li class="toctree-l1"><a class="reference internal" href="../../how-to/dataset-capacity/">Forecast And Scale Datasets</a></li>
   
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/parallel-generation/">Parallel And Streaming CSV</a></li>
+  
 </ul>
 
   
@@ -208,7 +210,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.7.1
   <br>Package source 8aa5d40af2a9f5f15e6572fd2abafdd805df8c9e
-  <br>Documentation 49d12c515c3aa7d012b038c5d1c96b50195fbcc1
+  <br>Documentation ad022a208022665d9613f795b6ec6f5399aa30ba
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -301,6 +303,11 @@ points, then exits successfully.</p>
 forecasts file/database bytes and optionally local generation time. The same
 guide describes opt-in <code>scalable-v1</code> policy settings. These additions are
 unreleased and absent from published <code>1.7.0rc1</code>.</p>
+<p>The current development checkout additionally provides explicit
+<code>generate --stream-csv [--workers 1..4]</code> and <code>doctor --require-extra profiling</code>.
+These new options are absent from published 1.7.1; see
+<a href="../../how-to/parallel-generation/">Parallel Generation And Streaming CSV</a> for
+eligibility, fallback, limits and the separate deterministic <code>tiled-v1</code> stream.</p>
 <h2 id="selective-transformation-review-and-policy-decisions">Selective Transformation (Review And Policy Decisions)<a class="headerlink" href="#selective-transformation-review-and-policy-decisions" title="Permanent link">&para;</a></h2>
 <p><code>transform-review SOURCE POLICY.yaml</code> reads a fixed local source snapshot and
 the policy's referenced local mapping files, then prints value-free field
