@@ -168,9 +168,11 @@ schema/privacy/native/business/scenario reconciliation at generation and writer
 boundaries, regardless of optional reporting settings. Omitted declarations
 serialize as absent. See the relational synthesis contract for conflicts/limits.
 
-## 1.8.0rc1 candidate generation and CSV optimizations
+<a id="180rc1-candidate-generation-and-csv-optimizations"></a>
 
-The 1.8.0rc1 candidate adds an explicit `tiled-v1` process API and
+## 1.8.0 generation and CSV optimizations
+
+Stable 1.8.0 provides an explicit `tiled-v1` process API and
 `generate --stream-csv [--workers 1..4]`. These coexist with ordinary generation
 and the released `scalable-v1`/`scalable-relational-v1` execution policies; no
 engine is selected automatically by row count. See

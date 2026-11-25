@@ -1,7 +1,7 @@
 # Parallel Generation And Streaming CSV
 
-This page describes **1.8.0rc1 candidate features**; check
-[publication status](../1.8.0rc1-release-status.md) before installing.
+This page describes **stable 1.8.0 features**; check
+[publication status](../1.8.0-release-status.md) before installing.
 Published 1.7.1 does not include `--stream-csv` or the `tiled-v1` Python API.
 Existing ordinary generation and reviewed
 `scalable-v1`/`scalable-relational-v1` policies remain available; see
@@ -19,10 +19,10 @@ Existing ordinary generation and reviewed
 An export does not switch engines merely because it is large. The new public
 streaming writer uses Python's CSV encoder and needs neither Arrow nor DuckDB.
 The optional `profiling` extra serves large input distinct counting, not CSV
-generation. Install the exact candidate version:
+generation. Install the exact stable version:
 
 ```bash
-python -m pip install "agent-paranoid-android==1.8.0rc1"
+python -m pip install "agent-paranoid-android==1.8.0"
 ```
 
 ## Export A Reviewed Spec

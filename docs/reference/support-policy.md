@@ -38,6 +38,7 @@ the capabilities they need.
 | Extra | Supported capability | Release gate |
 | --- | --- | --- |
 | `parquet` | Parquet import and export | isolated wheel install, `doctor --require-extra parquet`, Parquet tests |
+| `profiling` | Exact CSV distinct tracking with the bounded DuckDB/Arrow backend | isolated wheel install, `doctor --require-extra profiling`, exact-distinct spill and private-cleanup regressions |
 | `mcp` | Generator MCP transport | isolated wheel install, `doctor --require-extra mcp`, MCP contract tests |
 | `trino` | Read-only Trino client and safe SQL parsing | isolated wheel install, `doctor --require-extra trino`, mocked and live opt-in Trino tests |
 | `postgres` | Read-only allowlisted PostgreSQL profiling driver; deterministic PostgreSQL SQL export remains in base | isolated wheel install, `doctor --require-extra postgres`, fake-driver tests, and opt-in disposable execution example |

@@ -46,15 +46,15 @@ Use these focused references for task detail:
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate generated data against a `DatasetSpec` | Validation report |
 
-Development-only addition: [`estimate-capacity`](../how-to/dataset-capacity.md)
+Stable 1.8.0 includes [`estimate-capacity`](../how-to/dataset-capacity.md), which
 forecasts file/database bytes and optionally local generation time. The same
-guide describes opt-in `scalable-v1` policy settings. These additions are
-unreleased and absent from published `1.7.0rc1`.
+guide describes opt-in `scalable-v1` policy settings and their existing bounds
+and calibration limits.
 
-Candidate 1.8.0rc1 additionally provides explicit
+Stable 1.8.0 additionally provides explicit
 `generate --stream-csv [--workers 1..4]` and `doctor --require-extra profiling`.
 These new options are absent from published 1.7.1; check
-[candidate publication status](../1.8.0rc1-release-status.md) and see
+[release status](../1.8.0-release-status.md) and see
 [Parallel Generation And Streaming CSV](../how-to/parallel-generation.md) for
 eligibility, fallback, limits and the separate deterministic `tiled-v1` stream.
 

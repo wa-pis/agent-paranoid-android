@@ -41,13 +41,13 @@ it does not replace the reviewed lock or minimum profiles.
 | --- | --- | --- |
 | `base-minimum` | 3.11 | Faker 25.0.0; Pydantic 2.7.0; PyYAML 6.0.0 |
 | `parquet-minimum` | 3.11 | Base minimum; PyArrow 15.0.0 |
-| `profiling-minimum` (1.8.0rc1 candidate) | 3.11 | Base minimum; PyArrow 15.0.0; DuckDB 2.0.1 |
+| `profiling-minimum` (stable 1.8.0) | 3.11 | Base minimum; PyArrow 15.0.0; DuckDB 2.0.1 |
 | `mcp-minimum` | 3.11 | Faker 25.0.0; Pydantic 2.11.0; PyYAML 6.0.0; MCP 1.28.1 |
 | `trino-minimum` | 3.11 | Base minimum; sqlglot 30.0.0; Trino 0.330.0 |
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
 | `gigachat-minimum` | 3.11 | Base minimum; GigaChat 0.2.3 |
 | `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0; sqlglot 30.0.0 |
-| `latest-all` | 3.11–3.15 | Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; DuckDB 2.0.1 (1.8.0rc1 candidate profiling extension); MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4 |
+| `latest-all` | 3.11–3.15 | Faker 40.35.0; Pydantic 2.14.3; PyYAML 6.0.3; PyArrow 26.0.1; DuckDB 2.0.1 (stable 1.8.0 profiling extension); MCP 2.2.0; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.4; Psycopg 3.3.4 |
 
 MCP 1.28.1 requires Pydantic 2.11.0, so its minimum profile cannot reuse the
 base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
@@ -64,7 +64,7 @@ The minimum profiles run focused contracts instead of the full locked suite:
 | --- | --- | --- |
 | `base-minimum` | Deterministic generation and validation; Pydantic JSON and PyYAML parsing | `tests/test_io_workflows.py`, `tests/test_business_rules.py` |
 | `parquet-minimum` | Parquet serialization and loading | `tests/test_io_commands.py` |
-| `profiling-minimum` (1.8.0rc1 candidate) | Bounded exact distinct tracking and private temporary files | `tests/test_duckdb_profiling.py`, `tests/test_duckdb_distinct_security.py` |
+| `profiling-minimum` (stable 1.8.0) | Bounded exact distinct tracking and private temporary files | `tests/test_duckdb_profiling.py`, `tests/test_duckdb_distinct_security.py` |
 | `mcp-minimum` | Generator and Trino MCP transport schemas and real bounded stdio | `tests/test_mcp_generator_transport.py`, `tests/test_mcp_trino_transport.py`, `tests/test_mcp_sdk_roundtrip.py` |
 | `trino-minimum` | SQL policy and Trino client construction | `tests/test_mcp_trino_server.py` |
 | `openai-minimum` | Provider request, response, and error contracts | `tests/test_openai_provider.py` |
@@ -131,7 +131,7 @@ hashed dependency evidence in a generated manifest.
 | MCP | Accept `<3.0.0` | MCP 2.2.0 transport contracts cover byte budgets, redaction and request context; MCP 1.28.1 remains the minimum. |
 | OpenAI | Accept `<4.0.0` | OpenAI 3.18.0 evaluated with offline real-SDK HTTP transport, provider privacy contracts and doctor checks; 2.46.0 minimum retained. |
 | GigaChat | Accept `<0.2.5` | The adapter retains the 0.2.3 minimum and checks the 0.2.4 `chat.create` contract with offline SDK transport; earlier 0.2.x releases use an incompatible call shape. |
-| DuckDB | Accept `>=2.0.1,<3.0.0` for the 1.8.0rc1 candidate `profiling` extra | Exact-count equivalence, private temporary files, deadlines and missing-extra checks cover the native handoff. |
+| DuckDB | Accept `>=2.0.1,<3.0.0` for the stable 1.8.0 `profiling` extra | Exact-count equivalence, private temporary files, deadlines and missing-extra checks cover the native handoff. |
 | Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg | Add no upper bound | The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible. |
 
 A newly discovered incompatibility must first be reproduced by a focused
@@ -147,7 +147,7 @@ growth:
 | --- | --- | ---: |
 | base | CSV and JSON | 10 |
 | `parquet` | Parquet files | 11 |
-| `profiling` (1.8.0rc1 candidate) | Exact CSV distinct tracking with DuckDB and Arrow | 12 |
+| `profiling` (stable 1.8.0) | Exact CSV distinct tracking with DuckDB and Arrow | 12 |
 | `mcp` | Generator MCP server | 35 |
 | `openai` | Optional structured-output advisor | 20 |
 | `gigachat` | Experimental GigaChat advisor | 20 |
@@ -158,8 +158,8 @@ These are regression budgets, not a guarantee that every platform installs the
 same count. `PyArrow` is the largest optional wheel. Install `profiling` only
 when the bounded DuckDB distinct backend is needed; it is not required by
 parallel generation or streaming CSV export. Install the
-[published candidate](../1.8.0rc1-release-status.md) with
-`pip install 'agent-paranoid-android[profiling]==1.8.0rc1'`; the published 1.7.1
+[stable release](../1.8.0-release-status.md) with
+`pip install 'agent-paranoid-android[profiling]==1.8.0'`; the published 1.7.1
 wheel does not include it. The released `parquet` extra remains available
 independently.
 
