@@ -226,7 +226,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -283,7 +283,7 @@
 <tr>
 <td>Неизвестный тип/поле правила</td>
 <td>Опечатка или неподдерживаемая конструкция</td>
-<td>Сопоставьте правило с spec и <a href="./">справочником правил</a>.</td>
+<td>Сопоставьте правило с spec и <a href="../../../how-to/business-rules/">руководством по правилам — English</a>.</td>
 </tr>
 <tr>
 <td>Превышен work budget</td>
@@ -293,6 +293,7 @@
 </tbody>
 </table>
 <h2 id="160">Переносимость и смысл правил в 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h2>
+<p>Эти контракты сохраняются в стабильной 1.8.0.</p>
 <p><code>DatasetSpec.business_rules</code> переносит правила между Python, CLI, MCP, agent workspace и всеми форматами. <code>infer-spec --business-rules</code> сохраняет их в spec; generate, validate и export-postgres-sql также принимают отдельный --business-rules. Повторная валидация проверяет данные и не присваивает значения заново.</p>
 <p>У формул <code>mode: assign</code> по умолчанию задаёт результат; <code>mode: check</code> только проверяет. Отчёт содержит application и assigned_row_count: зелёный результат после присваивания не доказывает независимую верность бизнес-гипотезы. Поддерживаются явные equals: null / not_equals: null и числовые включительные gte/lte. DECIMAL-формулы и aggregate mappings используют точную арифметику с однократным HALF_UP округлением в scale целевого поля. Подробности: <a href="../../../rc4-external-feedback/">контракт правил 1.6</a>.</p>
 <h2 id="_7">Категории и ограничения<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
@@ -300,7 +301,11 @@
 <p>Пример контролируемых нарушений, проверенный существующими документационными тестами:</p>
 <pre><code class="language-bash">test-data-agent generate examples/negative_cases/dataset_spec.yaml --seed 1300 --mode mixed --invalid-ratio 0.5 --format json --business-rules examples/negative_cases/business_rules.yaml --output out/ru-negative
 </code></pre>
-<p>При намеренных нарушениях команда 1.6.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (<code>expectations_met=true</code>, ноль unexpected и missing expected), а не отсутствие нарушений. Режим <code>negative</code> и <code>mixed</code> не разрешает PII. Точные поля правил и примеры всех категорий описаны в <a href="./">существующем руководстве</a>.</p>
+<p>При намеренных нарушениях команда 1.8.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (<code>expectations_met=true</code>, ноль unexpected и missing expected), а не отсутствие нарушений. Режим <code>negative</code> и <code>mixed</code> не разрешает PII.</p>
+<p>Точные поля и примеры всех категорий есть в
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/business_rules">исполняемом справочнике правил — English</a>.
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/business_rules.schema.json">JSON Schema</a>
+создаётся из модели времени выполнения.</p>
 <h2 id="_8">Следующий шаг<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p><a href="../../getting-started/review-output/">Валидация</a>.</p>
 <h2 id="eav-">Условные формулы и синтетическая EAV-модель<a class="headerlink" href="#eav-" title="Permanent link">&para;</a></h2>

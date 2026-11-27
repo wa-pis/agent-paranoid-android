@@ -115,7 +115,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#safe-generator-sequence">Safe Generator Sequence</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#local-parquet-profiles">Local Parquet profiles (unreleased)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#local-parquet-profiles">Local Parquet profiles</a>
     </li>
         </ul>
     </li>
@@ -243,7 +243,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -251,7 +251,7 @@
 
                 <h1 id="connect-an-mcp-client">Connect An MCP Client<a class="headerlink" href="#connect-an-mcp-client" title="Permanent link">&para;</a></h1>
 <p>English · <a href="../../ru/how-to/mcp/">Русский</a></p>
-<p>Unless marked otherwise, these workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
+<p>Unless marked otherwise, these workflows describe stable <code>1.8.0</code>. Start with a workspace-confined
 server and enable only tools required for your task. For local preservation
 approval use <a href="../transformation/">Transform Local Data</a>; MCP cannot issue it.</p>
 <p>The project exposes two MCP servers with separate trust boundaries:</p>
@@ -500,7 +500,7 @@ access or external APIs.</p>
 <li>Call <code>approve_dataset_plan</code> with that exact fingerprint only after review.</li>
 <li>Report summaries and artifact paths, not generated rows.</li>
 </ol>
-<p>Use <code>profile_csv</code>, <code>profile_parquet</code> (unreleased), <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
+<p>Use <code>profile_csv</code>, <code>profile_parquet</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
 <code>validate_dataset</code> separately when an advanced client needs control over each
 pipeline stage. Direct <code>generate_dataset</code> and <code>export_dataset</code> do not require a
 planning approval argument; configure the client's confirmation policy before
@@ -510,10 +510,11 @@ not evidence that the human reviewed the displayed specification.</p>
 DatasetSpec. Direct <code>generate_dataset</code> and <code>export_dataset</code> calls can instead
 provide <code>business_rules_path</code> or a bounded structured <code>business_rules_payload</code>.
 Use one rule source: external rules cannot be combined with embedded rules.</p>
-<h3 id="local-parquet-profiles">Local Parquet profiles (unreleased)<a class="headerlink" href="#local-parquet-profiles" title="Permanent link">&para;</a></h3>
-<p>When the installed development build lists <code>profile_parquet</code>, enable
-<code>agent-paranoid-android[mcp,parquet]</code> in the server's Python environment. Put
-one regular Parquet file in the workspace and call the tool with
+<h3 id="local-parquet-profiles">Local Parquet profiles<a class="headerlink" href="#local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p><code>profile_parquet</code> has been available since stable <code>1.7.0</code> and is retained in
+stable <code>1.8.0</code>. Install <code>agent-paranoid-android[mcp,parquet]==1.8.0</code> in the
+server's Python environment. Put one regular Parquet file in the workspace and
+call the tool with
 <code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
 The optional <code>table_name</code> defaults to the file stem.</p>
 <p>The server applies the local profiling budgets and writes a new metadata-only

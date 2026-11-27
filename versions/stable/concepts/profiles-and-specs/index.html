@@ -229,7 +229,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -275,12 +275,16 @@ field-scoped labels, and default MCP responses do not receive the exact enum.</p
   --entity paid_orders \
   --output out/profile.json
 </code></pre>
-<p>SQL source policy 1.1 accepts exactly one fully qualified, single-table <code>SELECT</code>
+<p>SQL source policy 1.2 accepts exactly one fully qualified, single-table <code>SELECT</code>
 with explicit projections or an authorized qualified wildcard, bounded filters,
 and a small deterministic scalar-expression set. It rejects joins, CTEs,
 subqueries, set operations, windows, table functions, commands, volatile or
 unknown functions, multiple statements, and unauthorized references before
 derived aggregate work begins.</p>
+<p>Sensitivity follows the physical source column through direct aliases; renaming
+a protected column cannot authorize categories or temporal bounds. Policy 1.2
+does not expand SQL access or work budgets. See the
+<a href="../../agent-guides/trino-security/#enforcement">SQL enforcement contract</a>.</p>
 <p>It also accepts aliased <code>SUM</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code> and <code>AVG</code> projections,
 optionally grouped by explicit authorized source columns. Each other selected
 column must be a grouping key. <code>COUNT(*)</code> counts rows; it is not a row wildcard.

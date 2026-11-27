@@ -122,7 +122,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#_7">Безопасная последовательность инструментов</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#local-parquet-profiles">Профиль локального Parquet (ещё не выпущен)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#local-parquet-profiles">Профиль локального Parquet</a>
     </li>
         </ul>
     </li>
@@ -228,7 +228,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -236,6 +236,8 @@
 
                 <h1 id="mcp-">Подключить MCP-клиент<a class="headerlink" href="#mcp-" title="Permanent link">&para;</a></h1>
 <p><a href="../../../how-to/mcp/">English</a> · Русский</p>
+<p>Ниже описаны возможности стабильной 1.8.0. Локальное подтверждение preservation
+выдаётся отдельно через CLI; MCP не может его выдать.</p>
 <p>Для подключения Trino по логину и паролю используйте
 <a href="../trino/#trino-mcp-basic">готовый пример настройки MCP</a>.</p>
 <h2 id="_1">Для чего это нужно<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -316,12 +318,12 @@
 <li><code>approve_dataset_plan</code>: передать одобренный <code>reviewed_spec_sha256</code>.</li>
 <li>Проверить manifest и validation; сообщить только сводку и пути.</li>
 </ol>
-<p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
+<p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>profile_parquet</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
 <p>Trino <strong>default aggregate-only</strong> инструменты возвращают метаданные без исходных литералов. Отдельный <strong>explicit opt-in</strong> <code>run_safe_select</code> включается через <code>TRINO_ENABLE_SAFE_SELECT</code>; он маскирует строки, но может сохранять нечувствительные нестроковые значения источника. Такой результат не является анонимным или source-free; его нельзя передавать LLM или использовать как сгенерированные данные. Не включайте этот инструмент для описанного workflow.</p>
 <p>Generator ограничивает пути workspace, но это не sandbox процесса. Используйте отдельного системного пользователя/контейнер для недоверенных клиентов. Значения по умолчанию: frame 1 MiB, response 4 MiB, 32 active requests; Trino дополнительно ограничивает работу и параллельность. См. <a href="./">границы MCP</a> и <a href="../../../operations/audit-logging/">аудит</a>.</p>
-<h3 id="local-parquet-profiles">Профиль локального Parquet (ещё не выпущен)<a class="headerlink" href="#local-parquet-profiles" title="Permanent link">&para;</a></h3>
-<p>В сборке, где <code>tools/list</code> показывает <code>profile_parquet</code>, установите дополнения
-<code>agent-paranoid-android[mcp,parquet]</code> в окружение сервера. Поместите один Parquet
+<h3 id="local-parquet-profiles">Профиль локального Parquet<a class="headerlink" href="#local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p><code>profile_parquet</code> доступен с версии 1.7.0 и сохраняется в стабильной 1.8.0.
+Установите <code>agent-paranoid-android[mcp,parquet]==1.8.0</code> в окружение сервера. Поместите один Parquet
 в рабочую папку и передайте <code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
 Если не передать <code>table_name</code>, используется имя входного файла без расширения.</p>
 <p>Новый JSON содержит только метаданные профиля; ответ содержит относительный
