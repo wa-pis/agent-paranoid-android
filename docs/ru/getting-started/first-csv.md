@@ -161,7 +161,25 @@ python -c "from pathlib import Path; assert Path('out/ru-csv/customers.csv').rea
 
 ### Проверка результата
 
-Выполните `test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv`. Ожидается код 0. Для своего входа замените путь CSV, сохраните заголовок и отдельный выходной каталог; не вставляйте его строки в чат.
+Выполните `test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv`. Ожидается код 0.
+
+### Свой CSV
+
+Для уже проверенного входа замените путь CSV и выберите новую выходную папку.
+Для нового чувствительного домена сначала используйте
+[раздельный процесс с review спецификации](related-tables.md).
+Сохраните результаты вымышленного примера:
+
+```bash
+test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/own-customers/customers.csv
+```
+
+Не вставляйте исходные строки в чат и не публикуйте profile, логи или результат
+до проверки приватности.
 
 ### Типичные ошибки
 

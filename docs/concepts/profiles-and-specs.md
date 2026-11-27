@@ -55,12 +55,17 @@ test-data-agent profile-query query.sql \
   --output out/profile.json
 ```
 
-SQL source policy 1.1 accepts exactly one fully qualified, single-table `SELECT`
+SQL source policy 1.2 accepts exactly one fully qualified, single-table `SELECT`
 with explicit projections or an authorized qualified wildcard, bounded filters,
 and a small deterministic scalar-expression set. It rejects joins, CTEs,
 subqueries, set operations, windows, table functions, commands, volatile or
 unknown functions, multiple statements, and unauthorized references before
 derived aggregate work begins.
+
+Sensitivity follows the physical source column through direct aliases; renaming
+a protected column cannot authorize categories or temporal bounds. Policy 1.2
+does not expand SQL access or work budgets. See the
+[SQL enforcement contract](../agent-guides/trino-security.md#enforcement).
 
 It also accepts aliased `SUM`, `COUNT`, `MIN`, `MAX` and `AVG` projections,
 optionally grouped by explicit authorized source columns. Each other selected

@@ -2,7 +2,7 @@
 
 English · [Русский](../ru/getting-started/installation.md)
 
-Stable `1.8.0` is the recommended release after publication.
+Stable `1.8.0` is the recommended default.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ Stable `1.8.0` is the recommended release after publication.
 - enough local disk space for the requested output
 - a dedicated working directory for inputs and generated artifacts
 
-The supported CI matrix covers CPython 3.11, 3.12, 3.13, and 3.14. Python 3.11
+The supported CI matrix covers CPython 3.11, 3.12, 3.13, 3.14, and 3.15. Python 3.11
 remains the minimum so users can adopt newer interpreters without forcing
 existing environments to upgrade. The notice and release-gate rules for
 changing this matrix are defined in

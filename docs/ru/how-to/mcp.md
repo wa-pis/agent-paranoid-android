@@ -2,6 +2,9 @@
 
 [English](../../how-to/mcp.md) · Русский
 
+Ниже описаны возможности стабильной 1.8.0. Локальное подтверждение preservation
+выдаётся отдельно через CLI; MCP не может его выдать.
+
 Для подключения Trino по логину и паролю используйте
 [готовый пример настройки MCP](trino.md#trino-mcp-basic).
 
@@ -100,16 +103,16 @@ test-data-agent doctor --require-extra mcp
 4. `approve_dataset_plan`: передать одобренный `reviewed_spec_sha256`.
 5. Проверить manifest и validation; сообщить только сводку и пути.
 
-Для Trino сначала `profile_table_safe`, затем `plan_trino_dataset` и тот же review. Другие этапы доступны отдельно: `profile_csv`, `infer_dataset_spec`, `generate_dataset`, `validate_dataset`. Наличие низкоуровневого инструмента не отменяет согласованную политику review.
+Для Trino сначала `profile_table_safe`, затем `plan_trino_dataset` и тот же review. Другие этапы доступны отдельно: `profile_csv`, `profile_parquet`, `infer_dataset_spec`, `generate_dataset`, `validate_dataset`. Наличие низкоуровневого инструмента не отменяет согласованную политику review.
 
 Trino **default aggregate-only** инструменты возвращают метаданные без исходных литералов. Отдельный **explicit opt-in** `run_safe_select` включается через `TRINO_ENABLE_SAFE_SELECT`; он маскирует строки, но может сохранять нечувствительные нестроковые значения источника. Такой результат не является анонимным или source-free; его нельзя передавать LLM или использовать как сгенерированные данные. Не включайте этот инструмент для описанного workflow.
 
 Generator ограничивает пути workspace, но это не sandbox процесса. Используйте отдельного системного пользователя/контейнер для недоверенных клиентов. Значения по умолчанию: frame 1 MiB, response 4 MiB, 32 active requests; Trino дополнительно ограничивает работу и параллельность. См. [границы MCP](mcp.md) и [аудит](../../operations/audit-logging.md).
 
-### Профиль локального Parquet (ещё не выпущен) { #local-parquet-profiles }
+### Профиль локального Parquet { #local-parquet-profiles }
 
-В сборке, где `tools/list` показывает `profile_parquet`, установите дополнения
-`agent-paranoid-android[mcp,parquet]` в окружение сервера. Поместите один Parquet
+`profile_parquet` доступен с версии 1.7.0 и сохраняется в стабильной 1.8.0.
+Установите `agent-paranoid-android[mcp,parquet]==1.8.0` в окружение сервера. Поместите один Parquet
 в рабочую папку и передайте `{"input_path":"customers.parquet","output_path":"reports/customers.json"}`.
 Если не передать `table_name`, используется имя входного файла без расширения.
 

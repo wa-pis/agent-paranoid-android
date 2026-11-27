@@ -82,7 +82,7 @@ the table is wider than the intended profiling scope.
 ## SQL Query Source Rejected
 
 Pass one UTF-8 file to `profile-query`; SQL text is not accepted in an option
-or environment variable. SQL source policy 1.1 permits one fully qualified,
+or environment variable. SQL source policy 1.2 permits one fully qualified,
 single-table `SELECT` with explicit output aliases, bounded filters, and the
 documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
 window operations, table functions, comments, volatile/unknown functions,

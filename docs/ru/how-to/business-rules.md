@@ -78,10 +78,12 @@ python -c "import json; from pathlib import Path; r=json.loads(Path('out/ru-rule
 
 | Ошибка | Причина | Решение |
 | --- | --- | --- |
-| Неизвестный тип/поле правила | Опечатка или неподдерживаемая конструкция | Сопоставьте правило с spec и [справочником правил](business-rules.md). |
+| Неизвестный тип/поле правила | Опечатка или неподдерживаемая конструкция | Сопоставьте правило с spec и [руководством по правилам — English](../../how-to/business-rules.md). |
 | Превышен work budget | Слишком много строк × правил | Уменьшите тест; меняйте лимиты только после оценки ресурсов. |
 
 ## Переносимость и смысл правил в 1.6.0
+
+Эти контракты сохраняются в стабильной 1.8.0.
 
 `DatasetSpec.business_rules` переносит правила между Python, CLI, MCP, agent workspace и всеми форматами. `infer-spec --business-rules` сохраняет их в spec; generate, validate и export-postgres-sql также принимают отдельный --business-rules. Повторная валидация проверяет данные и не присваивает значения заново.
 
@@ -97,7 +99,12 @@ python -c "import json; from pathlib import Path; r=json.loads(Path('out/ru-rule
 test-data-agent generate examples/negative_cases/dataset_spec.yaml --seed 1300 --mode mixed --invalid-ratio 0.5 --format json --business-rules examples/negative_cases/business_rules.yaml --output out/ru-negative
 ```
 
-При намеренных нарушениях команда 1.6.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (`expectations_met=true`, ноль unexpected и missing expected), а не отсутствие нарушений. Режим `negative` и `mixed` не разрешает PII. Точные поля правил и примеры всех категорий описаны в [существующем руководстве](business-rules.md).
+При намеренных нарушениях команда 1.8.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (`expectations_met=true`, ноль unexpected и missing expected), а не отсутствие нарушений. Режим `negative` и `mixed` не разрешает PII.
+
+Точные поля и примеры всех категорий есть в
+[исполняемом справочнике правил — English](https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/business_rules).
+[JSON Schema](https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/business_rules.schema.json)
+создаётся из модели времени выполнения.
 
 
 ## Следующий шаг

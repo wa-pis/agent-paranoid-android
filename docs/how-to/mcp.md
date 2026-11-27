@@ -2,7 +2,7 @@
 
 English · [Русский](../ru/how-to/mcp.md)
 
-Unless marked otherwise, these workflows describe stable `1.6.0`. Start with a workspace-confined
+Unless marked otherwise, these workflows describe stable `1.8.0`. Start with a workspace-confined
 server and enable only tools required for your task. For local preservation
 approval use [Transform Local Data](transformation.md); MCP cannot issue it.
 
@@ -301,7 +301,7 @@ access or external APIs.
 5. Call `approve_dataset_plan` with that exact fingerprint only after review.
 6. Report summaries and artifact paths, not generated rows.
 
-Use `profile_csv`, `profile_parquet` (unreleased), `infer_dataset_spec`, `generate_dataset`, and
+Use `profile_csv`, `profile_parquet`, `infer_dataset_spec`, `generate_dataset`, and
 `validate_dataset` separately when an advanced client needs control over each
 pipeline stage. Direct `generate_dataset` and `export_dataset` do not require a
 planning approval argument; configure the client's confirmation policy before
@@ -313,11 +313,12 @@ DatasetSpec. Direct `generate_dataset` and `export_dataset` calls can instead
 provide `business_rules_path` or a bounded structured `business_rules_payload`.
 Use one rule source: external rules cannot be combined with embedded rules.
 
-### Local Parquet profiles (unreleased) { #local-parquet-profiles }
+### Local Parquet profiles { #local-parquet-profiles }
 
-When the installed development build lists `profile_parquet`, enable
-`agent-paranoid-android[mcp,parquet]` in the server's Python environment. Put
-one regular Parquet file in the workspace and call the tool with
+`profile_parquet` has been available since stable `1.7.0` and is retained in
+stable `1.8.0`. Install `agent-paranoid-android[mcp,parquet]==1.8.0` in the
+server's Python environment. Put one regular Parquet file in the workspace and
+call the tool with
 `{"input_path":"customers.parquet","output_path":"reports/customers.json"}`.
 The optional `table_name` defaults to the file stem.
 

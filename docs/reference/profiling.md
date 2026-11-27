@@ -125,7 +125,7 @@ the reviewed field into `dataset_spec.yaml`, preserve the planned generation
 settings, run `agent-review`, and approve the newly reported fingerprint.
 Do not overwrite the workspace spec with default inference settings.
 
-Folder cache format 9 recomputes older profiles. An old ambiguous profile without
+Current folder cache format 12 recomputes older profiles. An old ambiguous profile without
 storage evidence requires fresh profiling; saved profiles/plans are not silently
 upgraded. Evidence changes the profile fingerprint, and edited synthetic bounds
 change the spec fingerprint. Obtain new review/approval after either change.
