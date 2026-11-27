@@ -1,7 +1,9 @@
 # Forecast And Generate Larger Synthetic Datasets
 
-These additions are published in `1.7.0rc2`. They are not
-available in `1.7.0rc1`. Stable 1.6.0 remains the recommended default.
+This page describes stable `1.8.0`; see [publication status](../1.8.0-release-status.md).
+Capacity forecasts and independent scalable generation were introduced in
+`1.7.0rc2`; linked-table support followed in `1.7.0rc3`. Both are retained in
+stable `1.8.0`, the recommended release.
 
 ## Preview Storage And Time
 
@@ -15,8 +17,8 @@ explicitly creates a temporary fictional sample (default 2,000 rows per entity,
 at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
 It removes the sample and returns numeric summaries. Calibration never approves
 or publishes the requested dataset and does not advance its random stream.
-Calibration supports eligible linked tables with `scalable-relational-v1` in
-`1.7.0rc3`. Other related or rule-constrained specs report why calibration is
+Calibration supports eligible linked tables with `scalable-relational-v1`.
+Other related or rule-constrained specs report why calibration is
 unavailable.
 
 File forecasts describe the selected CSV, indented JSON or Snappy Parquet
@@ -81,7 +83,7 @@ Existing administrator output/disk and MCP invocation limits remain additional
 ceilings. The policy does not widen database or filesystem authority.
 
 `scalable-v1` supports independent tables in valid/edge modes and CSV/JSON/Parquet.
-Use Linux or macOS for scalable execution in this RC; native Windows execution
+Use Linux or macOS for scalable execution in stable `1.8.0`; native Windows execution
 of this engine is unsupported.
 Relationships, global constraints, business rules, scenarios and negative/mixed
 modes reject before generation; use the legacy engine for those bounded cases.
@@ -111,7 +113,7 @@ statistics and informational progress are not deterministic data artifacts.
 
 ## Recipe: 750,000 Distinct CSV Rows
 
-Use the scalable engine with CLI version `1.7.0rc2` or later on Linux or
+Use the scalable engine with stable CLI version `1.8.0` on Linux or
 macOS. Start in a fresh working directory. The synthetic integer primary
 key makes every complete row distinct.
 
@@ -252,6 +254,8 @@ accounting; memory checks and finite policy ceilings remain enabled.
 <a id="linked-tables-unreleased"></a>
 
 ## Linked Tables (1.7.0rc3)
+
+Introduced in `1.7.0rc3`, linked-table generation is included in stable `1.8.0`.
 
 ### Recipe: Customers And Orders
 

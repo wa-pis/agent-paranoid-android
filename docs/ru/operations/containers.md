@@ -2,7 +2,7 @@
 
 [English](../../operations/containers.md) · Русский
 
-Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.6.0 опубликованы с [проверяемыми digest/signature](../../release-evidence-1.6.0.md).
+Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.8.0 опубликованы с [проверяемыми digest и свидетельствами проверки](../../release-evidence-1.8.0.md#artifacts).
 
 | Образ GHCR, префикс ghcr.io/wa-pis/ | Entrypoint | Возможности |
 | --- | --- | --- |
@@ -10,7 +10,7 @@
 | agent-paranoid-android-generator-mcp | test-data-agent-mcp-generator | Core + MCP |
 | agent-paranoid-android-trino-mcp | test-data-agent-mcp-trino | Core + MCP + Trino/SQLGlot |
 
-Выберите tag 1.6.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.6 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.
+Выберите tag 1.8.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.8 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.
 
 ## Локальная сборка
 

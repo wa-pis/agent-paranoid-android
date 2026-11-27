@@ -6,7 +6,12 @@
 
 Новые DatasetSpec используют 1.1, legacy 1.0 поддерживается без decimal. Import payload без версии трактуется как 1.0, новый Python DatasetSpec по умолчанию — 1.1. Укажите версию явно.
 
-SQL query-source policy 1.1 допускает ограниченный single-table SELECT, scalar expressions и aliased SUM/COUNT/MIN/MAX/AVG с ограниченным GROUP BY. JOIN/CTE/subqueries/windows/HAVING/неизвестные функции отклоняются. Профиль хранит fingerprint, а не SQL text или result rows. has_unmodeled_expressions=true (в том числе aggregate) блокирует automatic infer-spec: напишите независимо проверенный spec. Direct column aliases могут выводиться автоматически; старые query profiles без marker нужно получить заново.
+SQL query-source policy 1.2 допускает ограниченный single-table SELECT, scalar expressions и aliased SUM/COUNT/MIN/MAX/AVG с ограниченным GROUP BY. JOIN/CTE/subqueries/windows/HAVING/неизвестные функции отклоняются. Профиль хранит fingerprint, а не SQL text или result rows. has_unmodeled_expressions=true (в том числе aggregate) блокирует automatic infer-spec: напишите независимо проверенный spec. Direct column aliases могут выводиться автоматически; старые query profiles без marker нужно получить заново.
+
+Чувствительность физического столбца сохраняется за прямым alias: переименование
+не разрешает раскрывать категории или временные границы. Policy 1.2 не расширяет
+SQL-доступ или бюджеты работы. Подробности:
+[контракт SQL-проверок — English](../../agent-guides/trino-security.md#enforcement).
 
 Практика: [раздельный процесс](../getting-started/related-tables.md), [поля DatasetSpec](../dataset_profile_and_spec.md), [конфигурация](../reference/configuration.md).
 

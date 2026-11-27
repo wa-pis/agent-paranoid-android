@@ -2,7 +2,7 @@
 
 [English](../../reference/configuration.md) · Русский
 
-Код: `core/dataset.py`, `core/field.py`, `core/entity.py`, `core/settings.py`, `limits.py`, `postgres_config.py`, `trino_config.py`. JSON Schema: [dataset_spec.schema.json](https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/dataset_spec.schema.json). Версия пакета 1.6.0 и DatasetSpec `schema_version: "1.1"` — разные версии. Совместимость с 1.0 сохраняется без decimal; при импорте payload без schema_version используется legacy 1.0, тогда как новый Python DatasetSpec по умолчанию создаёт 1.1. Указывайте версию явно.
+Код: `core/dataset.py`, `core/field.py`, `core/entity.py`, `core/settings.py`, `limits.py`, `postgres_config.py`, `trino_config.py`. JSON Schema: [dataset_spec.schema.json](https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/dataset_spec.schema.json). Версия пакета 1.8.0 и DatasetSpec `schema_version: "1.1"` — разные версии. Совместимость с 1.0 сохраняется без decimal; при импорте payload без schema_version используется legacy 1.0, тогда как новый Python DatasetSpec по умолчанию создаёт 1.1. Указывайте версию явно.
 
 ## DatasetSpec
 
@@ -95,11 +95,13 @@
 | OpenAI | OPENAI_API_KEY | Runtime secret только после согласования передачи |
 | GigaChat | GIGACHAT_CREDENTIALS либо GIGACHAT_ACCESS_TOKEN, GIGACHAT_SCOPE, GIGACHAT_CA_BUNDLE_FILE | Ровно один credential, обязательный TLS; experimental |
 
-Полный перечень параметров подключения, per-query scan/time limits, допустимых единиц, audit actor/size и transport budgets сохранён в [расширенном справочнике](configuration.md). Перед изменением конкретного интеграционного параметра прочитайте его строку там; значения из разных единиц не взаимозаменяемы. Не включайте insecure/unrestricted overrides ради обхода ошибки.
+Полный перечень параметров подключения, per-query scan/time limits, допустимых единиц, audit actor/size и transport budgets сохранён в [расширенном справочнике — English](../../reference/configuration.md). Перед изменением конкретного интеграционного параметра прочитайте его строку там; значения из разных единиц не взаимозаменяемы. Не включайте insecure/unrestricted overrides ради обхода ошибки.
 
 Проверка локальной конфигурации: [диагностика](../operations/troubleshooting.md). Проверка результата: [валидация](../getting-started/review-output.md).
 
 ## Режимы и точные значения 1.6.0
+
+Эти контракты сохраняются в стабильной 1.8.0.
 
 `edge` создаёт валидные границы, но constraints и business rules могут заменить отдельную границу; маленький count не покрывает всё. `load_test` умножает row_count на load_multiplier (по умолчанию 10); явный --count задаёт точное число без умножения. Повторяемость требует тот же порядок entities в spec, seed и окружение. Python core дополнительно поддерживает signed 64-bit отрицательный seed для совместимости; сохранённый spec — только 0…2**63-1.
 

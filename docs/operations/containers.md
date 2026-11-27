@@ -7,13 +7,13 @@ workers. PyPI remains the normal installation path for local Python use.
 
 ## Release Status
 
-Stable `1.6.0` images are published and verified; see the
-[immutable digests and signatures](../release-evidence-1.6.0.md).
+Stable `1.8.0` images are published and verified; see the
+[immutable digests and verification evidence](../release-evidence-1.8.0.md#artifacts).
 The [RC5 container evidence](../release-evidence-1.6.0rc5.md) remains bound to RC5.
 
 Select an exact version tag such as
-`ghcr.io/wa-pis/agent-paranoid-android-cli:1.6.0`, then resolve and verify its
-immutable digest before use. The stable tag also updates the mutable `1.6`, `1`
+`ghcr.io/wa-pis/agent-paranoid-android-cli:1.8.0`, then resolve and verify its
+immutable digest before use. The stable tag also updates the mutable `1.8`, `1`
 and `latest` aliases; none provides immutable version identity.
 
 ## Published Images

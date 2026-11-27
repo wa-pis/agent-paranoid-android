@@ -83,14 +83,15 @@ python3 -c "from pathlib import Path; assert Path('out/customers.csv').read_byte
 
 ## Use Your Own CSV
 
-Replace the fixture path with your file:
+Replace the fixture path with your file and choose a fresh output directory.
+Keep the fictional tutorial output for comparison:
 
 ```bash
 test-data-agent generate-from-csv data/customers.csv \
   --count 100 \
   --seed 12345 \
   --format csv \
-  --output out/customers.csv
+  --output out/own-customers/customers.csv
 ```
 
 Treat every source CSV as potentially sensitive. Do not share its contents,

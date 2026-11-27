@@ -2,7 +2,7 @@
 
 English · [Русский](../ru/reference/cli.md)
 
-This reference describes stable `1.6.0`. For complete tasks start with
+This reference describes stable `1.8.0`. For complete tasks start with
 [the user guide](../index.md) or [Transform Local Data](../how-to/transformation.md).
 Historical anchors are retained so existing links keep working.
 
@@ -205,7 +205,7 @@ same digest and receipt. Editing an input, policy, mapping or output setting
 requires a fresh review; a receipt is not a reusable blanket approval. Agents
 can consume a matching receipt but cannot issue one.
 
-For these workflows install stable `1.6.0` or a compatible later release.
+For these workflows install the recommended stable `1.8.0` release.
 Installing `1.5.0` does not expose `transform-batch`. Keep ordinary source-free
 generation workflows separate and retain their existing schemas. A transformed
 bundle may deliberately contain preserved or explicitly mapped source values;
