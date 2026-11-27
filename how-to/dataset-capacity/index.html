@@ -234,15 +234,17 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
 
 
                 <h1 id="forecast-and-generate-larger-synthetic-datasets">Forecast And Generate Larger Synthetic Datasets<a class="headerlink" href="#forecast-and-generate-larger-synthetic-datasets" title="Permanent link">&para;</a></h1>
-<p>These additions are published in <code>1.7.0rc2</code>. They are not
-available in <code>1.7.0rc1</code>. Stable 1.6.0 remains the recommended default.</p>
+<p>This page describes stable <code>1.8.0</code>; see <a href="../../1.8.0-release-status/">publication status</a>.
+Capacity forecasts and independent scalable generation were introduced in
+<code>1.7.0rc2</code>; linked-table support followed in <code>1.7.0rc3</code>. Both are retained in
+stable <code>1.8.0</code>, the recommended release.</p>
 <h2 id="preview-storage-and-time">Preview Storage And Time<a class="headerlink" href="#preview-storage-and-time" title="Permanent link">&para;</a></h2>
 <pre><code class="language-bash">test-data-agent estimate-capacity dataset_spec.yaml --json
 test-data-agent estimate-capacity dataset_spec.yaml --database postgresql --calibrate --json
@@ -252,8 +254,8 @@ explicitly creates a temporary fictional sample (default 2,000 rows per entity,
 at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
 It removes the sample and returns numeric summaries. Calibration never approves
 or publishes the requested dataset and does not advance its random stream.
-Calibration supports eligible linked tables with <code>scalable-relational-v1</code> in
-<code>1.7.0rc3</code>. Other related or rule-constrained specs report why calibration is
+Calibration supports eligible linked tables with <code>scalable-relational-v1</code>.
+Other related or rule-constrained specs report why calibration is
 unavailable.</p>
 <p>File forecasts describe the selected CSV, indented JSON or Snappy Parquet
 settings. Change <code>generation_settings.output_format</code> to compare formats.
@@ -307,7 +309,7 @@ profiling limits and all database read budgets remain separate and unchanged.
 Existing administrator output/disk and MCP invocation limits remain additional
 ceilings. The policy does not widen database or filesystem authority.</p>
 <p><code>scalable-v1</code> supports independent tables in valid/edge modes and CSV/JSON/Parquet.
-Use Linux or macOS for scalable execution in this RC; native Windows execution
+Use Linux or macOS for scalable execution in stable <code>1.8.0</code>; native Windows execution
 of this engine is unsupported.
 Relationships, global constraints, business rules, scenarios and negative/mixed
 modes reject before generation; use the legacy engine for those bounded cases.
@@ -333,7 +335,7 @@ bytes are identical; Parquet row-group/layout metadata can differ. Manifests
 record the policy/engine and include normal provenance/validation. Timing
 statistics and informational progress are not deterministic data artifacts.</p>
 <h2 id="recipe-750000-distinct-csv-rows">Recipe: 750,000 Distinct CSV Rows<a class="headerlink" href="#recipe-750000-distinct-csv-rows" title="Permanent link">&para;</a></h2>
-<p>Use the scalable engine with CLI version <code>1.7.0rc2</code> or later on Linux or
+<p>Use the scalable engine with stable CLI version <code>1.8.0</code> on Linux or
 macOS. Start in a fresh working directory. The synthetic integer primary
 key makes every complete row distinct.</p>
 <pre><code class="language-bash">python3 - &lt;&lt;'PY'
@@ -450,6 +452,7 @@ process image, avoiding the parent memory history retained by <code>getrusage</c
 accounting; memory checks and finite policy ceilings remain enabled.</p>
 <p><a id="linked-tables-unreleased"></a></p>
 <h2 id="linked-tables-170rc3">Linked Tables (1.7.0rc3)<a class="headerlink" href="#linked-tables-170rc3" title="Permanent link">&para;</a></h2>
+<p>Introduced in <code>1.7.0rc3</code>, linked-table generation is included in stable <code>1.8.0</code>.</p>
 <h3 id="recipe-customers-and-orders">Recipe: Customers And Orders<a class="headerlink" href="#recipe-customers-and-orders" title="Permanent link">&para;</a></h3>
 <p>Reuse the CSV recipe's execution policy with <code>scalable-relational-v1</code>.
 This example requests 150,000 customers and 600,000 orders, each with a

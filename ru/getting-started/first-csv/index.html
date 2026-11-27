@@ -115,6 +115,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#_12">Проверка результата</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#csv_2">Свой CSV</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#_13">Типичные ошибки</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#_14">Что важно про значения</a>
@@ -247,7 +249,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -353,7 +355,20 @@ python -c &quot;import csv; from pathlib import Path; f=Path('out/ru-csv/custome
 <p><strong>Как проверить:</strong> Код 0.</p>
 <p><strong>Если не получилось:</strong> Проверьте вход, seed, count, locale и версии зависимостей; manifest может содержать сведения окружения, поэтому не сравнивайте все артефакты как один файл.</p>
 <h3 id="_12">Проверка результата<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
-<p>Выполните <code>test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv</code>. Ожидается код 0. Для своего входа замените путь CSV, сохраните заголовок и отдельный выходной каталог; не вставляйте его строки в чат.</p>
+<p>Выполните <code>test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv</code>. Ожидается код 0.</p>
+<h3 id="csv_2">Свой CSV<a class="headerlink" href="#csv_2" title="Permanent link">&para;</a></h3>
+<p>Для уже проверенного входа замените путь CSV и выберите новую выходную папку.
+Для нового чувствительного домена сначала используйте
+<a href="../related-tables/">раздельный процесс с review спецификации</a>.
+Сохраните результаты вымышленного примера:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/own-customers/customers.csv
+</code></pre>
+<p>Не вставляйте исходные строки в чат и не публикуйте profile, логи или результат
+до проверки приватности.</p>
 <h3 id="_13">Типичные ошибки<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
 <table>
 <thead>

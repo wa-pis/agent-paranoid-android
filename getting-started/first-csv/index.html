@@ -222,7 +222,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -282,12 +282,13 @@ the header. Source rows are not shuffled or copied.</p>
 <pre><code class="language-bash">python3 -c &quot;from pathlib import Path; assert Path('out/customers.csv').read_bytes() == Path('out/repeated/customers.csv').read_bytes(); print('deterministic: ok')&quot;
 </code></pre>
 <h2 id="use-your-own-csv">Use Your Own CSV<a class="headerlink" href="#use-your-own-csv" title="Permanent link">&para;</a></h2>
-<p>Replace the fixture path with your file:</p>
+<p>Replace the fixture path with your file and choose a fresh output directory.
+Keep the fictional tutorial output for comparison:</p>
 <pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
   --count 100 \
   --seed 12345 \
   --format csv \
-  --output out/customers.csv
+  --output out/own-customers/customers.csv
 </code></pre>
 <p>Treat every source CSV as potentially sensitive. Do not share its contents,
 profile artifacts, or command logs until you have reviewed them. The profiler

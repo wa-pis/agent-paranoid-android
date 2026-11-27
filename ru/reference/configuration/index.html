@@ -193,7 +193,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -201,7 +201,7 @@
 
                 <h1 id="_1">Справочник конфигурации<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p><a href="../../../reference/configuration/">English</a> · Русский</p>
-<p>Код: <code>core/dataset.py</code>, <code>core/field.py</code>, <code>core/entity.py</code>, <code>core/settings.py</code>, <code>limits.py</code>, <code>postgres_config.py</code>, <code>trino_config.py</code>. JSON Schema: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/dataset_spec.schema.json">dataset_spec.schema.json</a>. Версия пакета 1.6.0 и DatasetSpec <code>schema_version: "1.1"</code> — разные версии. Совместимость с 1.0 сохраняется без decimal; при импорте payload без schema_version используется legacy 1.0, тогда как новый Python DatasetSpec по умолчанию создаёт 1.1. Указывайте версию явно.</p>
+<p>Код: <code>core/dataset.py</code>, <code>core/field.py</code>, <code>core/entity.py</code>, <code>core/settings.py</code>, <code>limits.py</code>, <code>postgres_config.py</code>, <code>trino_config.py</code>. JSON Schema: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/dataset_spec.schema.json">dataset_spec.schema.json</a>. Версия пакета 1.8.0 и DatasetSpec <code>schema_version: "1.1"</code> — разные версии. Совместимость с 1.0 сохраняется без decimal; при импорте payload без schema_version используется legacy 1.0, тогда как новый Python DatasetSpec по умолчанию создаёт 1.1. Указывайте версию явно.</p>
 <h2 id="datasetspec">DatasetSpec<a class="headerlink" href="#datasetspec" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -569,9 +569,10 @@
 </tr>
 </tbody>
 </table>
-<p>Полный перечень параметров подключения, per-query scan/time limits, допустимых единиц, audit actor/size и transport budgets сохранён в <a href="./">расширенном справочнике</a>. Перед изменением конкретного интеграционного параметра прочитайте его строку там; значения из разных единиц не взаимозаменяемы. Не включайте insecure/unrestricted overrides ради обхода ошибки.</p>
+<p>Полный перечень параметров подключения, per-query scan/time limits, допустимых единиц, audit actor/size и transport budgets сохранён в <a href="../../../reference/configuration/">расширенном справочнике — English</a>. Перед изменением конкретного интеграционного параметра прочитайте его строку там; значения из разных единиц не взаимозаменяемы. Не включайте insecure/unrestricted overrides ради обхода ошибки.</p>
 <p>Проверка локальной конфигурации: <a href="../../operations/troubleshooting/">диагностика</a>. Проверка результата: <a href="../../getting-started/review-output/">валидация</a>.</p>
 <h2 id="160">Режимы и точные значения 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h2>
+<p>Эти контракты сохраняются в стабильной 1.8.0.</p>
 <p><code>edge</code> создаёт валидные границы, но constraints и business rules могут заменить отдельную границу; маленький count не покрывает всё. <code>load_test</code> умножает row_count на load_multiplier (по умолчанию 10); явный --count задаёт точное число без умножения. Повторяемость требует тот же порядок entities в spec, seed и окружение. Python core дополнительно поддерживает signed 64-bit отрицательный seed для совместимости; сохранённый spec — только 0…2**63-1.</p>
 <p><code>decimal</code> требует schema_version 1.1 и distribution.kind=decimal_range с precision≤38, scale и строковыми min/max. <code>numeric_measure</code> разрешён только для явно проверенной нечувствительной numeric меры; sensitive flags, names и identifiers имеют veto. Пример: <a href="../source-output-matrix/">DECIMAL</a>.</p>
 <p>Трансформация использует отдельные BehaviorPolicy/BatchProfile schema_version 0.1; их нельзя подавать вместо DatasetSpec. <code>resource_limits</code> и TEST_DATA_AGENT_TRANSFORM_* настраивают её acquisition/decoding, а run caps могут понижать, не молча расширять session/profile ceilings. Полный перечень и единицы: <a href="../../../reference/configuration/#private-transformation-input-limits-16-development">transformation input limits</a>. Receipt и точный snapshot не заменяются переменной окружения.</p>

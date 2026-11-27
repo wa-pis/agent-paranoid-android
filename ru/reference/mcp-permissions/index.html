@@ -193,7 +193,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -259,8 +259,8 @@
 <td>Прочитать выбранный CSV, создать безопасный profile</td>
 </tr>
 <tr>
-<td>profile_parquet (ещё не выпущен)</td>
-<td>Прочитать один файл Parquet; нужен пакет с дополнением <code>parquet</code>. Записать новый JSON-профиль без перезаписи. Ответ содержит относительный путь и счётчики.</td>
+<td>profile_parquet</td>
+<td>Доступен с версии 1.7.0; прочитать один файл Parquet с дополнениями <code>mcp,parquet</code>. Записать новый JSON-профиль без перезаписи. Ответ содержит относительный путь и счётчики.</td>
 </tr>
 <tr>
 <td>infer_dataset_spec</td>
@@ -316,7 +316,7 @@
 </tr>
 </tbody>
 </table>
-<p>Текущая версия разработки регистрирует 16 инструментов через консольную команду и 14 через объект SDK уровня модуля. Дополнительные инструменты для пакетов и SQL-сессий требуют отдельного управления рабочей папкой и сессией. Ответы содержат метаданные, отчёты и пути. Строки данных и значения из правил замены в ответы не входят. При включённом аудите регистрируются начало и итог вызова.</p>
+<p>Стабильная 1.8.0 регистрирует 16 инструментов через консольную команду и 14 через объект SDK уровня модуля. Дополнительные инструменты для пакетов и SQL-сессий требуют отдельного управления рабочей папкой и сессией. Ответы содержат метаданные, отчёты и пути. Строки данных и значения из правил замены в ответы не входят. При включённом аудите регистрируются начало и итог вызова.</p>
 <p>Synthetic approval проверяет hash, но не может доказать фактическое чтение spec человеком. Клиент обязан получить review перед approve; direct generation не должна обходить эту политику. Возобновление старого чата не расширяет scope: проверьте сохранённый plan и полный текущий spec перед новым consent.</p>
 <p>Preservation receipt выдаёт только человек в local controlling-TTY. MCP не имеет issuer, approved boolean или права вводить APPROVE. Tool confirmation, database grant и новый hash не заменяют matching receipt. После изменения source/policy/classification/mapping нужен новый review/approval.</p>
 <h2 id="trino-tools">Trino tools<a class="headerlink" href="#trino-tools" title="Permanent link">&para;</a></h2>

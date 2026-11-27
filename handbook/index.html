@@ -214,7 +214,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../versions/stable/">Stable version selector</a> · <a href="../downloads/">Downloads</a>
 </aside>
 
@@ -334,14 +334,14 @@ metadata, never raw PII, secrets or source rows. See the
 <a href="#versions">Documentation Versions</a>. Maintainer and release records live in
 <a href="#history">History And Maintenance</a>.</p></section><section class="print-page" id="getting-started-installation" heading-number="1.2"><h1 id="getting-started-installation-installation">Installation<a class="headerlink" href="#getting-started-installation-installation" title="Permanent link">&para;</a></h1>
 <p>English · <a href="#ru-getting-started-installation">Русский</a></p>
-<p>Stable <code>1.8.0</code> is the recommended release after publication.</p>
+<p>Stable <code>1.8.0</code> is the recommended default.</p>
 <h2 id="getting-started-installation-requirements">Requirements<a class="headerlink" href="#getting-started-installation-requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Python 3.11 or newer</li>
 <li>enough local disk space for the requested output</li>
 <li>a dedicated working directory for inputs and generated artifacts</li>
 </ul>
-<p>The supported CI matrix covers CPython 3.11, 3.12, 3.13, and 3.14. Python 3.11
+<p>The supported CI matrix covers CPython 3.11, 3.12, 3.13, 3.14, and 3.15. Python 3.11
 remains the minimum so users can adopt newer interpreters without forcing
 existing environments to upgrade. The notice and release-gate rules for
 changing this matrix are defined in
@@ -468,12 +468,13 @@ the header. Source rows are not shuffled or copied.</p>
 <pre><code class="language-bash">python3 -c &quot;from pathlib import Path; assert Path('out/customers.csv').read_bytes() == Path('out/repeated/customers.csv').read_bytes(); print('deterministic: ok')&quot;
 </code></pre>
 <h2 id="getting-started-first-csv-use-your-own-csv">Use Your Own CSV<a class="headerlink" href="#getting-started-first-csv-use-your-own-csv" title="Permanent link">&para;</a></h2>
-<p>Replace the fixture path with your file:</p>
+<p>Replace the fixture path with your file and choose a fresh output directory.
+Keep the fictional tutorial output for comparison:</p>
 <pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
   --count 100 \
   --seed 12345 \
   --format csv \
-  --output out/customers.csv
+  --output out/own-customers/customers.csv
 </code></pre>
 <p>Treat every source CSV as potentially sensitive. Do not share its contents,
 profile artifacts, or command logs until you have reviewed them. The profiler
@@ -1396,8 +1397,10 @@ confined and return metadata, not rows.</p>
 for formats and arguments, <a href="#reference-mcp-permissions">MCP permissions</a>
 for integration rights, and <a href="#reference-configuration">Configuration</a>
 for schemas and budgets. Historical RC anchors remain valid links.</p></section><section class="print-page" id="how-to-dataset-capacity" heading-number="2.5"><h1 id="how-to-dataset-capacity-forecast-and-generate-larger-synthetic-datasets">Forecast And Generate Larger Synthetic Datasets<a class="headerlink" href="#how-to-dataset-capacity-forecast-and-generate-larger-synthetic-datasets" title="Permanent link">&para;</a></h1>
-<p>These additions are published in <code>1.7.0rc2</code>. They are not
-available in <code>1.7.0rc1</code>. Stable 1.6.0 remains the recommended default.</p>
+<p>This page describes stable <code>1.8.0</code>; see <a href="#1.8.0-release-status">publication status</a>.
+Capacity forecasts and independent scalable generation were introduced in
+<code>1.7.0rc2</code>; linked-table support followed in <code>1.7.0rc3</code>. Both are retained in
+stable <code>1.8.0</code>, the recommended release.</p>
 <h2 id="how-to-dataset-capacity-preview-storage-and-time">Preview Storage And Time<a class="headerlink" href="#how-to-dataset-capacity-preview-storage-and-time" title="Permanent link">&para;</a></h2>
 <pre><code class="language-bash">test-data-agent estimate-capacity dataset_spec.yaml --json
 test-data-agent estimate-capacity dataset_spec.yaml --database postgresql --calibrate --json
@@ -1407,8 +1410,8 @@ explicitly creates a temporary fictional sample (default 2,000 rows per entity,
 at most 5,000 rows per entity, 200,000 cells, 16 MiB output and 30 seconds).
 It removes the sample and returns numeric summaries. Calibration never approves
 or publishes the requested dataset and does not advance its random stream.
-Calibration supports eligible linked tables with <code>scalable-relational-v1</code> in
-<code>1.7.0rc3</code>. Other related or rule-constrained specs report why calibration is
+Calibration supports eligible linked tables with <code>scalable-relational-v1</code>.
+Other related or rule-constrained specs report why calibration is
 unavailable.</p>
 <p>File forecasts describe the selected CSV, indented JSON or Snappy Parquet
 settings. Change <code>generation_settings.output_format</code> to compare formats.
@@ -1462,7 +1465,7 @@ profiling limits and all database read budgets remain separate and unchanged.
 Existing administrator output/disk and MCP invocation limits remain additional
 ceilings. The policy does not widen database or filesystem authority.</p>
 <p><code>scalable-v1</code> supports independent tables in valid/edge modes and CSV/JSON/Parquet.
-Use Linux or macOS for scalable execution in this RC; native Windows execution
+Use Linux or macOS for scalable execution in stable <code>1.8.0</code>; native Windows execution
 of this engine is unsupported.
 Relationships, global constraints, business rules, scenarios and negative/mixed
 modes reject before generation; use the legacy engine for those bounded cases.
@@ -1488,7 +1491,7 @@ bytes are identical; Parquet row-group/layout metadata can differ. Manifests
 record the policy/engine and include normal provenance/validation. Timing
 statistics and informational progress are not deterministic data artifacts.</p>
 <h2 id="how-to-dataset-capacity-recipe-750000-distinct-csv-rows">Recipe: 750,000 Distinct CSV Rows<a class="headerlink" href="#how-to-dataset-capacity-recipe-750000-distinct-csv-rows" title="Permanent link">&para;</a></h2>
-<p>Use the scalable engine with CLI version <code>1.7.0rc2</code> or later on Linux or
+<p>Use the scalable engine with stable CLI version <code>1.8.0</code> on Linux or
 macOS. Start in a fresh working directory. The synthetic integer primary
 key makes every complete row distinct.</p>
 <pre><code class="language-bash">python3 - &lt;&lt;'PY'
@@ -1605,6 +1608,7 @@ process image, avoiding the parent memory history retained by <code>getrusage</c
 accounting; memory checks and finite policy ceilings remain enabled.</p>
 <p><a id="linked-tables-unreleased"></a></p>
 <h2 id="how-to-dataset-capacity-linked-tables-170rc3">Linked Tables (1.7.0rc3)<a class="headerlink" href="#how-to-dataset-capacity-linked-tables-170rc3" title="Permanent link">&para;</a></h2>
+<p>Introduced in <code>1.7.0rc3</code>, linked-table generation is included in stable <code>1.8.0</code>.</p>
 <h3 id="how-to-dataset-capacity-recipe-customers-and-orders">Recipe: Customers And Orders<a class="headerlink" href="#how-to-dataset-capacity-recipe-customers-and-orders" title="Permanent link">&para;</a></h3>
 <p>Reuse the CSV recipe's execution policy with <code>scalable-relational-v1</code>.
 This example requests 150,000 customers and 600,000 orders, each with a
@@ -1830,7 +1834,7 @@ performance decision.</p></section></section>
                         </h1>
                     <section class="print-page" id="how-to-mcp" heading-number="3.1"><h1 id="how-to-mcp-connect-an-mcp-client">Connect An MCP Client<a class="headerlink" href="#how-to-mcp-connect-an-mcp-client" title="Permanent link">&para;</a></h1>
 <p>English · <a href="#ru-how-to-mcp">Русский</a></p>
-<p>Unless marked otherwise, these workflows describe stable <code>1.6.0</code>. Start with a workspace-confined
+<p>Unless marked otherwise, these workflows describe stable <code>1.8.0</code>. Start with a workspace-confined
 server and enable only tools required for your task. For local preservation
 approval use <a href="#how-to-transformation">Transform Local Data</a>; MCP cannot issue it.</p>
 <p>The project exposes two MCP servers with separate trust boundaries:</p>
@@ -2079,7 +2083,7 @@ access or external APIs.</p>
 <li>Call <code>approve_dataset_plan</code> with that exact fingerprint only after review.</li>
 <li>Report summaries and artifact paths, not generated rows.</li>
 </ol>
-<p>Use <code>profile_csv</code>, <code>profile_parquet</code> (unreleased), <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
+<p>Use <code>profile_csv</code>, <code>profile_parquet</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, and
 <code>validate_dataset</code> separately when an advanced client needs control over each
 pipeline stage. Direct <code>generate_dataset</code> and <code>export_dataset</code> do not require a
 planning approval argument; configure the client's confirmation policy before
@@ -2089,10 +2093,11 @@ not evidence that the human reviewed the displayed specification.</p>
 DatasetSpec. Direct <code>generate_dataset</code> and <code>export_dataset</code> calls can instead
 provide <code>business_rules_path</code> or a bounded structured <code>business_rules_payload</code>.
 Use one rule source: external rules cannot be combined with embedded rules.</p>
-<h3 id="how-to-mcp-local-parquet-profiles">Local Parquet profiles (unreleased)<a class="headerlink" href="#how-to-mcp-local-parquet-profiles" title="Permanent link">&para;</a></h3>
-<p>When the installed development build lists <code>profile_parquet</code>, enable
-<code>agent-paranoid-android[mcp,parquet]</code> in the server's Python environment. Put
-one regular Parquet file in the workspace and call the tool with
+<h3 id="how-to-mcp-local-parquet-profiles">Local Parquet profiles<a class="headerlink" href="#how-to-mcp-local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p><code>profile_parquet</code> has been available since stable <code>1.7.0</code> and is retained in
+stable <code>1.8.0</code>. Install <code>agent-paranoid-android[mcp,parquet]==1.8.0</code> in the
+server's Python environment. Put one regular Parquet file in the workspace and
+call the tool with
 <code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
 The optional <code>table_name</code> defaults to the file stem.</p>
 <p>The server applies the local profiling budgets and writes a new metadata-only
@@ -2499,12 +2504,12 @@ inference, deterministic CSV generation, validation, and manifest creation:</p>
 <p>Container images are an optional deployment path for isolated CLI and MCP
 workers. PyPI remains the normal installation path for local Python use.</p>
 <h2 id="operations-containers-release-status">Release Status<a class="headerlink" href="#operations-containers-release-status" title="Permanent link">&para;</a></h2>
-<p>Stable <code>1.6.0</code> images are published and verified; see the
-<a href="#release-evidence-1.6.0">immutable digests and signatures</a>.
+<p>Stable <code>1.8.0</code> images are published and verified; see the
+<a href="#release-evidence-1.8.0-artifacts">immutable digests and verification evidence</a>.
 The <a href="#release-evidence-1.6.0rc5">RC5 container evidence</a> remains bound to RC5.</p>
 <p>Select an exact version tag such as
-<code>ghcr.io/wa-pis/agent-paranoid-android-cli:1.6.0</code>, then resolve and verify its
-immutable digest before use. The stable tag also updates the mutable <code>1.6</code>, <code>1</code>
+<code>ghcr.io/wa-pis/agent-paranoid-android-cli:1.8.0</code>, then resolve and verify its
+immutable digest before use. The stable tag also updates the mutable <code>1.8</code>, <code>1</code>
 and <code>latest</code> aliases; none provides immutable version identity.</p>
 <h2 id="operations-containers-published-images">Published Images<a class="headerlink" href="#operations-containers-published-images" title="Permanent link">&para;</a></h2>
 <table>
@@ -2819,12 +2824,16 @@ field-scoped labels, and default MCP responses do not receive the exact enum.</p
   --entity paid_orders \
   --output out/profile.json
 </code></pre>
-<p>SQL source policy 1.1 accepts exactly one fully qualified, single-table <code>SELECT</code>
+<p>SQL source policy 1.2 accepts exactly one fully qualified, single-table <code>SELECT</code>
 with explicit projections or an authorized qualified wildcard, bounded filters,
 and a small deterministic scalar-expression set. It rejects joins, CTEs,
 subqueries, set operations, windows, table functions, commands, volatile or
 unknown functions, multiple statements, and unauthorized references before
 derived aggregate work begins.</p>
+<p>Sensitivity follows the physical source column through direct aliases; renaming
+a protected column cannot authorize categories or temporal bounds. Policy 1.2
+does not expand SQL access or work budgets. See the
+<a href="#agent-guides-trino-security-enforcement">SQL enforcement contract</a>.</p>
 <p>It also accepts aliased <code>SUM</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code> and <code>AVG</code> projections,
 optionally grouped by explicit authorized source columns. Each other selected
 column must be a grouping key. <code>COUNT(*)</code> counts rows; it is not a row wildcard.
@@ -3120,7 +3129,7 @@ aggregate profiling. Replace the wildcard with reviewed exact columns when
 the table is wider than the intended profiling scope.</p>
 <h2 id="operations-troubleshooting-sql-query-source-rejected">SQL Query Source Rejected<a class="headerlink" href="#operations-troubleshooting-sql-query-source-rejected" title="Permanent link">&para;</a></h2>
 <p>Pass one UTF-8 file to <code>profile-query</code>; SQL text is not accepted in an option
-or environment variable. SQL source policy 1.1 permits one fully qualified,
+or environment variable. SQL source policy 1.2 permits one fully qualified,
 single-table <code>SELECT</code> with explicit output aliases, bounded filters, and the
 documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
 window operations, table functions, comments, volatile/unknown functions,
@@ -3396,7 +3405,7 @@ resource and artifact durability limits remain in their respective guides.</p>
 <p>Это русская редакция существующих пользовательских разделов: пути после <code>ru/</code> соответствуют английским страницам. Переключатель <strong>English / Русский</strong> открывает соответствующую страницу; ссылки доступны и при чтении Markdown в репозитории. Техническая справка <code>--help</code>, имена API и ключи остаются в оригинале.</p>
 <p>Исторические release evidence, ADR и служебные записи сопровождающих доступны в оригинале и помечены <strong>English</strong>. Они не представлены как переведённые страницы. Проверенные локальные примеры перенесены из прежнего русского руководства без изменения команд; условия и ограничения приведены в <a href="#ru-quality-report">отчёте</a>.</p></section><section class="print-page" id="ru-getting-started-installation" heading-number="8.1.2"><h1 id="ru-getting-started-installation-_1">Установка<a class="headerlink" href="#ru-getting-started-installation-_1" title="Permanent link">&para;</a></h1>
 <p><a href="#getting-started-installation">English</a> · Русский</p>
-<p>После публикации рекомендуемая стабильная версия — <strong>1.8.0</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
+<p>Рекомендуемая стабильная версия — <strong>1.8.0</strong>. Нужны Python 3.11+, место для результата и отдельная рабочая папка. CI поддерживает CPython 3.11–3.15.</p>
 <p>Перед установкой проверьте <a href="#1.8.0-release-status">статус выпуска</a>.</p>
 <p>Для <code>generate --stream-csv [--workers 1..4]</code> достаточно base. Дополнение
 <code>profiling</code> нужно для точного подсчёта distinct в больших входных CSV через
@@ -3577,7 +3586,20 @@ python -c &quot;import csv; from pathlib import Path; f=Path('out/ru-csv/custome
 <p><strong>Как проверить:</strong> Код 0.</p>
 <p><strong>Если не получилось:</strong> Проверьте вход, seed, count, locale и версии зависимостей; manifest может содержать сведения окружения, поэтому не сравнивайте все артефакты как один файл.</p>
 <h3 id="ru-getting-started-first-csv-_12">Проверка результата<a class="headerlink" href="#ru-getting-started-first-csv-_12" title="Permanent link">&para;</a></h3>
-<p>Выполните <code>test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv</code>. Ожидается код 0. Для своего входа замените путь CSV, сохраните заголовок и отдельный выходной каталог; не вставляйте его строки в чат.</p>
+<p>Выполните <code>test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv</code>. Ожидается код 0.</p>
+<h3 id="ru-getting-started-first-csv-csv_2">Свой CSV<a class="headerlink" href="#ru-getting-started-first-csv-csv_2" title="Permanent link">&para;</a></h3>
+<p>Для уже проверенного входа замените путь CSV и выберите новую выходную папку.
+Для нового чувствительного домена сначала используйте
+<a href="#ru-getting-started-related-tables">раздельный процесс с review спецификации</a>.
+Сохраните результаты вымышленного примера:</p>
+<pre><code class="language-bash">test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/own-customers/customers.csv
+</code></pre>
+<p>Не вставляйте исходные строки в чат и не публикуйте profile, логи или результат
+до проверки приватности.</p>
 <h3 id="ru-getting-started-first-csv-_13">Типичные ошибки<a class="headerlink" href="#ru-getting-started-first-csv-_13" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -3923,7 +3945,7 @@ test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-format
 <tr>
 <td>Неизвестный тип/поле правила</td>
 <td>Опечатка или неподдерживаемая конструкция</td>
-<td>Сопоставьте правило с spec и <a href="#ru-how-to-business-rules">справочником правил</a>.</td>
+<td>Сопоставьте правило с spec и <a href="#how-to-business-rules">руководством по правилам — English</a>.</td>
 </tr>
 <tr>
 <td>Превышен work budget</td>
@@ -3933,6 +3955,7 @@ test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-format
 </tbody>
 </table>
 <h2 id="ru-how-to-business-rules-160">Переносимость и смысл правил в 1.6.0<a class="headerlink" href="#ru-how-to-business-rules-160" title="Permanent link">&para;</a></h2>
+<p>Эти контракты сохраняются в стабильной 1.8.0.</p>
 <p><code>DatasetSpec.business_rules</code> переносит правила между Python, CLI, MCP, agent workspace и всеми форматами. <code>infer-spec --business-rules</code> сохраняет их в spec; generate, validate и export-postgres-sql также принимают отдельный --business-rules. Повторная валидация проверяет данные и не присваивает значения заново.</p>
 <p>У формул <code>mode: assign</code> по умолчанию задаёт результат; <code>mode: check</code> только проверяет. Отчёт содержит application и assigned_row_count: зелёный результат после присваивания не доказывает независимую верность бизнес-гипотезы. Поддерживаются явные equals: null / not_equals: null и числовые включительные gte/lte. DECIMAL-формулы и aggregate mappings используют точную арифметику с однократным HALF_UP округлением в scale целевого поля. Подробности: <a href="#rc4-external-feedback">контракт правил 1.6</a>.</p>
 <h2 id="ru-how-to-business-rules-_7">Категории и ограничения<a class="headerlink" href="#ru-how-to-business-rules-_7" title="Permanent link">&para;</a></h2>
@@ -3940,7 +3963,11 @@ test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-format
 <p>Пример контролируемых нарушений, проверенный существующими документационными тестами:</p>
 <pre><code class="language-bash">test-data-agent generate examples/negative_cases/dataset_spec.yaml --seed 1300 --mode mixed --invalid-ratio 0.5 --format json --business-rules examples/negative_cases/business_rules.yaml --output out/ru-negative
 </code></pre>
-<p>При намеренных нарушениях команда 1.6.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (<code>expectations_met=true</code>, ноль unexpected и missing expected), а не отсутствие нарушений. Режим <code>negative</code> и <code>mixed</code> не разрешает PII. Точные поля правил и примеры всех категорий описаны в <a href="#ru-how-to-business-rules">существующем руководстве</a>.</p>
+<p>При намеренных нарушениях команда 1.8.0 возвращает exit code 1, хотя набор и validation evidence сохранены. Это ожидаемое поведение данного negative-примера. Держите такой набор отдельно. Успех отрицательного сценария — совпадение ожидаемых и наблюдаемых нарушений (<code>expectations_met=true</code>, ноль unexpected и missing expected), а не отсутствие нарушений. Режим <code>negative</code> и <code>mixed</code> не разрешает PII.</p>
+<p>Точные поля и примеры всех категорий есть в
+<a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/business_rules">исполняемом справочнике правил — English</a>.
+<a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/business_rules.schema.json">JSON Schema</a>
+создаётся из модели времени выполнения.</p>
 <h2 id="ru-how-to-business-rules-_8">Следующий шаг<a class="headerlink" href="#ru-how-to-business-rules-_8" title="Permanent link">&para;</a></h2>
 <p><a href="#ru-getting-started-review-output">Валидация</a>.</p>
 <h2 id="ru-how-to-business-rules-eav-">Условные формулы и синтетическая EAV-модель<a class="headerlink" href="#ru-how-to-business-rules-eav-" title="Permanent link">&para;</a></h2>
@@ -4299,6 +4326,8 @@ PYCODE
                         </h1>
                     <section class="print-page" id="ru-how-to-mcp" heading-number="8.3.1"><h1 id="ru-how-to-mcp-mcp-">Подключить MCP-клиент<a class="headerlink" href="#ru-how-to-mcp-mcp-" title="Permanent link">&para;</a></h1>
 <p><a href="#how-to-mcp">English</a> · Русский</p>
+<p>Ниже описаны возможности стабильной 1.8.0. Локальное подтверждение preservation
+выдаётся отдельно через CLI; MCP не может его выдать.</p>
 <p>Для подключения Trino по логину и паролю используйте
 <a href="#ru-how-to-trino-trino-mcp-basic">готовый пример настройки MCP</a>.</p>
 <h2 id="ru-how-to-mcp-_1">Для чего это нужно<a class="headerlink" href="#ru-how-to-mcp-_1" title="Permanent link">&para;</a></h2>
@@ -4379,12 +4408,12 @@ PYCODE
 <li><code>approve_dataset_plan</code>: передать одобренный <code>reviewed_spec_sha256</code>.</li>
 <li>Проверить manifest и validation; сообщить только сводку и пути.</li>
 </ol>
-<p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
+<p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>profile_parquet</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
 <p>Trino <strong>default aggregate-only</strong> инструменты возвращают метаданные без исходных литералов. Отдельный <strong>explicit opt-in</strong> <code>run_safe_select</code> включается через <code>TRINO_ENABLE_SAFE_SELECT</code>; он маскирует строки, но может сохранять нечувствительные нестроковые значения источника. Такой результат не является анонимным или source-free; его нельзя передавать LLM или использовать как сгенерированные данные. Не включайте этот инструмент для описанного workflow.</p>
 <p>Generator ограничивает пути workspace, но это не sandbox процесса. Используйте отдельного системного пользователя/контейнер для недоверенных клиентов. Значения по умолчанию: frame 1 MiB, response 4 MiB, 32 active requests; Trino дополнительно ограничивает работу и параллельность. См. <a href="#ru-how-to-mcp">границы MCP</a> и <a href="#operations-audit-logging">аудит</a>.</p>
-<h3 id="ru-how-to-mcp-local-parquet-profiles">Профиль локального Parquet (ещё не выпущен)<a class="headerlink" href="#ru-how-to-mcp-local-parquet-profiles" title="Permanent link">&para;</a></h3>
-<p>В сборке, где <code>tools/list</code> показывает <code>profile_parquet</code>, установите дополнения
-<code>agent-paranoid-android[mcp,parquet]</code> в окружение сервера. Поместите один Parquet
+<h3 id="ru-how-to-mcp-local-parquet-profiles">Профиль локального Parquet<a class="headerlink" href="#ru-how-to-mcp-local-parquet-profiles" title="Permanent link">&para;</a></h3>
+<p><code>profile_parquet</code> доступен с версии 1.7.0 и сохраняется в стабильной 1.8.0.
+Установите <code>agent-paranoid-android[mcp,parquet]==1.8.0</code> в окружение сервера. Поместите один Parquet
 в рабочую папку и передайте <code>{"input_path":"customers.parquet","output_path":"reports/customers.json"}</code>.
 Если не передать <code>table_name</code>, используется имя входного файла без расширения.</p>
 <p>Новый JSON содержит только метаданные профиля; ответ содержит относительный
@@ -4465,7 +4494,7 @@ test-data-agent agent-status out/ru-agent --json
 <h2 id="ru-ai_integration-_8">Следующий шаг<a class="headerlink" href="#ru-ai_integration-_8" title="Permanent link">&para;</a></h2>
 <p><a href="#ru-how-to-reference-agent">Workflow для агента</a>.</p></section><section class="print-page" id="ru-operations-containers" heading-number="8.3.3"><h1 id="ru-operations-containers-_1">Работа в контейнерах<a class="headerlink" href="#ru-operations-containers-_1" title="Permanent link">&para;</a></h1>
 <p><a href="#operations-containers">English</a> · Русский</p>
-<p>Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.6.0 опубликованы с <a href="#release-evidence-1.6.0">проверяемыми digest/signature</a>.</p>
+<p>Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.8.0 опубликованы с <a href="#release-evidence-1.8.0-artifacts">проверяемыми digest и свидетельствами проверки</a>.</p>
 <table>
 <thead>
 <tr>
@@ -4492,7 +4521,7 @@ test-data-agent agent-status out/ru-agent --json
 </tr>
 </tbody>
 </table>
-<p>Выберите tag 1.6.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.6 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.</p>
+<p>Выберите tag 1.8.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.8 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.</p>
 <h2 id="ru-operations-containers-_2">Локальная сборка<a class="headerlink" href="#ru-operations-containers-_2" title="Permanent link">&para;</a></h2>
 <p>Из корня checkout можно собрать только нужный target; Docker-выполнение здесь не проверялось:</p>
 <pre><code class="language-bash">docker build --target cli -t agent-paranoid-android:cli .
@@ -4647,7 +4676,11 @@ docker build --target trino-mcp -t agent-paranoid-android:trino-mcp .
 <p><a href="#concepts-profiles-and-specs">English</a> · Русский</p>
 <p>Профиль описывает наблюдаемую структуру и ограниченные агрегаты источника; DatasetSpec задаёт исполняемый проверенный контракт. Generation использует spec, а не исходные строки. Профиль может содержать nullable/distinct/length/distribution evidence и кандидаты связей, но не source rows, PII или secrets.</p>
 <p>Новые DatasetSpec используют 1.1, legacy 1.0 поддерживается без decimal. Import payload без версии трактуется как 1.0, новый Python DatasetSpec по умолчанию — 1.1. Укажите версию явно.</p>
-<p>SQL query-source policy 1.1 допускает ограниченный single-table SELECT, scalar expressions и aliased SUM/COUNT/MIN/MAX/AVG с ограниченным GROUP BY. JOIN/CTE/subqueries/windows/HAVING/неизвестные функции отклоняются. Профиль хранит fingerprint, а не SQL text или result rows. has_unmodeled_expressions=true (в том числе aggregate) блокирует automatic infer-spec: напишите независимо проверенный spec. Direct column aliases могут выводиться автоматически; старые query profiles без marker нужно получить заново.</p>
+<p>SQL query-source policy 1.2 допускает ограниченный single-table SELECT, scalar expressions и aliased SUM/COUNT/MIN/MAX/AVG с ограниченным GROUP BY. JOIN/CTE/subqueries/windows/HAVING/неизвестные функции отклоняются. Профиль хранит fingerprint, а не SQL text или result rows. has_unmodeled_expressions=true (в том числе aggregate) блокирует automatic infer-spec: напишите независимо проверенный spec. Direct column aliases могут выводиться автоматически; старые query profiles без marker нужно получить заново.</p>
+<p>Чувствительность физического столбца сохраняется за прямым alias: переименование
+не разрешает раскрывать категории или временные границы. Policy 1.2 не расширяет
+SQL-доступ или бюджеты работы. Подробности:
+<a href="#agent-guides-trino-security-enforcement">контракт SQL-проверок — English</a>.</p>
 <p>Практика: <a href="#ru-getting-started-related-tables">раздельный процесс</a>, <a href="#ru-dataset_profile_and_spec">поля DatasetSpec</a>, <a href="#ru-reference-configuration">конфигурация</a>.</p>
 <p>Проект создаёт новые синтетические данные для тестирования программ. Он анализирует структуру CSV или разрешённые агрегаты базы, составляет <code>DatasetSpec</code>, генерирует значения и проверяет результат. Исходные строки не копируются в результат.</p>
 <p>Например, команде разработки нужны 25 заказов с корректными ссылками на покупателей, но реальные покупатели не должны попадать в тестовую среду. Можно использовать вымышленный CSV, проверить выведенную спецификацию и получить новый набор с явным <code>seed</code>.</p>
@@ -4924,9 +4957,9 @@ docker build --target trino-mcp -t agent-paranoid-android:trino-mcp .
 <td>Активируйте нужное окружение; проверьте <code>python -m pip --version</code> и путь команды</td>
 </tr>
 <tr>
-<td>Версия установленной команды отличается от checkout 1.6.0</td>
-<td>Установленная копия отстаёт от исходников</td>
-<td>Установите checkout в отдельное окружение; не выдавайте тест старой копии за тест исходников</td>
+<td>Версия установленной команды отличается от выбранного checkout</td>
+<td>Команда и исходники относятся к разным версиям</td>
+<td>Для текущего руководства используйте 1.8.0; при проверке исходников установите выбранный checkout в отдельное окружение</td>
 </tr>
 <tr>
 <td><code>unsafe filesystem path</code></td>

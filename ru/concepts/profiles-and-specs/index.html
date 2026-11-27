@@ -201,7 +201,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -211,7 +211,11 @@
 <p><a href="../../../concepts/profiles-and-specs/">English</a> · Русский</p>
 <p>Профиль описывает наблюдаемую структуру и ограниченные агрегаты источника; DatasetSpec задаёт исполняемый проверенный контракт. Generation использует spec, а не исходные строки. Профиль может содержать nullable/distinct/length/distribution evidence и кандидаты связей, но не source rows, PII или secrets.</p>
 <p>Новые DatasetSpec используют 1.1, legacy 1.0 поддерживается без decimal. Import payload без версии трактуется как 1.0, новый Python DatasetSpec по умолчанию — 1.1. Укажите версию явно.</p>
-<p>SQL query-source policy 1.1 допускает ограниченный single-table SELECT, scalar expressions и aliased SUM/COUNT/MIN/MAX/AVG с ограниченным GROUP BY. JOIN/CTE/subqueries/windows/HAVING/неизвестные функции отклоняются. Профиль хранит fingerprint, а не SQL text или result rows. has_unmodeled_expressions=true (в том числе aggregate) блокирует automatic infer-spec: напишите независимо проверенный spec. Direct column aliases могут выводиться автоматически; старые query profiles без marker нужно получить заново.</p>
+<p>SQL query-source policy 1.2 допускает ограниченный single-table SELECT, scalar expressions и aliased SUM/COUNT/MIN/MAX/AVG с ограниченным GROUP BY. JOIN/CTE/subqueries/windows/HAVING/неизвестные функции отклоняются. Профиль хранит fingerprint, а не SQL text или result rows. has_unmodeled_expressions=true (в том числе aggregate) блокирует automatic infer-spec: напишите независимо проверенный spec. Direct column aliases могут выводиться автоматически; старые query profiles без marker нужно получить заново.</p>
+<p>Чувствительность физического столбца сохраняется за прямым alias: переименование
+не разрешает раскрывать категории или временные границы. Policy 1.2 не расширяет
+SQL-доступ или бюджеты работы. Подробности:
+<a href="../../../agent-guides/trino-security/#enforcement">контракт SQL-проверок — English</a>.</p>
 <p>Практика: <a href="../../getting-started/related-tables/">раздельный процесс</a>, <a href="../../dataset_profile_and_spec/">поля DatasetSpec</a>, <a href="../../reference/configuration/">конфигурация</a>.</p>
 <p>Проект создаёт новые синтетические данные для тестирования программ. Он анализирует структуру CSV или разрешённые агрегаты базы, составляет <code>DatasetSpec</code>, генерирует значения и проверяет результат. Исходные строки не копируются в результат.</p>
 <p>Например, команде разработки нужны 25 заказов с корректными ссылками на покупателей, но реальные покупатели не должны попадать в тестовую среду. Можно использовать вымышленный CSV, проверить выведенную спецификацию и получить новый набор с явным <code>seed</code>.</p>

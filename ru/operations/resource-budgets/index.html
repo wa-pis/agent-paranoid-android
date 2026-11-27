@@ -193,7 +193,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -234,7 +234,7 @@
 </table>
 <p>Release ceilings — regression guard, а не обещание производительности на любом hardware. Shared-hardened Trino требует finite cumulative estimated-scan ceiling. Metadata wildcard разворачивается в один проверенный snapshot явных столбцов до агрегатов и расходует те же бюджеты.</p>
 <h2 id="_2">Генерация больших наборов<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>В <a href="../../../how-to/dataset-capacity/#recipe-750000-distinct-csv-rows">руководстве по масштабированию</a> есть команды для CSV, Parquet и связанных таблиц. Начните с пробного запуска, затем оцените время и размер файлов на целевой машине. После генерации проверьте опубликованный набор по его <code>dataset_spec.yaml</code>.</p>
+<p>В <a href="../../../how-to/dataset-capacity/#recipe-750000-distinct-csv-rows">руководстве по масштабированию — English</a> есть команды для CSV, Parquet и связанных таблиц. Начните с пробного запуска, затем оцените время и размер файлов на целевой машине. После генерации проверьте опубликованный набор по его <code>dataset_spec.yaml</code>.</p>
 <h2 id="_3">Сбои и публикация<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>Staging, same-filesystem rename и rollback защищают normal/handled failure transitions. Single-entity update нескольких файлов не является общей atomic transaction. Receipt/result markers могут записываться отдельно; agent recovery проверяет checkpoint, spec, manifest и rows без регенерации.</p>
 <p>Fsync отдельных writers не создаёт полную гарантию crash/power-loss durability. SIGKILL, storage failure и отключение питания могут оставить staging; это не завершённый bundle. При ENOSPC или deadline во время обработки staging удаляется, final destination и success metadata не публикуются, если процесс может завершить cleanup.</p>

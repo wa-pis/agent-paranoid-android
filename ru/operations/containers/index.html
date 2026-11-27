@@ -201,7 +201,7 @@
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.8.0
   <br>Package source b62bc17e49800e17f521cf5ea9f9043f55e0c5b8
-  <br>Documentation f1a4f21572324fa657bf89c81638b704e1125bdb
+  <br>Documentation 07366b08cc432257d02e451ff3c783fe0e623df4
   <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
 </aside>
 
@@ -209,7 +209,7 @@
 
                 <h1 id="_1">Работа в контейнерах<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p><a href="../../../operations/containers/">English</a> · Русский</p>
-<p>Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.6.0 опубликованы с <a href="../../../release-evidence-1.6.0/">проверяемыми digest/signature</a>.</p>
+<p>Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.8.0 опубликованы с <a href="../../../release-evidence-1.8.0/#artifacts">проверяемыми digest и свидетельствами проверки</a>.</p>
 <table>
 <thead>
 <tr>
@@ -236,7 +236,7 @@
 </tr>
 </tbody>
 </table>
-<p>Выберите tag 1.6.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.6 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.</p>
+<p>Выберите tag 1.8.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.8 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.</p>
 <h2 id="_2">Локальная сборка<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>Из корня checkout можно собрать только нужный target; Docker-выполнение здесь не проверялось:</p>
 <pre><code class="language-bash">docker build --target cli -t agent-paranoid-android:cli .
